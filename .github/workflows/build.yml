@@ -1,0 +1,49 @@
+name: Windows-Build
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Abhängigkeiten installieren
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt pyinstaller pillow
+
+      - name: Kurzer Start-Test
+        env:
+          SDL_VIDEODRIVER: dummy
+          SDL_AUDIODRIVER: dummy
+        run: python -c "import yokai.app, yokai.run, yokai.bosses; print('Import OK')"
+
+      - name: EXE bauen
+        run: pyinstaller --noconfirm --onefile --windowed --name YokaiNoMichi --icon icon.png --collect-data pygame main.py
+
+      - name: Als Artefakt hochladen
+        uses: actions/upload-artifact@v4
+        with:
+          name: YokaiNoMichi-Windows
+          path: dist/YokaiNoMichi.exe
+
+      - name: Release veröffentlichen
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          name: Yōkai no Michi – Build ${{ github.run_number }}
+          files: dist/YokaiNoMichi.exe
+          body: |
+            **Herunterladen:** `YokaiNoMichi.exe` unten anklicken, speichern, doppelklicken – fertig.
+            Windows SmartScreen kann beim ersten Start warnen („Unbekannter Herausgeber“): *Weitere Informationen → Trotzdem ausführen*.

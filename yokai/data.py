@@ -1,0 +1,416 @@
+"""Spielinhalte: Biome, Items, Synergien, Transformationen, aktive Items, Charaktere, Yokai, Erfolge."""
+
+# =====================================================================  BIOME
+BIOMES = {
+    'chikurin': dict(name='Bambuswald', jp='Chikurin', depth=1, floor=(62, 92, 52), floor_pat='grass',
+                     wall=(120, 166, 74), wall_pat='bamboo', rock=(118, 116, 104), moss=True, ambient='leaves',
+                     enemies=['hitodama', 'kodama', 'kappa', 'kasa_obake', 'bakezori', 'tsuchinoko'],
+                     music=('in', 220, 92, 'calm', 11), dark=0),
+    'inari': dict(name='Inari-Torii-Pfad', jp='Fushimi', depth=1, floor=(150, 112, 82), floor_pat='gravel',
+                  wall=(196, 58, 44), wall_pat='torii', rock=(150, 140, 130), moss=False, ambient='petals',
+                  enemies=['hitodama', 'kitsunebi_e', 'kasa_obake', 'bakezori', 'kodama', 'tsuchinoko'],
+                  music=('yo', 233, 96, 'calm', 12), dark=0),
+    'obakedera': dict(name='Geistertempel', jp='Obake-dera', depth=2, floor=(176, 164, 104), floor_pat='tatami',
+                      wall=(88, 56, 44), wall_pat='wood', rock=(120, 110, 100), moss=False, ambient='fireflies',
+                      enemies=['chochin', 'nopperabo', 'gaki', 'ittan_momen', 'bakeneko', 'onibi', 'hitodama'],
+                      music=('in', 196, 84, 'mystic', 21), dark=40),
+    'hakaba': dict(name='Alter Friedhof', jp='Hakaba', depth=2, floor=(84, 84, 96), floor_pat='stone',
+                   wall=(104, 104, 116), wall_pat='stone', rock=(130, 130, 140), moss=True, ambient='fog',
+                   enemies=['gaki', 'onibi', 'nopperabo', 'ittan_momen', 'chochin', 'kasa_obake'],
+                   music=('iwato', 185, 80, 'dark', 22), dark=60),
+    'kurama': dict(name='Kurama-Berg', jp='Kurama-yama', depth=3, floor=(116, 86, 64), floor_pat='gravel',
+                   wall=(92, 72, 60), wall_pat='rock', rock=(110, 100, 92), moss=True, ambient='leaves',
+                   enemies=['karasu_tengu', 'kamaitachi', 'yamabiko', 'bakeneko', 'yuki_warashi'],
+                   music=('in', 247, 110, 'battle', 31), dark=0),
+    'yukiyama': dict(name='Schneeberg', jp='Yuki-yama', depth=3, floor=(208, 218, 234), floor_pat='snow',
+                     wall=(140, 162, 194), wall_pat='ice', rock=(170, 186, 210), moss=False, ambient='snow',
+                     enemies=['yuki_warashi', 'kamaitachi', 'yamabiko', 'karasu_tengu', 'onibi'],
+                     music=('yo', 262, 100, 'mystic', 32), dark=0),
+    'ryugu': dict(name='Drachenpalast', jp='Ryūgū-jō', depth=4, floor=(54, 118, 128), floor_pat='coral',
+                  wall=(206, 96, 96), wall_pat='coral', rock=(210, 150, 150), moss=False, ambient='bubbles',
+                  enemies=['heikegani', 'funayurei', 'ningyo', 'isonade', 'kappa'],
+                  music=('ryukyu', 233, 104, 'battle', 41), dark=20),
+    'uminobe': dict(name='Geisterküste', jp='Umi-no-be', depth=4, floor=(74, 74, 84), floor_pat='sand',
+                    wall=(76, 56, 44), wall_pat='planks', rock=(96, 90, 86), moss=False, ambient='fog',
+                    enemies=['funayurei', 'heikegani', 'isonade', 'ningyo', 'onibi'],
+                    music=('iwato', 208, 92, 'dark', 42), dark=50),
+    'yomi': dict(name='Unterwelt', jp='Yomi no Kuni', depth=5, floor=(62, 26, 36), floor_pat='stone',
+                 wall=(44, 12, 22), wall_pat='bone', rock=(90, 50, 60), moss=False, ambient='embers',
+                 enemies=['oni', 'shikome', 'tsuchigumo', 'shinigami', 'gaki', 'onibi'],
+                 music=('iwato', 175, 116, 'battle', 51), dark=60),
+    'jigoku': dict(name='Höllenfeuer', jp='Jigoku', depth=5, floor=(82, 32, 22), floor_pat='lava',
+                   wall=(52, 22, 16), wall_pat='rock', rock=(70, 40, 30), moss=False, ambient='embers',
+                   enemies=['oni', 'shikome', 'shinigami', 'onibi', 'tsuchigumo', 'bakeneko'],
+                   music=('in', 165, 124, 'battle', 52), dark=30),
+    'takamagahara': dict(name='Himmelsgefilde', jp='Takamagahara', depth=6, floor=(226, 206, 150), floor_pat='cloud',
+                         wall=(240, 240, 250), wall_pat='cloud', rock=(220, 200, 140), moss=False, ambient='sparkle',
+                         enemies=['shinigami', 'oni', 'karasu_tengu', 'ningyo', 'yamabiko', 'kamaitachi', 'shikome'],
+                         music=('yo', 294, 112, 'battle', 61), dark=0),
+}
+DEPTH_BIOMES = {1: ['chikurin', 'inari'], 2: ['obakedera', 'hakaba'], 3: ['kurama', 'yukiyama'],
+                4: ['ryugu', 'uminobe'], 5: ['yomi', 'jigoku'], 6: ['takamagahara']}
+BOSS_POOL = {1: ['omukade', 'kappa_ou', 'jorogumo'], 2: ['gashadokuro', 'rokurokubi', 'nue'],
+             3: ['sojobo', 'raiju', 'yuki_onna'], 4: ['umibozu', 'ryujin', 'bake_kujira'],
+             5: ['orochi', 'shuten_doji', 'tamamo'], 6: ['mikaboshi']}
+
+# =====================================================================  ITEMS
+ITEMS = {}
+ORDER = []
+
+
+def I(iid, name, desc, icon, col, pools, tags, q, locked=False, **fx):
+    ITEMS[iid] = dict(id=iid, name=name, desc=desc, icon=icon, col=col, pools=pools, tags=tags, q=q,
+                      locked=locked, fx=fx)
+    ORDER.append(iid)
+
+
+GOLD = (236, 196, 80)
+# ---- Die drei Throninsignien & Götter (Kami-Pool)
+I('kusanagi', 'Kusanagi no Tsurugi', 'Das Grasmäher-Schwert', 'sword', (200, 230, 255), 'K', ['kami'], 4, True, dmg=1.5, dmgm=1.2, pierce=1)
+I('yata_kagami', 'Yata no Kagami', 'Der Spiegel der Sonnengöttin', 'mirror', GOLD, 'K', ['kami'], 4, True, back=1, bounce=1, rate=0.5)
+I('yasakani', 'Yasakani no Magatama', 'Juwel der Ewigkeit', 'magatama', (110, 220, 140), 'K', ['kami'], 4, True, hp=1, orbital=2, luck=1)
+I('amaterasu', 'Amaterasus Strahl', 'Die Sonne brennt', 'star', (255, 210, 80), 'K', ['kami'], 3, burn=1, dmg=1, size=1)
+I('tsukuyomi', 'Tsukuyomis Mondsichel', 'Das Licht der Nacht', 'moon', (200, 210, 255), 'K', ['kami'], 3, wave=1, ratem=1.2, slow=1)
+I('susanoo_zorn', 'Susanoos Zorn', 'Der Sturm folgt dir', 'cloud', (150, 160, 200), 'KB', ['kami', 'raijin'], 3, chain=1, knock=1, dmg=0.5)
+I('ame_nuboko', 'Ame-no-Nuboko', 'Der Speer, der die Inseln schuf', 'sword', GOLD, 'K', ['kami'], 3, pierce=1, range=80, dmg=1)
+I('kamikaze', 'Göttlicher Wind', 'Kamikaze trägt dich', 'cloud', (250, 250, 255), 'K', ['kami', 'tengu'], 3, homing=1, spd=15, fly=1)
+I('hachiman_bogen', 'Hachimans Bogen', 'Gott der Bogenschützen', 'bow', GOLD, 'K', ['kami'], 3, multishot=1, crit=0.1)
+I('sakura_zweig', 'Sakura-Zweig', 'Vergänglich und schön', 'flower', (250, 170, 200), 'TK', ['kami'], 2, clear_heal=0.25, luck=1)
+I('hamaya', 'Hamaya', 'Der Dämonen-brechende Pfeil', 'bow', (230, 60, 60), 'TK', ['kami'], 2, homing=1, dmg=0.5)
+I('juzu', 'Juzu-Gebetskette', 'Gebete durchdringen alles', 'beads', (160, 110, 70), 'TK', ['kami'], 2, spectral=1, dmg=0.4, rate=0.2)
+I('teru_teru', 'Teru-teru-bōzu', 'Verscheucht Regen und Flüche', 'doll', (200, 200, 220), 'TK', ['kami'], 2, luck=2, curse_immune=1)
+I('shimenawa', 'Shimenawa-Seil', 'Heiliges Seil, heilige Grenze', 'thread', (230, 210, 150), 'TS', ['kami', 'shikigami'], 2, shield=1)
+I('shakujo', 'Shakujō-Stab', 'Das Klingen vertreibt Böses', 'staff', GOLD, 'TK', ['kami', 'tengu'], 2, aura=1)
+# ---- Kitsune
+I('inari_maske', 'Inari-Maske', 'Glück der Füchse', 'mask', (250, 250, 250), 'T', ['kitsune'], 1, luck=2, coins=5)
+I('kitsunebi', 'Kitsune-bi', 'Fuchsfeuer sucht seinen Weg', 'flame', (110, 170, 255), 'T', ['kitsune'], 3, homing=1, burn=1)
+I('kyubi_schweif', 'Neunter Schweif', 'Mehr Schwänze, mehr Macht', 'tail', (240, 150, 60), 'T', ['kitsune'], 2, multishot=1)
+I('hoshi_no_tama', 'Hoshi no Tama', 'Die Sternenkugel des Fuchses', 'beads', (250, 250, 220), 'T', ['kitsune'], 2, orbital=1, rate=0.3)
+I('fuchsschrein', 'Kleiner Fuchsschrein', 'Opfergaben zahlen sich aus', 'box', (220, 70, 50), 'TS', ['kitsune'], 1, luck=1, spd=10, keys=1)
+# ---- Raijin / Donner
+I('raijin_trommel', 'Raijins Trommelstock', 'Donner bei jedem Schlag', 'drum', (250, 220, 90), 'T', ['raijin'], 3, raijin_chance=0.1)
+I('inazuma', 'Inazuma-Splitter', 'Ein Stück eines Blitzes', 'crystal', (255, 240, 120), 'T', ['raijin'], 2, chain=1, shotspd=30)
+I('raijin_magatama', 'Donner-Magatama', 'Es knistert leise', 'magatama', (250, 230, 80), 'T', ['raijin'], 2, raijin_chance=0.08, luck=1)
+I('raiju_klaue', 'Raijū-Klaue', 'Die Kralle des Donnerbiests', 'claw', (255, 230, 90), 'B', ['raijin'], 3, chain=1, rate=0.4)
+# ---- Fūjin / Tengu
+I('fujin_sack', 'Fūjins Windsack', 'Der Wind ist mit dir', 'bag', (140, 210, 150), 'T', ['tengu'], 2, shotspd=60, range=60, knock=1)
+I('tengu_faecher', 'Tengu-Fächer', 'Ein Hauch wird zum Sturm', 'fan', (60, 140, 60), 'T', ['tengu'], 2, knock=1, shotspd=40, spd=15)
+I('karasu_feder', 'Krähenfeder', 'Leicht wie die Nacht', 'feather', (60, 60, 80), 'T', ['tengu'], 2, spd=20, fly=1)
+I('tengu_geta', 'Ippon-Geta', 'Tengu-Sandalen mit einem Zahn', 'hat', (150, 100, 60), 'T', ['tengu'], 2, spd=25, dash_dmg=1)
+I('tengu_maske', 'Tengu-Maske', 'Stolz und Langnasig', 'mask', (220, 50, 40), 'T', ['tengu'], 2, dmg=0.7, range=50)
+I('kamaitachi_sichel', 'Kamaitachi-Sichel', 'Schnitte im Wind', 'claw', (200, 200, 210), 'T', ['tengu'], 2, rate=0.7, dmgm=0.85, pierce=1)
+I('furin', 'Fūrin', 'Die Windglocke ruft Salz herbei', 'bell', (150, 220, 240), 'TS', ['tengu'], 1, salts_regen=0.25, salts=1)
+I('sojobo_feder', 'Sōjōbōs Federfächer', 'Der König der Tengu fächert', 'feather', (230, 230, 230), 'B', ['tengu'], 3, multishot=2, dmgm=0.8)
+# ---- Shikigami / Onmyōdō
+I('shikigami_papier', 'Shikigami-Papier', 'Ein Diener aus Papier', 'doll', (230, 70, 70), 'T', ['shikigami'], 2, familiar=1)
+I('seimei_stern', 'Seimeis Pentagramm', 'Das Siegel des großen Onmyōji', 'star', (170, 110, 230), 'TB', ['shikigami'], 3, familiar=1, dmg=0.5)
+I('hitogata', 'Hitogata', 'Ein Papierschild umkreist dich', 'doll', (110, 150, 240), 'T', ['shikigami'], 2, orbital=1)
+I('ofuda_buendel', 'Ofuda-Bündel', 'Mehr Talismane!', 'scroll', (230, 60, 60), 'T', ['shikigami'], 2, ratem=1.25)
+I('kuji_in', 'Kuji-in-Siegel', 'Neun Handsiegel der Macht', 'scroll', (130, 90, 200), 'T', ['shikigami'], 2, multishot=1, dmgm=0.9)
+I('senbazuru', 'Senbazuru', 'Tausend Kraniche für einen Wunsch', 'crane', (240, 120, 160), 'T', ['shikigami'], 3, True, orbital=2, luck=1)
+I('origami_kranich', 'Origami-Kranich', 'Er fliegt für dich', 'crane', (120, 200, 240), 'T', ['shikigami'], 2, familiar=1)
+# ---- Yūrei / Tod
+I('yurei_laterne', 'Yūrei-Laterne', 'Ihr Licht geht durch Wände', 'lantern', (150, 220, 230), 'T', ['yurei'], 2, spectral=1, range=40)
+I('shinigami_sense', 'Sense des Shinigami', 'Der Tod schneidet tief', 'sword', (90, 90, 110), 'O', ['yurei'], 3, dmgm=1.4, pierce=1)
+I('onryo_haar', 'Haar der Onryō', 'Rache, die langsam vergiftet', 'thread', (40, 30, 50), 'OT', ['yurei'], 2, poison=1, slow=1)
+I('sanzu_muenze', 'Münze vom Sanzu-Fluss', 'Bezahle den Fährmann – einmal', 'coin', (190, 190, 200), 'TS', ['yurei'], 3, True, revive=1)
+I('shiro_kimono', 'Weißes Totengewand', 'Halb hier, halb dort', 'cloth', (240, 240, 250), 'T', ['yurei'], 2, fly=1, spirit=2)
+I('yuki_traene', 'Yuki-onnas Träne', 'Eiskalt', 'crystal', (190, 240, 255), 'T', ['yurei'], 2, freeze=0.15, slow=1)
+I('onibi_ring', 'Onibi-Ring', 'Geisterfeuer kreist um dich', 'flame', (180, 110, 240), 'T', ['yurei'], 2, orbital=1, burn=1)
+I('gashadokuro_knochen', 'Riesenknochen', 'Von einem Skelett aus Hunger', 'skull', (230, 226, 210), 'B', ['yurei'], 3, dmg=1, size=1, knock=1)
+# ---- Oni
+I('kanabo', 'Kanabō', 'Wie einem Oni ein Eisenknüppel', 'hammer', (70, 70, 80), 'O', ['oni'], 3, dmg=2, rate=-0.4, knock=1, size=1)
+I('oni_horn', 'Oni-Horn', 'Wut wird zu Stärke', 'fang', (240, 220, 160), 'O', ['oni'], 3, dmgm=1.3, rage=1)
+I('oni_sake', 'Oni-Sake', 'Ein Schluck zu viel', 'cup', (230, 80, 80), 'TO', ['oni'], 2, dmg=1, wave=1)
+I('shuten_kalebasse', 'Shutens Kalebasse', 'Explosiver Rausch', 'gourd', (220, 60, 50), 'OB', ['oni'], 3, explode=1, rate=-0.3, dmg=1)
+I('tigerfell', 'Tigerfell', 'Was echte Oni tragen', 'cloth', (250, 200, 60), 'T', ['oni'], 2, hp=1, dmg=0.5)
+I('hannya', 'Hannya-Maske', 'Eifersucht wird Feuer', 'mask', (210, 230, 200), 'O', ['oni', 'yurei'], 3, hurt_ring=1, dmg=1)
+I('yomi_feuer', 'Feuer von Yomi', 'Es brennt ewig', 'flame', (200, 30, 40), 'O', ['oni', 'yurei'], 3, burn=1, dmgm=1.25, explode=1)
+I('izanami_kamm', 'Izanamis Kamm', 'Aus dem Reich der Toten', 'fan', (60, 30, 60), 'O', ['yurei'], 3, multishot=1, poison=1, spirit=2)
+# ---- Ryū / Wasser
+I('ryu_perle', 'Drachenperle', 'Nyoi-hōju erfüllt Wünsche', 'beads', (120, 200, 255), 'T', ['ryu'], 3, homing=1, shotspd=30, size=0.5)
+I('ryu_schuppe', 'Drachenschuppe', 'Hart wie Jade', 'crystal', (60, 200, 170), 'T', ['ryu'], 2, hp=1, spd=5)
+I('kappa_teller', 'Kappa-Teller', 'Wasser auf dem Kopf', 'coin', (200, 230, 240), 'T', ['ryu'], 2, bounce=1, range=40)
+I('kappa_gurke', 'Kappas Gurke', 'Ein Kappa würde töten dafür', 'leaf', (90, 180, 70), 'TS', ['ryu'], 1, hp=1, fullheal=1)
+I('otohime_kamm', 'Otohimes Haarkamm', 'Von der Prinzessin des Meeres', 'fan', (250, 160, 200), 'T', ['ryu'], 2, rate=0.5, luck=1)
+I('kanagawa', 'Welle von Kanagawa', 'Die große Welle', 'wave', (60, 110, 200), 'T', ['ryu'], 3, wave=1, pierce=1, dmg=0.3)
+I('suijin_schale', 'Suijins Wasserschale', 'Der Wassergott ist gnädig', 'cup', (100, 160, 240), 'T', ['ryu'], 2, slow=1, size=1, freeze=0.05)
+I('umibozu_auge', 'Auge des Umibōzu', 'Es starrt aus der Tiefe', 'eye', (40, 60, 90), 'B', ['ryu'], 3, size=1.5, dmg=1, homing=1)
+I('ryujin_bart', 'Barthaar des Ryūjin', 'Fein wie Seide, stark wie Stahl', 'thread', (120, 200, 230), 'B', ['ryu'], 3, wave=1, pierce=1, range=60)
+I('koinobori', 'Koinobori', 'Der Karpfen schwimmt stromauf', 'fish', (230, 70, 70), 'T', ['ryu'], 2, spd=15, shotspd=40, range=40)
+# ---- Tanuki / Glück
+I('ebisu_angel', 'Ebisus Angelrute', 'Der Glücksgott fischt Gold', 'staff', (120, 180, 220), 'TS', ['tanuki'], 2, gold_shots=0.15, luck=1)
+I('daikoku_hammer', 'Daikokus Glückshammer', 'Reichtum wird Macht', 'hammer', GOLD, 'T', ['tanuki'], 3, money_dmg=1, coins=10)
+I('maneki_neko', 'Maneki-neko', 'Die Winkekatze lockt Münzen', 'daruma', (250, 250, 240), 'S', ['tanuki'], 2, magnet=1, discount=1, luck=1)
+I('tanuki_beutel', 'Tanuki-Beutel', 'Prall gefüllt', 'bag', (160, 110, 70), 'S', ['tanuki'], 1, coins=15, hp=1)
+I('tanuki_blatt_p', 'Verwandlungsblatt', 'Ein Tanuki ist nie, was er scheint', 'leaf', (90, 170, 80), 'T', ['tanuki'], 2, luck=2, spd=10, dash_reflect=1)
+# ---- Omamori (Shop)
+I('omamori_kenko', 'Omamori: Gesundheit', 'Kenkō – möge dein Herz stark sein', 'omamori', (220, 60, 60), 'S', [], 1, hp=1, heal=2)
+I('omamori_kinun', 'Omamori: Glück', 'Kin-un – möge das Gold fließen', 'omamori', (240, 200, 60), 'S', [], 1, luck=2)
+I('omamori_yakuyoke', 'Omamori: Schutz', 'Yakuyoke – Unheil prallt ab', 'omamori', (80, 120, 230), 'S', [], 2, shield=1)
+I('omamori_gokaku', 'Omamori: Erfolg', 'Gōkaku – du schaffst das', 'omamori', (80, 190, 100), 'S', [], 1, rate=0.4, shotspd=20)
+# ---- Essen
+I('onigiri', 'Onigiri', 'Reisbällchen mit Umeboshi', 'rice', (240, 240, 240), 'SB', [], 1, hp=1, heal=2)
+I('bento', 'Bentō', 'Mamas Mittagessen', 'box', (200, 60, 60), 'S', [], 1, hp=1, heal=4)
+I('mochi', 'Mochi', 'Klebrig und süß', 'beads', (250, 245, 240), 'TS', [], 1, hp=1, spd=-3)
+I('dango', 'Dango', 'Drei Bällchen am Spieß', 'dango', (240, 160, 190), 'TS', [], 1, spd=10, rate=0.3)
+I('matcha', 'Matcha-Tee', 'Bitter und wach', 'cup', (110, 180, 90), 'S', [], 1, rate=0.5, spd=10)
+I('fugu', 'Fugu', 'Ein falscher Schnitt...', 'fish', (240, 210, 90), 'T', [], 2, poison=1, kill_explode=0.2)
+I('wasabi', 'Wasabi', 'Scharf bis in die Nase', 'leaf', (130, 200, 90), 'T', [], 2, dmg=0.8, ratem=1.1)
+I('umeboshi', 'Umeboshi', 'Saure Pflaume, gesunder Körper', 'beads', (200, 50, 70), 'TS', [], 1, clear_heal=0.2, luck=1)
+I('natto', 'Nattō', 'Fäden ziehen sich überall hin', 'beads', (170, 130, 60), 'T', [], 2, split=1, size=-0.5)
+# ---- Waffen & Krieger
+I('tamahagane', 'Tamahagane-Klinge', 'Gefaltet tausendmal', 'sword', (220, 220, 230), 'T', [], 2, dmg=1)
+I('shuriken', 'Shuriken', 'Schnell und leise', 'star', (160, 160, 170), 'T', [], 2, rate=0.6, shotspd=50)
+I('kunai', 'Kunai-Gürtel', 'Messer zu allen Seiten', 'sword', (90, 90, 100), 'T', [], 2, side=1, rate=0.3)
+I('yumi', 'Yumi-Bogen', 'Lang, asymmetrisch, tödlich', 'bow', (160, 110, 60), 'T', [], 2, range=80, shotspd=80, dmg=0.5, pierce=1)
+I('bushido', 'Bushidō-Rolle', 'Der Weg des Kriegers', 'scroll', (200, 40, 40), 'T', [], 2, dmg=0.7, rate=0.3, spd=5, range=20, luck=1)
+I('strohhut', 'Strohhut', 'Für die lange Reise', 'hat', (220, 190, 110), 'T', [], 1, spd=15, range=30, hp=1)
+I('bakeneko_kralle', 'Bakeneko-Kralle', 'Katzen treffen immer kritisch', 'claw', (160, 90, 210), 'T', [], 2, crit=0.15, dmg=0.5)
+I('neko_gloeckchen', 'Katzenglöckchen', 'Klingeling', 'bell', (250, 220, 90), 'TS', [], 1, luck=1, spd=10, crit=0.1)
+# ---- Tempel & Kultur
+I('mokugyo', 'Mokugyo', 'Jeder vierte Schlag ist mächtig', 'drum', (170, 100, 50), 'T', [], 2, big_every=4)
+I('bonsho', 'Tempelglocke', 'Ihr Klang schmerzt Yokai', 'bell', (180, 130, 70), 'TB', [], 2, aura=1)
+I('daruma', 'Daruma', 'Siebenmal fallen, achtmal aufstehen', 'daruma', (220, 40, 40), 'T', [], 2, hurt_dmg=1, hp=1)
+I('kintsugi', 'Kintsugi-Schale', 'Gebrochen und doch schöner', 'cup', GOLD, 'T', [], 2, hurt_dmg=1, rate=0.3)
+I('hyakki_rolle', 'Rolle des Hyakki Yagyō', 'Die Nacht der 100 Dämonen', 'scroll', (120, 70, 160), 'TB', [], 3, kill_explode=0.25, dmg=0.5)
+I('noh_maske', 'Nō-Maske', 'Das Gesicht verändert sich mit dem Licht', 'mask', (245, 235, 220), 'T', [], 2, crit=0.12, spectral=1)
+I('shamisen', 'Shamisen', 'Drei Saiten, eine Welle', 'bow', (120, 70, 40), 'T', [], 2, wave=1, rate=0.4)
+I('komainu', 'Komainu-Statue', 'Ein Wächter an deiner Seite', 'daruma', (170, 170, 150), 'TS', [], 3, True, shield=1, hp=1)
+I('tanabata', 'Tanabata-Wunschzettel', 'Wünsch dir was', 'scroll', (120, 200, 240), 'T', [], 2, luck=3)
+I('hanabi', 'Hanabi', 'Feuerwerk!', 'star', (250, 120, 160), 'T', [], 3, explode=1, split=1)
+I('horagai', 'Horagai', 'Das Muschelhorn der Yamabushi', 'shell', (240, 210, 190), 'T', ['tengu'], 2, knock=1, shotspd=40, dmg=0.3)
+I('chochin_feuer', 'Chōchin-Feuer', 'Das Laternenfeuer springt über', 'lantern', (230, 70, 50), 'T', [], 2, burn=1, dmg=0.5)
+I('hozuki', 'Hōzuki-Laterne', 'Lichter der Ahnen weisen den Weg', 'lantern', (250, 140, 50), 'TS', [], 2, map=1, luck=1)
+I('sensu', 'Sensu', 'Ein goldener Faltfächer', 'fan', GOLD, 'S', [], 1, rate=0.5)
+I('karakasa', 'Karakasa', 'Ein Schirm, der Kugeln abwehrt', 'hat', (220, 80, 60), 'T', [], 2, dash_reflect=1, spd=10)
+I('jorogumo_seide', 'Jorōgumo-Seide', 'Klebrig und überall', 'thread', (240, 240, 240), 'TB', [], 2, slow=1, split=1)
+I('omukade_gift', 'Ōmukade-Gift', 'Hundert Beine, ein Biss', 'fang', (170, 80, 200), 'B', [], 3, poison=1, multishot=1)
+I('nue_schweif', 'Schweif der Nue', 'Eine Schlange als Schwanz', 'tail', (90, 160, 80), 'TB', [], 2, poison=1, homing=1)
+I('kiyome_sack', 'Sack mit Reinigungssalz', 'Kiyome – Reinigung', 'bag', (240, 240, 245), 'S', [], 1, salts=3)
+I('ronin_schwur', 'Schwur des Rōnin', 'Ohne Herrn, ohne Furcht', 'sword', (120, 120, 140), 'T', [], 3, True, dmg=1, dash_dmg=1, crit=0.08)
+I('kagami_mochi', 'Kagami-Mochi', 'Neujahrsglück', 'beads', (250, 250, 240), 'S', [], 2, hp=2)
+I('ema', 'Ema-Holztafel', 'Ein Wunsch an die Götter', 'box', (210, 170, 110), 'TS', [], 1, luck=1, rate=0.2, spd=5)
+I('tengu_auge', 'Allsehendes Tengu-Auge', 'Nichts bleibt verborgen', 'eye', (220, 60, 60), 'T', ['tengu'], 2, True, map=1, homing=1)
+I('yamata_zahn', 'Zahn der Orochi', 'Acht Köpfe, acht Zähne', 'fang', (110, 200, 110), 'B', [], 4, True, multishot=3, poison=1, dmgm=0.85)
+I('kyubi_juwel', 'Tamamos Juwel', 'Das Herz der Neunschwänzigen', 'crystal', (250, 180, 80), 'B', ['kitsune'], 4, True, homing=1, multishot=1, crit=0.15)
+I('shuten_schale', 'Shutens Sakeschale', 'Der König der Oni trinkt', 'cup', (180, 40, 40), 'B', ['oni'], 4, True, dmgm=1.5, hp=1)
+I('hoshi_splitter', 'Splitter des bösen Sterns', 'Mikaboshis Licht', 'star', (180, 120, 255), 'B', ['kami'], 4, True, multishot=2, homing=1, chain=1)
+
+ITEM_IDS = ORDER
+
+# =====================================================================  SYNERGIEN
+SYNERGIES = [
+    dict(id='jingi', name='Sanshu no Jingi', desc='Die drei Throninsignien vereint!', items=['kusanagi', 'yata_kagami', 'yasakani'], fx=dict(dmgm=1.5, multishot=2, homing=1, chain=1)),
+    dict(id='sonne_mond', name='Sonne & Mond', desc='Tag und Nacht in deiner Hand', items=['amaterasu', 'tsukuyomi'], fx=dict(dmgm=1.3, split=1)),
+    dict(id='sturmgoetter', name='Sturmgötter', desc='Raijin und Fūjin kämpfen mit dir', items=['raijin_trommel', 'fujin_sack'], fx=dict(raijin_chance=0.15, multishot=1, knock=1)),
+    dict(id='fuchstanz', name='Fuchsfeuer-Tanz', desc='Neun Flammen tanzen', items=['kitsunebi', 'kyubi_schweif'], fx=dict(multishot=2, homing=1)),
+    dict(id='fuchshochzeit', name='Kitsune no Yomeiri', desc='Sonnenregen – die Fuchshochzeit', items=['inari_maske', 'hoshi_no_tama'], fx=dict(orbital=2, luck=2)),
+    dict(id='gluecksgoetter', name='Glücksgötter', desc='Ebisu und Daikoku lachen', items=['ebisu_angel', 'daikoku_hammer'], fx=dict(gold_shots=0.2, coins=20, luck=2)),
+    dict(id='onmyodo', name='Onmyōdō', desc='Der Weg von Yin und Yang', items=['shikigami_papier', 'seimei_stern'], fx=dict(familiar=2)),
+    dict(id='papiersturm', name='Papiersturm', desc='Talismane überall', items=['ofuda_buendel', 'kuji_in'], fx=dict(ratem=1.3, pierce=1)),
+    dict(id='kranichschwarm', name='Kranichschwarm', desc='Tausend Flügel', items=['senbazuru', 'origami_kranich'], fx=dict(familiar=1, orbital=1, homing=1)),
+    dict(id='geisterlicht', name='Geisterlicht', desc='Laternen der Verstorbenen', items=['yurei_laterne', 'onibi_ring'], fx=dict(orbital=1, burn=1, spectral=1)),
+    dict(id='todesbote', name='Todesbote', desc='Der Fährmann arbeitet für dich', items=['shinigami_sense', 'sanzu_muenze'], fx=dict(kill_heal=0.1, dmgm=1.2)),
+    dict(id='ewiger_winter', name='Ewiger Winter', desc='Alles erstarrt', items=['yuki_traene', 'suijin_schale'], fx=dict(freeze=0.15, slow=1)),
+    dict(id='tengu_flug', name='Tengu-Flug', desc='Spring über Berge', items=['karasu_feder', 'tengu_geta'], fx=dict(spd=20, dash_dmg=1, dash_fire=1)),
+    dict(id='grosser_wind', name='Großer Wind', desc='Ein Taifun bricht los', items=['tengu_faecher', 'fujin_sack'], fx=dict(knock=1, shotspd=60, multishot=1)),
+    dict(id='oni_rausch', name='Oni-Rausch', desc='Sake macht Oni unbesiegbar', items=['oni_sake', 'shuten_kalebasse'], fx=dict(explode=1, dmgm=1.3)),
+    dict(id='oni_krieger', name='Oni-Krieger', desc='Knüppel und Tigerfell', items=['kanabo', 'tigerfell'], fx=dict(size=1, dmg=1.5, knock=1)),
+    dict(id='drachenkoenig', name='Drachenkönig', desc='Perle und Bart des Ryūjin', items=['ryu_perle', 'ryujin_bart'], fx=dict(homing=1, pierce=1, chain=1)),
+    dict(id='grosse_welle', name='Tsunami', desc='Die Welle prallt zurück', items=['kanagawa', 'kappa_teller'], fx=dict(bounce=1, multishot=1)),
+    dict(id='kappa_fest', name='Kappa-Festmahl', desc='Gurken für alle!', items=['kappa_gurke', 'kappa_teller'], fx=dict(hp=2, fullheal=1)),
+    dict(id='blitzschlag', name='Blitz & Klaue', desc='Das Donnerbiest erwacht', items=['inazuma', 'raiju_klaue'], fx=dict(chain=1, raijin_chance=0.1)),
+    dict(id='hanami', name='Hanami', desc='Kirschblüten und Dango', items=['sakura_zweig', 'dango'], fx=dict(clear_heal=0.25, rate=0.5)),
+    dict(id='teezeremonie', name='Teezeremonie', desc='Ruhe vor dem Sturm', items=['matcha', 'sensu'], fx=dict(rate=0.8, dmg=0.5)),
+    dict(id='sushi', name='Sushi-Platte', desc='Fugu mit Wasabi – riskant!', items=['wasabi', 'fugu'], fx=dict(kill_explode=0.2, dmg=1)),
+    dict(id='omamori_set', name='Omamori-Sammler', desc='Die Götter beschützen dich doppelt', items=['omamori_kenko', 'omamori_kinun', 'omamori_yakuyoke'], fx=dict(revive=1)),
+    dict(id='tempelmusik', name='Tempelmusik', desc='Shamisen und Holzfisch', items=['shamisen', 'mokugyo'], fx=dict(aura=1, wave=1)),
+    dict(id='tempelfest', name='Tempelfest', desc='Die Glocke schlägt zurück', items=['bonsho', 'mokugyo'], fx=dict(aura=1, hurt_ring=1)),
+    dict(id='bushi', name='Bushi-Seele', desc='Klinge und Ehre', items=['tamahagane', 'bushido'], fx=dict(crit=0.2, dmg=1)),
+    dict(id='ninja', name='Shinobi', desc='Shuriken und Kunai', items=['shuriken', 'kunai'], fx=dict(multishot=1, side=1, rate=0.5)),
+    dict(id='kyudo', name='Kyūdō', desc='Der Weg des Bogens', items=['yumi', 'hamaya'], fx=dict(homing=1, crit=0.15, dmgm=1.2)),
+    dict(id='daruma_geist', name='Unbeugsam', desc='Gebrochen, gekittet, gestärkt', items=['daruma', 'kintsugi'], fx=dict(hp=1, shield=1)),
+    dict(id='wunsch', name='Wunsch erfüllt', desc='Die Sterne hören dich', items=['tanabata', 'teru_teru'], fx=dict(luck=5)),
+    dict(id='unterweltgift', name='Unterweltgift', desc='Haar und Schweif', items=['onryo_haar', 'nue_schweif'], fx=dict(split=1, poison=1)),
+    dict(id='hannya_zorn', name='Hannya-Zorn', desc='Wut ohne Grenzen', items=['hannya', 'oni_horn'], fx=dict(rage=1, dmgm=1.3)),
+    dict(id='spinnennetz', name='Netz der Spinne', desc='Gift und Seide', items=['jorogumo_seide', 'omukade_gift'], fx=dict(multishot=1, slow=1)),
+    dict(id='mondklinge', name='Mondsichel-Klinge', desc='Schnitte kehren zurück', items=['tsukuyomi', 'kamaitachi_sichel'], fx=dict(boomerang=1, multishot=1)),
+    dict(id='feuerwerk', name='Feuerwerk über Edo', desc='Hanabi am Sommerfest', items=['hanabi', 'chochin_feuer'], fx=dict(burn=1, kill_explode=0.2)),
+    dict(id='koi_drache', name='Koi wird zum Drachen', desc='Der Karpfen erklimmt den Wasserfall', items=['koinobori', 'ryu_perle'], fx=dict(size=1, dmg=1, homing=1)),
+    dict(id='winkekatze', name='Doppeltes Katzenglück', desc='Zwei Katzen, doppeltes Glück', items=['maneki_neko', 'neko_gloeckchen'], fx=dict(luck=3, magnet=1)),
+    dict(id='schreinwaechter', name='Schreinwächter', desc='Komainu bewacht das Seil', items=['komainu', 'shimenawa'], fx=dict(orbital=2, shield=1)),
+    dict(id='seimei_meister', name='Abe no Seimei', desc='Der legendäre Onmyōji', items=['seimei_stern', 'kuji_in'], fx=dict(homing=1, familiar=1)),
+    dict(id='tengu_koenig', name='Tengu-König', desc='Maske und Fächer des Sōjōbō', items=['tengu_maske', 'sojobo_feder'], fx=dict(dmgm=1.3, homing=1)),
+    dict(id='orochi_kusanagi', name='Aus dem Schwanz der Orochi', desc='Susanoo fand das Schwert in der Schlange', items=['kusanagi', 'yamata_zahn'], fx=dict(dmgm=1.4, pierce=1)),
+]
+
+# =====================================================================  TRANSFORMATIONEN
+TRANSFORMS = {
+    'kitsune': dict(name='Kitsune-Avatar', desc='Du wirst zum Fuchsgeist', fx=dict(multishot=1, homing=1, spd=15), col=(250, 160, 60)),
+    'raijin': dict(name='Donnergott', desc='Blitze gehorchen dir', fx=dict(chain=1, raijin_chance=0.2), col=(255, 230, 90)),
+    'oni': dict(name='Oni-Gestalt', desc='Hörner wachsen dir', fx=dict(dmgm=1.4, size=1, hp=1), col=(230, 60, 50)),
+    'shikigami': dict(name='Onmyōji-Meister', desc='Papier gehorcht dir', fx=dict(familiar=2, orbital=1), col=(240, 240, 240)),
+    'yurei': dict(name='Yūrei-Gestalt', desc='Du bist zwischen den Welten', fx=dict(fly=1, spectral=1, spirit=4), col=(190, 220, 255)),
+    'tengu': dict(name='Tengu-Herr', desc='Dir wachsen Flügel', fx=dict(fly=1, spd=20, multishot=1), col=(60, 60, 70)),
+    'ryu': dict(name='Drachenblut', desc='Das Blut des Ryūjin', fx=dict(hp=2, pierce=1, homing=1, size=0.5), col=(80, 200, 220)),
+    'kami': dict(name='Kami-Erleuchtung', desc='Göttliches Licht umgibt dich', fx=dict(shield=1, dmgm=1.3, aura=1), col=(255, 230, 140)),
+    'tanuki': dict(name='Bake-Danuki', desc='Meister der Verwandlung und des Geldes', fx=dict(coins=30, luck=3, gold_shots=0.25, discount=1), col=(160, 110, 70)),
+}
+
+# =====================================================================  AKTIVE ITEMS
+ACTIVES = {
+    'ofuda_sturm': dict(name='Ofuda-Sturm', desc='Ein Ring aus Talismanen', icon='scroll', col=(230, 60, 60), charge=3),
+    'kagura_suzu': dict(name='Kagura-Suzu', desc='Göttlicher Tanz: unverwundbar', icon='bell', col=GOLD, charge=4),
+    'tanuki_blatt': dict(name='Tanuki-Blatt', desc='Verwandelt Items im Raum', icon='leaf', col=(90, 170, 80), charge=6),
+    'uchide_kozuchi': dict(name='Uchide no Kozuchi', desc='Der Glückshammer klopft Münzen', icon='hammer', col=(220, 170, 60), charge=4),
+    'tamatebako': dict(name='Tamatebako', desc='Was ist wohl in der Kiste?', icon='box', col=(200, 50, 90), charge=2),
+    'raijin_taiko': dict(name='Raijin-Taiko', desc='Blitze treffen alle Feinde', icon='drum', col=(250, 220, 80), charge=4),
+    'tsukuyomi_spiegel': dict(name='Mondspiegel', desc='Die Zeit steht still', icon='mirror', col=(200, 210, 255), charge=4),
+    'sake_kalebasse': dict(name='Sake-Kalebasse', desc='Heilt und macht mutig', icon='gourd', col=(220, 220, 200), charge=3),
+    'shikigami_ruf': dict(name='Shikigami-Ruf', desc='Papierkrieger stürzen sich auf Feinde', icon='doll', col=(240, 240, 240), charge=3),
+    'onryo_kerze': dict(name='Kerze der Onryō', desc='Fluch auf alle Feinde', icon='flame', col=(170, 90, 230), charge=3),
+    'hyotan_sauger': dict(name='Saugkalebasse', desc='Saugt Geschosse ein und schießt zurück', icon='gourd', col=(200, 120, 60), charge=2),
+    'tengu_uchiwa': dict(name='Tengu-Uchiwa', desc='Ein Windstoß fegt alles fort', icon='fan', col=(60, 140, 60), charge=2),
+}
+
+# =====================================================================  CHARAKTERE
+CHARS = {
+    'hana': dict(name='Hana', title='Die Schreinmaid', desc='Ausgeglichen. Startet mit dem Ofuda-Sturm.',
+                 hp=6, spirit=0, fx={}, items=[], active='ofuda_sturm', coins=0, keys=0, salts=2,
+                 unlock='Von Beginn an verfügbar'),
+    'kenji': dict(name='Kenji', title='Der Rōnin', desc='Hoher Schaden, kurze Reichweite, durchbohrt Feinde.',
+                  hp=6, spirit=0, fx=dict(dmgm=1.35, rate=-0.5, range=-50, pierce=1, knock=1), items=[], active=None,
+                  coins=0, keys=0, salts=2, unlock='Besiege einen Boss auf Ebene 2'),
+    'kuzunoha': dict(name='Kuzunoha', title='Die Fuchsfrau', desc='Schnell und zerbrechlich. Fuchsfeuer von Beginn an.',
+                     hp=4, spirit=0, fx=dict(spd=20, dmgm=0.85), items=['kitsunebi'], active=None,
+                     coins=0, keys=0, salts=2, unlock='Werde zum Kitsune-Avatar'),
+    'ponpoko': dict(name='Ponpoko', title='Der Tanuki', desc='Viel Leben, viel Glück, viel Geld.',
+                    hp=8, spirit=0, fx=dict(spd=-12, luck=2), items=[], active='tanuki_blatt',
+                    coins=25, keys=1, salts=1, unlock='Sammle insgesamt 300 Mon'),
+    'benkei': dict(name='Benkei', title='Der Kriegermönch', desc='Ein Bollwerk. Langsam, aber riesige Talismane.',
+                   hp=10, spirit=0, fx=dict(spd=-8, dmgm=1.25, rate=-0.6, size=1.5, knock=1), items=[],
+                   active='kagura_suzu', coins=0, keys=0, salts=2, unlock='Besiege insgesamt 500 Yokai'),
+    'okiku': dict(name='Okiku', title='Der Brunnengeist', desc='Nur Geisterherzen. Fliegt, Schüsse durch Wände.',
+                  hp=0, spirit=6, fx=dict(fly=1, spectral=1, dmgm=0.95), items=[], active='onryo_kerze',
+                  coins=0, keys=0, salts=2, unlock='Stirb 10-mal', spirit_only=True),
+    'kotaro': dict(name='Kotarō', title='Das Tengu-Kind', desc='Fliegt von Anfang an, schnelle Federn.',
+                   hp=6, spirit=0, fx=dict(fly=1, shotspd=40, spd=10), items=['karasu_feder'], active='tengu_uchiwa',
+                   coins=0, keys=0, salts=2, unlock='Besiege Sōjōbō, den Tengu-König'),
+    'seimei': dict(name='Seimei', title='Der Onmyōji', desc='Schwacher Schuss, aber Shikigami-Diener.',
+                   hp=6, spirit=0, fx=dict(dmgm=0.85), items=['shikigami_papier', 'hitogata'], active='shikigami_ruf',
+                   coins=0, keys=0, salts=2, unlock='Gewinne einen Lauf'),
+    'akago': dict(name='Akago', title='Das Oni-Kind', desc='Wird stärker, je verletzter es ist.',
+                  hp=8, spirit=0, fx=dict(rage=1, dmgm=1.1), items=['oni_sake'], active=None,
+                  coins=0, keys=0, salts=1, unlock='Schließe 3 Oni-Pakte'),
+    'susanoo': dict(name='Susanoo', title='Der Sturmgott', desc='Ein Gott unter Sterblichen. Mit Kusanagi.',
+                    hp=8, spirit=0, fx=dict(dmgm=1.2, rate=0.3), items=['kusanagi'], active='raijin_taiko',
+                    coins=0, keys=0, salts=3, unlock='Besiege Amatsu-Mikaboshi in Takamagahara'),
+}
+CHAR_ORDER = ['hana', 'kenji', 'kuzunoha', 'ponpoko', 'benkei', 'okiku', 'kotaro', 'seimei', 'akago', 'susanoo']
+
+# =====================================================================  YOKAI (Gegner)
+def A(kind, **kw):
+    d = dict(kind=kind, n=1, spread=0.0, speed=110, cd=2.0, col=(240, 80, 120), eff=None, r=3)
+    d.update(kw)
+    return d
+
+
+ENEMIES = {
+    'hitodama': dict(name='Hitodama', sprite='hitodama', hp=6, speed=36, r=6, move='float', attack=None, fly=True, glow=(120, 220, 255)),
+    'kodama': dict(name='Kodama', sprite='kodama', hp=10, speed=0, r=7, move='static', attack=A('ring', n=6, speed=70, cd=2.6, col=(200, 255, 200))),
+    'kappa': dict(name='Kappa', sprite='kappa', hp=11, speed=34, r=7, move='wander', attack=A('aimed', speed=120, cd=2.2, col=(100, 190, 255))),
+    'kasa_obake': dict(name='Kasa-obake', sprite='kasa_obake', hp=9, speed=95, r=7, move='hop', attack=None),
+    'bakezori': dict(name='Bake-zōri', sprite='bakezori', hp=7, speed=62, r=6, move='chase', attack=None, erratic=True),
+    'tsuchinoko': dict(name='Tsuchinoko', sprite='tsuchinoko', hp=10, speed=40, r=7, move='charge', attack=None),
+    'kitsunebi_e': dict(name='Kitsune-bi', sprite='kitsunebi_e', hp=10, speed=55, r=6, move='circle', attack=A('aimed', speed=110, cd=2.4, col=(120, 180, 255))),
+    'chochin': dict(name='Chōchin-obake', sprite='chochin', hp=13, speed=26, r=7, move='float', attack=A('cross', speed=95, cd=2.4, col=(255, 160, 60)), fly=True, glow=(255, 180, 90)),
+    'nopperabo': dict(name='Nopperabō', sprite='nopperabo', hp=15, speed=0, r=7, move='teleport', attack=A('aimed', n=3, spread=0.35, speed=115, cd=2.2, col=(230, 220, 200))),
+    'gaki': dict(name='Gaki', sprite='gaki', hp=13, speed=46, r=7, move='chase', attack=None, death=('split', 'gaki_small', 2)),
+    'gaki_small': dict(name='Kleiner Gaki', sprite='gaki_small', hp=4, speed=66, r=4, move='chase', attack=None),
+    'ittan_momen': dict(name='Ittan-momen', sprite='ittan_momen', hp=11, speed=72, r=7, move='bounce', attack=None, fly=True),
+    'bakeneko': dict(name='Bakeneko', sprite='bakeneko', hp=15, speed=50, r=7, move='charge', attack=None),
+    'onibi': dict(name='Onibi', sprite='onibi', hp=7, speed=44, r=6, move='float', attack=None, fly=True, death=('explode', 8), glow=(190, 120, 255)),
+    'karasu_tengu': dict(name='Karasu-Tengu', sprite='karasu_tengu', hp=16, speed=70, r=7, move='circle', attack=A('aimed', n=3, spread=0.3, speed=125, cd=2.0, col=(90, 90, 110)), fly=True),
+    'yuki_warashi': dict(name='Yuki-warashi', sprite='yuki_warashi', hp=14, speed=34, r=7, move='wander', attack=A('aimed', n=2, spread=0.2, speed=105, cd=2.0, col=(190, 240, 255), eff='slow')),
+    'kamaitachi': dict(name='Kamaitachi', sprite='kamaitachi', hp=12, speed=55, r=6, move='charge', attack=None, fast_charge=True),
+    'yamabiko': dict(name='Yamabiko', sprite='yamabiko', hp=18, speed=0, r=7, move='static', attack=A('mirror', speed=120, cd=0.5, col=(150, 160, 210))),
+    'heikegani': dict(name='Heikegani', sprite='heikegani', hp=20, speed=40, r=7, move='side', attack=A('ring', n=8, speed=80, cd=2.8, col=(150, 220, 255))),
+    'funayurei': dict(name='Funayūrei', sprite='funayurei', hp=13, speed=40, r=7, move='float', attack=A('aimed', speed=100, cd=2.6, col=(150, 230, 230)), fly=True),
+    'ningyo': dict(name='Ningyo', sprite='ningyo', hp=15, speed=0, r=7, move='teleport', attack=A('aimed', speed=190, cd=1.6, col=(120, 240, 220))),
+    'isonade': dict(name='Isonade', sprite='isonade', hp=20, speed=60, r=7, move='burrow', attack=A('ring', n=10, speed=90, cd=99, col=(140, 160, 200))),
+    'oni': dict(name='Oni', sprite='oni', hp=46, speed=32, r=10, move='chase', attack=A('aimed', n=3, spread=0.4, speed=100, cd=3.0, col=(255, 90, 60)), big=True),
+    'shikome': dict(name='Shikome', sprite='shikome', hp=16, speed=78, r=7, move='chase', attack=None, erratic=True),
+    'tsuchigumo': dict(name='Tsuchigumo', sprite='tsuchigumo', hp=28, speed=26, r=9, move='wander', attack=A('spawn', what='kumo', cd=3.2, max=4)),
+    'kumo': dict(name='Kumo', sprite='kumo', hp=3, speed=82, r=4, move='chase', attack=None),
+    'shinigami': dict(name='Shinigami', sprite='shinigami', hp=32, speed=22, r=9, move='float', attack=A('spiral', n=3, speed=85, cd=3.4, col=(170, 100, 230)), fly=True),
+    'kappa_small': dict(name='Kappa', sprite='kappa_small', hp=6, speed=50, r=5, move='chase', attack=None),
+    'karasu': dict(name='Krähe', sprite='karasu', hp=5, speed=80, r=5, move='float', attack=None, fly=True),
+}
+
+CHAMPIONS = {
+    'rot': dict(name='Roter', col=(255, 120, 120), hp=2.0),
+    'blau': dict(name='Blauer', col=(120, 160, 255), hp=1.3, fire=1.6),
+    'gold': dict(name='Goldener', col=(255, 220, 90), hp=1.4, coins=3),
+    'lila': dict(name='Violetter', col=(200, 120, 255), hp=1.3, explode=True),
+    'gruen': dict(name='Grüner', col=(130, 240, 140), hp=1.3, regen=True),
+    'weiss': dict(name='Weißer', col=(255, 255, 255), hp=1.5, speed=1.4),
+}
+
+# =====================================================================  BOSSE (Infos; Logik in bosses.py)
+BOSSES = {
+    'omukade': dict(name='Ōmukade', title='Der Riesentausendfüßler', hp=230),
+    'kappa_ou': dict(name='Kappa-Ō', title='König der Flussgeister', hp=220),
+    'jorogumo': dict(name='Jorōgumo', title='Die Spinnenfrau', hp=225),
+    'gashadokuro': dict(name='Gashadokuro', title='Das hungrige Riesenskelett', hp=340),
+    'rokurokubi': dict(name='Rokurokubi', title='Die mit dem langen Hals', hp=310),
+    'nue': dict(name='Nue', title='Die Chimäre der Nacht', hp=320),
+    'sojobo': dict(name='Sōjōbō', title='König der Tengu', hp=430),
+    'raiju': dict(name='Raijū', title='Das Donnerbiest', hp=410),
+    'yuki_onna': dict(name='Yuki-onna', title='Die Schneefrau', hp=400),
+    'umibozu': dict(name='Umibōzu', title='Der Meeresmönch', hp=540),
+    'ryujin': dict(name='Ryūjin', title='Der Drachenkönig', hp=560),
+    'bake_kujira': dict(name='Bake-kujira', title='Der Geisterwal', hp=530),
+    'orochi': dict(name='Yamata no Orochi', title='Die achtköpfige Schlange', hp=880),
+    'shuten_doji': dict(name='Shuten-dōji', title='König der Oni', hp=820),
+    'tamamo': dict(name='Tamamo-no-Mae', title='Die neunschwänzige Füchsin', hp=800),
+    'mikaboshi': dict(name='Amatsu-Mikaboshi', title='Der böse Stern des Himmels', hp=1500),
+}
+BOSS_REWARD = {  # Freischaltung beim ersten Sieg
+    'omukade': 'senbazuru', 'kappa_ou': 'komainu', 'jorogumo': 'ronin_schwur', 'gashadokuro': 'sanzu_muenze',
+    'rokurokubi': 'tengu_auge', 'nue': 'yata_kagami', 'sojobo': None, 'raiju': 'kusanagi',
+    'yuki_onna': 'yasakani', 'umibozu': None, 'ryujin': None, 'bake_kujira': None,
+    'orochi': 'yamata_zahn', 'shuten_doji': 'shuten_schale', 'tamamo': 'kyubi_juwel', 'mikaboshi': 'hoshi_splitter',
+}
+
+# =====================================================================  ERFOLGE
+# (id, Name, Beschreibung, Belohnung)  – geprüft in run.py über check_achievements
+ACHIEVEMENTS = [
+    ('first_blood', 'Erster Yokai', 'Besiege deinen ersten Yokai', None),
+    ('first_boss', 'Dämonenjäger', 'Besiege deinen ersten Boss', None),
+    ('kenji', 'Herrenlos', 'Besiege einen Boss auf Ebene 2', ('char', 'kenji')),
+    ('kuzunoha', 'Neun Schwänze', 'Werde zum Kitsune-Avatar', ('char', 'kuzunoha')),
+    ('ponpoko', 'Reicher Tanuki', 'Sammle insgesamt 300 Mon', ('char', 'ponpoko')),
+    ('benkei', 'Tausend Schwerter', 'Besiege insgesamt 500 Yokai', ('char', 'benkei')),
+    ('okiku', 'Zehnmal gestorben', 'Stirb 10-mal', ('char', 'okiku')),
+    ('kotaro', 'Tengu-Bezwinger', 'Besiege Sōjōbō', ('char', 'kotaro')),
+    ('seimei', 'Die Nacht überlebt', 'Gewinne einen Lauf', ('char', 'seimei')),
+    ('akago', 'Pakt mit den Oni', 'Schließe insgesamt 3 Oni-Pakte', ('char', 'akago')),
+    ('susanoo', 'Der Himmel ist frei', 'Besiege Amatsu-Mikaboshi', ('char', 'susanoo')),
+    ('hard', 'Oni-Modus', 'Gewinne einen Lauf (schaltet den Oni-Modus frei)', ('mode', 'hard')),
+    ('heaven', 'Der Weg nach oben', 'Gewinne einen Lauf (öffnet Takamagahara)', ('mode', 'heaven')),
+    ('synergy1', 'Harmonie', 'Entdecke eine Synergie', ('item', 'tanabata')),
+    ('synergy10', 'Meister der Harmonie', 'Entdecke 10 verschiedene Synergien', None),
+    ('transform', 'Verwandlung', 'Erlebe eine Transformation', None),
+    ('daikichi', 'Großes Glück', 'Ziehe ein Daikichi-Omikuji', None),
+    ('onsen', 'Entspannung', 'Bade in einer heißen Quelle', None),
+    ('rich', 'Wie Daikoku', 'Habe 99 Mon gleichzeitig', None),
+    ('nohit', 'Unberührt', 'Besiege einen Boss ohne Treffer', None),
+    ('items10', 'Sammler', 'Sammle 10 Items in einem Lauf', None),
+    ('kami', 'Gesegnet', 'Erhalte einen Kami-Segen', None),
+    ('challenge', 'Herausforderung angenommen', 'Schließe einen Kampfraum ab', None),
+    ('donor', 'Großzügig', 'Spende 30 Mon in Saisen-Kästen', ('item', 'ema')),
+    ('floor5', 'Die Tore von Yomi', 'Erreiche Yomi (Ebene 5)', None),
+    ('win_hard', 'Oni unter Oni', 'Gewinne im Oni-Modus', None),
+    ('all_chars', 'Hyakki Yagyō', 'Schalte alle Charaktere frei', None),
+]
