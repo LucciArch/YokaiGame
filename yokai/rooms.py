@@ -447,6 +447,7 @@ class Room:
         self.populated = False
         self.boss_id = None
         self.extra = {}
+        self.revealed = kind != 'secret'
 
 
 def generate_floor(rng, depth, labyrinth=False, hard=False):
@@ -522,6 +523,27 @@ def generate_floor(rng, depth, labyrinth=False, hard=False):
                     r.doors[d] = n
             if r.kind == 'treasure' and depth >= 2:
                 r.locked = True
+        # Geheimraum: leere Zelle neben mindestens zwei Räumen (nicht neben Boss)
+        cands = []
+        for x in range(9):
+            for y in range(9):
+                if (x, y) in rooms:
+                    continue
+                ns = [(x + dx, y + dy) for dx, dy in DIRS.values() if (x + dx, y + dy) in rooms]
+                if not ns or any(rooms[n].kind in ('boss',) for n in ns):
+                    continue
+                cands.append((len(ns), rng.random(), (x, y)))
+        if cands:
+            cands.sort(reverse=True)
+            pos = cands[0][2]
+            sr = Room(pos, 'secret')
+            sr.layout_seed = rng.randrange(1 << 30)
+            rooms[pos] = sr
+            for d, (dx, dy) in DIRS.items():
+                n = (pos[0] + dx, pos[1] + dy)
+                if n in rooms and n != pos:
+                    sr.doors[d] = n
+                    rooms[n].doors[OPP[d]] = pos
         return rooms, start, boss
     raise RuntimeError('Ebenen-Generierung fehlgeschlagen')
 
@@ -533,6 +555,15 @@ def build_room_tiles(room, rng):
         else:
             tpl = rng.choice(TEMPLATES)
         room.tiles, room.spawns = parse(tpl, rng)
+    elif room.kind == 'secret':
+        tpl = ["............."
+               , ".O.........O."
+               , "............."
+               , "............."
+               , "............."
+               , ".O.........O."
+               , "............."]
+        room.tiles, room.spawns = parse(tpl, rng, mirror=False)
     elif room.kind == 'curse':
         tpl = ["............."
                , ".SSS.....SSS."

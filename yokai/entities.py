@@ -95,6 +95,14 @@ class Particle:
             pygame.draw.circle(s, self.col, (int(self.x), int(self.y)), r, 1)
         elif self.kind == 'petal':
             pygame.draw.ellipse(s, self.col, (int(self.x), int(self.y), 3, 2))
+        elif self.kind == 'soul':
+            x, y = int(self.x + math.sin(self.life * 9) * 2), int(self.y)
+            gfx.draw_glow(s, x, y, 7, self.col, int(110 * f))
+            pygame.draw.circle(s, (240, 250, 255), (x, y), max(1, int(2 * f + 0.5)))
+        elif self.kind == 'spark':
+            ln = 4 * f + 1
+            n = math.hypot(self.vx, self.vy) or 1
+            pygame.draw.line(s, self.col, (self.x, self.y), (self.x - self.vx / n * ln, self.y - self.vy / n * ln), 1)
 
 
 def burst(run, x, y, col, n=8, spd=60, life=0.4, size=2, grav=0):
@@ -668,7 +676,8 @@ class Player:
             pygame.draw.ellipse(s, (255, 230, 120), (int(self.x) - 6, int(self.y) - 18, 12, 4), 1)
         if vis:
             bob = int(abs(math.sin(self.anim * 9)) * 1.5) if self.moving else 0
-            spr = gfx.sprite(self.char, self.flip)
+            frame = (0, 1, 0, 2)[int(self.anim * 8) % 4] if self.moving and not self.f['fly'] else 0
+            spr = gfx.sprite(self.char, self.flip, frame=frame)
             alpha_s = spr
             if 'yurei' in self.transforms or self.char == 'okiku':
                 alpha_s = spr.copy()
@@ -704,7 +713,8 @@ class Hazard:
         self.warn, self.act = warn, act
         self.dmg, self.owner, self.kind = dmg, owner, kind
         self.col = col or {'strike': (255, 240, 120), 'fire': (255, 140, 40), 'slam': (230, 220, 200),
-                           'ice': (190, 240, 255), 'water': (120, 190, 255), 'meteor': (200, 140, 255)}.get(kind, (255, 255, 255))
+                           'ice': (190, 240, 255), 'water': (120, 190, 255), 'meteor': (200, 140, 255),
+                           'smoke': (140, 140, 150), 'ink': (60, 20, 40)}.get(kind, (255, 255, 255))
         self.t = 0.0
         self.done = set()
         self.started = False
@@ -721,6 +731,10 @@ class Hazard:
                 audio.play('explode', 0.5); run.shake(4)
                 burst(run, self.x, self.y, self.col, 12, 80)
         p = run.player
+        if self.kind == 'smoke':
+            if math.hypot(p.x - self.x, p.y - self.y) < self.r + p.hitr:
+                run.slow_player = max(run.slow_player, 0.3)
+            return self.t < self.warn + self.act
         if self.owner == 'e':
             if math.hypot(p.x - self.x, p.y - self.y) < self.r + p.hitr:
                 p.hurt(1)
@@ -740,6 +754,10 @@ class Hazard:
             pygame.draw.circle(s, self.col, (x, y), r, 1)
             pygame.draw.circle(s, self.col, (x, y), max(1, int(r * f)), 1)
         else:
+            if self.kind == 'smoke':
+                f = 1 - (self.t - self.warn) / max(0.01, self.act)
+                gfx.draw_glow(s, x, y, int(r * 1.6), (60, 60, 70), int(90 * f))
+                return
             if self.kind == 'strike':
                 pts = [(x + random.randint(-4, 4), y - 300 + i * 30) for i in range(10)] + [(x, y)]
                 pygame.draw.lines(s, (255, 255, 230), False, pts, 2)
@@ -837,6 +855,8 @@ class Enemy:
         spd = self.speed * (0.5 if self.slowed > 0 else 1)
         self.ai(dt, spd)
         # Rückstoß
+        if self.d.get('heavy'):
+            self.kx = self.ky = 0
         if abs(self.kx) + abs(self.ky) > 1:
             self.x, self.y, _, _ = move_body(run.room, self.x, self.y, self.r, self.kx * dt, self.ky * dt, self.fly)
             self.kx *= 0.82; self.ky *= 0.82
@@ -924,6 +944,10 @@ class Enemy:
                     self.st = 0.6
                     if bx or by:
                         run.shake(1)
+                    if d.get('charge_ring'):
+                        n = d['charge_ring']
+                        for i in range(n):
+                            ebullet(run, self.x, self.y, i / n * math.tau, 85, (230, 230, 230))
                 if random.random() < 0.5:
                     run.particles.append(Particle(self.x, self.y + 4, 0, 0, 0.3, (200, 190, 170), 2))
             elif self.state == 'stun':
@@ -1042,6 +1066,8 @@ class Enemy:
             off = random.uniform(0, math.tau)
             for i in range(n):
                 ebullet(self.run, self.x, self.y, off + i / n * math.tau, sp, a['col'], eff=a['eff'])
+                if a.get('double'):
+                    ebullet(self.run, self.x, self.y, off + (i + 0.5) / n * math.tau, sp * 0.75, a['col'], eff=a['eff'], delay=0.35)
         elif k == 'cross':
             off = 0 if int(self.t * 10) % 2 else math.pi / 4
             for i in range(4):
@@ -1050,6 +1076,11 @@ class Enemy:
             for i in range(14):
                 for j in range(a['n']):
                     ebullet(self.run, self.x, self.y, self.t + i * 0.45 + j / a['n'] * math.tau, sp, a['col'], delay=i * 0.08)
+        elif k == 'trail':
+            if a.get('smoke'):
+                run.hazards.append(Hazard(self.x, self.y, 12, 0.0, 2.5, 0, 'e', 'smoke'))
+            else:
+                run.hazards.append(Hazard(self.x, self.y + 2, 8, 0.25, 1.8, 1, 'e', 'fire'))
         elif k == 'spawn':
             alive = [s for s in self.spawned if not s.dead]
             self.spawned = alive
@@ -1077,7 +1108,10 @@ class Enemy:
         if self.frozen > 0:
             tint = (170, 220, 255)
         flip = self.vx < 0
-        spr = gfx.sprite(self.d['sprite'], flip, self.flash > 0, tint)
+        frame = 0
+        if not self.fly and self.d['move'] in ('chase', 'wander', 'side', 'charge'):
+            frame = (0, 1, 0, 2)[int(self.t * (14 if self.state == 'charge' else 7)) % 4]
+        spr = gfx.sprite(self.d['sprite'], flip, self.flash > 0, tint, frame=frame)
         bob = 0
         if self.fly:
             bob = int(math.sin(self.t * 4) * 2)

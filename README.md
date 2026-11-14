@@ -26,16 +26,16 @@ Jeder Push auf `main` baut über GitHub Actions automatisch eine neue `.exe`.
 
 ## Inhalt
 
-- **6 Ebenen, 11 Biome**: Bambuswald, Inari-Torii-Pfad, Geistertempel, Alter Friedhof, Kurama-Berg, Schneeberg, Drachenpalast Ryūgū-jō, Geisterküste, Yomi, Höllenfeuer und Takamagahara
-- **16 Bosse** mit je eigenen Angriffsmustern und zweiter Phase: Ōmukade, Kappa-Ō, Jorōgumo, Gashadokuro, Rokurokubi, Nue, Sōjōbō, Raijū, Yuki-onna, Umibōzu, Ryūjin, Bake-kujira, Yamata no Orochi, Shuten-dōji, Tamamo-no-Mae und Amatsu-Mikaboshi
-- **29 Yokai-Gegnertypen** plus 6 Champion-Varianten (rot, blau, gold, violett, grün, weiß)
-- **118 passive Items** und **12 aktive Items**, Itempools für Schatzraum, Laden, Boss, Kami-Schrein und Oni-Schrein
-- **42 Synergien** (z. B. die drei Throninsignien *Kusanagi + Yata no Kagami + Yasakani no Magatama*)
+- **6 Ebenen, 16 Biome**: Bambuswald, Inari-Torii-Pfad, Kappa-Flussufer, Geistertempel, Alter Friedhof, Spukvilla, Kurama-Berg, Schneeberg, Ōe-Berg, Drachenpalast, Geisterküste, Tiefsee, Yomi, Höllenfeuer, Hof des Enma und Takamagahara
+- **21 Bosse** mit je eigenen Angriffsmustern und zweiter Phase: Ōmukade, Kappa-Ō, Jorōgumo, Gashadokuro, Rokurokubi, Nue, Sōjōbō, Raijū, Yuki-onna, Umibōzu, Ryūjin, Bake-kujira, Yamata no Orochi, Shuten-dōji, Tamamo-no-Mae Ōnyūdō, Nurarihyon, die drei Kamaitachi, Akkorokamui, Enma-Daiō und Amatsu-Mikaboshi
+- **40 Yokai-Gegnertypen** plus 6 Champion-Varianten (rot, blau, gold, violett, grün, weiß)
+- **134 passive Items** und **12 aktive Items**, Itempools für Schatzraum, Laden, Boss, Kami-Schrein und Oni-Schrein
+- **51 Synergien** (z. B. die drei Throninsignien *Kusanagi + Yata no Kagami + Yasakani no Magatama*)
 - **9 Transformationen**: 3 Items eines Themas verwandeln dich (Kitsune, Donnergott, Oni, Onmyōji, Yūrei, Tengu, Drache, Kami, Tanuki)
 - **10 Charaktere** zum Freischalten, jeweils mit eigenen Werten und Startitems
-- **27 Erfolge**, die Charaktere, Items, den Oni-Modus und Takamagahara freischalten
+- **30 Erfolge**, die Charaktere, Items, den Oni-Modus und Takamagahara freischalten
 - Prozedurale Ebenen mit 46 Raumvorlagen + zufällig generierten Räumen (gespiegelt → hunderte Varianten)
-- Spezialräume: Schatzraum (verschlossen ab Ebene 2), Laden, Fluchraum, Kampfraum, Omikuji-Schrein, heiße Quelle (Onsen), Kami- und Oni-Schreine nach Bossen
+- Spezialräume: Schatzraum (verschlossen ab Ebene 2), Laden, Fluchraum, Kampfraum, Geheimräume (mit Reinigungssalz an rissigen Wänden aufdecken), Omikuji-Schrein, heiße Quelle (Onsen), Kami- und Oni-Schreine nach Bossen
 - Flüche (Dunkelheit, Nebel, Labyrinth, Verirrte), Oni-Modus (schwer), tägliche Prüfung mit festem Seed
 - Codex aller Items, Erfolge, Statistik
 - Pixel-Art und Musik werden komplett im Code erzeugt (Koto, Taiko, Shakuhachi in japanischen Tonleitern)

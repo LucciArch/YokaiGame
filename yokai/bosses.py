@@ -1393,6 +1393,379 @@ class Mikaboshi(Boss):
                 D.circle(s, (255, 240, 200), (int(x + math.cos(a) * 40), int(y + math.sin(a) * 24)), 3)
 
 
+# =====================================================================  RUNDE 1: NEUE BOSSE
+class Oonyudo(Boss):
+    """Ein riesiger Mönch, der immer größer wird."""
+    r = 16
+
+    def setup(self):
+        self.attacks = ['stomp', 'beads', 'wisps', 'grow']
+        self.attacks2 = ['stomp', 'beads', 'wisps', 'grow', 'shadow']
+        self.size = 1.0
+        self.y = CY - 20
+
+    def move(self, dt):
+        if self.co is None:
+            d = norm(self.p.x - self.x, self.p.y - self.y)
+            self.x += d[0] * 18 * dt
+            self.y += d[1] * 12 * dt
+            self.clamp_pos(24)
+
+    def on_phase2(self):
+        self.size = 1.35
+        self.r = 21
+
+    def a_stomp(self):
+        for k in range(2 if self.phase == 1 else 3):
+            yield 0.35
+            self.run.shake(5)
+            self.ring(16, 80 + k * 10, k * 0.2, (200, 160, 120))
+            yield 0.4
+
+    def a_beads(self):
+        bs = []
+        for i in range(10):
+            a = i / 10 * math.tau
+            b = ebullet(self.run, self.x, self.y, 0, 0.0, (190, 140, 90), 4)
+            b.life = 99
+            bs.append((b, a))
+        for k in range(30):
+            for b, a in bs:
+                aa = a + k * 0.1
+                b.x, b.y = self.x + math.cos(aa) * 34, self.y + math.sin(aa) * 26
+            yield 0.03
+        for b, a in bs:
+            ang = math.atan2(b.y - self.y, b.x - self.x)
+            sp = 100 * self.run.bullet_speed_mult
+            b.vx, b.vy = math.cos(ang) * sp, math.sin(ang) * sp
+            b.life = 5
+        yield 0.5
+
+    def a_wisps(self):
+        self.summon('hitodama', 3, 40)
+        yield 0.7
+
+    def a_grow(self):
+        for i in range(3):
+            self.hazard(self.p.x, self.p.y, 22, 0.8, 0.15, 'slam')
+            yield 0.35
+        yield 0.5
+
+    def a_shadow(self):
+        for i in range(8):
+            a = i / 8 * math.tau + self.t
+            self.hazard(self.p.x + math.cos(a) * 50, self.p.y + math.sin(a) * 40, 16, 0.9, 0.15, 'slam')
+        yield 1.2
+
+    def render(self, s, t):
+        D = pygame.draw
+        x, y = int(self.x), int(self.y)
+        k = self.size
+        gfx.draw_glow(s, x, y, int(40 * k), (80, 60, 120), 70)
+        D.ellipse(s, (30, 20, 40), (x - int(20 * k), y - int(10 * k), int(40 * k), int(34 * k)))
+        D.ellipse(s, (70, 50, 90), (x - int(19 * k), y - int(9 * k), int(38 * k), int(32 * k)))
+        D.circle(s, (230, 190, 160), (x, y - int(16 * k)), int(12 * k))
+        D.circle(s, (250, 210, 180), (x - int(3 * k), y - int(19 * k)), int(4 * k))
+        eyes(s, x, y - int(16 * k), int(5 * k), (255, 230, 120), max(1, int(2 * k)))
+        D.line(s, (120, 60, 50), (x - int(4 * k), y - int(9 * k)), (x + int(4 * k), y - int(9 * k)), 2)
+        for i in range(9):
+            a = math.pi * (0.15 + i / 8 * 0.7)
+            D.circle(s, (170, 110, 60), (int(x + math.cos(a) * 15 * k), int(y - 4 * k + math.sin(a) * 8 * k)), max(2, int(3 * k)))
+
+
+class Nurarihyon(Boss):
+    """Der Herr der Yokai – lässt andere kämpfen."""
+    r = 11
+
+    def setup(self):
+        self.attacks = ['command', 'fan', 'tea', 'vanish']
+        self.attacks2 = ['command', 'fan', 'tea', 'vanish', 'parade']
+        self.y = RY + 60
+
+    def move(self, dt):
+        self.x += math.sin(self.t * 0.6) * 25 * dt
+
+    def a_command(self):
+        pool = self.run.biome['enemies']
+        self.summon(random.choice(pool), 2, 50)
+        yield 0.6
+        for e in self.run.enemies:
+            if e is not self and not e.dead and not e.is_boss:
+                e.speed *= 1.3
+        yield 0.5
+
+    def a_fan(self):
+        for k in range(3):
+            self.fan(7, 0.2, 110, (220, 190, 120))
+            yield 0.45
+
+    def a_tea(self):
+        for i in range(24):
+            ebullet(self.run, self.x, self.y, i * 0.42, 70, (170, 220, 140), acc=0.6)
+            yield 0.05
+
+    def a_vanish(self):
+        self.alpha = 60
+        self.invuln = True
+        yield 0.5
+        self.x, self.y = free_tile_pos(self.run.room, random, (self.p.x, self.p.y), 100, True)
+        self.alpha = 255
+        self.invuln = False
+        self.ring(14, 95, 0, (220, 190, 120))
+        yield 0.4
+
+    def a_parade(self):
+        for i in range(10):
+            y = RY + 20 + (i % 5) * 45
+            left = i % 2 == 0
+            x = RX + 6 if left else RX + RW - 6
+            for j in range(3):
+                ebullet(self.run, x, y + j * 8, 0 if left else math.pi, 90, (200, 120, 220), delay=j * 0.1)
+            yield 0.25
+
+    def render(self, s, t):
+        D = pygame.draw
+        x, y = int(self.x), int(self.y)
+        D.polygon(s, (60, 50, 90), [(x - 8, y - 2), (x + 8, y - 2), (x + 13, y + 15), (x - 13, y + 15)])
+        D.polygon(s, (200, 170, 100), [(x - 3, y - 2), (x + 3, y - 2), (x + 2, y + 15), (x - 2, y + 15)])
+        D.ellipse(s, (240, 220, 200), (x - 8, y - 22, 16, 22))
+        D.circle(s, (240, 210, 190), (x, y - 6), 6)
+        eyes(s, x, y - 7, 3, (40, 20, 20), 1)
+        D.line(s, (180, 170, 160), (x - 4, y - 2), (x - 1, y + 2)); D.line(s, (180, 170, 160), (x + 4, y - 2), (x + 1, y + 2))
+        D.line(s, (150, 110, 60), (x + 6, y), (x + 16, y - 8), 2)
+        D.circle(s, (120, 120, 120), (x + 16, y - 9), 2)
+        if int(t * 2) % 2:
+            D.circle(s, (200, 200, 210), (x + 18, int(y - 14 - (t * 20) % 8)), 2, 1)
+
+
+class KamaitachiTrio(Boss):
+    """Drei Wiesel: eines bringt zu Fall, eines schneidet, eines heilt."""
+    r = 8
+
+    def setup(self):
+        self.pos = [[CX - 60, CY - 30], [CX, CY - 50], [CX + 60, CY - 30]]
+        self.attacks = ['trip', 'slash', 'whirl', 'heal']
+        self.attacks2 = ['trip', 'slash', 'whirl', 'heal', 'tornado']
+        self.a0 = 0.0
+
+    def hitboxes(self):
+        return [(p[0], p[1], 8) for p in self.pos]
+
+    def move(self, dt):
+        self.a0 += dt * (1.2 if self.phase == 1 else 1.8)
+        if self.co is None:
+            for i, p in enumerate(self.pos):
+                a = self.a0 + i * math.tau / 3
+                tx, ty = CX + math.cos(a) * 110, CY + math.sin(a) * 60
+                p[0] += (tx - p[0]) * min(1, dt * 3)
+                p[1] += (ty - p[1]) * min(1, dt * 3)
+        self.x = sum(p[0] for p in self.pos) / 3
+        self.y = sum(p[1] for p in self.pos) / 3
+
+    def a_trip(self):
+        p = self.pos[0]
+        d = norm(self.p.x - p[0], self.p.y - p[1])
+        yield 0.3
+        for i in range(30):
+            p[0] = clamp(p[0] + d[0] * 6, RX + 10, RX + RW - 10)
+            p[1] = clamp(p[1] + d[1] * 6, RY + 10, RY + RH - 10)
+            if i % 3 == 0:
+                ebullet(self.run, p[0], p[1], math.atan2(d[1], d[0]) + math.pi / 2, 50, (230, 230, 240), 2)
+                ebullet(self.run, p[0], p[1], math.atan2(d[1], d[0]) - math.pi / 2, 50, (230, 230, 240), 2)
+            yield 0.02
+
+    def a_slash(self):
+        for k in range(3):
+            p = self.pos[1]
+            a = math.atan2(self.p.y - p[1], self.p.x - p[0])
+            for j in range(6):
+                ebullet(self.run, p[0], p[1], a, 150 + j * 18, (250, 250, 255), 2)
+            yield 0.35
+
+    def a_whirl(self):
+        for k in range(40):
+            for i, p in enumerate(self.pos):
+                a = k * 0.16 + i * math.tau / 3
+                p[0] = self.p.x + math.cos(a) * 80
+                p[1] = self.p.y + math.sin(a) * 60
+                p[0] = clamp(p[0], RX + 10, RX + RW - 10)
+                p[1] = clamp(p[1], RY + 10, RY + RH - 10)
+                if k % 8 == 0:
+                    ebullet(self.run, p[0], p[1], math.atan2(self.p.y - p[1], self.p.x - p[0]), 90, (200, 220, 200))
+            yield 0.04
+
+    def a_heal(self):
+        p = self.pos[2]
+        gfx_t = 0
+        for i in range(10):
+            self.run.particles.append(Particle(p[0] + random.uniform(-8, 8), p[1], 0, -40, 0.6, (120, 255, 140), 2))
+            yield 0.08
+        self.hp = min(self.maxhp, self.hp + self.maxhp * 0.04)
+        self.ring(10, 80, 0, (120, 255, 140), x=p[0], y=p[1])
+
+    def a_tornado(self):
+        for k in range(50):
+            for i, p in enumerate(self.pos):
+                ebullet(self.run, p[0], p[1], k * 0.3 + i * 2.1, 80, (190, 230, 190), 2, curve=0.8)
+            yield 0.05
+
+    def render(self, s, t):
+        D = pygame.draw
+        for i, (x, y) in enumerate(self.pos):
+            x, y = int(x), int(y)
+            gfx.shadow(s, (x - 8, y + 6, 16, 4))
+            D.ellipse(s, (30, 20, 10), (x - 10, y - 6, 20, 13))
+            D.ellipse(s, (180, 130, 80), (x - 9, y - 5, 18, 11))
+            D.circle(s, (190, 140, 90), (x + 8, y - 6), 5)
+            eyes(s, x + 9, y - 7, 2, (255, 255, 255), 1)
+            col = [(230, 230, 240), (250, 250, 255), (140, 240, 150)][i]
+            D.arc(s, col, (x - 14, y - 12, 16, 16), 1.0, 3.0, 2)
+            D.line(s, (150, 100, 60), (x - 9, y), (x - 18, y - 6 + int(math.sin(t * 8 + i) * 3)), 3)
+
+
+class Akkorokamui(Boss):
+    """Ein gewaltiger roter Krake aus dem Meer von Uchiura."""
+    r = 20
+
+    def setup(self):
+        self.y = RY + 50
+        self.attacks = ['tentacle', 'ink', 'ring', 'suction']
+        self.attacks2 = ['tentacle', 'ink', 'ring', 'suction', 'storm']
+
+    def move(self, dt):
+        self.x = CX + math.sin(self.t * 0.5) * 70
+
+    def a_tentacle(self):
+        for k in range(4 if self.phase == 1 else 6):
+            side = random.choice('lrb')
+            if side == 'l':
+                y = self.p.y
+                for i in range(6):
+                    self.hazard(RX + 16 + i * 32, y, 14, 0.7 + i * 0.05, 0.25, 'slam')
+            elif side == 'r':
+                y = self.p.y
+                for i in range(6):
+                    self.hazard(RX + RW - 16 - i * 32, y, 14, 0.7 + i * 0.05, 0.25, 'slam')
+            else:
+                x = self.p.x
+                for i in range(5):
+                    self.hazard(x, RY + RH - 16 - i * 32, 14, 0.7 + i * 0.05, 0.25, 'slam')
+            yield 0.45
+
+    def a_ink(self):
+        a0 = self.ang_p()
+        for i in range(30):
+            ebullet(self.run, self.x, self.y + 10, a0 + random.uniform(-0.6, 0.6), random.uniform(60, 120), (60, 20, 40), 4, eff='slow')
+            yield 0.03
+        self.run.hazards.append(Hazard(self.p.x, self.p.y, 30, 0.2, 3.0, 0, 'e', 'smoke'))
+        yield 0.4
+
+    def a_ring(self):
+        for k in range(3):
+            self.ring(22, 80, k * 0.14, (230, 70, 80), 4)
+            yield 0.4
+
+    def a_suction(self):
+        for i in range(40):
+            d = norm(self.x - self.p.x, self.y - self.p.y)
+            self.run.wind = (d[0] * 60, d[1] * 60, 0.1)
+            if i % 6 == 0:
+                self.fan(5, 0.3, 90, (230, 70, 80))
+            yield 0.05
+
+    def a_storm(self):
+        for i in range(45):
+            for k in range(4):
+                ebullet(self.run, self.x, self.y, i * 0.17 + k * math.pi / 2, 85, (250, 120, 120), curve=-0.5)
+            yield 0.05
+
+    def render(self, s, t):
+        D = pygame.draw
+        x, y = int(self.x), int(self.y)
+        for i in range(8):
+            a = math.pi * (0.05 + i / 7 * 0.9)
+            pts = []
+            for j in range(9):
+                f = j / 8
+                L = 18 + f * 46
+                aa = a + math.sin(t * 2.5 + i + f * 3) * 0.25 * f
+                pts.append((x + math.cos(aa) * L * 1.3, y + 6 + math.sin(aa) * L))
+            D.lines(s, (150, 30, 40), False, pts, 6)
+            D.lines(s, (220, 70, 80), False, pts, 3)
+            for j in range(2, 9, 2):
+                D.circle(s, (250, 190, 190), (int(pts[j][0]), int(pts[j][1])), 1)
+        D.ellipse(s, (120, 20, 30), (x - 24, y - 30, 48, 44))
+        D.ellipse(s, (210, 60, 70), (x - 22, y - 28, 44, 40))
+        D.ellipse(s, (240, 120, 120), (x - 12, y - 24, 14, 10))
+        eyes(s, x, y - 2, 10, (255, 230, 120), 3)
+        D.circle(s, (20, 10, 10), (x - 10, y - 2), 1); D.circle(s, (20, 10, 10), (x + 10, y - 2), 1)
+
+
+class Enma(Boss):
+    """Enma-Daiō, König und Richter der Unterwelt."""
+    r = 17
+
+    def setup(self):
+        self.y = RY + 55
+        self.attacks = ['judgement', 'brush', 'summon', 'mirror']
+        self.attacks2 = ['judgement', 'brush', 'summon', 'mirror', 'sentence']
+        self.trail = []
+
+    def move(self, dt):
+        self.x = CX + math.sin(self.t * 0.35) * 50
+        self.trail.append((self.p.x, self.p.y))
+        del self.trail[:-240]
+
+    def a_judgement(self):
+        cols = random.sample(range(13), 5 if self.phase == 1 else 7)
+        for c in cols:
+            x = RX + 16 + c * 32
+            for r in range(7):
+                self.hazard(x, RY + 16 + r * 32, 15, 0.9, 0.2, 'fire')
+        yield 1.3
+
+    def a_brush(self):
+        for k in range(3):
+            a = self.ang_p()
+            for j in range(9):
+                off = (j - 4) * 8
+                px, py = -math.sin(a) * off, math.cos(a) * off
+                ebullet(self.run, self.x + px, self.y + py, a, 110, (30, 20, 30), 3, delay=abs(j - 4) * 0.04)
+            yield 0.5
+
+    def a_summon(self):
+        self.summon('oni', 1, 30)
+        self.summon('shikome', 1, 30)
+        yield 0.8
+
+    def a_mirror(self):
+        pts = self.trail[::30][-8:]
+        for (x, y) in pts:
+            self.hazard(x, y, 16, 0.6, 0.15, 'strike')
+        yield 0.9
+
+    def a_sentence(self):
+        for i in range(60):
+            for k in range(6):
+                ebullet(self.run, self.x, self.y, i * 0.11 * (1 if k % 2 else -1) + k * math.tau / 6, 85, (230, 60, 50), 3)
+            yield 0.06
+
+    def render(self, s, t):
+        D = pygame.draw
+        x, y = int(self.x), int(self.y)
+        gfx.draw_glow(s, x, y, 44, (200, 40, 30), 70)
+        D.rect(s, (60, 30, 20), (x - 30, y + 6, 60, 14))
+        D.rect(s, (180, 140, 60), (x - 30, y + 6, 60, 3))
+        D.polygon(s, (130, 20, 30), [(x - 14, y - 6), (x + 14, y - 6), (x + 22, y + 10), (x - 22, y + 10)])
+        D.circle(s, (200, 70, 50), (x, y - 14), 12)
+        D.rect(s, (20, 20, 30), (x - 12, y - 34, 24, 12))
+        D.rect(s, (230, 190, 70), (x - 6, y - 32, 12, 3))
+        D.polygon(s, (20, 10, 10), [(x - 10, y - 6), (x + 10, y - 6), (x, y + 6)])
+        eyes(s, x, y - 16, 5, (255, 240, 120), 2)
+        D.line(s, (20, 10, 10), (x - 9, y - 22), (x - 2, y - 19), 2); D.line(s, (20, 10, 10), (x + 9, y - 22), (x + 2, y - 19), 2)
+        D.rect(s, (220, 200, 150), (x + 20, y - 18, 4, 24))
+
+
 BOSS_CLASSES = {
     'omukade': Omukade, 'kappa_ou': KappaOu, 'jorogumo': Jorogumo,
     'gashadokuro': Gashadokuro, 'rokurokubi': Rokurokubi, 'nue': Nue,
@@ -1400,6 +1773,8 @@ BOSS_CLASSES = {
     'umibozu': Umibozu, 'ryujin': Ryujin, 'bake_kujira': BakeKujira,
     'orochi': Orochi, 'shuten_doji': ShutenDoji, 'tamamo': Tamamo,
     'mikaboshi': Mikaboshi,
+    'oonyudo': Oonyudo, 'nurarihyon': Nurarihyon, 'kamaitachi_trio': KamaitachiTrio,
+    'akkorokamui': Akkorokamui, 'enma': Enma,
 }
 
 

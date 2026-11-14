@@ -166,17 +166,82 @@ SPRITES = {
         "..nnnn..", ".gwwwwg.", "gkggkgg.", "gyyyyggG", ".ggggGG.", ".gg..gg.", "yy....yy", "........"],
     'karasu': [
         "...kk...", "..kekk..", "..kkyy..", "k.kkk..k", "kkkkkkkk", ".kkkkkk.", "..k..k..", "........"],
+    'tesso': [
+        "............", "...qq..qq...", "..qqqqqqqq..", ".qeqqqqqqqq.", "qqqqqqqqqqql",
+        ".mqqqqqqqq.l", "..q.q..q.q..", "............"],
+    'abura_akago': [
+        "....f..f....", "...fof.ff...", "..ffooooff..", ".fosssssof..", ".oskssksso..",
+        ".osssmmsso..", "..ossssso...", ".fooSSSoof..", "..ossssso...", "...os..so...",
+        "...ff..ff...", "............"],
+    'nurikabe': [
+        "..............", ".llllllllllll.", ".lldlllldllll.", ".llllllllllll.", ".llkkllllkkll.",
+        ".llkellllkell.", ".llllllllllll.", "sllllkkkkllls.", "slllllllllllls", ".llldllllldll.",
+        ".llllllllllll.", ".llllllllllll.", ".dddd....dddd.", ".............."],
+    'mokumokuren': [
+        "nnnnnnnnnnnn", "nwwwwnwwwwwn", "nwkewnwwwwwn", "nwwwwnwwkewn", "nnnnnnnnnnnn",
+        "nwwwwnwwwwwn", "nwwkenwwwwwn", "nwwwwnwkewwn", "nnnnnnnnnnnn", "nwwwwnwwwwwn",
+        "nkewwnwwwwwn", "nnnnnnnnnnnn"],
+    'jinmenju': [
+        "...GGGGGG...", "..GGgGGgGG..", ".GGgGGGGgGG.", ".GsSGGGGsSG.", ".GkkGGGGkkG.",
+        "..GGGsSGGG..", "...GGkkGG...", ".....nn.....", ".....nn.....", "....nnnn....",
+        "...nn..nn...", "............"],
+    'yosuzume': [
+        "..nn....", ".nekn...", "nnnnnnyy", ".NnnnN..", "..N..N..", "........"],
+    'enenra': [
+        "....ll......", "..llllll....", ".lldllll....", ".llllllll...", "lllkllkll...",
+        "llllllllll..", ".llldddlll..", "..llllllllll", "...lllllllll", ".....llllll.",
+        ".......ll...", "............"],
+    'gyuki': [
+        "w............w", "ww..kkkkkk..ww", ".wwkkkkkkkkww.", "..kkekkkkekk..", "..kkkkkkkkkk..",
+        "k.kkkwwwwkkk.k", ".kkkkkkkkkkkk.", "k.kkkkkkkkkk.k", ".k.kkkkkkkk.k.", "k..k......k..k",
+        "..............", ".............."],
+    'kamikiri': [
+        "....kk......", "...kkkk.....", "..kekkyy....", "..kkkkyyy...", "...kkkk.....",
+        "l..kkkk..l..", ".l.kkkk.l...", "..lkkkkl....", "...kkkk.....", "...k..k.....",
+        "..yy..yy....", "............"],
+    'kerakera_onna': [
+        "...hhhhhh...", "..hhhhhhhh..", "..hssssssh..", "..hskssksh..", "..hsrrrrsh..",
+        "..hsrwwrsh..", "...ssssss...", "..ppppMppp..", ".sppppMpppps", "..pppppppp..",
+        "..PPPPPPPP..", "..PPPPPPPP..", "..PPP..PPP..", "..kk....kk.."],
+    'sazae_oni': [
+        ".....n......", "....nnn.....", "...nmnmn....", "..nnnnnnn...", ".nmnnmnnmn..",
+        "nnnnnnnnnnn.", ".mmmmmmmmm..", ".mkemmkemm..", ".mmmmmmmmm..", "..m.m.m.m...",
+        "............", "............"],
 }
 
 _cache = {}
 
 
-def sprite(name, flip=False, flash=False, tint=None, scale=1):
-    key = (name, flip, flash, tint, scale)
+def _legs(base, frame):
+    """Einfache Laufanimation: hebt den linken bzw. rechten Fuß an."""
+    w, h = base.get_size()
+    out = base.copy()
+    half = w // 2
+    x0, x1 = (0, half) if frame == 1 else (half, w)
+    rows = 2
+    for y in range(h - rows, h):
+        for x in range(x0, x1):
+            out.set_at((x, y - 1), base.get_at((x, y)))
+            out.set_at((x, y), (0, 0, 0, 0))
+    return out
+
+
+def sprite(name, flip=False, flash=False, tint=None, scale=1, frame=0):
+    key = (name, flip, flash, tint, scale, frame)
     s = _cache.get(key)
     if s is not None:
         return s
-    if (name, False, False, None, 1) not in _cache:
+    if frame:
+        b = sprite(name, False, False, None, 1, 0)
+        fk = (name, False, False, None, 1, frame)
+        if fk not in _cache:
+            _cache[fk] = _legs(b, frame)
+        s = _cache[fk]
+        if tint or flash or flip or scale != 1:
+            s = _post(s, flip, flash, tint, scale)
+        _cache[key] = s
+        return s
+    if (name, False, False, None, 1, 0) not in _cache:
         rows = SPRITES[name]
         w, h = len(rows[0]), len(rows)
         base = pygame.Surface((w, h), pygame.SRCALPHA)
@@ -184,8 +249,14 @@ def sprite(name, flip=False, flash=False, tint=None, scale=1):
             for x, ch in enumerate(row):
                 if ch != '.':
                     base.set_at((x, y), PAL[ch])
-        _cache[(name, False, False, None, 1)] = base
-    s = _cache[(name, False, False, None, 1)]
+        _cache[(name, False, False, None, 1, 0)] = base
+    s = _cache[(name, False, False, None, 1, 0)]
+    s = _post(s, flip, flash, tint, scale)
+    _cache[key] = s
+    return s
+
+
+def _post(s, flip, flash, tint, scale):
     if scale != 1:
         s = pygame.transform.scale(s, (s.get_width() * scale, s.get_height() * scale))
     if tint:
@@ -199,7 +270,6 @@ def sprite(name, flip=False, flash=False, tint=None, scale=1):
         s.fill((255, 255, 255), special_flags=pygame.BLEND_RGB_MAX)
     if flip:
         s = pygame.transform.flip(s, True, False)
-    _cache[key] = s
     return s
 
 
@@ -478,12 +548,61 @@ def make_floor(biome, rng):
         elif pat == 'snow':
             for _ in range(200):
                 s.set_at((rng.randrange(RW), rng.randrange(RH)), (255, 255, 255))
+    _decor(s, biome.get('decor'), base, rng)
     # leichte Vignette zum Rand
     v = pygame.Surface((RW, RH), pygame.SRCALPHA)
     for i in range(10):
         pygame.draw.rect(v, (0, 0, 0, 10), (i, i, RW - 2 * i, RH - 2 * i), 1)
     s.blit(v, (0, 0))
     return s
+
+
+def _decor(s, kind, base, rng):
+    D = pygame.draw
+    n = rng.randint(10, 22)
+    for _ in range(n):
+        x, y = rng.randrange(8, RW - 8), rng.randrange(8, RH - 8)
+        if kind in ('grass', 'reeds'):
+            c = (90, 150, 70) if kind == 'grass' else (120, 150, 80)
+            for i in range(rng.randint(3, 6)):
+                dx = rng.randint(-4, 4)
+                D.line(s, _c(c, rng.uniform(0.8, 1.3)), (x + dx, y), (x + dx + rng.randint(-2, 2), y - rng.randint(3, 8 if kind == 'reeds' else 5)))
+            if kind == 'reeds' and rng.random() < 0.3:
+                D.ellipse(s, (120, 80, 50), (x - 1, y - 11, 3, 5))
+        elif kind == 'petals':
+            for i in range(rng.randint(2, 5)):
+                D.ellipse(s, (250, 180, 205), (x + rng.randint(-8, 8), y + rng.randint(-6, 6), 3, 2))
+        elif kind == 'leaves':
+            col = rng.choice([(190, 90, 40), (210, 140, 50), (160, 60, 40)])
+            D.ellipse(s, col, (x, y, 5, 3))
+            D.line(s, _c(col, 0.6), (x, y + 1), (x + 4, y + 1))
+        elif kind == 'cracks':
+            pts = [(x, y)]
+            for i in range(4):
+                pts.append((pts[-1][0] + rng.randint(-7, 7), pts[-1][1] + rng.randint(-7, 7)))
+            D.lines(s, _c(base, 0.55), False, pts, 1)
+        elif kind == 'graves' and rng.random() < 0.35:
+            D.rect(s, (120, 120, 130), (x, y - 8, 7, 10))
+            D.rect(s, (90, 90, 100), (x, y - 8, 7, 10), 1)
+            D.line(s, (60, 60, 70), (x + 2, y - 5), (x + 4, y - 5))
+        elif kind == 'bones':
+            c = (220, 212, 190)
+            D.line(s, c, (x, y), (x + 7, y + rng.randint(-3, 3)), 2)
+            D.circle(s, c, (x, y), 2); D.circle(s, c, (x + 7, y), 2)
+            if rng.random() < 0.15:
+                D.circle(s, c, (x + 14, y - 3), 4); D.circle(s, (40, 20, 20), (x + 13, y - 4), 1)
+        elif kind == 'shells':
+            col = rng.choice([(240, 200, 210), (230, 230, 210), (200, 120, 130)])
+            D.polygon(s, col, [(x, y), (x + 4, y - 4), (x + 8, y)])
+            if rng.random() < 0.4:
+                for i in range(3):
+                    D.line(s, (40, 120, 70), (x + 12 + i * 2, y + 4), (x + 12 + i * 2 + rng.randint(-2, 2), y - 6), 1)
+        elif kind == 'planks' and rng.random() < 0.4:
+            D.rect(s, (90, 64, 44), (x, y, rng.randint(12, 24), 4))
+        elif kind == 'snow':
+            D.ellipse(s, (240, 245, 255), (x, y, rng.randint(6, 14), 4))
+        elif kind == 'clouds':
+            D.circle(s, (250, 240, 210), (x, y), rng.randint(3, 6))
 
 
 def make_walls(biome, rng):
@@ -542,6 +661,10 @@ def make_walls(biome, rng):
                 D.circle(s, c, (x, y), r)
         s.set_clip(None)
     D.rect(s, _c(wc, 0.35), outer, 2)
+    for cx, cy in ((outer.x, outer.y), (outer.right - 20, outer.y), (outer.x, outer.bottom - 20), (outer.right - 20, outer.bottom - 20)):
+        D.rect(s, _c(wc, 0.45), (cx, cy, 20, 20))
+        D.rect(s, _c(wc, 1.2), (cx + 3, cy + 3, 14, 14))
+        D.rect(s, _c(wc, 0.7), (cx + 6, cy + 6, 8, 8))
     inner = pygame.Rect(RX, RY, RW, RH)
     D.rect(s, _c(wc, 0.4), inner.inflate(4, 4), 2)
     s.fill((0, 0, 0, 0), inner)
@@ -565,10 +688,35 @@ def draw_tile(surf, t, x, y, biome, var=0):
         if biome.get('moss'):
             D.circle(surf, (70, 130, 60), (x + 10, y + 8), 3)
     elif t == T_PIT:
-        D.rect(surf, (10, 6, 14), (x, y, 32, 32))
-        D.rect(surf, _c(biome['floor'], 0.45), (x, y, 32, 6))
-        D.rect(surf, _c(biome['floor'], 0.3), (x, y + 6, 32, 3))
-        D.rect(surf, (4, 2, 6), (x + 3, y + 14, 26, 15))
+        kind = biome.get('pit', 'void')
+        if kind == 'water':
+            D.rect(surf, (30, 70, 120), (x, y, 32, 32))
+            D.rect(surf, (20, 50, 90), (x, y + 18, 32, 14))
+            D.rect(surf, _c(biome['floor'], 0.6), (x, y, 32, 4))
+            for i in range(3):
+                yy = y + 8 + i * 8
+                D.line(surf, (120, 180, 230), (x + 4 + (i * 7) % 12, yy), (x + 12 + (i * 7) % 12, yy), 1)
+        elif kind == 'lava':
+            D.rect(surf, (150, 40, 10), (x, y, 32, 32))
+            D.rect(surf, (230, 110, 30), (x + 2, y + 6, 28, 22))
+            D.rect(surf, (60, 20, 10), (x, y, 32, 5))
+            for i in range(3):
+                D.circle(surf, (255, 200, 80), (x + 7 + i * 9, y + 12 + (i % 2) * 8), 2)
+        elif kind == 'ice':
+            D.rect(surf, (150, 200, 235), (x, y, 32, 32))
+            D.rect(surf, (110, 160, 210), (x, y, 32, 32), 1)
+            D.line(surf, (240, 250, 255), (x + 5, y + 6), (x + 14, y + 15), 1)
+            D.line(surf, (240, 250, 255), (x + 18, y + 20), (x + 26, y + 26), 1)
+            D.rect(surf, (20, 40, 70), (x + 6, y + 10, 20, 16))
+        elif kind == 'cloud':
+            D.rect(surf, (120, 160, 220), (x, y, 32, 32))
+            D.circle(surf, (240, 245, 255), (x + 6, y + 26), 7)
+            D.circle(surf, (240, 245, 255), (x + 22, y + 8), 5)
+        else:
+            D.rect(surf, (10, 6, 14), (x, y, 32, 32))
+            D.rect(surf, _c(biome['floor'], 0.45), (x, y, 32, 6))
+            D.rect(surf, _c(biome['floor'], 0.3), (x, y + 6, 32, 3))
+            D.rect(surf, (4, 2, 6), (x + 3, y + 14, 26, 15))
     elif t == T_SPIKE:
         for i in range(3):
             for j in range(3):
@@ -588,6 +736,23 @@ def draw_tile(surf, t, x, y, biome, var=0):
         D.rect(surf, sc, (x + 9, y + 8, 14, 7))
         D.rect(surf, (255, 210, 120), (x + 12, y + 10, 8, 4))
         D.polygon(surf, _c(sc, 0.8), [(x + 5, y + 8), (x + 16, y + 1), (x + 27, y + 8)])
+
+
+_grade = {}
+
+
+def color_grade(surf, col, strength=26):
+    """Leichte Farbstimmung + Vignette über den ganzen Bildschirm."""
+    key = (col, strength)
+    g = _grade.get(key)
+    if g is None:
+        g = pygame.Surface((W, H), pygame.SRCALPHA)
+        g.fill(col + (strength,))
+        for i in range(40):
+            a = int((1 - i / 40) ** 2 * 110)
+            pygame.draw.rect(g, (0, 0, 0, a), (i * 2, i * 2, W - i * 4, H - i * 4), 2)
+        _grade[key] = g
+    surf.blit(g, (0, 0))
 
 
 # ---------------------------------------------------------------- Text

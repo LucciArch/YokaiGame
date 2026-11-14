@@ -13,6 +13,10 @@ from .entities import (Player, Bullet, Enemy, Pickup, Pedestal, Obj, Hazard, Par
 from .bosses import make_boss, CX, CY
 
 ACH = {a[0]: a for a in ACHIEVEMENTS}
+_GRADE = {'chikurin': (40, 90, 30), 'inari': (120, 50, 20), 'kawabe': (20, 70, 80), 'obakedera': (60, 40, 20),
+          'hakaba': (40, 50, 80), 'yashiki': (60, 20, 50), 'kurama': (80, 50, 20), 'yukiyama': (60, 90, 130),
+          'oeyama': (90, 30, 10), 'ryugu': (10, 70, 90), 'uminobe': (30, 40, 60), 'shinkai': (0, 20, 80),
+          'yomi': (90, 0, 30), 'jigoku': (120, 30, 0), 'enma_cho': (110, 20, 10), 'takamagahara': (120, 100, 40)}
 Q_WEIGHT = {0: 1.0, 1: 1.0, 2: 0.8, 3: 0.42, 4: 0.18}
 CURSES = {'dunkel': 'Fluch der Dunkelheit', 'nebel': 'Fluch des Nebels', 'labyrinth': 'Fluch des Labyrinths',
           'verirrt': 'Fluch der Verirrten'}
@@ -118,7 +122,8 @@ class Run:
         room.seen = True
         if room_obj is None:
             for d, n in room.doors.items():
-                self.rooms[n].seen = True
+                if self.rooms[n].revealed:
+                    self.rooms[n].seen = True
         if room.tiles is None:
             build_room_tiles(room, random.Random(room.layout_seed))
         self.pickups = [o for o in room.objects if isinstance(o, Pickup)]
@@ -155,7 +160,35 @@ class Run:
 
     def door_locked(self, d):
         n = self.room.doors.get(d)
-        return bool(n and self.rooms[n].locked)
+        if not n or self.room.pos == ('shrine',):
+            return False
+        r = self.rooms[n]
+        return bool(r.locked or not r.revealed or (self.room.kind == 'secret' and False))
+
+    def hidden_doors(self):
+        out = []
+        if self.room.pos == ('shrine',):
+            return out
+        for d, n in self.room.doors.items():
+            if not self.rooms[n].revealed:
+                out.append((d, n))
+        return out
+
+    def reveal_near(self, x, y, rad):
+        for d, n in self.hidden_doors():
+            dx, dy = DOOR_POS[d]
+            if math.hypot(dx - x, dy - y) < rad:
+                r = self.rooms[n]
+                r.revealed = True
+                r.seen = True
+                audio.play('unlock')
+                self.shake(6)
+                burst(self, dx, dy, (220, 200, 160), 30, 120, 0.8, 3)
+                self.banner('Geheimraum entdeckt!', 'Ein verborgener Pfad öffnet sich', (230, 210, 150))
+                self.save.stat('secrets')
+                self.achieve('secret')
+                if self.save['stats'].get('secrets', 0) >= 10:
+                    self.achieve('secret10')
 
     def doors_open(self):
         return self.room.cleared
@@ -214,7 +247,11 @@ class Run:
                 eid = rng.choice(kinds_g)
             else:
                 eid = rng.choice(kinds_g + kinds_f)
-            self.spawn_enemy(eid, x, y, self.champ_roll())
+            champ = self.champ_roll()
+            for gi in range(ENEMIES[eid].get('group', 1)):
+                gx = clamp(x + random.uniform(-14, 14) * (gi > 0), RX + 10, RX + RW - 10)
+                gy = clamp(y + random.uniform(-14, 14) * (gi > 0), RY + 10, RY + RH - 10)
+                self.spawn_enemy(eid, gx, gy, champ)
         if not self.enemies:
             room.cleared = True
 
@@ -258,6 +295,18 @@ class Run:
             self.banner('Kampfraum!', 'Überstehe alle Wellen für eine Belohnung', (255, 120, 100))
             self.spawn_room_enemies(room)
             room.extra['waves'] -= 1
+        elif k == 'secret':
+            r = random.random()
+            if r < 0.45:
+                self.pedestals.append(Pedestal(self.pick_item('K' if random.random() < 0.3 else 'T', 0.1), cx, cy))
+            elif r < 0.75:
+                for i in range(random.randint(6, 11)):
+                    self.pickups.append(Pickup('coin' if random.random() < 0.8 else 'coin5', cx + random.uniform(-40, 40), cy + random.uniform(-25, 25), pop=False))
+                self.pickups.append(Pickup('key', cx, cy + 30, pop=False))
+            else:
+                self.pickups.append(Pickup('chest', cx - 30, cy, pop=False))
+                self.pickups.append(Pickup('chest', cx + 30, cy, pop=False))
+                self.pickups.append(Pickup('spirit', cx, cy + 30, pop=False))
         elif k == 'omikuji':
             self.objs.append(Obj('omikuji', cx - 40, cy))
             self.objs.append(Obj('saisen', cx + 40, cy + 6))
@@ -392,6 +441,7 @@ class Run:
         burst(self, x, y, (90, 80, 80), 12, 60, 0.8, 4)
         self.particles.append(Particle(x, y, 0, 0, 0.25, (255, 230, 160), r, kind='ring'))
         if owner == 'p':
+            self.reveal_near(x, y, r + 40)
             for e in list(self.enemies):
                 if e.active():
                     for hx, hy, hr in e.hitboxes():
@@ -421,6 +471,11 @@ class Run:
             self.floats.append([e.x, e.y - 14, 'Kritisch!', (255, 220, 90), 0.6])
         e.hp -= dmg
         e.flash = 0.07
+        if b is not None:
+            for _ in range(3):
+                a = math.atan2(-b.vy, -b.vx) + random.uniform(-0.9, 0.9)
+                v = random.uniform(60, 140)
+                self.particles.append(Particle(b.x, b.y, math.cos(a) * v, math.sin(a) * v, 0.18, (255, 250, 220), 1, kind='spark'))
         if self.save['settings'].get('dmgnums', True) and dmg >= 0.5:
             self.floats.append([e.x + random.uniform(-4, 4), e.y - 10, '%d' % round(dmg) if dmg >= 1 else '%.1f' % dmg, (255, 255, 255), 0.45])
         if burn:
@@ -490,6 +545,7 @@ class Run:
         col = gfx.PAL['w'] if not e.champ else CHAMPIONS[e.champ]['col']
         burst(self, e.x, e.y, col, 14, 90, 0.5, 2)
         burst(self, e.x, e.y, (40, 30, 50), 8, 40, 0.7, 3)
+        self.particles.append(Particle(e.x, e.y - 4, random.uniform(-6, 6), -28, 1.1, (120, 200, 255), 2, kind='soul'))
         audio.play('kill', 0.6)
         self.kills += 1
         self.save.stat('kills')
@@ -549,6 +605,8 @@ class Run:
             self.achieve('kotaro')
         if b.id == 'mikaboshi':
             self.achieve('susanoo')
+        if len(s['bosses']) >= len(BOSSES):
+            self.achieve('all_bosses')
         if not self.boss_hit:
             self.achieve('nohit')
             s.stat('nohit_bosses')
@@ -674,6 +732,7 @@ class Run:
             return
         p.salts -= 1
         audio.play('blank')
+        self.reveal_near(p.x, p.y, 75)
         self.clear_ebullets()
         self.flash_white = 0.25
         self.particles.append(Particle(p.x, p.y, 0, 0, 0.4, (255, 255, 255), 140, kind='ring'))
@@ -1239,6 +1298,12 @@ class Run:
             other = self.rooms[n]
             x, y = DOOR_POS[d]
             horiz = d in 'ns'
+            if not other.revealed:
+                col = (40, 30, 30)
+                for i in range(4):
+                    a = random.Random(i + n[0] * 7 + n[1]).uniform(0, math.tau)
+                    pygame.draw.line(s, col, (x, y), (x + math.cos(a) * 9, y + math.sin(a) * 6), 1)
+                continue
             w, h = (34, 18) if horiz else (18, 34)
             rect = pygame.Rect(0, 0, w, h)
             rect.center = (x, y + (-6 if d == 'n' else 6 if d == 's' else 0)) if horiz else (x + (-6 if d == 'w' else 6), y)
@@ -1274,7 +1339,8 @@ class Run:
         if self.room.extra.get('tutorial'):
             cx = RX + RW / 2
             lines = ['WASD – Bewegen', 'Pfeiltasten / Maus – Ofuda werfen', 'Leertaste – Ausweichrolle',
-                     'E – Aktives Item     Q – Reinigungssalz', 'Tab – Items & Werte    Esc – Pause']
+                     'E – Aktives Item     Q – Reinigungssalz', 'Tab – Items & Werte    Esc – Pause',
+                     'Tipp: Salz an rissigen Wänden deckt Geheimräume auf']
             for i, l in enumerate(lines):
                 gfx.TEXT.add(l, cx, RY + 22 + i * 13, 8, (230, 220, 190), 'c', alpha=170)
         for h in self.hazards:
@@ -1303,6 +1369,7 @@ class Run:
         dark = self.biome['dark'] + (150 if self.curse == 'dunkel' else 0)
         if dark > 0 and not self.room.kind.startswith('shrine'):
             self.draw_dark(s, min(215, dark))
+        gfx.color_grade(s, self.biome.get('grade', _GRADE.get(self.biome_id, (0, 0, 0))), 18)
         if self.timestop > 0:
             ov = pygame.Surface((RW, RH), pygame.SRCALPHA)
             ov.fill((90, 110, 200, 40))
@@ -1447,10 +1514,10 @@ class Run:
         bg = pygame.Surface((w + 4, h + 4), pygame.SRCALPHA)
         bg.fill((0, 0, 0, 110))
         s.blit(bg, (x0 - 2, y0 - 2))
-        icons = {'boss': (230, 50, 50), 'treasure': (240, 200, 70), 'shop': (90, 200, 90), 'curse': (170, 80, 200),
+        icons = {'secret': (200, 180, 140), 'boss': (230, 50, 50), 'treasure': (240, 200, 70), 'shop': (90, 200, 90), 'curse': (170, 80, 200),
                  'challenge': (230, 120, 60), 'omikuji': (230, 80, 70), 'onsen': (120, 200, 230)}
         for pos, r in rooms.items():
-            if not (r.seen or show_all):
+            if not (r.seen or show_all) or not r.revealed:
                 continue
             rx = x0 + (pos[0] - minx) * cw
             ry = y0 + (pos[1] - miny) * ch

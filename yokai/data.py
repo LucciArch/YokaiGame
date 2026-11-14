@@ -47,11 +47,39 @@ BIOMES = {
                          enemies=['shinigami', 'oni', 'karasu_tengu', 'ningyo', 'yamabiko', 'kamaitachi', 'shikome'],
                          music=('yo', 294, 112, 'battle', 61), dark=0),
 }
-DEPTH_BIOMES = {1: ['chikurin', 'inari'], 2: ['obakedera', 'hakaba'], 3: ['kurama', 'yukiyama'],
-                4: ['ryugu', 'uminobe'], 5: ['yomi', 'jigoku'], 6: ['takamagahara']}
-BOSS_POOL = {1: ['omukade', 'kappa_ou', 'jorogumo'], 2: ['gashadokuro', 'rokurokubi', 'nue'],
-             3: ['sojobo', 'raiju', 'yuki_onna'], 4: ['umibozu', 'ryujin', 'bake_kujira'],
-             5: ['orochi', 'shuten_doji', 'tamamo'], 6: ['mikaboshi']}
+BIOMES.update({
+    'kawabe': dict(name='Kappa-Flussufer', jp='Kawabe', depth=1, floor=(70, 104, 70), floor_pat='grass',
+                   wall=(96, 120, 86), wall_pat='rock', rock=(120, 124, 116), moss=True, ambient='fireflies',
+                   enemies=['kappa', 'tesso', 'hitodama', 'kasa_obake', 'yosuzume', 'tsuchinoko'],
+                   music=('ryukyu', 220, 98, 'calm', 13), dark=10, pit='water', decor='reeds'),
+    'yashiki': dict(name='Spukvilla', jp='Bake-yashiki', depth=2, floor=(118, 82, 56), floor_pat='wood',
+                    wall=(70, 44, 36), wall_pat='wood', rock=(110, 90, 80), moss=False, ambient='fog',
+                    enemies=['mokumokuren', 'chochin', 'tesso', 'enenra', 'kerakera_onna', 'nopperabo'],
+                    music=('iwato', 196, 78, 'mystic', 23), dark=80, decor='cracks'),
+    'oeyama': dict(name='Ōe-Berg', jp='Ōe-yama', depth=3, floor=(96, 70, 58), floor_pat='gravel',
+                   wall=(70, 50, 44), wall_pat='rock', rock=(100, 84, 76), moss=False, ambient='embers',
+                   enemies=['kamikiri', 'jinmenju', 'abura_akago', 'karasu_tengu', 'bakeneko', 'gyuki'],
+                   music=('in', 233, 116, 'battle', 33), dark=20, decor='bones'),
+    'shinkai': dict(name='Tiefsee', jp='Shinkai', depth=4, floor=(24, 46, 78), floor_pat='sand',
+                    wall=(30, 60, 100), wall_pat='coral', rock=(60, 90, 130), moss=False, ambient='bubbles',
+                    enemies=['sazae_oni', 'gyuki', 'isonade', 'ningyo', 'funayurei'],
+                    music=('iwato', 196, 96, 'mystic', 43), dark=90, pit='water', decor='shells'),
+    'enma_cho': dict(name='Hof des Enma', jp='Enma-chō', depth=5, floor=(110, 30, 30), floor_pat='stone',
+                     wall=(60, 16, 16), wall_pat='stone', rock=(140, 110, 60), moss=False, ambient='embers',
+                     enemies=['oni', 'nurikabe', 'kerakera_onna', 'shinigami', 'abura_akago', 'shikome'],
+                     music=('in', 175, 120, 'battle', 53), dark=40, pit='lava', decor='cracks'),
+})
+DEPTH_BIOMES = {1: ['chikurin', 'inari', 'kawabe'], 2: ['obakedera', 'hakaba', 'yashiki'], 3: ['kurama', 'yukiyama', 'oeyama'],
+                4: ['ryugu', 'uminobe', 'shinkai'], 5: ['yomi', 'jigoku', 'enma_cho'], 6: ['takamagahara']}
+for _b, _pit, _dec in (('chikurin', 'void', 'grass'), ('inari', 'void', 'petals'), ('obakedera', 'void', 'cracks'),
+                       ('hakaba', 'void', 'graves'), ('kurama', 'void', 'leaves'), ('yukiyama', 'ice', 'snow'),
+                       ('ryugu', 'water', 'shells'), ('uminobe', 'water', 'planks'), ('yomi', 'void', 'bones'),
+                       ('jigoku', 'lava', 'cracks'), ('takamagahara', 'cloud', 'clouds')):
+    BIOMES[_b].setdefault('pit', _pit)
+    BIOMES[_b].setdefault('decor', _dec)
+BOSS_POOL = {1: ['omukade', 'kappa_ou', 'jorogumo', 'oonyudo'], 2: ['gashadokuro', 'rokurokubi', 'nue', 'nurarihyon'],
+             3: ['sojobo', 'raiju', 'yuki_onna', 'kamaitachi_trio'], 4: ['umibozu', 'ryujin', 'bake_kujira', 'akkorokamui'],
+             5: ['orochi', 'shuten_doji', 'tamamo', 'enma'], 6: ['mikaboshi']}
 
 # =====================================================================  ITEMS
 ITEMS = {}
@@ -197,6 +225,24 @@ I('kyubi_juwel', 'Tamamos Juwel', 'Das Herz der Neunschwänzigen', 'crystal', (2
 I('shuten_schale', 'Shutens Sakeschale', 'Der König der Oni trinkt', 'cup', (180, 40, 40), 'B', ['oni'], 4, True, dmgm=1.5, hp=1)
 I('hoshi_splitter', 'Splitter des bösen Sterns', 'Mikaboshis Licht', 'star', (180, 120, 255), 'B', ['kami'], 4, True, multishot=2, homing=1, chain=1)
 
+# ---- Neue Items (Runde 1)
+I('tesso_zahn', 'Zahn des Tesso', 'Die Eisenratte nagt alles durch', 'fang', (160, 170, 190), 'T', [], 2, pierce=1, rate=0.3)
+I('abura_schale', 'Ölschale', 'Das Feuerkind leckt daran', 'cup', (240, 170, 60), 'T', [], 2, burn=1, range=30)
+I('nurikabe_stein', 'Nurikabe-Stein', 'Eine unsichtbare Wand schützt dich', 'crystal', (160, 160, 150), 'TS', [], 3, shield=1, hp=1)
+I('mokumoku_auge', 'Hundert Augen', 'Aus den Shōji starrt es zurück', 'eye', (230, 230, 210), 'T', ['yurei'], 2, homing=1, crit=0.08)
+I('jinmen_frucht', 'Gesichterfrucht', 'Sie lacht, wenn man sie isst', 'daruma', (240, 190, 140), 'TS', [], 1, fullheal=1, luck=1)
+I('suzume_feder', 'Spatzenfeder', 'Der Nachtspatz singt', 'feather', (150, 100, 60), 'T', ['tengu'], 1, rate=0.4, spd=10)
+I('enenra_pfeife', 'Rauchpfeife', 'Du wirst zu Rauch, wenn du rollst', 'staff', (140, 140, 150), 'T', ['yurei'], 2, dash_reflect=1, spectral=1)
+I('gyuki_horn', 'Gyūki-Horn', 'Vom Ochsenkopf-Spinnendämon', 'fang', (60, 60, 70), 'TO', ['oni'], 2, dmg=1.2, knock=1)
+I('kerakera_faecher', 'Fächer der Kerakera-onna', 'Ihr Lachen hallt wider', 'fan', (190, 80, 160), 'T', [], 2, multishot=1, wave=1)
+I('sazae_muschel', 'Sazae-Muschel', 'Eine Turbanschnecke mit Geheimnissen', 'shell', (230, 150, 170), 'T', ['ryu'], 2, bounce=1, hp=1)
+I('onyudo_kette', 'Ōnyūdōs Gebetskette', 'Riesige Perlen eines riesigen Mönchs', 'beads', (190, 140, 90), 'B', ['kami'], 4, True, orbital=3, dmg=0.5)
+I('nurarihyon_pfeife', 'Nurarihyons Kiseru', 'Der Herr der Yokai befiehlt', 'staff', (180, 150, 90), 'B', ['shikigami'], 4, True, familiar=2, luck=2)
+I('kamaitachi_klingen', 'Klingen der drei Wiesel', 'Stolpern, Schneiden, Heilen', 'claw', (230, 230, 240), 'B', ['tengu'], 4, True, multishot=2, rate=0.5, pierce=1)
+I('akkoro_tinte', 'Akkorokamuis Tinte', 'Rot wie das Meer bei Sonnenuntergang', 'gourd', (200, 40, 60), 'B', ['ryu'], 4, True, slow=1, poison=1, split=1)
+I('enma_spiegel', 'Jōhari-Spiegel', 'Er zeigt alle Sünden', 'mirror', (220, 60, 50), 'B', ['kami'], 4, True, dmgm=1.5, back=1)
+I('geheimkarte', 'Karte des Diebes', 'Wo sind die verborgenen Räume?', 'scroll', (190, 160, 110), 'TS', [], 2, True, map=1, salts=2)
+
 ITEM_IDS = ORDER
 
 # =====================================================================  SYNERGIEN
@@ -242,6 +288,15 @@ SYNERGIES = [
     dict(id='schreinwaechter', name='Schreinwächter', desc='Komainu bewacht das Seil', items=['komainu', 'shimenawa'], fx=dict(orbital=2, shield=1)),
     dict(id='seimei_meister', name='Abe no Seimei', desc='Der legendäre Onmyōji', items=['seimei_stern', 'kuji_in'], fx=dict(homing=1, familiar=1)),
     dict(id='tengu_koenig', name='Tengu-König', desc='Maske und Fächer des Sōjōbō', items=['tengu_maske', 'sojobo_feder'], fx=dict(dmgm=1.3, homing=1)),
+    dict(id='hundert_augen', name='Hundert Augen sehen alles', desc='Kein Yokai entkommt deinem Blick', items=['mokumoku_auge', 'tengu_auge'], fx=dict(crit=0.2, homing=1)),
+    dict(id='rattenschwarm', name='Tessos Schwarm', desc='Tausend kleine Zähne', items=['tesso_zahn', 'natto'], fx=dict(split=1, multishot=1)),
+    dict(id='oelfeuer', name='Ölfeuer', desc='Laternenöl brennt am besten', items=['abura_schale', 'chochin_feuer'], fx=dict(explode=1, burn=1)),
+    dict(id='gericht', name='Göttliches Gericht', desc='Zwei Spiegel – Himmel und Hölle', items=['enma_spiegel', 'yata_kagami'], fx=dict(chain=1, dmgm=1.3)),
+    dict(id='hyakki_herr', name='Herr der Nachtparade', desc='Alle Yokai folgen dir', items=['nurarihyon_pfeife', 'shikigami_papier'], fx=dict(familiar=2)),
+    dict(id='wirbelklingen', name='Wirbelwind-Klingen', desc='Die Wiesel kehren immer zurück', items=['kamaitachi_klingen', 'kamaitachi_sichel'], fx=dict(boomerang=1, pierce=1)),
+    dict(id='tiefsee', name='Aus der Tiefsee', desc='Tinte und Muschel', items=['akkoro_tinte', 'sazae_muschel'], fx=dict(bounce=1, multishot=1)),
+    dict(id='unbeweglich', name='Unbeweglich', desc='Wand und Wächter', items=['nurikabe_stein', 'komainu'], fx=dict(shield=1, hp=2)),
+    dict(id='riesenmoench', name='Gebet des Riesen', desc='Perlen kreisen um dich', items=['onyudo_kette', 'juzu'], fx=dict(orbital=2, spectral=1)),
     dict(id='orochi_kusanagi', name='Aus dem Schwanz der Orochi', desc='Susanoo fand das Schwert in der Schlange', items=['kusanagi', 'yamata_zahn'], fx=dict(dmgm=1.4, pierce=1)),
 ]
 
@@ -344,6 +399,17 @@ ENEMIES = {
     'tsuchigumo': dict(name='Tsuchigumo', sprite='tsuchigumo', hp=28, speed=26, r=9, move='wander', attack=A('spawn', what='kumo', cd=3.2, max=4)),
     'kumo': dict(name='Kumo', sprite='kumo', hp=3, speed=82, r=4, move='chase', attack=None),
     'shinigami': dict(name='Shinigami', sprite='shinigami', hp=32, speed=22, r=9, move='float', attack=A('spiral', n=3, speed=85, cd=3.4, col=(170, 100, 230)), fly=True),
+    'tesso': dict(name='Tesso', sprite='tesso', hp=4, speed=88, r=4, move='chase', attack=None, group=3, erratic=True),
+    'abura_akago': dict(name='Abura-akago', sprite='abura_akago', hp=12, speed=38, r=6, move='float', attack=A('trail', cd=0.45), fly=True, glow=(255, 160, 60)),
+    'nurikabe': dict(name='Nurikabe', sprite='nurikabe', hp=70, speed=17, r=12, move='chase', attack=None, heavy=True, big=True),
+    'mokumokuren': dict(name='Mokumokuren', sprite='mokumokuren', hp=16, speed=0, r=7, move='static', attack=A('aimed', speed=200, cd=1.5, col=(255, 250, 220))),
+    'jinmenju': dict(name='Jinmenju', sprite='jinmenju', hp=32, speed=0, r=8, move='static', attack=A('spiral', n=2, speed=70, cd=4.0, col=(250, 200, 150))),
+    'yosuzume': dict(name='Yosuzume', sprite='yosuzume', hp=3, speed=95, r=4, move='circle', attack=None, fly=True, group=4),
+    'enenra': dict(name='Enenra', sprite='enenra', hp=14, speed=30, r=7, move='float', attack=A('trail', cd=0.6, smoke=True), fly=True),
+    'gyuki': dict(name='Gyūki', sprite='gyuki', hp=34, speed=42, r=9, move='charge', attack=None, charge_ring=10),
+    'kamikiri': dict(name='Kamikiri', sprite='kamikiri', hp=11, speed=60, r=6, move='charge', attack=None, fast_charge=True),
+    'kerakera_onna': dict(name='Kerakera-onna', sprite='kerakera_onna', hp=28, speed=26, r=8, move='wander', attack=A('ring', n=16, speed=75, cd=3.2, col=(240, 120, 200), double=True)),
+    'sazae_oni': dict(name='Sazae-oni', sprite='sazae_oni', hp=24, speed=38, r=7, move='side', attack=A('aimed', n=5, spread=0.22, speed=105, cd=2.6, col=(250, 170, 190))),
     'kappa_small': dict(name='Kappa', sprite='kappa_small', hp=6, speed=50, r=5, move='chase', attack=None),
     'karasu': dict(name='Krähe', sprite='karasu', hp=5, speed=80, r=5, move='float', attack=None, fly=True),
 }
@@ -374,12 +440,19 @@ BOSSES = {
     'orochi': dict(name='Yamata no Orochi', title='Die achtköpfige Schlange', hp=880),
     'shuten_doji': dict(name='Shuten-dōji', title='König der Oni', hp=820),
     'tamamo': dict(name='Tamamo-no-Mae', title='Die neunschwänzige Füchsin', hp=800),
+    'oonyudo': dict(name='Ōnyūdō', title='Der riesige Mönch', hp=240),
+    'nurarihyon': dict(name='Nurarihyon', title='Oberhaupt aller Yokai', hp=330),
+    'kamaitachi_trio': dict(name='Die drei Kamaitachi', title='Stolpern, Schneiden, Heilen', hp=420),
+    'akkorokamui': dict(name='Akkorokamui', title='Der rote Riesenkrake', hp=560),
+    'enma': dict(name='Enma-Daiō', title='Richter der Unterwelt', hp=860),
     'mikaboshi': dict(name='Amatsu-Mikaboshi', title='Der böse Stern des Himmels', hp=1500),
 }
 BOSS_REWARD = {  # Freischaltung beim ersten Sieg
     'omukade': 'senbazuru', 'kappa_ou': 'komainu', 'jorogumo': 'ronin_schwur', 'gashadokuro': 'sanzu_muenze',
     'rokurokubi': 'tengu_auge', 'nue': 'yata_kagami', 'sojobo': None, 'raiju': 'kusanagi',
     'yuki_onna': 'yasakani', 'umibozu': None, 'ryujin': None, 'bake_kujira': None,
+    'oonyudo': 'onyudo_kette', 'nurarihyon': 'nurarihyon_pfeife', 'kamaitachi_trio': 'kamaitachi_klingen',
+    'akkorokamui': 'akkoro_tinte', 'enma': 'enma_spiegel',
     'orochi': 'yamata_zahn', 'shuten_doji': 'shuten_schale', 'tamamo': 'kyubi_juwel', 'mikaboshi': 'hoshi_splitter',
 }
 
@@ -413,4 +486,7 @@ ACHIEVEMENTS = [
     ('floor5', 'Die Tore von Yomi', 'Erreiche Yomi (Ebene 5)', None),
     ('win_hard', 'Oni unter Oni', 'Gewinne im Oni-Modus', None),
     ('all_chars', 'Hyakki Yagyō', 'Schalte alle Charaktere frei', None),
+    ('secret', 'Verborgene Pfade', 'Finde einen Geheimraum (Reinigungssalz an Wänden!)', ('item', 'geheimkarte')),
+    ('secret10', 'Schatzjäger', 'Finde 10 Geheimräume', None),
+    ('all_bosses', 'Bezwinger der Nachtparade', 'Besiege alle 21 Bosse', None),
 ]
