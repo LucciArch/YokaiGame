@@ -23,7 +23,7 @@ CURSES = {'dunkel': 'Fluch der Dunkelheit', 'nebel': 'Fluch des Nebels', 'labyri
 
 
 class Run:
-    def __init__(self, game, char_id, seed=None, hard=False, daily=False):
+    def __init__(self, game, char_id, seed=None, hard=False, daily=False, endless=False):
         self.game = game
         self.save = game.save
         self.seed = seed if seed is not None else random.randrange(1, 10 ** 8)
@@ -31,6 +31,10 @@ class Run:
         random.seed(self.seed * 7 + 3)
         self.hard = hard
         self.daily = daily
+        self.endless = endless
+        self.loop = 0
+        self.hold = None
+        self.portrait = None
         self.depth = 1
         self.time = 0.0
         self.result = None
@@ -54,6 +58,7 @@ class Run:
         self.boss = None
         self.boss_hit = False
         self.bullet_speed_mult = 1.12 if hard else 1.0
+        self.loop_mult = 1.0
         self.kills = 0
         self.rooms_cleared = 0
         self.coins_got = 0
@@ -102,6 +107,13 @@ class Run:
 
     def go_deeper(self, depth=None):
         self.depth = depth or self.depth + 1
+        if self.depth > 6:
+            self.depth = 1
+            self.loop += 1
+            self.loop_mult = 1 + 0.6 * self.loop
+            self.bullet_speed_mult = (1.12 if self.hard else 1.0) + 0.07 * self.loop
+            self.achieve('loop1')
+            self.banner('Schleife %d' % (self.loop + 1), 'Die Nacht beginnt von vorn – stärker als zuvor', (200, 140, 255), big=True)
         audio.play('stairs')
         self.fade = 1.0
         self.new_floor()
@@ -149,6 +161,7 @@ class Run:
         elif not room.cleared:
             self.spawn_room_enemies(room)
         self.fade = 0.6
+        self.boss_intro = 0
         if room.kind == 'boss' and not room.cleared:
             self.boss_intro = 2.2
             audio.play('boss')
@@ -211,7 +224,7 @@ class Run:
         return iid
 
     def champ_roll(self):
-        ch = 0.03 + 0.02 * self.depth + (0.08 if self.hard else 0) + (0.12 if self.depth == 6 else 0)
+        ch = 0.03 + 0.02 * self.depth + (0.08 if self.hard else 0) + (0.12 if self.depth == 6 else 0) + 0.1 * self.loop
         if random.random() < ch:
             return random.choice(list(CHAMPIONS.keys()))
         return None
@@ -295,6 +308,17 @@ class Run:
             self.banner('Kampfraum!', 'Überstehe alle Wellen für eine Belohnung', (255, 120, 100))
             self.spawn_room_enemies(room)
             room.extra['waves'] -= 1
+        elif k == 'library':
+            for dx in (-70, 0, 70):
+                self.pedestals.append(Pedestal(self.pick_item('T', 0.08), cx + dx, cy - 6, group='bib'))
+            self.banner('Schriftrollenarchiv', 'Drei Schriftrollen – nur eine darfst du nehmen', (200, 180, 140))
+            self.achieve('library')
+        elif k == 'dojo':
+            self.banner('Dōjō', 'Besiege die Champions!', (255, 150, 110))
+            pool = self.biome['enemies']
+            for i, dx in enumerate((-60, 60) if self.depth < 4 else (-80, 0, 80)):
+                e = self.spawn_enemy(random.choice(pool), cx + dx, cy - 20, random.choice(list(CHAMPIONS.keys())))
+                e.hp = e.maxhp = e.maxhp * 2
         elif k == 'secret':
             r = random.random()
             if r < 0.45:
@@ -605,6 +629,7 @@ class Run:
             self.achieve('kotaro')
         if b.id == 'mikaboshi':
             self.achieve('susanoo')
+            self.achieve('endless')
         if len(s['bosses']) >= len(BOSSES):
             self.achieve('all_bosses')
         if not self.boss_hit:
@@ -623,7 +648,9 @@ class Run:
         self.pedestals.append(Pedestal(self.pick_item('B'), cx, cy - 30))
         self.spawn_pickup('heart', cx - 30, cy + 10)
         p = self.player
-        if self.depth == 5:
+        if self.endless and self.depth in (5, 6):
+            self.objs.append(Obj('heaven' if self.depth == 5 else 'torii', cx, cy + 40))
+        elif self.depth == 5:
             self.objs.append(Obj('victory', cx - 70, cy + 40))
             if self.save['heaven_unlocked']:
                 self.objs.append(Obj('heaven', cx + 70, cy + 40))
@@ -815,6 +842,10 @@ class Run:
         # Raum geschafft?
         if not self.room.cleared and not self.enemies:
             self.on_room_clear()
+        if self.hold:
+            self.hold[2] -= dt
+            if self.hold[2] <= 0:
+                self.hold = None
         self.update_fx(dt)
         if p.dead and self.result is None:
             self.result = 'dead'
@@ -939,6 +970,11 @@ class Run:
         if room.kind == 'boss':
             self.boss_room_rewards()
             audio.get().music(self.biome['music'])
+        elif room.kind == 'dojo':
+            self.spawn_pickup('chest', cx, cy)
+            if random.random() < 0.35:
+                self.pedestals.append(Pedestal(self.pick_item('T', 0.1), cx, cy - 30))
+            self.achieve('dojo')
         elif room.kind == 'challenge':
             self.pedestals.append(Pedestal(self.pick_item('T', 0.1), cx, cy))
             self.achieve('challenge')
@@ -1211,6 +1247,9 @@ class Run:
                 if val == 'hard':
                     s.data['hard_unlocked'] = True
                     sub = 'Oni-Modus freigeschaltet'
+                elif val == 'endless':
+                    s.data['endless_unlocked'] = True
+                    sub = 'Endlose Nacht freigeschaltet (Taste N bei der Charakterwahl)'
                 else:
                     s.data['heaven_unlocked'] = True
                     sub = 'Takamagahara ist nun erreichbar'
@@ -1266,7 +1305,7 @@ class Run:
         s.write()
 
     def score(self):
-        return int(self.depth * 1000 + self.kills * 10 + len(self.player.items) * 50 + (5000 if self.result == 'win' else 0)
+        return int((self.depth + self.loop * 6) * 1000 + self.kills * 10 + len(self.player.items) * 50 + (5000 if self.result == 'win' else 0)
                    - self.time * 0.5)
 
     # ======================================================================  Zeichnen
@@ -1289,6 +1328,28 @@ class Run:
         self.bg = bg
         self.bg_dirty = False
 
+    def draw_pits(self, s, t):
+        kind = self.biome.get('pit', 'void')
+        if kind not in ('water', 'lava'):
+            return
+        tiles = self.room.tiles
+        for ty in range(ROWS):
+            for tx in range(COLS):
+                if tiles[ty][tx] != T_PIT:
+                    continue
+                x, y = RX + tx * TILE, RY + ty * TILE
+                if kind == 'water':
+                    for i in range(2):
+                        ox = int((t * 14 + i * 13 + tx * 7) % 24)
+                        yy = y + 10 + i * 10 + int(math.sin(t * 2 + tx + i) * 1.5)
+                        pygame.draw.line(s, (150, 210, 250), (x + 3 + ox // 2, yy), (x + 9 + ox // 2, yy), 1)
+                else:
+                    ph = (t * 0.8 + tx * 0.37 + ty * 0.61) % 1
+                    bx, by = x + 8 + int((tx * 13 + ty * 7) % 16), y + 10 + int((tx * 5 + ty * 11) % 14)
+                    r = int(1 + ph * 3)
+                    pygame.draw.circle(s, (255, 220, 120), (bx, by), r, 1)
+                    gfx.draw_glow(s, x + 16, y + 16, 18, (255, 110, 30), int(40 + 25 * math.sin(t * 3 + tx)))
+
     def draw_doors(self, s, t):
         room = self.room
         open_ = self.doors_open()
@@ -1308,7 +1369,8 @@ class Run:
             rect = pygame.Rect(0, 0, w, h)
             rect.center = (x, y + (-6 if d == 'n' else 6 if d == 's' else 0)) if horiz else (x + (-6 if d == 'w' else 6), y)
             frame = {'boss': (150, 30, 40), 'treasure': (230, 190, 70), 'shop': (90, 160, 90), 'curse': (110, 40, 120),
-                     'challenge': (200, 90, 50), 'omikuji': (210, 60, 50), 'onsen': (120, 190, 220)}.get(other.kind, (110, 70, 45))
+                     'challenge': (200, 90, 50), 'omikuji': (210, 60, 50), 'onsen': (120, 190, 220),
+                     'library': (150, 120, 200), 'dojo': (230, 140, 60), 'secret': (160, 140, 110)}.get(other.kind, (110, 70, 45))
             if self.curse == 'verirrt' and not other.visited:
                 frame = (110, 70, 45)
             pygame.draw.rect(s, (16, 10, 14), rect.inflate(6, 6))
@@ -1333,6 +1395,7 @@ class Run:
         if self.bg_dirty or self.bg is None:
             self.render_bg()
         s.blit(self.bg, (0, 0))
+        self.draw_pits(s, t)
         self.draw_doors(s, t)
         p = self.player
         # Tutorial-Hinweise
@@ -1355,6 +1418,11 @@ class Run:
         ents.sort(key=lambda e: e.y)
         for e in ents:
             e.draw(s, t)
+        if self.hold:
+            icon, col, ht = self.hold
+            yy = p.y - 28 - (1 - min(1, (1.4 - ht) * 4)) * 6
+            gfx.draw_glow(s, int(p.x), int(yy), 16, col, 110)
+            gfx.draw_icon(s, icon, col, p.x, yy)
         for b in self.pbullets:
             b.draw(s, t)
         for b in self.ebullets:
@@ -1459,7 +1527,7 @@ class Run:
             T.add('E', ax - 15, ay - 12, 7, (200, 190, 160), 'r')
         # Ebene
         T.add('%s – %s' % (self.biome['jp'], self.biome['name']), 300, 3, 8, (230, 220, 190))
-        info = 'Ebene %d' % self.depth + ('  •  Oni-Modus' if self.hard else '') + ('  •  ' + CURSES[self.curse] if self.curse else '')
+        info = 'Ebene %d' % self.depth + ('  •  Schleife %d' % (self.loop + 1) if self.endless else '') + ('  •  Oni-Modus' if self.hard else '') + ('  •  ' + CURSES[self.curse] if self.curse else '')
         T.add(info, 300, 15, 6, (190, 170, 150))
         # Minikarte
         if self.curse != 'nebel' and not self.room.kind.startswith('shrine'):
@@ -1476,18 +1544,41 @@ class Run:
             pygame.draw.rect(s, (220, 50, 60), (bx, by, int(bw * f), 4))
             T.add(b.name, bx - 6, by - 4, 7, (255, 220, 200), 'r')
         # Titelkarte
-        if self.title_t > 0:
+        if self.title_t > 0 and self.boss_intro <= 0:
             a = int(255 * min(1, self.title_t))
             T.add('Ebene %d' % self.depth, W // 2, 92, 9, (230, 210, 170), 'c', alpha=a)
             T.add(self.biome['name'], W // 2, 104, 18, (255, 245, 225), 'c', alpha=a)
             T.add(self.biome['jp'], W // 2, 128, 10, (210, 170, 150), 'c', alpha=a)
         if self.boss_intro > 0 and self.boss:
             a = int(255 * min(1, self.boss_intro))
-            ov = pygame.Surface((W, 60), pygame.SRCALPHA)
-            ov.fill((0, 0, 0, int(a * 0.6)))
-            s.blit(ov, (0, 110))
-            T.add(self.boss.name, W // 2, 118, 20, (255, 210, 190), 'c', alpha=a)
-            T.add(self.boss.title, W // 2, 146, 9, (230, 190, 170), 'c', alpha=a)
+            if self.portrait is None or self.portrait[0] is not self.boss:
+                tmp = pygame.Surface((W, H), pygame.SRCALPHA)
+                b = self.boss
+                old = b.spawn_t
+                b.spawn_t = 0
+                try:
+                    b.render(tmp, 0.0)
+                except Exception:
+                    pass
+                b.spawn_t = old
+                box = pygame.Rect(0, 0, 130, 110)
+                box.center = (int(b.x), int(b.y) - 4)
+                box.clamp_ip(pygame.Rect(0, 0, W, H))
+                crop = tmp.subsurface(box).copy()
+                self.portrait = (b, pygame.transform.scale(crop, (195, 165)))
+            img = self.portrait[1]
+            slide = min(1, (2.2 - self.boss_intro) * 4)
+            ov = pygame.Surface((W, 110), pygame.SRCALPHA)
+            ov.fill((10, 4, 14, int(a * 0.8)))
+            s.blit(ov, (0, 95))
+            pygame.draw.line(s, (200, 60, 60), (0, 95), (W, 95), 2)
+            pygame.draw.line(s, (200, 60, 60), (0, 204), (W, 204), 2)
+            im = img.copy()
+            im.set_alpha(a)
+            s.blit(im, (int(-200 + 220 * slide), 68), area=pygame.Rect(0, 27, 195, 110 + 27))
+            T.add(self.boss.name, W // 2 + 70, 122, 20, (255, 210, 190), 'c', alpha=a)
+            T.add(self.boss.title, W // 2 + 70, 152, 9, (230, 190, 170), 'c', alpha=a)
+            T.add('Ebene %d' % self.depth, W // 2 + 70, 170, 7, (190, 160, 150), 'c', alpha=a)
         # Banner
         if self.cur_banner:
             title, sub, col, big = self.cur_banner
@@ -1515,7 +1606,8 @@ class Run:
         bg.fill((0, 0, 0, 110))
         s.blit(bg, (x0 - 2, y0 - 2))
         icons = {'secret': (200, 180, 140), 'boss': (230, 50, 50), 'treasure': (240, 200, 70), 'shop': (90, 200, 90), 'curse': (170, 80, 200),
-                 'challenge': (230, 120, 60), 'omikuji': (230, 80, 70), 'onsen': (120, 200, 230)}
+                 'challenge': (230, 120, 60), 'omikuji': (230, 80, 70), 'onsen': (120, 200, 230),
+                 'library': (170, 140, 230), 'dojo': (240, 160, 60)}
         for pos, r in rooms.items():
             if not (r.seen or show_all) or not r.revealed:
                 continue

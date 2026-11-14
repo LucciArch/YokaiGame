@@ -384,6 +384,7 @@ class Player:
         if not silent:
             run.banner(it['name'], it['desc'], it['col'])
             audio.play('item')
+            run.hold = [it['icon'], it['col'], 1.4]
         run.on_item(iid)
         # Synergien
         for s in SYNERGIES:
@@ -783,7 +784,7 @@ class Enemy:
         self.name = d['name']
         self.x, self.y = x, y
         self.r = d['r']
-        mult = (1 + 0.2 * (run.depth - 1)) * (1.3 if run.hard else 1.0)
+        mult = (1 + 0.2 * (run.depth - 1)) * (1.3 if run.hard else 1.0) * run.loop_mult
         self.champ = champ
         cm = CHAMPIONS[champ] if champ else {}
         self.maxhp = self.hp = d['hp'] * mult * cm.get('hp', 1)

@@ -210,6 +210,7 @@ class Game:
                 elif k == pygame.K_p: out.append('pause')
                 elif k == pygame.K_TAB: out.append('tab')
                 elif k == pygame.K_h: out.append('hard')
+                elif k == pygame.K_n: out.append('endless')
                 elif k == pygame.K_r: out.append('retry')
             elif e.type == pygame.JOYBUTTONDOWN:
                 if e.button == 0: out.append('ok')
@@ -390,7 +391,8 @@ class Game:
 
     def start_run(self, char, seed=None, daily=False):
         self.last_char = char
-        self.run = Run(self, char, seed, self.hard and not daily and self.save['hard_unlocked'], daily)
+        self.run = Run(self, char, seed, self.hard and not daily and self.save['hard_unlocked'], daily,
+                       getattr(self, 'endless', False) and not daily and self.save.data.get('endless_unlocked', False))
         self.state = 'play'
         self.show_tab = False
 
@@ -458,6 +460,10 @@ class Game:
         if self.save['hard_unlocked']:
             T.add('[H] Oni-Modus: ' + ('AN' if self.hard else 'aus'), W - 32, 258, 8,
                   (255, 110, 100) if self.hard else (190, 180, 170), 'r')
+        if self.save.data.get('endless_unlocked'):
+            en = getattr(self, 'endless', False)
+            T.add('[N] Endlose Nacht: ' + ('AN' if en else 'aus'), W - 32, 244, 8,
+                  (200, 140, 255) if en else (190, 180, 170), 'r')
         T.add('Enter – Start     Esc – Zurück', 32, 258, 7, (170, 160, 150))
         for nv in nav:
             if nv == 'left':
@@ -468,6 +474,8 @@ class Game:
                 self.char_sel = (self.char_sel + 5) % n; audio.play('move')
             elif nv == 'hard' and self.save['hard_unlocked']:
                 self.hard = not self.hard; audio.play('select')
+            elif nv == 'endless' and self.save.data.get('endless_unlocked'):
+                self.endless = not getattr(self, 'endless', False); audio.play('select')
             elif nv == 'back':
                 self.state = 'title'; audio.play('move')
             elif isinstance(nv, tuple) and nv[0] == 'click':

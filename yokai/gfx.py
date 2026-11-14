@@ -203,6 +203,22 @@ SPRITES = {
         "...hhhhhh...", "..hhhhhhhh..", "..hssssssh..", "..hskssksh..", "..hsrrrrsh..",
         "..hsrwwrsh..", "...ssssss...", "..ppppMppp..", ".sppppMpppps", "..pppppppp..",
         "..PPPPPPPP..", "..PPPPPPPP..", "..PPP..PPP..", "..kk....kk.."],
+    'hyosube': [
+        "............", "..nnnnnnnn..", ".nnnnnnnnnn.", ".nnwkwnwkwn.", ".nnnnnnnnnn.",
+        ".nnrrrrrrnn.", ".nnrwwwwrnn.", "..nnnnnnnn..", ".nnnnnnnnnn.", "..nn....nn..",
+        "..yy....yy..", "............"],
+    'tenome': [
+        "...ssssss...", "..ssssssss..", "..ssSSSSss..", "..ssssssss..", "...ssmmss...",
+        "...ssssss...", ".e.dddddd.e.", "skddddddddks", "s.dddddddd.s", "..dddddddd..",
+        "..dddddddd..", "..ddd..ddd..", "..ss....ss..", "............"],
+    'nekomata': [
+        "............", ".w.....w..ow", ".ww...ww.oo.", ".wwwwwww.w..", ".wewwwew.o..",
+        ".wwwmwww.w..", "..owwwwwo...", "..wwwwwwww..", "..woowwwww..", "..wwwwwooo..",
+        "..ww.ww.ww..", "..kk.kk.kk.."],
+    'kasha': [
+        "f..........f", "ff.k....k.ff", ".f.kk..kk.f.", "..fkkkkkkf..", "..kekkkkek..",
+        "..kkkrrkkk..", "..fkkkkkkf..", ".fokkkkkkof.", ".ofkkkkkkfo.", "..okk..kko..",
+        "..rr....rr..", "............"],
     'sazae_oni': [
         ".....n......", "....nnn.....", "...nmnmn....", "..nnnnnnn...", ".nmnnmnnmn..",
         "nnnnnnnnnnn.", ".mmmmmmmmm..", ".mkemmkemm..", ".mmmmmmmmm..", "..m.m.m.m...",

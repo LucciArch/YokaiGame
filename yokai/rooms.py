@@ -328,6 +328,26 @@ TEMPLATES = [
      , "..x.R...R.x.."
      , ".....O......."
      , "............."],
+    ['.............' , '.RRR.....RRR.' , '.R.........R.' , '...e.x.x.e...' , '.R.........R.' , '.RRR.....RRR.' , '.............'],
+    ['.............' , '..P.P.P.P.P..' , '.e.........e.' , '......f......' , '.e.........e.' , '..P.P.P.P.P..' , '.............'],
+    ['.............' , '.O.O.O.O.O.O.' , '.............' , '..e..LLL..e..' , '.............' , '.O.O.O.O.O.O.' , '.............'],
+    ['.............' , '...RRR.RRR...' , '..R.e...e.R..' , '..R...f...R..' , '..R.e...e.R..' , '...RRR.RRR...' , '.............'],
+    ['.............' , '.SSSSS.SSSSS.' , '.....e.e.....' , '..f.......f..' , '.....e.e.....' , '.SSSSS.SSSSS.' , '.............'],
+    ['.............' , '.PPPPP.PPPPP.' , '.PPPPP.PPPPP.' , '..f.......f..' , '.PPPPP.PPPPP.' , '.PPPPP.PPPPP.' , '.............'],
+    ['.............' , '..x.R...R.x..' , '....R...R....' , '..RRR...RRR..' , '....R...R....' , '..x.R...R.x..' , '.............'],
+    ['.............' , '.L.e.....e.L.' , '...RR...RR...' , '......x......' , '...RR...RR...' , '.L.e.....e.L.' , '.............'],
+    ['.............' , '..e...O...e..' , '.OOO.....OOO.' , '......f......' , '.OOO.....OOO.' , '..e...O...e..' , '.............'],
+    ['.............' , '.e..P...P..e.' , '...PPP.PPP...' , '....P...P....' , '...PPP.PPP...' , '.e..P...P..e.' , '.............'],
+    ['.............' , '..R.......R..' , '.RxR.....RxR.' , '..R.......R..' , '.RxR.....RxR.' , '..R.......R..' , '.............'],
+    ['.............' , '.f.S.....S.f.' , '...S..e..S...' , '..SS.....SS..' , '...S..e..S...' , '.f.S.....S.f.' , '.............'],
+    ['.............' , '....e...e....' , '.RR.......RR.' , '.RR..LLL..RR.' , '.RR.......RR.' , '....e...e....' , '.............'],
+    ['.............' , '..PPP...PPP..' , '..PxP...PxP..' , '..P.......P..' , '..PxP...PxP..' , '..PPP...PPP..' , '.............'],
+    ['.............' , '.e.O.O.O.O.e.' , '.............' , '....RR.RR....' , '.............' , '.e.O.O.O.O.e.' , '.............'],
+    ['.............' , '..f.......f..' , '.....RRR.....' , '..e.R...R.e..' , '.....RRR.....' , '..f.......f..' , '.............'],
+    ['.............' , '.SS.SS.SS.SS.' , '..x.......x..' , '.............' , '..x.......x..' , '.SS.SS.SS.SS.' , '.............'],
+    ['.............' , '.R.R.R.R.R.R.' , '..e.......e..' , '.R.R..f..R.R.' , '..e.......e..' , '.R.R.R.R.R.R.' , '.............'],
+    ['.............' , '....PPPPP....' , '..e.P...P.e..' , '....P.x.P....' , '..e.P...P.e..' , '....PP.PP....' , '.............'],
+    ['.............' , '.x....L....x.' , '..RR.....RR..' , '.............' , '..RR.....RR..' , '.x....L....x.' , '.............'],
 ]
 
 # Spezialraum-Layouts (ohne Gegner)
@@ -438,7 +458,7 @@ class Room:
         self.doors = {}            # dir -> Nachbarraum-pos
         self.tiles = None
         self.spawns = []
-        self.cleared = kind not in ('normal', 'boss', 'challenge')
+        self.cleared = kind not in ('normal', 'boss', 'challenge', 'dojo')
         self.visited = False
         self.seen = False
         self.objects = []          # persistente Pickups/Sockel etc. (gespeichert beim Verlassen)
@@ -506,16 +526,18 @@ def generate_floor(rng, depth, labyrinth=False, hard=False):
         rooms[boss] = Room(boss, 'boss')
         rooms[rest[0]].kind = 'treasure'
         rooms[rest[1]].kind = 'shop'
-        extras = ['challenge', 'curse', 'omikuji', 'onsen', 'treasure2']
+        extras = ['challenge', 'curse', 'omikuji', 'onsen', 'treasure2', 'library', 'dojo']
         rng.shuffle(extras)
         for p, k in zip(rest[2:], extras):
             if k == 'treasure2':
                 if depth >= 2 and rng.random() < 0.5:
                     rooms[p].kind = 'treasure'
+            elif k == 'library' and depth < 2:
+                continue
             else:
                 rooms[p].kind = k
         for r in rooms.values():
-            r.cleared = r.kind not in ('normal', 'boss', 'challenge')
+            r.cleared = r.kind not in ('normal', 'boss', 'challenge', 'dojo')
             r.layout_seed = rng.randrange(1 << 30)
             for d, (dx, dy) in DIRS.items():
                 n = (r.pos[0] + dx, r.pos[1] + dy)
@@ -549,7 +571,7 @@ def generate_floor(rng, depth, labyrinth=False, hard=False):
 
 
 def build_room_tiles(room, rng):
-    if room.kind in ('normal', 'challenge'):
+    if room.kind in ('normal', 'challenge', 'dojo'):
         if rng.random() < 0.22:
             tpl = random_layout(rng)
         else:
