@@ -207,7 +207,12 @@ class Boss(Enemy):
         surf = pygame.Surface((W, H), pygame.SRCALPHA) if (self.flash > 0 or self.frozen > 0 or self.alpha < 255) else None
         target = surf if surf is not None else s
         gfx.shadow(s, (int(self.x) - self.r, int(self.y) + self.r - 4, self.r * 2, 7))
-        self.render(target, t)
+        oy = self.y
+        self.y += math.sin(t * 2.2) * 1.2
+        try:
+            self.render(target, t)
+        finally:
+            self.y = oy
         if surf is not None:
             if self.flash > 0:
                 surf.fill((120, 110, 110, 0), special_flags=pygame.BLEND_RGB_ADD)
@@ -1775,6 +1780,137 @@ class Enma(Boss):
         D.rect(s, (220, 200, 150), (x + 20, y - 18, 4, 24))
 
 
+class Izanami(Boss):
+    """Die Urgöttin, verwandelt durch die Speisen von Yomi."""
+    r = 15
+
+    def setup(self):
+        self.y = CY - 30
+        self.attacks = ['raijin8', 'hags', 'rot', 'veil']
+        self.attacks2 = ['raijin8', 'hags', 'rot', 'veil', 'boulder']
+
+    def move(self, dt):
+        self.x = CX + math.sin(self.t * 0.4) * 80
+        self.y = CY - 30 + math.cos(self.t * 0.6) * 20
+
+    def a_raijin8(self):
+        for i in range(8):
+            a = i / 8 * math.tau + self.t
+            self.hazard(self.p.x + math.cos(a) * 45, self.p.y + math.sin(a) * 35, 14, 0.7, 0.15, 'strike')
+            yield 0.08
+        yield 0.6
+
+    def a_hags(self):
+        self.summon('shikome', 3, 50)
+        yield 0.8
+
+    def a_rot(self):
+        for k in range(50):
+            for j in range(3):
+                ebullet(self.run, self.x, self.y, k * 0.21 + j * math.tau / 3, 80, (150, 220, 120), 3, eff='slow' if j == 0 else None)
+            yield 0.05
+
+    def a_veil(self):
+        self.alpha = 70
+        self.invuln = True
+        for k in range(3):
+            self.fan(9, 0.14, 120, (200, 120, 230))
+            yield 0.4
+        self.alpha = 255
+        self.invuln = False
+
+    def a_boulder(self):
+        for i in range(5):
+            x = random.uniform(RX + 30, RX + RW - 30)
+            self.hazard(x, self.p.y, 26, 1.0, 0.2, 'slam')
+            yield 0.2
+        self.ring(24, 90, 0, (180, 160, 140), 4)
+        yield 0.6
+
+    def render(self, s, t):
+        D = pygame.draw
+        x, y = int(self.x), int(self.y)
+        gfx.draw_glow(s, x, y, 46, (120, 40, 140), 80)
+        for i in range(7):
+            a = math.pi * (0.2 + i / 6 * 0.6)
+            D.line(s, (20, 10, 30), (x, y - 14), (x + math.cos(a) * 30, y - 14 + math.sin(a) * 34 + math.sin(t * 2 + i) * 3), 3)
+        D.polygon(s, (230, 225, 235), [(x - 9, y - 6), (x + 9, y - 6), (x + 18, y + 22), (x - 18, y + 22)])
+        D.polygon(s, (120, 60, 120), [(x - 2, y - 6), (x + 2, y - 6), (x + 3, y + 22), (x - 3, y + 22)])
+        D.circle(s, (20, 10, 30), (x, y - 16), 10)
+        D.circle(s, (220, 230, 210), (x, y - 14), 7)
+        D.line(s, (120, 150, 110), (x - 4, y - 10), (x + 3, y - 17), 1)
+        eyes(s, x, y - 15, 3, (255, 90, 90), 1)
+        D.ellipse(s, (240, 210, 90), (x - 10, y - 30, 20, 6), 1)
+
+
+class Kagutsuchi(Boss):
+    """Der Feuergott, dessen Geburt die Welt in Brand setzte."""
+    r = 16
+
+    def setup(self):
+        self.attacks = ['eruption', 'firewall', 'meteor', 'nova']
+        self.attacks2 = ['eruption', 'firewall', 'meteor', 'nova', 'inferno']
+
+    def move(self, dt):
+        if self.co is None:
+            d = norm(self.p.x - self.x, self.p.y - self.y)
+            self.x += d[0] * 22 * dt
+            self.y += d[1] * 16 * dt
+            self.clamp_pos(26)
+        if random.random() < 0.5:
+            self.run.hazards.append(Hazard(self.x + random.uniform(-10, 10), self.y + 14, 9, 0.2, 1.5, 1, 'e', 'fire'))
+
+    def a_eruption(self):
+        for i in range(24):
+            ebullet(self.run, self.x, self.y - 10, -math.pi / 2 + random.uniform(-1.2, 1.2), random.uniform(120, 190), (255, 140, 40), 3, ay=170)
+            yield 0.05
+        yield 0.5
+
+    def a_firewall(self):
+        horiz = random.random() < 0.5
+        gap = random.randint(1, 4 if horiz else 10)
+        for i in range(7 if horiz else 13):
+            if abs(i - gap) <= 1:
+                continue
+            if horiz:
+                ebullet(self.run, RX + 4, RY + 16 + i * 32, 0, 85, (255, 110, 40), 5)
+            else:
+                ebullet(self.run, RX + 16 + i * 32, RY + 4, math.pi / 2, 75, (255, 110, 40), 5)
+        yield 1.0
+
+    def a_meteor(self):
+        for i in range(9):
+            self.hazard(self.p.x + random.uniform(-50, 50), self.p.y + random.uniform(-40, 40), 18, 0.8, 0.3, 'fire')
+            yield 0.12
+        yield 0.5
+
+    def a_nova(self):
+        for k in range(3):
+            self.ring(20, 70 + k * 25, k * 0.15, (255, 200, 80), 3)
+            yield 0.3
+
+    def a_inferno(self):
+        for k in range(60):
+            for j in range(5):
+                ebullet(self.run, self.x, self.y, k * 0.13 + j * math.tau / 5, 95, (255, 90, 30), 3, curve=0.4)
+            yield 0.05
+
+    def render(self, s, t):
+        D = pygame.draw
+        x, y = int(self.x), int(self.y)
+        gfx.draw_glow(s, x, y, 50, (255, 90, 20), 120)
+        for i in range(12):
+            a = i / 12 * math.tau + t * 2
+            L = 22 + math.sin(t * 9 + i * 2) * 6
+            D.polygon(s, (255, 150, 40), [(x + math.cos(a - 0.15) * 12, y + math.sin(a - 0.15) * 12),
+                                           (x + math.cos(a) * L, y + math.sin(a) * L),
+                                           (x + math.cos(a + 0.15) * 12, y + math.sin(a + 0.15) * 12)])
+        D.circle(s, (255, 210, 90), (x, y), 14)
+        D.circle(s, (255, 250, 210), (x, y), 8)
+        eyes(s, x, y - 2, 5, (180, 20, 10), 2)
+        D.arc(s, (180, 20, 10), (x - 5, y + 1, 10, 6), 3.4, 6.0, 1)
+
+
 BOSS_CLASSES = {
     'omukade': Omukade, 'kappa_ou': KappaOu, 'jorogumo': Jorogumo,
     'gashadokuro': Gashadokuro, 'rokurokubi': Rokurokubi, 'nue': Nue,
@@ -1783,7 +1919,7 @@ BOSS_CLASSES = {
     'orochi': Orochi, 'shuten_doji': ShutenDoji, 'tamamo': Tamamo,
     'mikaboshi': Mikaboshi,
     'oonyudo': Oonyudo, 'nurarihyon': Nurarihyon, 'kamaitachi_trio': KamaitachiTrio,
-    'akkorokamui': Akkorokamui, 'enma': Enma,
+    'akkorokamui': Akkorokamui, 'enma': Enma, 'izanami': Izanami, 'kagutsuchi': Kagutsuchi,
 }
 
 

@@ -155,6 +155,7 @@ class Run:
 
     def go_deeper(self, depth=None):
         self.depth = depth or self.depth + 1
+        self.descend = 1.3
         if self.depth > 6:
             self.depth = 1
             self.loop += 1
@@ -704,7 +705,7 @@ class Run:
             self.achieve('kenji')
         if b.id == 'sojobo':
             self.achieve('kotaro')
-        if b.id == 'mikaboshi':
+        if self.depth == 6:
             self.achieve('susanoo')
             self.achieve('endless')
         if len(s['bosses']) >= len(BOSSES):
@@ -876,6 +877,8 @@ class Run:
 
     # ======================================================================  Update
     def update(self, dt, inp):
+        if getattr(self, 'descend', 0) > 0:
+            self.descend -= dt
         if self.slide:
             self.slide[2] += dt
             if self.slide[2] >= 0.24:
@@ -1290,6 +1293,7 @@ class Run:
                 return
             p.coins -= o.data['price']
             o.used = True
+            self.achieve('teahouse')
             fx = dict(o.data['fx'])
             if 'hp' in fx or 'heal' in fx:
                 p.apply_once({kk: vv for kk, vv in fx.items() if kk in ('hp', 'heal')})
@@ -1300,6 +1304,7 @@ class Run:
             audio.play('heal')
             self.banner(o.data['name'], ', '.join('%s +%g' % (kk, vv) for kk, vv in fx.items()).replace('rate', 'Feuerrate').replace('hp', 'Herz').replace('dmg', 'Schaden').replace('spd', 'Tempo').replace('shotspd', 'Schussgeschw.').replace('luck', 'Glück').replace('heal', 'Heilung').replace('range', 'Reichweite').replace('size', 'Größe'), o.data['col'])
         elif k == 'slots':
+            self.achieve('slots')
             if p.coins < 3:
                 return
             p.coins -= 3
@@ -1494,21 +1499,25 @@ class Run:
 
     # ======================================================================  Zeichnen
     def render_bg(self):
-        rng = random.Random(self.room.layout_seed if self.room.pos != ('shrine',) else 7)
+        room = self.room
+        if getattr(room, '_bgcache', None) is None or room._bgcache[0] != self.biome_id:
+            rng = random.Random(room.layout_seed if room.pos != ('shrine',) else 7)
+            floor = gfx.make_floor(self.biome if not room.kind.startswith('shrine') else
+                                   dict(self.biome, floor=(60, 20, 30) if room.kind == 'shrine_oni' else (200, 190, 150),
+                                        floor_pat='stone'), rng)
+            room._bgcache = (self.biome_id, floor, gfx.make_walls(self.biome, rng))
+        _, floor, walls = room._bgcache
         bg = pygame.Surface((W, H))
         bg.fill((12, 8, 16))
-        floor = gfx.make_floor(self.biome if not self.room.kind.startswith('shrine') else
-                               dict(self.biome, floor=(60, 20, 30) if self.room.kind == 'shrine_oni' else (200, 190, 150),
-                                    floor_pat='stone'), rng)
         bg.blit(floor, (RX, RY))
         tl = pygame.Surface((W, H), pygame.SRCALPHA)
         for ty in range(ROWS):
             for tx in range(COLS):
-                t = self.room.tiles[ty][tx]
+                t = room.tiles[ty][tx]
                 if t:
                     gfx.draw_tile(tl, t, RX + tx * TILE, RY + ty * TILE, self.biome)
         bg.blit(tl, (0, 0))
-        bg.blit(gfx.make_walls(self.biome, rng), (0, 0))
+        bg.blit(walls, (0, 0))
         self.bg = bg
         self.bg_dirty = False
 
@@ -1676,6 +1685,24 @@ class Run:
             s.blit(img, (area.x + ox, area.y + oy))
             s.set_clip(None)
         self.draw_hud(s, t)
+        if getattr(self, 'descend', 0) > 0:
+            f = 1 - self.descend / 1.3
+            ov = pygame.Surface((W, H), pygame.SRCALPHA)
+            ov.fill((6, 2, 8, int(255 * min(1, self.descend * 1.6))))
+            s.blit(ov, (0, 0))
+            for i in range(5):
+                z = (f * 2.2 + i * 0.22) % 1.1
+                sc = 0.15 + z * 2.2
+                al = int(255 * max(0, min(1, (1.1 - z) * 2)) * min(1, self.descend * 2))
+                cx, cy = W // 2, H // 2 + 10
+                w, h = int(60 * sc), int(50 * sc)
+                col = (210, 50, 40)
+                tor = pygame.Surface((W, H), pygame.SRCALPHA)
+                pygame.draw.rect(tor, col + (al,), (cx - w // 2, cy - h // 2, w, max(2, int(5 * sc))))
+                pygame.draw.rect(tor, col + (al,), (cx - w // 2 + int(6 * sc), cy - h // 2 + int(10 * sc), w - int(12 * sc), max(1, int(3 * sc))))
+                pygame.draw.rect(tor, col + (al,), (cx - w // 2 + int(8 * sc), cy - h // 2, max(2, int(4 * sc)), h))
+                pygame.draw.rect(tor, col + (al,), (cx + w // 2 - int(12 * sc), cy - h // 2, max(2, int(4 * sc)), h))
+                s.blit(tor, (0, 0))
         if self.fade > 0:
             ov = pygame.Surface((W, H), pygame.SRCALPHA)
             ov.fill((0, 0, 0, int(min(1, self.fade) * 255)))

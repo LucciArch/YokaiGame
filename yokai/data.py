@@ -79,7 +79,7 @@ for _b, _pit, _dec in (('chikurin', 'void', 'grass'), ('inari', 'void', 'petals'
     BIOMES[_b].setdefault('decor', _dec)
 BOSS_POOL = {1: ['omukade', 'kappa_ou', 'jorogumo', 'oonyudo'], 2: ['gashadokuro', 'rokurokubi', 'nue', 'nurarihyon'],
              3: ['sojobo', 'raiju', 'yuki_onna', 'kamaitachi_trio'], 4: ['umibozu', 'ryujin', 'bake_kujira', 'akkorokamui'],
-             5: ['orochi', 'shuten_doji', 'tamamo', 'enma'], 6: ['mikaboshi']}
+             5: ['orochi', 'shuten_doji', 'tamamo', 'enma'], 6: ['mikaboshi', 'izanami', 'kagutsuchi']}
 
 # =====================================================================  ITEMS
 ITEMS = {}
@@ -251,6 +251,8 @@ I('daruma_otoshi', 'Daruma-otoshi', 'Schlag schnell, aber genau', 'hammer', (90,
 I('yatagarasu', 'Yatagarasu', 'Die dreibeinige Krähe weist den Weg', 'feather', (40, 40, 50), 'K', ['kami', 'tengu'], 3, map=1, homing=1, fly=1)
 I('tenugui', 'Tenugui', 'Ein Handtuch für alle Fälle', 'cloth', (90, 130, 200), 'TS', [], 1, spd=12, clear_heal=0.1)
 I('hagoromo', 'Hagoromo', 'Das Federgewand einer Himmelsjungfrau', 'cloth', (230, 240, 255), 'K', ['kami'], 3, fly=1, spirit=4)
+I('izanami_schleier', 'Izanamis Schleier', 'Leben und Tod in einem Gewand', 'cloth', (120, 60, 120), 'B', ['yurei', 'kami'], 4, True, revive=1, spectral=1, spirit=4)
+I('kagutsuchi_glut', 'Glut des Kagutsuchi', 'Das erste Feuer der Welt', 'flame', (255, 90, 30), 'B', ['kami', 'oni'], 4, True, burn=1, explode=1, dmgm=1.3)
 I('geheimkarte', 'Karte des Diebes', 'Wo sind die verborgenen Räume?', 'scroll', (190, 160, 110), 'TS', [], 2, True, map=1, salts=2)
 
 ITEM_IDS = ORDER
@@ -379,7 +381,7 @@ CHARS = {
                   coins=0, keys=0, salts=1, unlock='Schließe 3 Oni-Pakte'),
     'susanoo': dict(name='Susanoo', title='Der Sturmgott', desc='Ein Gott unter Sterblichen. Seine Schüsse rufen Blitze.',
                     hp=8, spirit=0, fx=dict(dmgm=1.2, rate=0.3, raijin_chance=0.08), items=['kusanagi'], active='raijin_taiko',
-                    coins=0, keys=0, salts=3, unlock='Besiege Amatsu-Mikaboshi in Takamagahara'),
+                    coins=0, keys=0, salts=3, unlock='Besiege einen Boss in Takamagahara'),
 }
 CHAR_ORDER = ['hana', 'kenji', 'kuzunoha', 'ponpoko', 'benkei', 'okiku', 'kotaro', 'seimei', 'akago', 'susanoo']
 
@@ -473,6 +475,8 @@ BOSSES = {
     'kamaitachi_trio': dict(name='Die drei Kamaitachi', title='Stolpern, Schneiden, Heilen', hp=420),
     'akkorokamui': dict(name='Akkorokamui', title='Der rote Riesenkrake', hp=560),
     'enma': dict(name='Enma-Daiō', title='Richter der Unterwelt', hp=860),
+    'izanami': dict(name='Izanami', title='Die Göttin, die in Yomi blieb', hp=1450),
+    'kagutsuchi': dict(name='Kagutsuchi', title='Der Gott des Feuers', hp=1450),
     'mikaboshi': dict(name='Amatsu-Mikaboshi', title='Der böse Stern des Himmels', hp=1500),
 }
 BOSS_REWARD = {  # Freischaltung beim ersten Sieg
@@ -480,7 +484,7 @@ BOSS_REWARD = {  # Freischaltung beim ersten Sieg
     'rokurokubi': 'tengu_auge', 'nue': 'yata_kagami', 'sojobo': None, 'raiju': 'kusanagi',
     'yuki_onna': 'yasakani', 'umibozu': None, 'ryujin': None, 'bake_kujira': None,
     'oonyudo': 'onyudo_kette', 'nurarihyon': 'nurarihyon_pfeife', 'kamaitachi_trio': 'kamaitachi_klingen',
-    'akkorokamui': 'akkoro_tinte', 'enma': 'enma_spiegel',
+    'akkorokamui': 'akkoro_tinte', 'enma': 'enma_spiegel', 'izanami': 'izanami_schleier', 'kagutsuchi': 'kagutsuchi_glut',
     'orochi': 'yamata_zahn', 'shuten_doji': 'shuten_schale', 'tamamo': 'kyubi_juwel', 'mikaboshi': 'hoshi_splitter',
 }
 
@@ -509,7 +513,7 @@ ACHIEVEMENTS = [
     ('kotaro', 'Tengu-Bezwinger', 'Besiege Sōjōbō', ('char', 'kotaro')),
     ('seimei', 'Die Nacht überlebt', 'Gewinne einen Lauf', ('char', 'seimei')),
     ('akago', 'Pakt mit den Oni', 'Schließe insgesamt 3 Oni-Pakte', ('char', 'akago')),
-    ('susanoo', 'Der Himmel ist frei', 'Besiege Amatsu-Mikaboshi', ('char', 'susanoo')),
+    ('susanoo', 'Der Himmel ist frei', 'Besiege einen Boss in Takamagahara', ('char', 'susanoo')),
     ('hard', 'Oni-Modus', 'Gewinne einen Lauf (schaltet den Oni-Modus frei)', ('mode', 'hard')),
     ('heaven', 'Der Weg nach oben', 'Gewinne einen Lauf (öffnet Takamagahara)', ('mode', 'heaven')),
     ('synergy1', 'Harmonie', 'Entdecke eine Synergie', ('item', 'tanabata')),
@@ -528,8 +532,10 @@ ACHIEVEMENTS = [
     ('all_chars', 'Hyakki Yagyō', 'Schalte alle Charaktere frei', None),
     ('secret', 'Verborgene Pfade', 'Finde einen Geheimraum (Reinigungssalz an Wänden!)', ('item', 'geheimkarte')),
     ('secret10', 'Schatzjäger', 'Finde 10 Geheimräume', None),
-    ('all_bosses', 'Bezwinger der Nachtparade', 'Besiege alle 21 Bosse', None),
-    ('endless', 'Die Nacht endet nie', 'Besiege Amatsu-Mikaboshi (schaltet die Endlose Nacht frei)', ('mode', 'endless')),
+    ('all_bosses', 'Bezwinger der Nachtparade', 'Besiege alle 23 Bosse', None),
+    ('teahouse', 'Teezeremonie', 'Trinke im Teehaus', None),
+    ('slots', 'Glücksspieler', 'Spiele am Tanuki-Automaten', None),
+    ('endless', 'Die Nacht endet nie', 'Besiege einen Boss in Takamagahara (schaltet die Endlose Nacht frei)', ('mode', 'endless')),
     ('loop1', 'Noch eine Runde', 'Erreiche Schleife 2 in der Endlosen Nacht', None),
     ('library', 'Bücherwurm', 'Besuche ein Schriftrollenarchiv', None),
     ('dojo', 'Meister des Dōjō', 'Besiege die Champions im Dōjō', None),
