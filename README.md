@@ -64,3 +64,8 @@ yokai/gfx.py         Pixel-Art-Sprites, Icons, Kacheln, Text
 yokai/audio.py       Prozedurale Musik und Soundeffekte
 ```
 
+
+## Grafik
+Alle Sprites sind selbst gezeichnet – als Python-Quellcode in `art_src/` (Figuren, Yōkai, Bosse).
+`python art_src/build.py` erzeugt daraus `yokai/assets/sprites/`. Als Zeichenwerkzeug dient
+`pixelstudio.py` aus dem MIT-lizenzierten Skill *pixel-art-studio* (gamezxz, siehe `art_src/tools/`).

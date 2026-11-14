@@ -1,0 +1,500 @@
+{
+ "abura_akago": {
+  "h": 23,
+  "kind": "strip",
+  "n": 2,
+  "w": 20
+ },
+ "akago": {
+  "h": 32,
+  "kind": "dir4",
+  "n": 4,
+  "w": 32
+ },
+ "azukiarai": {
+  "h": 25,
+  "kind": "strip",
+  "n": 2,
+  "w": 19
+ },
+ "bake_danuki": {
+  "h": 26,
+  "kind": "strip",
+  "n": 2,
+  "w": 25
+ },
+ "bakeneko": {
+  "h": 22,
+  "kind": "strip",
+  "n": 2,
+  "w": 27
+ },
+ "bakezori": {
+  "h": 21,
+  "kind": "strip",
+  "n": 2,
+  "w": 23
+ },
+ "benkei": {
+  "h": 32,
+  "kind": "dir4",
+  "n": 4,
+  "w": 32
+ },
+ "boss_akkorokamui": {
+  "h": 61,
+  "kind": "strip",
+  "n": 2,
+  "w": 68
+ },
+ "boss_bake_kujira": {
+  "h": 41,
+  "kind": "strip",
+  "n": 2,
+  "w": 68
+ },
+ "boss_enma": {
+  "h": 58,
+  "kind": "strip",
+  "n": 2,
+  "w": 50
+ },
+ "boss_gashadokuro": {
+  "h": 68,
+  "kind": "strip",
+  "n": 2,
+  "w": 68
+ },
+ "boss_izanami": {
+  "h": 55,
+  "kind": "strip",
+  "n": 2,
+  "w": 44
+ },
+ "boss_jorogumo": {
+  "h": 54,
+  "kind": "strip",
+  "n": 2,
+  "w": 56
+ },
+ "boss_kagutsuchi": {
+  "h": 59,
+  "kind": "strip",
+  "n": 2,
+  "w": 52
+ },
+ "boss_kappa_ou": {
+  "h": 59,
+  "kind": "strip",
+  "n": 2,
+  "w": 52
+ },
+ "boss_nue": {
+  "h": 46,
+  "kind": "strip",
+  "n": 2,
+  "w": 54
+ },
+ "boss_nurarihyon": {
+  "h": 50,
+  "kind": "strip",
+  "n": 2,
+  "w": 38
+ },
+ "boss_omukade_head": {
+  "h": 29,
+  "kind": "strip",
+  "n": 2,
+  "w": 28
+ },
+ "boss_omukade_seg": {
+  "h": 22,
+  "kind": "strip",
+  "n": 2,
+  "w": 24
+ },
+ "boss_oonyudo": {
+  "h": 67,
+  "kind": "strip",
+  "n": 2,
+  "w": 56
+ },
+ "boss_orochi_head": {
+  "h": 25,
+  "kind": "strip",
+  "n": 2,
+  "w": 26
+ },
+ "boss_raiju": {
+  "h": 40,
+  "kind": "strip",
+  "n": 2,
+  "w": 52
+ },
+ "boss_rokuro_body": {
+  "h": 35,
+  "kind": "strip",
+  "n": 2,
+  "w": 36
+ },
+ "boss_rokuro_head": {
+  "h": 27,
+  "kind": "strip",
+  "n": 2,
+  "w": 28
+ },
+ "boss_ryujin_head": {
+  "h": 33,
+  "kind": "strip",
+  "n": 2,
+  "w": 36
+ },
+ "boss_shuten_doji": {
+  "h": 54,
+  "kind": "strip",
+  "n": 2,
+  "w": 46
+ },
+ "boss_sojobo": {
+  "h": 55,
+  "kind": "strip",
+  "n": 2,
+  "w": 56
+ },
+ "boss_tamamo": {
+  "h": 53,
+  "kind": "strip",
+  "n": 2,
+  "w": 52
+ },
+ "boss_umibozu": {
+  "h": 63,
+  "kind": "strip",
+  "n": 2,
+  "w": 68
+ },
+ "boss_yuki_onna": {
+  "h": 51,
+  "kind": "strip",
+  "n": 2,
+  "w": 36
+ },
+ "chochin": {
+  "h": 28,
+  "kind": "strip",
+  "n": 2,
+  "w": 20
+ },
+ "enenra": {
+  "h": 27,
+  "kind": "strip",
+  "n": 2,
+  "w": 27
+ },
+ "funayurei": {
+  "h": 29,
+  "kind": "strip",
+  "n": 2,
+  "w": 21
+ },
+ "gaki": {
+  "h": 26,
+  "kind": "strip",
+  "n": 2,
+  "w": 22
+ },
+ "gaki_small": {
+  "h": 17,
+  "kind": "strip",
+  "n": 2,
+  "w": 16
+ },
+ "gyuki": {
+  "h": 30,
+  "kind": "strip",
+  "n": 2,
+  "w": 34
+ },
+ "hana": {
+  "h": 32,
+  "kind": "dir4",
+  "n": 4,
+  "w": 32
+ },
+ "heikegani": {
+  "h": 20,
+  "kind": "strip",
+  "n": 2,
+  "w": 26
+ },
+ "hitodama": {
+  "h": 24,
+  "kind": "strip",
+  "n": 2,
+  "w": 20
+ },
+ "hyosube": {
+  "h": 25,
+  "kind": "strip",
+  "n": 2,
+  "w": 21
+ },
+ "isonade": {
+  "h": 22,
+  "kind": "strip",
+  "n": 2,
+  "w": 30
+ },
+ "ittan_momen": {
+  "h": 19,
+  "kind": "strip",
+  "n": 2,
+  "w": 33
+ },
+ "jinmenju": {
+  "h": 32,
+  "kind": "strip",
+  "n": 2,
+  "w": 29
+ },
+ "kamaitachi": {
+  "h": 20,
+  "kind": "strip",
+  "n": 2,
+  "w": 27
+ },
+ "kamikiri": {
+  "h": 24,
+  "kind": "strip",
+  "n": 2,
+  "w": 20
+ },
+ "kappa": {
+  "h": 27,
+  "kind": "strip",
+  "n": 2,
+  "w": 26
+ },
+ "kappa_small": {
+  "h": 20,
+  "kind": "strip",
+  "n": 2,
+  "w": 19
+ },
+ "karasu": {
+  "h": 15,
+  "kind": "strip",
+  "n": 2,
+  "w": 20
+ },
+ "karasu_tengu": {
+  "h": 26,
+  "kind": "strip",
+  "n": 2,
+  "w": 28
+ },
+ "kasa_obake": {
+  "h": 28,
+  "kind": "strip",
+  "n": 2,
+  "w": 24
+ },
+ "kasha": {
+  "h": 23,
+  "kind": "strip",
+  "n": 2,
+  "w": 28
+ },
+ "katawaguruma": {
+  "h": 32,
+  "kind": "strip",
+  "n": 2,
+  "w": 31
+ },
+ "kenji": {
+  "h": 32,
+  "kind": "dir4",
+  "n": 4,
+  "w": 32
+ },
+ "kerakera_onna": {
+  "h": 36,
+  "kind": "strip",
+  "n": 2,
+  "w": 32
+ },
+ "kitsunebi_e": {
+  "h": 23,
+  "kind": "strip",
+  "n": 2,
+  "w": 20
+ },
+ "kodama": {
+  "h": 24,
+  "kind": "strip",
+  "n": 2,
+  "w": 20
+ },
+ "kotaro": {
+  "h": 32,
+  "kind": "dir4",
+  "n": 4,
+  "w": 32
+ },
+ "kumo": {
+  "h": 14,
+  "kind": "strip",
+  "n": 2,
+  "w": 16
+ },
+ "kuzunoha": {
+  "h": 32,
+  "kind": "dir4",
+  "n": 4,
+  "w": 32
+ },
+ "mokumokuren": {
+  "h": 26,
+  "kind": "strip",
+  "n": 2,
+  "w": 26
+ },
+ "nekomata": {
+  "h": 22,
+  "kind": "strip",
+  "n": 2,
+  "w": 28
+ },
+ "ningyo": {
+  "h": 20,
+  "kind": "strip",
+  "n": 2,
+  "w": 26
+ },
+ "nopperabo": {
+  "h": 28,
+  "kind": "strip",
+  "n": 2,
+  "w": 22
+ },
+ "nuppeppo": {
+  "h": 26,
+  "kind": "strip",
+  "n": 2,
+  "w": 26
+ },
+ "nurikabe": {
+  "h": 40,
+  "kind": "strip",
+  "n": 2,
+  "w": 40
+ },
+ "okiku": {
+  "h": 32,
+  "kind": "dir4",
+  "n": 4,
+  "w": 32
+ },
+ "oni": {
+  "h": 36,
+  "kind": "strip",
+  "n": 2,
+  "w": 32
+ },
+ "onibi": {
+  "h": 23,
+  "kind": "strip",
+  "n": 2,
+  "w": 20
+ },
+ "ponpoko": {
+  "h": 32,
+  "kind": "dir4",
+  "n": 4,
+  "w": 32
+ },
+ "sazae_oni": {
+  "h": 22,
+  "kind": "strip",
+  "n": 2,
+  "w": 24
+ },
+ "seimei": {
+  "h": 32,
+  "kind": "dir4",
+  "n": 4,
+  "w": 32
+ },
+ "shikome": {
+  "h": 27,
+  "kind": "strip",
+  "n": 2,
+  "w": 24
+ },
+ "shinigami": {
+  "h": 33,
+  "kind": "strip",
+  "n": 2,
+  "w": 26
+ },
+ "susanoo": {
+  "h": 32,
+  "kind": "dir4",
+  "n": 4,
+  "w": 32
+ },
+ "tenome": {
+  "h": 28,
+  "kind": "strip",
+  "n": 2,
+  "w": 24
+ },
+ "tesso": {
+  "h": 15,
+  "kind": "strip",
+  "n": 2,
+  "w": 17
+ },
+ "tsuchigumo": {
+  "h": 25,
+  "kind": "strip",
+  "n": 2,
+  "w": 33
+ },
+ "tsuchinoko": {
+  "h": 18,
+  "kind": "strip",
+  "n": 2,
+  "w": 29
+ },
+ "tsurube_otoshi": {
+  "h": 31,
+  "kind": "strip",
+  "n": 2,
+  "w": 30
+ },
+ "wanyudo": {
+  "h": 32,
+  "kind": "strip",
+  "n": 2,
+  "w": 31
+ },
+ "yamabiko": {
+  "h": 24,
+  "kind": "strip",
+  "n": 2,
+  "w": 23
+ },
+ "yosuzume": {
+  "h": 14,
+  "kind": "strip",
+  "n": 2,
+  "w": 17
+ },
+ "yuki_warashi": {
+  "h": 24,
+  "kind": "strip",
+  "n": 2,
+  "w": 21
+ }
+}

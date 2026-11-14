@@ -842,7 +842,8 @@ class Enemy:
         self.x, self.y = x, y
         self.r = d['r']
         if sheets.has(d['sprite']):
-            self.r = max(self.r, int(16 * sheets.scale_of(d['sprite']) * 0.33))
+            sw, sh = sheets.size_of(d['sprite'])
+            self.r = max(self.r, int(min(sw, sh) * 0.34))
         elif d['sprite'] in art.ARTS:
             sp = art.make(d['sprite'])
             self.r = max(self.r, int(min(sp.get_width(), sp.get_height()) * 0.36))
@@ -1215,6 +1216,8 @@ class Enemy:
                 dd = sheets.dir_from(*self.charge_dir)
             else:
                 dd = sheets.dir_from(p.x - self.x, p.y - self.y)
+            if sheets.META[name]['kind'] == 'strip':
+                dd = sheets.hdir((self.charge_dir[0] if self.d['move'] == 'charge' and self.state in ('charge', 'wind') and self.charge_dir else p.x - self.x))
             sc = sheets.scale_of(name) + (1 if getattr(self, 'mini', False) else 0)
             spr = sheets.frame(name, dd, int(self.t * (12 if self.state == 'charge' else 6)), sc, self.flash > 0, tint)
         else:

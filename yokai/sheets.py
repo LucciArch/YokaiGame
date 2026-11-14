@@ -1,9 +1,10 @@
-"""Animierte Sprites aus dem Ninja-Adventure-Asset-Pack (pixel-boy, CC0).
-
-Spritesheets (64x64): Spalten = Blickrichtung (unten, oben, links, rechts),
-Zeilen = Animationsbilder (4). Tier-Sheets (32x16): 2 Bilder.
-Boss-Streifen: quadratische Bilder nebeneinander.
+"""Animierte Sprites – komplett selbst gezeichnet (Quellcode in art_src/, gebaut mit
+pixelstudio). Metadaten in assets/sprites/sprites.json:
+  kind 'dir4'  – Zellen cell x cell, Spalten = Blickrichtung (unten, oben, links, rechts),
+                 Zeilen = Laufbilder
+  kind 'strip' – n gleich breite Bilder nebeneinander, Blick nach links (rechts = gespiegelt)
 """
+import json
 import os
 import sys
 import pygame
@@ -15,21 +16,18 @@ BASE = _here
 
 DOWN, UP, LEFT, RIGHT = 0, 1, 2, 3
 
-# Darstellungsgröße (Vergrößerungsfaktor der 16-px-Pixel-Art)
-SCALE = {'kumo': 1, 'gaki_small': 1, 'tesso': 1, 'yosuzume': 1, 'kappa_small': 1, 'nuppeppo_klein': 1,
-         'oni': 3, 'tsuchigumo': 3, 'nurikabe': 3, 'gyuki': 3, 'kerakera_onna': 3, 'tsurube_otoshi': 3}
+try:
+    with open(os.path.join(BASE, 'sprites.json'), encoding='utf-8') as fh:
+        META = json.load(fh)
+except (OSError, ValueError):
+    META = {}
 
 _raw = {}
 _cache = {}
-_exists = {}
 
 
 def has(name):
-    v = _exists.get(name)
-    if v is None:
-        v = os.path.exists(os.path.join(BASE, name + '.png'))
-        _exists[name] = v
-    return v
+    return name in META
 
 
 def _load(name):
@@ -45,39 +43,35 @@ def _load(name):
 
 
 def scale_of(name):
-    return SCALE.get(name, 2)
+    return 1
+
+
+def size_of(name):
+    m = META.get(name, {})
+    return m.get('w', 16), m.get('h', 16)
 
 
 def frame_count(name):
-    raw = _load(name)
-    w, h = raw.get_size()
-    if name.startswith('boss_'):
-        return max(1, w // h)
-    if (w, h) == (32, 16):
-        return 2
-    return 4
+    m = META.get(name, {})
+    return m.get('n', 4)
 
 
 def frame(name, d=DOWN, f=0, scale=None, flash=False, tint=None, alpha=255):
-    scale = scale_of(name) if scale is None else scale
+    scale = 1 if scale is None else scale
     key = (name, d, f % 8, scale, flash, tint)
     s = _cache.get(key)
     if s is None:
         raw = _load(name)
-        w, h = raw.get_size()
+        m = META[name]
+        w, h = m['w'], m['h']
+        n = m.get('n', 4)
         flip = False
-        if name.startswith('boss_'):
-            n = max(1, w // h)
-            sub = raw.subsurface(((f % n) * h, 0, h, h))
-            flip = d == LEFT
-        elif (w, h) == (32, 16):
-            sub = raw.subsurface(((f % 2) * 16, 0, 16, 16))
-            flip = d == RIGHT
-        elif w >= 64 and h >= 64:
-            sub = raw.subsurface((min(3, d) * 16, (f % 4) * 16, 16, 16))
+        if m['kind'] == 'dir4':
+            sub = raw.subsurface((min(3, d) * w, (f % n) * h, w, h))
         else:
-            sub = raw
-        s = pygame.transform.scale(sub, (int(sub.get_width() * scale), int(sub.get_height() * scale)))
+            sub = raw.subsurface(((f % n) * w, 0, w, h))
+            flip = d == RIGHT
+        s = sub if scale == 1 else pygame.transform.scale(sub, (int(w * scale), int(h * scale)))
         if flip:
             s = pygame.transform.flip(s, True, False)
         if tint:
@@ -92,6 +86,10 @@ def frame(name, d=DOWN, f=0, scale=None, flash=False, tint=None, alpha=255):
         s = s.copy()
         s.set_alpha(alpha)
     return s
+
+
+def hdir(dx):
+    return RIGHT if dx > 0 else LEFT
 
 
 def dir_from(dx, dy):

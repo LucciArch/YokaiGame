@@ -244,7 +244,7 @@ class Boss(Enemy):
     sheet = None   # (Name, Skalierung, Tönung)
 
     def face_dir(self):
-        return sheets.dir_from(self.p.x - self.x, self.p.y - self.y)
+        return sheets.hdir(self.p.x - self.x)
 
     def render_sheet(self, s, t):
         name, sc, tint = self.sheet
@@ -336,8 +336,8 @@ class Omukade(Boss):
         if type(self) is Omukade:
             segs = self.seg_pos()
             for i, (x, y) in enumerate(reversed(segs)):
-                sheets.blit_center(s, 'b_larva', x, y, sheets.dir_from(math.cos(self.heading), math.sin(self.heading)), int(t * 8) + i, 2)
-            sheets.blit_center(s, 'b_larva', self.x, self.y, sheets.dir_from(math.cos(self.heading), math.sin(self.heading)), int(t * 8), 3, (255, 160, 140))
+                sheets.blit_center(s, 'boss_omukade_seg', x, y, sheets.hdir(math.cos(self.heading)), int(t * 8) + i)
+            sheets.blit_center(s, 'boss_omukade_head', self.x, self.y, sheets.hdir(math.cos(self.heading)), int(t * 8))
             return
         segs = self.seg_pos()
         for i, (x, y) in enumerate(reversed(segs)):
@@ -360,10 +360,11 @@ class Omukade(Boss):
 
 
 class KappaOu(Boss):
-    sheet = ('kappa', 4, None)
+    sheet = ('boss_kappa_ou', 1, None)
 
     def render_sheet(self, s, t):
-        img = sheets.blit_center(s, 'kappa', self.x, self.y - self.z - 6, self.face_dir(), int(t * 7), 4)
+        img = sheets.blit_center(s, 'boss_kappa_ou', self.x, self.y - self.z - 6, self.face_dir(), int(t * 7))
+        return
         x, y = int(self.x), int(self.y - self.z - 6 - img.get_height() / 2)
         pygame.draw.polygon(s, (245, 205, 70), [(x - 12, y + 6), (x - 13, y - 6), (x - 6, y + 1), (x, y - 9), (x + 6, y + 1), (x + 13, y - 6), (x + 12, y + 6)])
         pygame.draw.polygon(s, (150, 100, 30), [(x - 12, y + 6), (x - 13, y - 6), (x - 6, y + 1), (x, y - 9), (x + 6, y + 1), (x + 13, y - 6), (x + 12, y + 6)], 1)
@@ -441,7 +442,7 @@ class KappaOu(Boss):
 
 
 class Jorogumo(Boss):
-    sheet = ('kumo', 4, None)
+    sheet = ('boss_jorogumo', 1, None)
 
     r = 13
 
@@ -516,7 +517,7 @@ class Jorogumo(Boss):
 
 # =====================================================================  EBENE 2
 class Gashadokuro(Boss):
-    sheet = ('b_skull', 4, (240, 230, 220))
+    sheet = ('boss_gashadokuro', 1, None)
 
     def render_extra(self, s, t):
         bone = (232, 226, 206)
@@ -689,7 +690,7 @@ class Rokurokubi(Boss):
             cy = by + (self.y - by) * f
             D.circle(s, (240, 210, 190), (int(cx), int(cy)), 4)
         x, y = int(self.x), int(self.y)
-        sheets.blit_center(s, 'b_woman', x, y, sheets.dir_from(self.p.x - x, self.p.y - y), 0, 2)
+        sheets.blit_center(s, 'boss_rokuro_head', x, y, sheets.hdir(self.p.x - x), int(t * 4))
         return
         D.circle(s, (20, 10, 20), (x, y - 3), 11)
         D.circle(s, (248, 222, 204), (x, y), 8)
@@ -699,7 +700,7 @@ class Rokurokubi(Boss):
 
 
 class Nue(Boss):
-    sheet = ('b_reptile2', 4, (255, 220, 160))
+    sheet = ('boss_nue', 1, None)
 
     r = 14
 
@@ -775,7 +776,7 @@ class Nue(Boss):
 
 # =====================================================================  EBENE 3
 class Sojobo(Boss):
-    sheet = ('boss_tengu', 1, None)
+    sheet = ('boss_sojobo', 1, None)
 
     r = 13
 
@@ -844,7 +845,7 @@ class Sojobo(Boss):
 
 
 class Raiju(Boss):
-    sheet = ('boss_spirit', 1.4, (200, 230, 255))
+    sheet = ('boss_raiju', 1, None)
 
     r = 12
 
@@ -918,7 +919,7 @@ class Raiju(Boss):
 
 
 class YukiOnna(Boss):
-    sheet = ('b_woman', 3, (190, 225, 255))
+    sheet = ('boss_yuki_onna', 1, None)
 
     def render_extra(self, s, t):
         if random.random() < 0.3:
@@ -995,7 +996,7 @@ class YukiOnna(Boss):
 
 # =====================================================================  EBENE 4
 class Umibozu(Boss):
-    sheet = ('b_slime', 5, (70, 80, 110))
+    sheet = ('boss_umibozu', 1, None)
 
     r = 22
 
@@ -1110,7 +1111,7 @@ class Ryujin(Omukade):
                 for side in (-1, 1):
                     D.line(s, (240, 210, 90), (x, y), (x + side * 9, y + 6), 2)
         hx, hy = int(self.x), int(self.y)
-        sheets.blit_center(s, 'b_dragon', hx, hy, sheets.dir_from(math.cos(self.heading), math.sin(self.heading)), int(t * 8), 3)
+        sheets.blit_center(s, 'boss_ryujin_head', hx, hy, sheets.hdir(math.cos(self.heading)), int(t * 8))
         return
         hd = self.heading
         for side in (-1, 1):
@@ -1122,7 +1123,7 @@ class Ryujin(Omukade):
 
 
 class BakeKujira(Boss):
-    sheet = ('b_fish', 5, (230, 236, 250))
+    sheet = ('boss_bake_kujira', 1, None)
 
     def face_dir(self):
         return sheets.RIGHT if self.face > 0 else sheets.LEFT
@@ -1276,7 +1277,7 @@ class Orochi(Boss):
                 cy = y + (hy - y) * f
                 D.circle(s, (40, 90, 50), (int(cx), int(cy)), 5)
                 D.circle(s, (80, 150, 80), (int(cx), int(cy)), 4)
-            sheets.blit_center(s, 'b_snake', hx, hy, sheets.dir_from(self.p.x - hx, self.p.y - hy), int(t * 6) + i, 2)
+            sheets.blit_center(s, 'boss_orochi_head', hx, hy, sheets.hdir(self.p.x - hx), int(t * 6) + i)
         D.circle(s, (30, 60, 30), (x, y), 20)
         D.circle(s, (70, 130, 70), (x, y), 19)
         for i in range(6):
@@ -1284,7 +1285,7 @@ class Orochi(Boss):
 
 
 class ShutenDoji(Boss):
-    sheet = ('oni', 4, None)
+    sheet = ('boss_shuten_doji', 1, None)
 
     def render_extra(self, s, t):
         gx = int(self.x + self.face * 24)
@@ -1367,7 +1368,7 @@ class ShutenDoji(Boss):
 
 
 class Tamamo(Boss):
-    sheet = ('b_sorc', 3, None)
+    sheet = ('boss_tamamo', 1, None)
 
     def render_sheet(self, s, t):
         for i in range(9):
@@ -1378,9 +1379,9 @@ class Tamamo(Boss):
             pygame.draw.circle(s, (255, 250, 240), (int(tx), int(ty)), 4)
         gfx.draw_glow(s, int(self.x), int(self.y), 34, (255, 190, 90), 60)
         if self.phase == 2:
-            sheets.blit_center(s, 'kitsunebi_e', self.x, self.y - 4, self.face_dir(), int(t * 8), 4)
+            sheets.blit_center(s, 'kitsunebi_e', self.x, self.y - 4, self.face_dir(), int(t * 8), 3)
         else:
-            sheets.blit_center(s, 'b_sorc', self.x, self.y - 6, self.face_dir(), int(t * 7), 3)
+            sheets.blit_center(s, 'boss_tamamo', self.x, self.y - 6, self.face_dir(), int(t * 7))
 
     r = 11
 
@@ -1557,11 +1558,11 @@ class Mikaboshi(Boss):
 
 # =====================================================================  RUNDE 1: NEUE BOSSE
 class Oonyudo(Boss):
-    sheet = ('b_monk2', 4, None)
+    sheet = ('boss_oonyudo', 1, None)
 
     def render_sheet(self, s, t):
         gfx.draw_glow(s, int(self.x), int(self.y), int(40 * self.size), (80, 60, 120), 70)
-        sheets.blit_center(s, 'b_monk2', self.x, self.y - 8, self.face_dir(), int(t * 6), 4 if self.phase == 1 else 5)
+        sheets.blit_center(s, 'boss_oonyudo', self.x, self.y - 8, self.face_dir(), int(t * 6))
 
     """Ein riesiger Mönch, der immer größer wird."""
     r = 16
@@ -1645,7 +1646,7 @@ class Oonyudo(Boss):
 
 
 class Nurarihyon(Boss):
-    sheet = ('b_master', 3, None)
+    sheet = ('boss_nurarihyon', 1, None)
 
     """Der Herr der Yokai – lässt andere kämpfen."""
     r = 11
@@ -1788,7 +1789,7 @@ class KamaitachiTrio(Boss):
         D = pygame.draw
         for i, (x, y) in enumerate(self.pos):
             gfx.shadow(s, (int(x) - 10, int(y) + 10, 20, 5))
-            sheets.blit_center(s, 'b_lizard2', x, y, sheets.dir_from(self.p.x - x, self.p.y - y), int(t * 9) + i, 2,
+            sheets.blit_center(s, 'kamaitachi', x, y, sheets.hdir(self.p.x - x), int(t * 9) + i, 1,
                                [(255, 255, 255), (230, 230, 255), (200, 255, 200)][i])
         return
         for i, (x, y) in enumerate(self.pos):
@@ -1804,7 +1805,7 @@ class KamaitachiTrio(Boss):
 
 
 class Akkorokamui(Boss):
-    sheet = ('b_octopus', 5, (255, 120, 120))
+    sheet = ('boss_akkorokamui', 1, None)
 
     """Ein gewaltiger roter Krake aus dem Meer von Uchiura."""
     r = 20
@@ -1884,7 +1885,7 @@ class Akkorokamui(Boss):
 
 
 class Enma(Boss):
-    sheet = ('boss_samurai', 2, None)
+    sheet = ('boss_enma', 1, None)
 
     """Enma-Daiō, König und Richter der Unterwelt."""
     r = 17
@@ -1954,7 +1955,7 @@ class Enma(Boss):
 
 
 class Izanami(Boss):
-    sheet = ('b_vampire', 3, (220, 200, 240))
+    sheet = ('boss_izanami', 1, None)
 
     """Die Urgöttin, verwandelt durch die Speisen von Yomi."""
     r = 15
@@ -2019,7 +2020,7 @@ class Izanami(Boss):
 
 
 class Kagutsuchi(Boss):
-    sheet = ('boss_flam', 1.6, None)
+    sheet = ('boss_kagutsuchi', 1, None)
 
     """Der Feuergott, dessen Geburt die Welt in Brand setzte."""
     r = 16
