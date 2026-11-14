@@ -13,6 +13,13 @@ from .entities import (Player, Bullet, Enemy, Pickup, Pedestal, Obj, Hazard, Par
 from .bosses import make_boss, CX, CY
 
 ACH = {a[0]: a for a in ACHIEVEMENTS}
+TIPS = ['Reinigungssalz an rissigen Wänden öffnet Geheimräume.', 'Die Ausweichrolle macht dich kurz unverwundbar.',
+        'Drei Items eines Themas lösen eine Transformation aus.', 'Ohne Treffer gegen den Boss erscheint öfter ein Schrein.',
+        'Oni-Schreine kosten Herzen – Kami-Schreine sind kostenlos.', 'Ab Ebene 2 brauchen Schatzräume einen Schlüssel.',
+        'Im Codex siehst du, welche Synergien du schon kennst.', 'Rot aufleuchtende Yokai schießen gleich.',
+        'Das Teehaus verbessert deine Werte dauerhaft.', 'Champions mit farbigem Punkt sind stärker – und lohnender.',
+        'In der Tab-Ansicht siehst du alle Werte und Items.', 'Bosse rasen bei 25 % Leben vor Wut.',
+        'Der Tanuki-Automat: 3 Mon für dein Glück.', 'Das tägliche Omikuji ist ein guter Ort für Mon.']
 _GRADE = {'chikurin': (40, 90, 30), 'inari': (120, 50, 20), 'kawabe': (20, 70, 80), 'obakedera': (60, 40, 20),
           'hakaba': (40, 50, 80), 'yashiki': (60, 20, 50), 'kurama': (80, 50, 20), 'yukiyama': (60, 90, 130),
           'oeyama': (90, 30, 10), 'ryugu': (10, 70, 90), 'uminobe': (30, 40, 60), 'shinkai': (0, 20, 80),
@@ -370,6 +377,17 @@ class Run:
             for i, dx in enumerate((-60, 60) if self.depth < 4 else (-80, 0, 80)):
                 e = self.spawn_enemy(random.choice(pool), cx + dx, cy - 20, random.choice(list(CHAMPIONS.keys())))
                 e.hp = e.maxhp = e.maxhp * 2
+        elif k == 'teahouse':
+            self.banner('Teehaus', 'Ein Schluck Stärke – für immer', (150, 200, 120))
+            opts = [('Matcha', {'rate': 0.35}, (110, 180, 90)), ('Mochi', {'hp': 1}, (250, 245, 240)),
+                    ('Sake', {'dmg': 0.6}, (230, 230, 210)), ('Gyokuro', {'spd': 10, 'shotspd': 25}, (90, 160, 80)),
+                    ('Amazake', {'luck': 1, 'heal': 2}, (240, 220, 200)), ('Kombu-Tee', {'range': 40, 'size': 0.5}, (60, 100, 60))]
+            random.shuffle(opts)
+            for i, (nm, fx, col) in enumerate(opts[:3]):
+                self.objs.append(Obj('tea', cx - 80 + i * 80, cy, name=nm, fx=fx, col=col, price=random.randint(6, 10)))
+        elif k == 'slots':
+            self.objs.append(Obj('slots', cx, cy))
+            self.banner('Tanuki-Spielhalle', 'Wage dein Glück!', (230, 150, 90))
         elif k == 'secret':
             r = random.random()
             if r < 0.45:
@@ -1267,6 +1285,46 @@ class Run:
                 self.banner('Kyō – Pech!', 'Binde den Zettel an den Baum…', (200, 120, 255))
                 p.iframes = 0
                 p.hurt(1)
+        elif k == 'tea':
+            if o.used or p.coins < o.data['price']:
+                return
+            p.coins -= o.data['price']
+            o.used = True
+            fx = dict(o.data['fx'])
+            if 'hp' in fx or 'heal' in fx:
+                p.apply_once({kk: vv for kk, vv in fx.items() if kk in ('hp', 'heal')})
+            for kk, vv in fx.items():
+                if kk not in ('hp', 'heal'):
+                    p.bonus[kk] += vv
+            p.recalc()
+            audio.play('heal')
+            self.banner(o.data['name'], ', '.join('%s +%g' % (kk, vv) for kk, vv in fx.items()).replace('rate', 'Feuerrate').replace('hp', 'Herz').replace('dmg', 'Schaden').replace('spd', 'Tempo').replace('shotspd', 'Schussgeschw.').replace('luck', 'Glück').replace('heal', 'Heilung').replace('range', 'Reichweite').replace('size', 'Größe'), o.data['col'])
+        elif k == 'slots':
+            if p.coins < 3:
+                return
+            p.coins -= 3
+            o.cool = 1.0
+            o.data['spin'] = 1
+            o.data['res'] = random.randint(0, 4)
+            audio.play('coin')
+            r = random.random() - 0.015 * p.s['luck']
+            if r < 0.03:
+                self.pedestals.append(Pedestal(self.pick_item('T'), o.x + 50, o.y))
+                self.banner('Jackpot!', 'Der Tanuki verneigt sich', (255, 220, 120), True)
+                audio.play('unlock')
+            elif r < 0.2:
+                for i in range(5):
+                    self.spawn_pickup('coin', o.x, o.y + 14)
+            elif r < 0.35:
+                self.random_drop(o.x, o.y + 14)
+            elif r < 0.42:
+                self.banner('Tanuki-Streich!', 'Blätter verwandeln sich in Yokai', (200, 150, 90))
+                pool = self.biome['enemies']
+                for i in range(2):
+                    self.spawn_enemy(random.choice(pool), o.x + random.choice([-60, 60]), o.y + 30)
+                self.room.cleared = False
+            else:
+                self.floats.append([o.x, o.y - 30, 'Niete…', (200, 190, 180), 0.8])
         elif k == 'onsen':
             if o.used:
                 return
@@ -1496,7 +1554,8 @@ class Run:
             rect.center = (x, y + (-6 if d == 'n' else 6 if d == 's' else 0)) if horiz else (x + (-6 if d == 'w' else 6), y)
             frame = {'boss': (150, 30, 40), 'treasure': (230, 190, 70), 'shop': (90, 160, 90), 'curse': (110, 40, 120),
                      'challenge': (200, 90, 50), 'omikuji': (210, 60, 50), 'onsen': (120, 190, 220),
-                     'library': (150, 120, 200), 'dojo': (230, 140, 60), 'secret': (160, 140, 110)}.get(other.kind, (110, 70, 45))
+                     'library': (150, 120, 200), 'dojo': (230, 140, 60), 'secret': (160, 140, 110),
+                     'teahouse': (110, 170, 90), 'slots': (230, 120, 70)}.get(other.kind, (110, 70, 45))
             if self.curse == 'verirrt' and not other.visited:
                 frame = (110, 70, 45)
             pygame.draw.rect(s, (16, 10, 14), rect.inflate(6, 6))
@@ -1715,6 +1774,9 @@ class Run:
             T.add('Ebene %d' % self.depth, W // 2, 92, 9, (230, 210, 170), 'c', alpha=a)
             T.add(self.biome['name'], W // 2, 104, 18, (255, 245, 225), 'c', alpha=a)
             T.add(self.biome['jp'], W // 2, 128, 10, (210, 170, 150), 'c', alpha=a)
+            if not hasattr(self, 'tip') or self.tip[0] != self.depth:
+                self.tip = (self.depth, random.choice(TIPS))
+            T.add('Tipp: ' + self.tip[1], W // 2, 148, 7, (200, 190, 170), 'c', alpha=a)
         if self.boss_intro > 0 and self.boss:
             a = int(255 * min(1, self.boss_intro))
             if self.portrait is None or self.portrait[0] is not self.boss:
@@ -1773,7 +1835,7 @@ class Run:
         s.blit(bg, (x0 - 2, y0 - 2))
         icons = {'secret': (200, 180, 140), 'boss': (230, 50, 50), 'treasure': (240, 200, 70), 'shop': (90, 200, 90), 'curse': (170, 80, 200),
                  'challenge': (230, 120, 60), 'omikuji': (230, 80, 70), 'onsen': (120, 200, 230),
-                 'library': (170, 140, 230), 'dojo': (240, 160, 60)}
+                 'library': (170, 140, 230), 'dojo': (240, 160, 60), 'teahouse': (120, 190, 100), 'slots': (240, 140, 80)}
         for pos, r in rooms.items():
             if not (r.seen or show_all) or not r.revealed:
                 continue

@@ -1347,6 +1347,28 @@ class Obj:
             D.rect(s, (60, 40, 30), (x - 10, y - 10, 20, 14))
             D.rect(s, col, (x - 4, y - 6, 8, 10))
             gfx.TEXT.add('Oni-Schrein' if oni else 'Kami-Schrein', x, y + 8, 6, col, 'c')
+        elif k == 'tea':
+            nm, price, col = self.data['name'], self.data['price'], self.data['col']
+            D.rect(s, (90, 60, 40), (x - 12, y - 2, 24, 10))
+            D.rect(s, (130, 90, 60), (x - 12, y - 4, 24, 3))
+            if not self.used:
+                D.ellipse(s, col, (x - 5, y - 12, 10, 8))
+                D.ellipse(s, (250, 250, 250), (x - 5, y - 12, 10, 8), 1)
+                gfx.TEXT.add(nm, x, y + 10, 6, (240, 225, 190), 'c')
+                gfx.TEXT.add('%d Mon' % price, x, y + 18, 6, (255, 230, 120), 'c')
+        elif k == 'slots':
+            D.rect(s, (40, 20, 20), (x - 14, y - 22, 28, 32))
+            D.rect(s, (200, 60, 50), (x - 13, y - 21, 26, 30))
+            D.rect(s, (250, 240, 220), (x - 10, y - 16, 20, 9))
+            sy = self.data.get('spin', 0)
+            icons = ['coin', 'leaf', 'heart', 'flame', 'star']
+            for i in range(3):
+                ic = icons[int((t * 12 if self.cool > 0.3 else 0) + i * 2 + self.data.get('res', 0)) % len(icons)]
+                D.circle(s, {'coin': (230, 190, 70), 'leaf': (90, 170, 80), 'heart': (220, 50, 60), 'flame': (255, 140, 40), 'star': (250, 230, 120)}[ic],
+                         (x - 6 + i * 6, y - 11), 2)
+            D.circle(s, (160, 110, 70), (x, y - 26), 5)
+            D.circle(s, (20, 10, 10), (x - 2, y - 27), 1); D.circle(s, (20, 10, 10), (x + 2, y - 27), 1)
+            gfx.TEXT.add('Tanuki-Automat 3 Mon', x, y + 12, 6, (240, 225, 190), 'c')
         elif k == 'back':
             D.rect(s, (20, 14, 20), (x - 10, y - 10, 20, 20))
             gfx.TEXT.add('Zurück', x, y + 12, 6, (230, 210, 170), 'c')
