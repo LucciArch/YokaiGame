@@ -29,6 +29,7 @@ class Audio:
             pygame.mixer.set_num_channels(24)
             self.channels = pygame.mixer.get_init()[2]
             self._build_sfx()
+            self._variants()
             self.music_ch = pygame.mixer.Channel(23)
             pygame.mixer.set_reserved(1)
             self.ok = True
@@ -134,8 +135,32 @@ class Audio:
             'stairs': self._snd(cat([P(f, 0.14) for f in (784, 659, 523, 392, 330)]), 0.7),
         }
 
+    def _variants(self):
+        """Tonhöhen-Varianten, damit sich häufige Klänge nicht wiederholen."""
+        self.var = {}
+        for name in ('shoot', 'hit', 'kill', 'coin', 'ehit'):
+            snd = self.sfx[name]
+            arr = pygame.sndarray.array(snd).astype(np.float32)
+            out = []
+            for f in (0.9, 1.0, 1.1):
+                n = int(len(arr) / f)
+                idx = np.clip((np.arange(n) * f).astype(np.int64), 0, len(arr) - 1)
+                out.append(pygame.sndarray.make_sound(np.ascontiguousarray(arr[idx].astype(np.int16))))
+            self.var[name] = out
+
     def play(self, name, vol=1.0):
         if not self.ok or name not in self.sfx:
+            return
+        if name in getattr(self, 'var', {}) and random.random() < 0.8:
+            s = random.choice(self.var[name])
+            now = pygame.time.get_ticks()
+            if now - self.last_play.get(name, -999) < 35:
+                return
+            self.last_play[name] = now
+            ch = pygame.mixer.find_channel(False)
+            if ch:
+                ch.set_volume(self.vol_sfx * vol)
+                ch.play(s)
             return
         now = pygame.time.get_ticks()
         if now - self.last_play.get(name, -999) < 35:

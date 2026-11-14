@@ -1181,6 +1181,9 @@ class Enemy:
         s.blit(spr, (int(self.x) - spr.get_width() // 2, int(self.y) - spr.get_height() // 2 - bob - 2))
         if self.champ:
             pygame.draw.circle(s, CHAMPIONS[self.champ]['col'], (int(self.x), int(self.y) - spr.get_height() // 2 - 5 - bob), 2)
+        a = self.d.get('attack')
+        if a and a['kind'] in ('aimed', 'ring', 'cross', 'spiral') and 0 < self.acd < 0.32 and self.d['move'] not in ('burrow', 'drop'):
+            gfx.draw_glow(s, int(self.x), int(self.y) - 2, self.r + 8, (255, 70, 60), int(160 * (1 - self.acd / 0.32)))
 
 
 # =========================================================================  Pickups & Objekte

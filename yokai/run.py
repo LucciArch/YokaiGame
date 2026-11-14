@@ -1516,6 +1516,19 @@ class Run:
                     pygame.draw.circle(s, (230, 190, 70), (x, y - 4), 3, 1)
             if other.kind == 'boss':
                 gfx.draw_glow(s, x, y, 16, (255, 50, 50), 60)
+                tc = (200, 40, 40)
+                if horiz:
+                    yy = rect.y - 6 if d == 'n' else rect.bottom + 2
+                    pygame.draw.rect(s, (30, 10, 10), (rect.x - 7, yy, rect.w + 14, 4))
+                    pygame.draw.rect(s, tc, (rect.x - 5, yy + 1, rect.w + 10, 2))
+                    pygame.draw.rect(s, tc, (rect.x - 2, rect.y - 2, 3, rect.h + 4))
+                    pygame.draw.rect(s, tc, (rect.right - 1, rect.y - 2, 3, rect.h + 4))
+                else:
+                    xx = rect.x - 6 if d == 'w' else rect.right + 2
+                    pygame.draw.rect(s, (30, 10, 10), (xx, rect.y - 7, 4, rect.h + 14))
+                    pygame.draw.rect(s, tc, (xx + 1, rect.y - 5, 2, rect.h + 10))
+                    pygame.draw.rect(s, tc, (rect.x - 2, rect.y - 2, rect.w + 4, 3))
+                    pygame.draw.rect(s, tc, (rect.x - 2, rect.bottom - 1, rect.w + 4, 3))
 
     def draw(self, s, t):
         if self.bg_dirty or self.bg is None:
@@ -1544,6 +1557,19 @@ class Run:
         ents.sort(key=lambda e: e.y)
         for e in ents:
             e.draw(s, t)
+        near, nd = None, 42
+        for pd in self.pedestals:
+            dd = math.hypot(pd.x - p.x, pd.y - p.y)
+            if not pd.taken and dd < nd:
+                near, nd = pd, dd
+        if near and not self.hold:
+            name, desc, icon, col = near.info()
+            bx = clamp(near.x, RX + 70, RX + RW - 70)
+            by = near.y - 44
+            w = max(gfx.text_w(name, 8), gfx.text_w(desc, 6)) + 12
+            gfx.panel(s, (int(bx - w / 2), int(by), int(w), 22), 200, col)
+            gfx.TEXT.add(name, bx, by + 2, 8, col, 'c')
+            gfx.TEXT.add(desc, bx, by + 12, 6, (230, 225, 210), 'c')
         if self.hold:
             icon, col, ht = self.hold
             yy = p.y - 28 - (1 - min(1, (1.4 - ht) * 4)) * 6
