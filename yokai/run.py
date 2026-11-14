@@ -5,7 +5,7 @@ import pygame
 from collections import deque, defaultdict
 from .settings import *
 from . import gfx, audio
-from .data import (BIOMES, DEPTH_BIOMES, BOSS_POOL, ITEMS, ITEM_IDS, ACTIVES, ENEMIES, CHAMPIONS, BOSSES,
+from .data import (TRINKETS, BIOMES, DEPTH_BIOMES, BOSS_POOL, ITEMS, ITEM_IDS, ACTIVES, ENEMIES, CHAMPIONS, BOSSES,
                    BOSS_REWARD, CHARS, ACHIEVEMENTS, TRANSFORMS, SYNERGIES, CHAR_ORDER)
 from .rooms import generate_floor, build_room_tiles, Room
 from .entities import (Player, Bullet, Enemy, Pickup, Pedestal, Obj, Hazard, Particle, burst, clamp, norm,
@@ -23,7 +23,7 @@ TIPS = ['Reinigungssalz an rissigen Wänden öffnet Geheimräume.', 'Die Ausweic
 _GRADE = {'chikurin': (40, 90, 30), 'inari': (120, 50, 20), 'kawabe': (20, 70, 80), 'obakedera': (60, 40, 20),
           'hakaba': (40, 50, 80), 'yashiki': (60, 20, 50), 'kurama': (80, 50, 20), 'yukiyama': (60, 90, 130),
           'oeyama': (90, 30, 10), 'ryugu': (10, 70, 90), 'uminobe': (30, 40, 60), 'shinkai': (0, 20, 80),
-          'yomi': (90, 0, 30), 'jigoku': (120, 30, 0), 'enma_cho': (110, 20, 10), 'takamagahara': (120, 100, 40)}
+          'yomi': (90, 0, 30), 'jigoku': (120, 30, 0), 'enma_cho': (110, 20, 10), 'takamagahara': (120, 100, 40), 'tsukiyomi': (60, 70, 140)}
 Q_WEIGHT = {0: 1.0, 1: 1.0, 2: 0.8, 3: 0.42, 4: 0.18}
 CURSES = {'dunkel': 'Fluch der Dunkelheit', 'nebel': 'Fluch des Nebels', 'labyrinth': 'Fluch des Labyrinths',
           'verirrt': 'Fluch der Verirrten'}
@@ -353,7 +353,12 @@ class Run:
                     price = int((10 + q * 4) * disc)
                     self.pedestals.append(Pedestal(iid, cx + dx, cy - 10, price=price))
                 else:
-                    kind, price = random.choice([('heart', 3), ('key', 5), ('salt', 4), ('spirit', 5), ('battery', 6), ('chest', 6)])
+                    kind, price = random.choice([('heart', 3), ('key', 5), ('salt', 4), ('spirit', 5), ('battery', 6), ('chest', 6), ('trinket', 8)])
+                    if kind == 'trinket':
+                        pk = self.spawn_trinket(cx + dx, cy - 6)
+                        pk.vx = pk.vy = 0
+                        pk.price = max(1, int(price * disc))
+                        continue
                     self.pickups.append(Pickup(kind, cx + dx, cy - 6, price=max(1, int(price * disc)), pop=False))
             self.objs.append(Obj('saisen', cx, cy + 60))
         elif k == 'curse':
@@ -502,14 +507,22 @@ class Run:
             return norm(p.x - x, p.y - y)
         return norm(RX + best[0] * TILE + 16 - x, RY + best[1] * TILE + 16 - y)
 
+    def spawn_trinket(self, x, y, tid=None):
+        pk = Pickup('trinket', x, y)
+        pk.tid = tid or random.choice(list(TRINKETS.keys()))
+        self.pickups.append(pk)
+        return pk
+
     def spawn_pickup(self, kind, x, y, pop=True):
+        if kind == 'trinket':
+            return self.spawn_trinket(x, y)
         pk = Pickup(kind, x, y, pop=pop)
         self.pickups.append(pk)
         return pk
 
     def random_drop(self, x, y, luck_bonus=0.0):
         luck = self.player.s['luck'] + luck_bonus
-        table = [('coin', 34), ('half', 10), ('heart', 10), ('key', 11), ('salt', 7), ('chest', 6 + luck),
+        table = [('coin', 34), ('half', 10), ('heart', 10), ('key', 11), ('salt', 7), ('chest', 6 + luck), ('trinket', 2.5),
                  ('spirit', 5 + luck * 0.5), ('battery', 3), ('coin5', 4 + luck)]
         if self.player.spirit_only:
             table = [(k, w * (0.2 if k in ('half', 'heart') else 1)) for k, w in table]
@@ -1157,6 +1170,24 @@ class Run:
                 else:
                     p.salts += 1
                     audio.play('pickup', 0.7)
+            elif k == 'trinket':
+                if pk.age < 0.8 or getattr(pk, 'swapcool', 0) > 0:
+                    continue
+                old = p.trinket
+                if pk.price:
+                    p.coins -= pk.price
+                    pk.price = 0
+                    audio.play('buy')
+                p.trinket = pk.tid
+                p.recalc()
+                tr = TRINKETS[pk.tid]
+                self.banner(tr['name'], tr['desc'] + '  (Anhänger)', tr['col'])
+                audio.play('pickup')
+                if old:
+                    pk.tid = old
+                    pk.age = 0
+                    pk.x += 18
+                    ok = False
             elif k == 'battery':
                 if p.active and p.charge < ACTIVES[p.active]['charge']:
                     p.charge = ACTIVES[p.active]['charge']
@@ -1777,6 +1808,11 @@ class Run:
                     col = (255, 230, 120) if int(t * 4) % 2 else (180, 240, 140)
                 pygame.draw.rect(s, col, (ax + 13, ay + 9 - (k + 1) * hh + 1, bw, hh - 1))
             T.add('E', ax - 15, ay - 12, 7, (200, 190, 160), 'r')
+        if p.trinket:
+            tr = TRINKETS[p.trinket]
+            pygame.draw.rect(s, (20, 14, 24), (262, 5, 18, 18))
+            pygame.draw.rect(s, (120, 100, 70), (262, 5, 18, 18), 1)
+            gfx.draw_icon(s, tr['icon'], tr['col'], 271, 14)
         # Ebene
         T.add('%s – %s' % (self.biome['jp'], self.biome['name']), 300, 3, 8, (230, 220, 190))
         info = ('Prüfung  •  ' if self.challenge else '') + ('%d:%02d  •  ' % (max(0, 900 - self.time) // 60, max(0, 900 - self.time) % 60) if self.challenge == 'zeitlauf' else '') + 'Ebene %d' % self.depth + ('  •  Schleife %d' % (self.loop + 1) if self.endless else '') + ('  •  Oni-Modus' if self.hard else '') + ('  •  ' + CURSES[self.curse] if self.curse else '')

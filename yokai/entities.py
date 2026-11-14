@@ -5,7 +5,7 @@ import pygame
 from collections import defaultdict
 from .settings import *
 from . import gfx, audio
-from .data import ITEMS, ENEMIES, CHAMPIONS, ACTIVES, CHARS, SYNERGIES, TRANSFORMS
+from .data import ITEMS, ENEMIES, CHAMPIONS, ACTIVES, CHARS, SYNERGIES, TRANSFORMS, TRINKETS
 
 ONE_TIME = ('hp', 'heal', 'spirit', 'coins', 'keys', 'salts', 'fullheal')
 
@@ -296,6 +296,8 @@ class Player:
         self.s = {}
         self.f = defaultdict(float)
         self.bonus = defaultdict(float)
+        self.trinket = None
+        self.recoil = 0.0
         self.temp = []   # [fx-dict, rest-zeit]
         self.recalc()
         run.player = self
@@ -309,6 +311,8 @@ class Player:
         out += [s['fx'] for s in SYNERGIES if s['id'] in self.synergies]
         out += [TRANSFORMS[t]['fx'] for t in self.transforms]
         out.append(self.bonus)
+        if getattr(self, 'trinket', None):
+            out.append(TRINKETS[self.trinket]['fx'])
         out += [t[0] for t in getattr(self, 'temp', [])]
         return out
 
@@ -482,6 +486,7 @@ class Player:
         self.anim += dt
         for k in ('iframes', 'dash_cd', 'shoot_cd', 'hurt_buff', 'kagura', 'room_dmg_buff', 'aura_cd'):
             setattr(self, k, max(0.0, getattr(self, k) - dt))
+        self.recoil = max(0.0, self.recoil - dt)
         if self.temp:
             for tfx in self.temp:
                 tfx[1] -= dt
@@ -552,6 +557,7 @@ class Player:
                 self.flip = sx < 0
             if self.shoot_cd <= 0 and run.challenge != 'papiermeister':
                 self.fire(self.facing)
+                self.recoil = 0.08
                 self.shoot_cd = 1.0 / self.s['rate']
                 run.player_fired = True
         # Begleiter
@@ -702,7 +708,9 @@ class Player:
                 alpha_s.set_alpha(190)
             if self.dash_t > 0:
                 alpha_s = spr.copy(); alpha_s.set_alpha(150)
-            s.blit(alpha_s, (int(self.x) - spr.get_width() // 2, int(self.y) - spr.get_height() + 5 - bob))
+            rx = int(-self.facing[0] * 1.5) if self.recoil > 0 else 0
+            ry = int(-self.facing[1] * 1.5) if self.recoil > 0 else 0
+            s.blit(alpha_s, (int(self.x) - spr.get_width() // 2 + rx, int(self.y) - spr.get_height() + 5 - bob + ry))
             if 'oni' in self.transforms:
                 pygame.draw.polygon(s, (250, 230, 120), [(self.x - 4, self.y - 13), (self.x - 6, self.y - 18), (self.x - 2, self.y - 13)])
                 pygame.draw.polygon(s, (250, 230, 120), [(self.x + 4, self.y - 13), (self.x + 6, self.y - 18), (self.x + 2, self.y - 13)])
@@ -1136,7 +1144,11 @@ class Enemy:
     def draw(self, s, t):
         if self.spawn_t > 0:
             f = 1 - self.spawn_t / 0.55
-            pygame.draw.circle(s, (230, 230, 240), (int(self.x), int(self.y)), int(10 * (1 - f)) + 1, 1)
+            for i in range(6):
+                a = i / 6 * math.tau + f * 2
+                rr = 4 + f * 10
+                c = int(200 - 80 * f)
+                pygame.draw.circle(s, (c, c, c + 10), (int(self.x + math.cos(a) * rr), int(self.y + math.sin(a) * rr * 0.6)), max(1, int(5 * (1 - f)) + 1))
             if f < 0.5:
                 return
         if self.hidden:
@@ -1245,6 +1257,11 @@ class Pickup:
             D.rect(s, (180, 40, 40), (x - 8, y - 5, 16, 11))
             D.rect(s, (130, 20, 30), (x - 8, y - 5, 16, 4))
             D.rect(s, (240, 200, 90), (x - 2, y - 2, 4, 4))
+        elif k == 'trinket':
+            tr = TRINKETS[self.tid]
+            gfx.draw_glow(s, x, y, 10, tr['col'], 60)
+            D.line(s, (230, 60, 60), (x, y - 10), (x, y - 6), 1)
+            gfx.draw_icon(s, tr['icon'], tr['col'], x, y)
         elif k == 'battery':
             D.rect(s, (40, 30, 30), (x - 4, y - 7, 9, 14))
             D.rect(s, (250, 240, 220), (x - 3, y - 6, 7, 12))

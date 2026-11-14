@@ -69,8 +69,12 @@ BIOMES.update({
                      enemies=['oni', 'nurikabe', 'kerakera_onna', 'shinigami', 'abura_akago', 'shikome', 'katawaguruma', 'wanyudo'],
                      music=('in', 175, 120, 'battle', 53), dark=40, pit='lava', decor='cracks'),
 })
+BIOMES['tsukiyomi'] = dict(name='Mondpalast', jp='Tsuki no Miya', depth=6, floor=(150, 160, 200), floor_pat='cloud',
+                          wall=(210, 215, 235), wall_pat='cloud', rock=(170, 180, 210), moss=False, ambient='sparkle',
+                          enemies=['shinigami', 'yamabiko', 'kamaitachi', 'ningyo', 'katawaguruma', 'karasu_tengu', 'nurikabe'],
+                          music=('yo', 247, 100, 'mystic', 62), dark=50, pit='cloud', decor='clouds')
 DEPTH_BIOMES = {1: ['chikurin', 'inari', 'kawabe'], 2: ['obakedera', 'hakaba', 'yashiki'], 3: ['kurama', 'yukiyama', 'oeyama'],
-                4: ['ryugu', 'uminobe', 'shinkai'], 5: ['yomi', 'jigoku', 'enma_cho'], 6: ['takamagahara']}
+                4: ['ryugu', 'uminobe', 'shinkai'], 5: ['yomi', 'jigoku', 'enma_cho'], 6: ['takamagahara', 'tsukiyomi']}
 for _b, _pit, _dec in (('chikurin', 'void', 'grass'), ('inari', 'void', 'petals'), ('obakedera', 'void', 'cracks'),
                        ('hakaba', 'void', 'graves'), ('kurama', 'void', 'leaves'), ('yukiyama', 'ice', 'snow'),
                        ('ryugu', 'water', 'shells'), ('uminobe', 'water', 'planks'), ('yomi', 'void', 'bones'),
@@ -256,6 +260,24 @@ I('kagutsuchi_glut', 'Glut des Kagutsuchi', 'Das erste Feuer der Welt', 'flame',
 I('geheimkarte', 'Karte des Diebes', 'Wo sind die verborgenen Räume?', 'scroll', (190, 160, 110), 'TS', [], 2, True, map=1, salts=2)
 
 ITEM_IDS = ORDER
+
+# ---- Omamori-Anhänger (ein Slot, tauschbar)
+TRINKETS = {
+    'am_kitsune': dict(name='Fuchs-Anhänger', desc='Glück +2', icon='mask', col=(250, 240, 230), fx=dict(luck=2)),
+    'am_tora': dict(name='Tiger-Anhänger', desc='Schaden +0.7', icon='claw', col=(250, 200, 60), fx=dict(dmg=0.7)),
+    'am_usagi': dict(name='Hasen-Anhänger', desc='Tempo +18', icon='leaf', col=(250, 250, 250), fx=dict(spd=18)),
+    'am_kame': dict(name='Schildkröten-Anhänger', desc='Schild pro Raum', icon='shell', col=(90, 160, 90), fx=dict(shield=1)),
+    'am_tsuru': dict(name='Kranich-Anhänger', desc='Feuerrate +0.5', icon='crane', col=(240, 240, 250), fx=dict(rate=0.5)),
+    'am_koi': dict(name='Koi-Anhänger', desc='Reichweite +60', icon='fish', col=(240, 120, 60), fx=dict(range=60)),
+    'am_hebi': dict(name='Schlangen-Anhänger', desc='Giftige Talismane', icon='tail', col=(110, 200, 90), fx=dict(poison=1)),
+    'am_kumo': dict(name='Wolken-Anhänger', desc='Zielsuchend', icon='cloud', col=(220, 230, 250), fx=dict(homing=1)),
+    'am_hi': dict(name='Feuer-Anhänger', desc='Brennende Talismane', icon='flame', col=(255, 140, 40), fx=dict(burn=1)),
+    'am_tama': dict(name='Perlen-Anhänger', desc='Ein Schild-Orbital', icon='beads', col=(200, 220, 255), fx=dict(orbital=1)),
+    'am_kane': dict(name='Münz-Anhänger', desc='Goldene Talismane, Magnet', icon='coin', col=GOLD, fx=dict(gold_shots=0.12, magnet=1)),
+    'am_tsuki': dict(name='Mond-Anhänger', desc='Salz bei Raumende', icon='moon', col=(200, 210, 255), fx=dict(salts_regen=0.2)),
+    'am_ken': dict(name='Schwert-Anhänger', desc='Krit-Chance +12 %', icon='sword', col=(210, 210, 230), fx=dict(crit=0.12)),
+    'am_yama': dict(name='Berg-Anhänger', desc='Rückstoß, größere Talismane', icon='hat', col=(140, 120, 100), fx=dict(knock=1, size=0.7)),
+}
 
 # =====================================================================  SYNERGIEN
 SYNERGIES = [
