@@ -64,7 +64,3 @@ yokai/gfx.py         Pixel-Art-Sprites, Icons, Kacheln, Text
 yokai/audio.py       Prozedurale Musik und Soundeffekte
 ```
 
-## Grafiken & Lizenzen
-
-Figuren-, Yokai- und Boss-Sprites stammen aus dem **[Ninja Adventure Asset Pack](https://pixel-boy.itch.io/ninja-adventure-asset-pack)** von *pixel-boy* und *AAA* – veröffentlicht unter **CC0 1.0** (siehe `yokai/assets/LICENSE-NinjaAdventure-CC0.txt`). Vielen Dank!
-Musik, Soundeffekte, Item-Icons und Umgebungsgrafiken werden im Code erzeugt.
