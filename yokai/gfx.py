@@ -783,6 +783,22 @@ def color_grade(surf, col, strength=26):
     surf.blit(g, (0, 0))
 
 
+_edge = {}
+
+
+def color_grade_edge(surf, col, alpha):
+    """Farbiger Bildschirmrand (Treffer / wenig Leben)."""
+    e = _edge.get(col)
+    if e is None:
+        e = pygame.Surface((W, H), pygame.SRCALPHA)
+        for i in range(30):
+            a = int((1 - i / 30) ** 2 * 255)
+            pygame.draw.rect(e, col + (a,), (i * 2, i * 2, W - i * 4, H - i * 4), 2)
+        _edge[col] = e
+    e.set_alpha(alpha)
+    surf.blit(e, (0, 0))
+
+
 # ---------------------------------------------------------------- Text
 class TextLayer:
     """Texte werden in Spielkoordinaten gesammelt und scharf in Fensterauflösung gezeichnet."""

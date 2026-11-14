@@ -350,7 +350,7 @@ class Game:
             s.blit(spr, (int(x), int(250 - spr.get_height() - bob)))
 
     # ================================================================  Zustände
-    MENU = ['Neuer Lauf', 'Tägliche Prüfung', 'Herausforderungen', 'Codex der Items', 'Erfolge', 'Statistik', 'Optionen', 'Beenden']
+    MENU = ['Neuer Lauf', 'Tägliche Prüfung', 'Herausforderungen', 'Codex der Items', 'Erfolge', 'Statistik', 'Steuerung', 'Optionen', 'Beenden']
 
     def st_title(self, dt, events, nav):
         s = self.screen
@@ -360,7 +360,7 @@ class Game:
         T.add('– Hyakki Yagyō –', W // 2, 66, 11, (230, 140, 130), 'c')
         items = self.MENU
         for i, m in enumerate(items):
-            y = 88 + i * 16
+            y = 84 + i * 15
             sel = i == self.sel
             col = (255, 230, 150) if sel else (210, 200, 190)
             if sel:
@@ -375,7 +375,7 @@ class Game:
             elif isinstance(n, tuple) and n[0] == 'click':
                 mx, my = n[1]
                 for i in range(len(items)):
-                    if W // 2 - 70 < mx < W // 2 + 70 and 88 + i * 16 - 2 < my < 88 + i * 16 + 13:
+                    if W // 2 - 70 < mx < W // 2 + 70 and 84 + i * 15 - 2 < my < 84 + i * 15 + 12:
                         self.sel = i
                         self.title_select(i)
             elif n == 'ok':
@@ -403,6 +403,8 @@ class Game:
             self.state = 'achievements'; self.scroll = 0
         elif m == 'Statistik':
             self.state = 'stats'
+        elif m == 'Steuerung':
+            self.state = 'controls'
         elif m == 'Optionen':
             self.state = 'options'; self.sel = 0
         elif m == 'Beenden':
@@ -848,6 +850,29 @@ class Game:
         T.add('Esc – Zurück', W // 2, 285, 6, (150, 140, 140), 'c')
         for n in nav:
             if n in ('back', 'ok'): self.state = 'title'
+
+    def st_controls(self, dt, events, nav):
+        s = self.screen
+        s.fill((18, 12, 24))
+        T = gfx.TEXT
+        T.add('Steuerung', W // 2, 8, 14, (255, 230, 170), 'c')
+        rows = [('Bewegen', 'W A S D', 'Linker Stick'), ('Ofuda werfen', 'Pfeiltasten / linke Maustaste', 'Rechter Stick'),
+                ('Ausweichrolle', 'Leertaste / Shift / rechte Maustaste', 'A / RB'), ('Aktives Item', 'E', 'Y / LB'),
+                ('Reinigungssalz', 'Q', 'X'), ('Items & Werte', 'Tab (halten)', '–'), ('Pause', 'Esc / P', 'Start'),
+                ('Vollbild', 'F11', '–')]
+        T.add('Aktion', 40, 34, 8, (200, 180, 150)); T.add('Tastatur / Maus', 150, 34, 8, (200, 180, 150)); T.add('Controller', 360, 34, 8, (200, 180, 150))
+        for i, (a, k, c) in enumerate(rows):
+            y = 52 + i * 18
+            gfx.panel(s, (32, y - 3, W - 64, 16), 140, (80, 70, 90))
+            T.add(a, 40, y, 8, (250, 240, 220)); T.add(k, 150, y, 8, (220, 220, 240)); T.add(c, 360, y, 8, (220, 220, 240))
+        tips = ['Die Rolle macht dich kurz unverwundbar.', 'Salz löscht alle Geschosse und öffnet Geheimräume an rissigen Wänden.',
+                'Rot aufleuchtende Yokai greifen gleich an.']
+        for i, t_ in enumerate(tips):
+            T.add(t_, W // 2, 205 + i * 13, 7, (200, 190, 170), 'c')
+        T.add('Esc – Zurück', W // 2, 285, 6, (150, 140, 140), 'c')
+        for n in nav:
+            if n in ('back', 'ok'):
+                self.state = 'title'
 
     def st_options(self, dt, events, nav):
         s = self.screen

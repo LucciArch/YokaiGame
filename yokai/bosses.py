@@ -329,7 +329,7 @@ class KappaOu(Boss):
 
     def setup(self):
         self.attacks = ['jump', 'spit', 'summon']
-        self.attacks2 = ['jump', 'spit', 'summon', 'rain', 'triple']
+        self.attacks2 = ['jump', 'spit', 'summon', 'rain', 'triple', 'whirlpool']
         self.z = 0.0
 
     def a_jump(self, n=1):
@@ -353,6 +353,12 @@ class KappaOu(Boss):
 
     def a_triple(self):
         yield from self.a_jump(3)
+
+    def a_whirlpool(self):
+        for k in range(40):
+            for j in range(2):
+                ebullet(self.run, self.x, self.y, k * 0.3 + j * math.pi, 80, (110, 190, 255), curve=0.9)
+            yield 0.05
 
     def a_spit(self):
         for i in range(3):
@@ -393,7 +399,7 @@ class Jorogumo(Boss):
 
     def setup(self):
         self.attacks = ['web', 'eggs', 'spiral', 'dash']
-        self.attacks2 = ['web', 'eggs', 'spiral', 'dash', 'webring']
+        self.attacks2 = ['web', 'eggs', 'spiral', 'dash', 'webring', 'net']
         self.y = RY + 60
         self.tx = self.x
 
@@ -422,6 +428,15 @@ class Jorogumo(Boss):
         yield 0.6
         self.fan(3, 0.3, 140, (180, 90, 220))
         yield 0.3
+
+    def a_net(self):
+        for row in range(3):
+            y = self.p.y - 40 + row * 40
+            for col in range(0, 13, 2):
+                ebullet(self.run, RX + 16 + col * 32 + (16 if row % 2 else 0), y, math.pi / 2, 0.0, (240, 240, 250), 3, eff='slow').life = 1.6
+        yield 1.2
+        self.fan(5, 0.2, 140, (180, 90, 220))
+        yield 0.4
 
     def a_webring(self):
         self.ring(16, 70, 0, (240, 240, 250), eff='slow')
@@ -458,7 +473,7 @@ class Gashadokuro(Boss):
         self.hands = [[CX - 70, RY + 110], [CX + 70, RY + 110]]
         self.hand_home = [[CX - 70, RY + 110], [CX + 70, RY + 110]]
         self.attacks = ['slam', 'bones', 'jaw']
-        self.attacks2 = ['slam', 'double', 'bones', 'jaw']
+        self.attacks2 = ['slam', 'double', 'bones', 'jaw', 'clap']
         self.busy = [False, False]
 
     def move(self, dt):
@@ -494,6 +509,23 @@ class Gashadokuro(Boss):
     def a_double(self):
         yield from self._slam(0)
         yield from self._slam(1)
+
+    def a_clap(self):
+        self.busy = [True, True]
+        ty = self.p.y
+        for k in range(12):
+            for i, h in enumerate(self.hands):
+                h[0] += ((RX + 30 if i == 0 else RX + RW - 30) - h[0]) * 0.3
+                h[1] += (ty - h[1]) * 0.3
+            yield 0.04
+        for k in range(14):
+            for i, h in enumerate(self.hands):
+                h[0] += (self.p.x - h[0]) * 0.2
+            yield 0.03
+        self.ring(16, 100, 0, (230, 220, 200), x=self.hands[0][0], y=ty)
+        self.run.shake(6)
+        yield 0.4
+        self.busy = [False, False]
 
     def a_bones(self):
         for i in range(16):

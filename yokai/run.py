@@ -1693,10 +1693,10 @@ class Run:
             ov = pygame.Surface((RW, RH), pygame.SRCALPHA)
             ov.fill((90, 110, 200, 40))
             s.blit(ov, (RX, RY))
-        if self.hurt_flash > 0:
-            ov = pygame.Surface((W, H), pygame.SRCALPHA)
-            ov.fill((200, 0, 30, int(self.hurt_flash * 300)))
-            s.blit(ov, (0, 0))
+        low = p.total_hp() <= 2 and not p.dead
+        if self.hurt_flash > 0 or low:
+            a = int(self.hurt_flash * 600) if self.hurt_flash > 0 else int(60 + 50 * math.sin(t * 5))
+            gfx.color_grade_edge(s, (200, 0, 30), min(220, a))
         if self.flash_white > 0:
             ov = pygame.Surface((W, H), pygame.SRCALPHA)
             ov.fill((255, 255, 255, int(min(1, self.flash_white * 4) * 150)))
@@ -1909,4 +1909,16 @@ class Run:
                 col = (255, 255, 255)
             pygame.draw.rect(s, col, (rx, ry, cw - 1, ch - 1))
             if r.kind in icons and (r.seen or show_all):
-                pygame.draw.rect(s, icons[r.kind], (rx + 2, ry + 1, cw - 5, ch - 3))
+                c = icons[r.kind]
+                mx, my = rx + cw // 2 - 1, ry + ch // 2 - 1
+                k = r.kind
+                if k == 'boss':
+                    pygame.draw.line(s, c, (mx - 2, my - 2), (mx + 2, my + 2)); pygame.draw.line(s, c, (mx + 2, my - 2), (mx - 2, my + 2))
+                elif k in ('treasure', 'library'):
+                    pygame.draw.polygon(s, c, [(mx - 2, my + 2), (mx - 2, my - 1), (mx, my + 1), (mx + 2, my - 1), (mx + 2, my + 2)])
+                elif k in ('shop', 'slots'):
+                    pygame.draw.circle(s, c, (mx, my), 2)
+                elif k in ('onsen', 'teahouse'):
+                    pygame.draw.rect(s, c, (mx - 2, my, 5, 2)); pygame.draw.line(s, c, (mx, my - 2), (mx, my - 1))
+                else:
+                    pygame.draw.rect(s, c, (mx - 1, my - 1, 3, 3))
