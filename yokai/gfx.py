@@ -219,6 +219,18 @@ SPRITES = {
         "f..........f", "ff.k....k.ff", ".f.kk..kk.f.", "..fkkkkkkf..", "..kekkkkek..",
         "..kkkrrkkk..", "..fkkkkkkf..", ".fokkkkkkof.", ".ofkkkkkkfo.", "..okk..kko..",
         "..rr....rr..", "............"],
+    'tsurube_otoshi': [
+        "..hhhhhhhh..", ".hhhhhhhhhh.", "hhssssssssh.", "hsskssskssh.", "hssssssssshh",
+        "hsrrrrrrrssh", "hsrwkwwkrssh", "hssrrrrrsshh", ".hssssssshh.", "..hhhhhhhh..",
+        "...h.hh.h...", "............"],
+    'wanyudo': [
+        "...ffffff...", "..fonnnnof..", ".fnnoooonnf.", "fnosssssonnf", "fnoskssksonf",
+        "fnosssssonnf", "fnosrrrsonnf", "fnoossssonnf", ".fnnoooonnf.", "..fonnnnof..",
+        "...ffffff...", "............"],
+    'katawaguruma': [
+        "....ffff....", "...fhhhhf...", "..fhsssshf..", "..fhskskhf..", "..fhssmshf..",
+        "...fhhhhf...", ".nnnnnnnnnn.", "nnffnnnnffnn", "nfoofnnfoofn", "nnffnnnnffnn",
+        ".nnnnnnnnnn.", "............"],
     'sazae_oni': [
         ".....n......", "....nnn.....", "...nmnmn....", "..nnnnnnn...", ".nmnnmnnmn..",
         "nnnnnnnnnnn.", ".mmmmmmmmm..", ".mkemmkemm..", ".mmmmmmmmm..", "..m.m.m.m...",

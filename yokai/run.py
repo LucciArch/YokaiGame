@@ -23,7 +23,7 @@ CURSES = {'dunkel': 'Fluch der Dunkelheit', 'nebel': 'Fluch des Nebels', 'labyri
 
 
 class Run:
-    def __init__(self, game, char_id, seed=None, hard=False, daily=False, endless=False):
+    def __init__(self, game, char_id, seed=None, hard=False, daily=False, endless=False, challenge=None):
         self.game = game
         self.save = game.save
         self.seed = seed if seed is not None else random.randrange(1, 10 ** 8)
@@ -32,6 +32,7 @@ class Run:
         self.hard = hard
         self.daily = daily
         self.endless = endless
+        self.challenge = challenge
         self.loop = 0
         self.hold = None
         self.portrait = None
@@ -80,7 +81,31 @@ class Run:
         self.last_boss = None
         self.player = Player(self, char_id)
         self.save.stat('runs')
+        self.apply_challenge()
         self.new_floor()
+
+    def apply_challenge(self):
+        c = self.challenge
+        p = self.player
+        if not c:
+            return
+        if c == 'glaskanone':
+            p.maxhp = p.hp = 2
+            p.bonus['dmgm'] = 2.0
+        elif c == 'fuchspfad':
+            for i in ('kyubi_schweif', 'inari_maske'):
+                p.gain_item(i, silent=True)
+        elif c == 'kaufmann':
+            p.coins = 99
+        elif c == 'oni_pakt':
+            for i in ('kanabo', 'oni_horn', 'hannya'):
+                p.gain_item(i, silent=True)
+            p.maxhp = 2
+            p.hp = 2
+        elif c == 'papiermeister':
+            p.bonus['familiar'] = 3
+            p.bonus['homing'] = 1
+        p.recalc()
 
     # ======================================================================  Ebenen
     def new_floor(self):
@@ -90,7 +115,15 @@ class Run:
         self.curse = None
         if self.depth >= 2 and rng.random() < (0.3 if not self.hard else 0.45) and not self.player.f['curse_immune']:
             self.curse = rng.choice(list(CURSES.keys()))
+        if self.challenge == 'dunkle_nacht':
+            self.curse = 'dunkel'
         self.rooms, start, self.boss_pos = generate_floor(rng, self.depth, self.curse == 'labyrinth', self.hard)
+        for r in self.rooms.values():
+            if self.challenge == 'fuchspfad' and r.kind == 'shop':
+                r.kind = 'onsen'
+            if self.challenge == 'kaufmann' and r.kind == 'treasure':
+                r.kind = 'shop'
+                r.locked = False
         self.boss_id = rng.choice(BOSS_POOL[self.depth])
         self.rooms[self.boss_pos].boss_id = self.boss_id
         self.room = None
@@ -102,7 +135,12 @@ class Run:
             self.save['stats']['best_floor'] = self.depth
         if self.depth >= 5:
             self.achieve('floor5')
-        self.enter_room(start, None)
+        if self.challenge == 'bossrush':
+            self.enter_room(start, None)
+            self.enter_room(self.boss_pos, None)
+            self.player.x, self.player.y = RX + RW / 2, RY + RH - 30
+        else:
+            self.enter_room(start, None)
         self.title_t = 3.0
         audio.get().music(self.biome['music'])
         if self.curse:
@@ -639,6 +677,7 @@ class Run:
         self.ebullets.clear()
         self.boss = None
         self.last_boss = b.id
+        self.bosses_beaten = getattr(self, 'bosses_beaten', []) + [b.id]
         self.bullet_speed_mult = (1.12 if self.hard else 1.0) + 0.07 * self.loop
         s = self.save
         first = s.add_to('bosses', b.id)
@@ -668,7 +707,15 @@ class Run:
         self.pedestals.append(Pedestal(self.pick_item('B'), cx, cy - 30))
         self.spawn_pickup('heart', cx - 30, cy + 10)
         p = self.player
-        if self.endless and self.depth in (5, 6):
+        if self.challenge == 'bossrush':
+            self.pedestals.append(Pedestal(self.pick_item('T'), cx + 50, cy - 30))
+        if self.challenge and self.depth >= 5:
+            goal = 6 if self.challenge == 'bossrush' else 5
+            if self.depth >= goal:
+                self.objs.append(Obj('victory', cx, cy + 40))
+            else:
+                self.objs.append(Obj('heaven', cx, cy + 40))
+        elif self.endless and self.depth in (5, 6):
             self.objs.append(Obj('heaven' if self.depth == 5 else 'torii', cx, cy + 40))
         elif self.depth == 5:
             self.objs.append(Obj('victory', cx - 70, cy + 40))
@@ -893,6 +940,9 @@ class Run:
             if self.hold[2] <= 0:
                 self.hold = None
         self.update_fx(dt)
+        if self.challenge == 'zeitlauf' and self.time > 900 and not p.dead:
+            p.dead = True
+            self.banner('Die Sonne geht auf…', 'Zu spät!', (255, 200, 120), True)
         if p.dead and self.result is None:
             self.result = 'dead'
             self.end_run(False)
@@ -1354,6 +1404,9 @@ class Run:
 
     def end_run(self, win):
         s = self.save
+        if win and self.challenge:
+            self.achieve('ch_' + self.challenge)
+            s.add_to('challenges_done', self.challenge)
         if win:
             s.stat('wins')
             s['char_wins'][self.char] = s['char_wins'].get(self.char, 0) + 1
@@ -1614,7 +1667,7 @@ class Run:
             T.add('E', ax - 15, ay - 12, 7, (200, 190, 160), 'r')
         # Ebene
         T.add('%s – %s' % (self.biome['jp'], self.biome['name']), 300, 3, 8, (230, 220, 190))
-        info = 'Ebene %d' % self.depth + ('  •  Schleife %d' % (self.loop + 1) if self.endless else '') + ('  •  Oni-Modus' if self.hard else '') + ('  •  ' + CURSES[self.curse] if self.curse else '')
+        info = ('Prüfung  •  ' if self.challenge else '') + ('%d:%02d  •  ' % (max(0, 900 - self.time) // 60, max(0, 900 - self.time) % 60) if self.challenge == 'zeitlauf' else '') + 'Ebene %d' % self.depth + ('  •  Schleife %d' % (self.loop + 1) if self.endless else '') + ('  •  Oni-Modus' if self.hard else '') + ('  •  ' + CURSES[self.curse] if self.curse else '')
         T.add(info, 300, 15, 6, (190, 170, 150))
         # Minikarte
         if self.curse != 'nebel' and not self.room.kind.startswith('shrine'):

@@ -9,7 +9,7 @@ from .settings import *
 from . import gfx, audio
 from .save import Save
 from .data import (ITEMS, ITEM_IDS, CHARS, CHAR_ORDER, ACHIEVEMENTS, ACTIVES, SYNERGIES, TRANSFORMS, BOSSES,
-                   BIOMES)
+                   BIOMES, CHALLENGES)
 from .run import Run
 
 FX_NAMES = {
@@ -350,7 +350,7 @@ class Game:
             s.blit(spr, (int(x), int(250 - spr.get_height() - bob)))
 
     # ================================================================  Zustände
-    MENU = ['Neuer Lauf', 'Tägliche Prüfung', 'Codex der Items', 'Erfolge', 'Statistik', 'Optionen', 'Beenden']
+    MENU = ['Neuer Lauf', 'Tägliche Prüfung', 'Herausforderungen', 'Codex der Items', 'Erfolge', 'Statistik', 'Optionen', 'Beenden']
 
     def st_title(self, dt, events, nav):
         s = self.screen
@@ -360,7 +360,7 @@ class Game:
         T.add('– Hyakki Yagyō –', W // 2, 66, 11, (230, 140, 130), 'c')
         items = self.MENU
         for i, m in enumerate(items):
-            y = 92 + i * 17
+            y = 88 + i * 16
             sel = i == self.sel
             col = (255, 230, 150) if sel else (210, 200, 190)
             if sel:
@@ -375,7 +375,7 @@ class Game:
             elif isinstance(n, tuple) and n[0] == 'click':
                 mx, my = n[1]
                 for i in range(len(items)):
-                    if W // 2 - 70 < mx < W // 2 + 70 and 92 + i * 17 - 2 < my < 92 + i * 17 + 13:
+                    if W // 2 - 70 < mx < W // 2 + 70 and 88 + i * 16 - 2 < my < 88 + i * 16 + 13:
                         self.sel = i
                         self.title_select(i)
             elif n == 'ok':
@@ -391,6 +391,12 @@ class Game:
             self.char_sel = CHAR_ORDER.index(self.last_char) if self.last_char in CHAR_ORDER else 0
         elif m == 'Tägliche Prüfung':
             self.start_daily()
+        elif m == 'Herausforderungen':
+            if not self.save['bosses']:
+                self.toast('Noch gesperrt', 'Besiege zuerst einen Boss', (230, 150, 140))
+                return
+            self.state = 'challenges'
+            self.ch_sel = 0
         elif m == 'Codex der Items':
             self.state = 'codex'
         elif m == 'Erfolge':
@@ -402,10 +408,11 @@ class Game:
         elif m == 'Beenden':
             self.quit()
 
-    def start_run(self, char, seed=None, daily=False):
+    def start_run(self, char, seed=None, daily=False, challenge=None):
         self.last_char = char
-        self.run = Run(self, char, seed, self.hard and not daily and self.save['hard_unlocked'], daily,
-                       getattr(self, 'endless', False) and not daily and self.save.data.get('endless_unlocked', False))
+        self.run = Run(self, char, seed, self.hard and not daily and not challenge and self.save['hard_unlocked'], daily,
+                       getattr(self, 'endless', False) and not daily and not challenge and self.save.data.get('endless_unlocked', False),
+                       challenge)
         self.state = 'play'
         self.show_tab = False
 
@@ -416,6 +423,36 @@ class Game:
         ch = random.Random(seed).choice(chars)
         self.start_run(ch, seed, daily=today.isoformat())
         self.run.banner('Tägliche Prüfung', 'Alle spielen heute denselben Lauf: %s' % CHARS[ch]['name'], (255, 220, 150), True)
+
+    # ---------------------------------------------------------------- Herausforderungen
+    def st_challenges(self, dt, events, nav):
+        s = self.screen
+        s.fill((18, 12, 24))
+        T = gfx.TEXT
+        done = set(self.save['challenges_done'])
+        T.add('Herausforderungen  (%d / %d bestanden)' % (len(done), len(CHALLENGES)), W // 2, 8, 12, (255, 230, 170), 'c')
+        for i, c in enumerate(CHALLENGES):
+            y = 32 + i * 26
+            sel = i == self.ch_sel
+            gfx.panel(s, (30, y, W - 60, 23), 210 if sel else 150, (255, 210, 120) if sel else (90, 80, 90))
+            spr = gfx.sprite(c['char'])
+            s.blit(spr, (38, y + 5))
+            T.add(c['name'], 58, y + 2, 9, (255, 230, 150) if sel else (220, 210, 200))
+            T.add(c['desc'], 58, y + 13, 6, (210, 200, 190))
+            if c['id'] in done:
+                star(s, W - 44, y + 11, (255, 220, 100))
+            T.add(CHARS[c['char']]['name'], W - 54, y + 7, 7, (180, 170, 160), 'r')
+        T.add('Enter – Starten     Esc – Zurück', W // 2, 287, 6, (150, 140, 140), 'c')
+        for n in nav:
+            if n == 'up': self.ch_sel = (self.ch_sel - 1) % len(CHALLENGES); audio.play('move')
+            elif n == 'down': self.ch_sel = (self.ch_sel + 1) % len(CHALLENGES); audio.play('move')
+            elif n == 'back': self.state = 'title'
+            elif n == 'ok':
+                c = CHALLENGES[self.ch_sel]
+                audio.play('select')
+                self.start_run(c['char'], challenge=c['id'])
+                self.run.banner('Prüfung: ' + c['name'], c['desc'], (255, 200, 140), True)
+                return
 
     # ---------------------------------------------------------------- Charakterwahl
     def st_chars(self, dt, events, nav):
@@ -662,6 +699,9 @@ class Game:
         for i, iid in enumerate(p.items[:40]):
             it = ITEMS[iid]
             gfx.draw_icon(s, it['icon'], it['col'], 225 + (i % 9) * 20, 95 + (i // 9) * 20)
+        if run.last_boss or getattr(run, 'bosses_beaten', None):
+            bl = getattr(run, 'bosses_beaten', [])
+            T.add('Besiegte Bosse: ' + (', '.join(BOSSES[b]['name'] for b in bl) if bl else '–'), W // 2, 233, 7, (240, 200, 170), 'c')
         T.add('R – Nochmal mit %s      Enter – Hauptmenü' % CHARS[p.char]['name'], W // 2, 246, 8, (230, 220, 200), 'c')
         if self.over_t > 0.8:
             for n in nav:

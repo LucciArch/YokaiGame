@@ -550,7 +550,7 @@ class Player:
             self.facing = norm(sx, sy)
             if abs(sx) > 0.2:
                 self.flip = sx < 0
-            if self.shoot_cd <= 0:
+            if self.shoot_cd <= 0 and run.challenge != 'papiermeister':
                 self.fire(self.facing)
                 self.shoot_cd = 1.0 / self.s['rate']
                 run.player_fired = True
@@ -1009,6 +1009,30 @@ class Enemy:
                     self.st = random.uniform(2.0, 3.2)
                     self.acd = min(self.acd, 0.35)
             self.vx = dx
+        elif mv == 'zigzag':
+            base = math.atan2(dy, dx) + (0.9 if int(self.t * 1.5) % 2 else -0.9)
+            self.x, self.y, bx, by = move_body(room, self.x, self.y, self.r, math.cos(base) * spd * dt, math.sin(base) * spd * dt, self.fly)
+            self.vx = dx
+        elif mv == 'drop':
+            self.st -= dt
+            if self.state in ('idle', 'up'):
+                self.state = 'up'
+                self.hidden = True
+                if self.st <= 0:
+                    self.state = 'falling'
+                    self.st = 0.8
+                    self.x, self.y = p.x, p.y
+            elif self.state == 'falling':
+                if self.st <= 0:
+                    self.hidden = False
+                    self.state = 'down'
+                    self.st = 1.8
+                    run.shake(3)
+                    self.do_attack(force=True)
+            elif self.state == 'down':
+                if self.st <= 0:
+                    self.state = 'up'
+                    self.st = random.uniform(1.0, 2.0)
         elif mv == 'bounce':
             sp = math.hypot(self.vx, self.vy) or 1
             f = spd / sp
@@ -1116,6 +1140,12 @@ class Enemy:
             if f < 0.5:
                 return
         if self.hidden:
+            if self.state == 'falling':
+                f = 1 - self.st / 0.8
+                gfx.shadow(s, (int(self.x) - int(4 + 8 * f), int(self.y) + 4, int(8 + 16 * f), int(3 + 4 * f)), 120)
+                return
+            if self.state == 'up':
+                return
             if self.state == 'emerge':
                 pygame.draw.circle(s, (120, 110, 90), (int(self.x), int(self.y)), 7, 2)
             else:

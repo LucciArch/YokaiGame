@@ -12,7 +12,7 @@ BIOMES = {
                   music=('yo', 233, 96, 'calm', 12), dark=0),
     'obakedera': dict(name='Geistertempel', jp='Obake-dera', depth=2, floor=(176, 164, 104), floor_pat='tatami',
                       wall=(88, 56, 44), wall_pat='wood', rock=(120, 110, 100), moss=False, ambient='fireflies',
-                      enemies=['chochin', 'nopperabo', 'gaki', 'ittan_momen', 'bakeneko', 'onibi', 'hitodama'],
+                      enemies=['chochin', 'nopperabo', 'gaki', 'ittan_momen', 'bakeneko', 'onibi', 'hitodama', 'tsurube_otoshi'],
                       music=('in', 196, 84, 'mystic', 21), dark=40),
     'hakaba': dict(name='Alter Friedhof', jp='Hakaba', depth=2, floor=(84, 84, 96), floor_pat='stone',
                    wall=(104, 104, 116), wall_pat='stone', rock=(130, 130, 140), moss=True, ambient='fog',
@@ -20,7 +20,7 @@ BIOMES = {
                    music=('iwato', 185, 80, 'dark', 22), weather='rain', dark=60),
     'kurama': dict(name='Kurama-Berg', jp='Kurama-yama', depth=3, floor=(116, 86, 64), floor_pat='gravel',
                    wall=(92, 72, 60), wall_pat='rock', rock=(110, 100, 92), moss=True, ambient='leaves',
-                   enemies=['karasu_tengu', 'kamaitachi', 'yamabiko', 'bakeneko', 'yuki_warashi', 'nekomata'],
+                   enemies=['karasu_tengu', 'kamaitachi', 'yamabiko', 'bakeneko', 'yuki_warashi', 'nekomata', 'tsurube_otoshi'],
                    music=('in', 247, 110, 'battle', 31), dark=0),
     'yukiyama': dict(name='Schneeberg', jp='Yuki-yama', depth=3, floor=(208, 218, 234), floor_pat='snow',
                      wall=(140, 162, 194), wall_pat='ice', rock=(170, 186, 210), moss=False, ambient='snow',
@@ -40,11 +40,11 @@ BIOMES = {
                  music=('iwato', 175, 116, 'battle', 51), weather='ash', dark=60),
     'jigoku': dict(name='Höllenfeuer', jp='Jigoku', depth=5, floor=(82, 32, 22), floor_pat='lava',
                    wall=(52, 22, 16), wall_pat='rock', rock=(70, 40, 30), moss=False, ambient='embers',
-                   enemies=['oni', 'shikome', 'shinigami', 'onibi', 'tsuchigumo', 'bakeneko', 'kasha'],
+                   enemies=['oni', 'shikome', 'shinigami', 'onibi', 'tsuchigumo', 'bakeneko', 'kasha', 'wanyudo'],
                    music=('in', 165, 124, 'battle', 52), weather='ash', dark=30),
     'takamagahara': dict(name='Himmelsgefilde', jp='Takamagahara', depth=6, floor=(226, 206, 150), floor_pat='cloud',
                          wall=(240, 240, 250), wall_pat='cloud', rock=(220, 200, 140), moss=False, ambient='sparkle',
-                         enemies=['shinigami', 'oni', 'karasu_tengu', 'ningyo', 'yamabiko', 'kamaitachi', 'shikome'],
+                         enemies=['shinigami', 'oni', 'karasu_tengu', 'ningyo', 'yamabiko', 'kamaitachi', 'shikome', 'katawaguruma'],
                          music=('yo', 294, 112, 'battle', 61), dark=0),
 }
 BIOMES.update({
@@ -54,11 +54,11 @@ BIOMES.update({
                    music=('ryukyu', 220, 98, 'calm', 13), weather='rain', dark=10, pit='water', decor='reeds'),
     'yashiki': dict(name='Spukvilla', jp='Bake-yashiki', depth=2, floor=(118, 82, 56), floor_pat='wood',
                     wall=(70, 44, 36), wall_pat='wood', rock=(110, 90, 80), moss=False, ambient='fog',
-                    enemies=['mokumokuren', 'chochin', 'tesso', 'enenra', 'kerakera_onna', 'nopperabo', 'tenome'],
+                    enemies=['mokumokuren', 'chochin', 'tesso', 'enenra', 'kerakera_onna', 'nopperabo', 'tenome', 'katawaguruma'],
                     music=('iwato', 196, 78, 'mystic', 23), dark=80, decor='cracks'),
     'oeyama': dict(name='Ōe-Berg', jp='Ōe-yama', depth=3, floor=(96, 70, 58), floor_pat='gravel',
                    wall=(70, 50, 44), wall_pat='rock', rock=(100, 84, 76), moss=False, ambient='embers',
-                   enemies=['kamikiri', 'jinmenju', 'abura_akago', 'karasu_tengu', 'bakeneko', 'gyuki', 'tenome'],
+                   enemies=['kamikiri', 'jinmenju', 'abura_akago', 'karasu_tengu', 'bakeneko', 'gyuki', 'tenome', 'wanyudo'],
                    music=('in', 233, 116, 'battle', 33), dark=20, decor='bones'),
     'shinkai': dict(name='Tiefsee', jp='Shinkai', depth=4, floor=(24, 46, 78), floor_pat='sand',
                     wall=(30, 60, 100), wall_pat='coral', rock=(60, 90, 130), moss=False, ambient='bubbles',
@@ -66,7 +66,7 @@ BIOMES.update({
                     music=('iwato', 196, 96, 'mystic', 43), weather='rain_dark', dark=90, pit='water', decor='shells'),
     'enma_cho': dict(name='Hof des Enma', jp='Enma-chō', depth=5, floor=(110, 30, 30), floor_pat='stone',
                      wall=(60, 16, 16), wall_pat='stone', rock=(140, 110, 60), moss=False, ambient='embers',
-                     enemies=['oni', 'nurikabe', 'kerakera_onna', 'shinigami', 'abura_akago', 'shikome'],
+                     enemies=['oni', 'nurikabe', 'kerakera_onna', 'shinigami', 'abura_akago', 'shikome', 'katawaguruma', 'wanyudo'],
                      music=('in', 175, 120, 'battle', 53), dark=40, pit='lava', decor='cracks'),
 })
 DEPTH_BIOMES = {1: ['chikurin', 'inari', 'kawabe'], 2: ['obakedera', 'hakaba', 'yashiki'], 3: ['kurama', 'yukiyama', 'oeyama'],
@@ -433,6 +433,9 @@ ENEMIES = {
     'tenome': dict(name='Tenome', sprite='tenome', hp=18, speed=24, r=7, move='wander', attack=A('aimed', n=2, spread=0.15, speed=140, cd=1.8, col=(255, 240, 160))),
     'nekomata': dict(name='Nekomata', sprite='nekomata', hp=20, speed=55, r=7, move='charge', attack=A('aimed', n=2, spread=0.2, speed=120, cd=2.8, col=(250, 170, 90)), fast_charge=True),
     'kasha': dict(name='Kasha', sprite='kasha', hp=22, speed=50, r=7, move='float', attack=A('trail', cd=0.35), fly=True, glow=(255, 120, 40)),
+    'tsurube_otoshi': dict(name='Tsurube-otoshi', sprite='tsurube_otoshi', hp=20, speed=0, r=8, move='drop', attack=A('ring', n=10, speed=85, cd=99, col=(220, 200, 160))),
+    'wanyudo': dict(name='Wanyūdō', sprite='wanyudo', hp=24, speed=95, r=8, move='bounce', attack=A('trail', cd=0.3), fly=True, glow=(255, 120, 40)),
+    'katawaguruma': dict(name='Katawaguruma', sprite='katawaguruma', hp=16, speed=60, r=7, move='zigzag', attack=A('aimed', n=3, spread=0.3, speed=110, cd=2.4, col=(255, 160, 80)), glow=(255, 150, 60)),
     'kappa_small': dict(name='Kappa', sprite='kappa_small', hp=6, speed=50, r=5, move='chase', attack=None),
     'karasu': dict(name='Krähe', sprite='karasu', hp=5, speed=80, r=5, move='float', attack=None, fly=True),
 }
@@ -481,6 +484,18 @@ BOSS_REWARD = {  # Freischaltung beim ersten Sieg
     'orochi': 'yamata_zahn', 'shuten_doji': 'shuten_schale', 'tamamo': 'kyubi_juwel', 'mikaboshi': 'hoshi_splitter',
 }
 
+# =====================================================================  PRÜFUNGEN (Herausforderungen)
+CHALLENGES = [
+    dict(id='glaskanone', name='Glaskanone', char='hana', desc='Nur ein Herz – aber doppelter Schaden.', goal=5),
+    dict(id='fuchspfad', name='Der Pfad des Fuchses', char='kuzunoha', desc='Startet mit Fuchs-Items. Keine Läden.', goal=5),
+    dict(id='dunkle_nacht', name='Die dunkelste Nacht', char='kenji', desc='Jede Ebene ist verflucht und finster.', goal=5),
+    dict(id='zeitlauf', name='Wettlauf gegen den Morgen', char='kotaro', desc='Besiege Ebene 5 in 15 Minuten.', goal=5),
+    dict(id='kaufmann', name='Der reiche Kaufmann', char='ponpoko', desc='99 Mon zu Beginn, aber Schatzräume werden zu Läden.', goal=5),
+    dict(id='oni_pakt', name='Pakt mit dem Teufel', char='akago', desc='Drei Oni-Items, aber nur ein Herzcontainer.', goal=5),
+    dict(id='bossrush', name='Boss-Ansturm', char='benkei', desc='Nur Bosskämpfe – nach jedem Boss ein Item.', goal=6),
+    dict(id='papiermeister', name='Papiermeister', char='seimei', desc='Du schießt nicht – nur deine Shikigami kämpfen.', goal=5),
+]
+
 # =====================================================================  ERFOLGE
 # (id, Name, Beschreibung, Belohnung)  – geprüft in run.py über check_achievements
 ACHIEVEMENTS = [
@@ -518,4 +533,12 @@ ACHIEVEMENTS = [
     ('loop1', 'Noch eine Runde', 'Erreiche Schleife 2 in der Endlosen Nacht', None),
     ('library', 'Bücherwurm', 'Besuche ein Schriftrollenarchiv', None),
     ('dojo', 'Meister des Dōjō', 'Besiege die Champions im Dōjō', None),
+    ('ch_glaskanone', 'Prüfung: Glaskanone', 'Bestehe die Prüfung „Glaskanone“', None),
+    ('ch_fuchspfad', 'Prüfung: Der Pfad des Fuchses', 'Bestehe die Prüfung „Der Pfad des Fuchses“', None),
+    ('ch_dunkle_nacht', 'Prüfung: Die dunkelste Nacht', 'Bestehe die Prüfung „Die dunkelste Nacht“', None),
+    ('ch_zeitlauf', 'Prüfung: Wettlauf gegen den Morgen', 'Bestehe die Prüfung „Wettlauf gegen den Morgen“', None),
+    ('ch_kaufmann', 'Prüfung: Der reiche Kaufmann', 'Bestehe die Prüfung „Der reiche Kaufmann“', None),
+    ('ch_oni_pakt', 'Prüfung: Pakt mit dem Teufel', 'Bestehe die Prüfung „Pakt mit dem Teufel“', None),
+    ('ch_bossrush', 'Prüfung: Boss-Ansturm', 'Bestehe die Prüfung „Boss-Ansturm“', None),
+    ('ch_papiermeister', 'Prüfung: Papiermeister', 'Bestehe die Prüfung „Papiermeister“', None),
 ]

@@ -22,6 +22,7 @@ DEFAULT = {
     'hard_unlocked': False,
     'heaven_unlocked': False,
     'daily': {},
+    'challenges_done': [],
     'settings': {'music': 0.55, 'sfx': 0.8, 'fullscreen': False, 'shake': True, 'dmgnums': True},
 }
 
