@@ -425,6 +425,7 @@ class Player:
             return False
         self.hit_this_floor = True
         run.boss_hit = True
+        run.hitstop = 0.07
         while amount > 0 and self.spirit > 0:
             self.spirit -= 1; amount -= 1
         self.hp = max(0, self.hp - amount)
@@ -818,6 +819,8 @@ class Enemy:
         self.contact = 1
 
     def active(self):
+        if self.champ == 'geist' and (self.t % 2.4) > 1.6:
+            return False
         return not self.dead and self.spawn_t <= 0 and not self.hidden
 
     def hitboxes(self):
@@ -1119,8 +1122,12 @@ class Enemy:
         elif self.d['move'] == 'hop' and self.state == 'hop':
             bob = int(math.sin(min(1, self.st / 0.45) * math.pi) * 14)
         gfx.shadow(s, (int(self.x) - self.r, int(self.y) + self.r - 3, self.r * 2, 4))
-        if self.alpha < 255:
-            spr = spr.copy(); spr.set_alpha(self.alpha)
+        alpha = self.alpha
+        if self.champ == 'geist':
+            ph = self.t % 2.4
+            alpha = 60 if ph > 1.6 else 230
+        if alpha < 255:
+            spr = spr.copy(); spr.set_alpha(alpha)
         if self.state == 'wind' and int(t * 30) % 2:
             spr = gfx.sprite(self.d['sprite'], flip, True)
         s.blit(spr, (int(self.x) - spr.get_width() // 2, int(self.y) - spr.get_height() // 2 - bob - 2))

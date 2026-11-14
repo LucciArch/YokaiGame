@@ -71,6 +71,9 @@ class Run:
         self.bg_dirty = True
         self.fade = 1.0
         self.pending = None
+        self.hitstop = 0.0
+        self.slide = None
+        self._last = None
         self.shrine_room = None
         self.boss_pos = None
         self.curse = None
@@ -590,6 +593,12 @@ class Run:
             if e.champ == 'lila':
                 for i in range(8):
                     ebullet(self, e.x, e.y, i / 8 * math.tau, 90, (200, 120, 255))
+            if e.champ == 'teiler' and e.maxhp > 3:
+                for i in range(2):
+                    c = self.spawn_enemy(e.id, e.x + random.uniform(-8, 8), e.y + random.uniform(-8, 8))
+                    c.maxhp = c.hp = e.maxhp / 2.4 / CHAMPIONS['teiler']['hp']
+                    c.spawn_t = 0.05
+                    c.d = dict(c.d)
             if e.champ == 'gold':
                 for i in range(3):
                     self.spawn_pickup('coin', e.x, e.y)
@@ -777,6 +786,14 @@ class Run:
 
     # ======================================================================  Update
     def update(self, dt, inp):
+        if self.slide:
+            self.slide[2] += dt
+            if self.slide[2] >= 0.24:
+                self.slide = None
+            return
+        if self.hitstop > 0:
+            self.hitstop -= dt
+            return
         self.time += dt
         self.save['stats']['playtime'] = self.save['stats'].get('playtime', 0) + dt
         p = self.player
@@ -821,7 +838,11 @@ class Run:
             d = 'e'
         if d and d in self.room.doors:
             audio.play('door', 0.6)
+            last = self._last
             self.enter_room(self.room.doors[d], d)
+            if last is not None:
+                self.slide = [last, d, 0.0]
+                self.fade = 0
             return
         elif d:
             p.x = clamp(p.x, RX, RX + RW)
@@ -855,6 +876,18 @@ class Run:
         p = self.player
         nb = []
         for b in self.pbullets:
+            if b.delay <= 0 and random.random() < 0.35 and len(self.particles) < 600:
+                fl = b.fl
+                if fl.get('burn'):
+                    self.particles.append(Particle(b.x, b.y, random.uniform(-8, 8), -25, 0.3, (255, random.randint(120, 200), 40), 2))
+                elif fl.get('poison'):
+                    self.particles.append(Particle(b.x, b.y, 0, 18, 0.35, (120, 230, 90), 1))
+                elif fl.get('chain'):
+                    self.particles.append(Particle(b.x + random.uniform(-3, 3), b.y + random.uniform(-3, 3), 0, 0, 0.12, (255, 250, 170), 1))
+                elif fl.get('homing') or fl.get('spectral'):
+                    self.particles.append(Particle(b.x, b.y, 0, 0, 0.25, b.col, 1))
+                elif b.big or b.gold:
+                    self.particles.append(Particle(b.x, b.y, 0, 0, 0.3, b.col, 2))
             alive = b.update(dt, self)
             if alive and b.delay <= 0:
                 for e in self.enemies:
@@ -1450,6 +1483,20 @@ class Run:
             ov = pygame.Surface((W, H), pygame.SRCALPHA)
             ov.fill((255, 255, 255, int(min(1, self.flash_white * 4) * 150)))
             s.blit(ov, (0, 0))
+        self._last = s.subsurface((RX - 16, RY - 16, RW + 32, RH + 32)).copy()
+        if self.slide:
+            img, d, st = self.slide
+            f = min(1, st / 0.24)
+            f = f * f * (3 - 2 * f)
+            dx, dy = DIRS[d]
+            ow, oh = RW + 32, RH + 32
+            ox, oy = -dx * ow * f, -dy * oh * f
+            area = pygame.Rect(RX - 16, RY - 16, ow, oh)
+            s.set_clip(area)
+            cur = s.subsurface(area).copy()
+            s.blit(cur, (area.x + dx * ow * (1 - f), area.y + dy * oh * (1 - f)))
+            s.blit(img, (area.x + ox, area.y + oy))
+            s.set_clip(None)
         self.draw_hud(s, t)
         if self.fade > 0:
             ov = pygame.Surface((W, H), pygame.SRCALPHA)

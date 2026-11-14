@@ -347,20 +347,20 @@ ACTIVES = {
 
 # =====================================================================  CHARAKTERE
 CHARS = {
-    'hana': dict(name='Hana', title='Die Schreinmaid', desc='Ausgeglichen. Startet mit dem Ofuda-Sturm.',
-                 hp=6, spirit=0, fx={}, items=[], active='ofuda_sturm', coins=0, keys=0, salts=2,
+    'hana': dict(name='Hana', title='Die Schreinmaid', desc='Ausgeglichen. Findet öfter Reinigungssalz.',
+                 hp=6, spirit=0, fx=dict(salts_regen=0.15), items=[], active='ofuda_sturm', coins=0, keys=0, salts=2,
                  unlock='Von Beginn an verfügbar'),
-    'kenji': dict(name='Kenji', title='Der Rōnin', desc='Hoher Schaden, kurze Reichweite, durchbohrt Feinde.',
-                  hp=6, spirit=0, fx=dict(dmgm=1.35, rate=-0.5, range=-50, pierce=1, knock=1), items=[], active=None,
+    'kenji': dict(name='Kenji', title='Der Rōnin', desc='Iaijutsu: Die Ausweichrolle schneidet Feinde. Hoher Schaden, kurze Reichweite.',
+                  hp=6, spirit=0, fx=dict(dmgm=1.35, rate=-0.5, range=-50, pierce=1, knock=1, dash_dmg=1), items=[], active=None,
                   coins=0, keys=0, salts=2, unlock='Besiege einen Boss auf Ebene 2'),
-    'kuzunoha': dict(name='Kuzunoha', title='Die Fuchsfrau', desc='Schnell und zerbrechlich. Fuchsfeuer von Beginn an.',
-                     hp=4, spirit=0, fx=dict(spd=20, dmgm=0.85), items=['kitsunebi'], active=None,
+    'kuzunoha': dict(name='Kuzunoha', title='Die Fuchsfrau', desc='Schnell und zerbrechlich. Ihre Rolle löscht Geschosse.',
+                     hp=4, spirit=0, fx=dict(spd=20, dmgm=0.85, dash_reflect=1), items=['kitsunebi'], active=None,
                      coins=0, keys=0, salts=2, unlock='Werde zum Kitsune-Avatar'),
-    'ponpoko': dict(name='Ponpoko', title='Der Tanuki', desc='Viel Leben, viel Glück, viel Geld.',
-                    hp=8, spirit=0, fx=dict(spd=-12, luck=2), items=[], active='tanuki_blatt',
+    'ponpoko': dict(name='Ponpoko', title='Der Tanuki', desc='Goldene Talismane und Münzmagnet. Viel Leben, viel Glück.',
+                    hp=8, spirit=0, fx=dict(spd=-12, luck=2, gold_shots=0.1, magnet=1), items=[], active='tanuki_blatt',
                     coins=25, keys=1, salts=1, unlock='Sammle insgesamt 300 Mon'),
-    'benkei': dict(name='Benkei', title='Der Kriegermönch', desc='Ein Bollwerk. Langsam, aber riesige Talismane.',
-                   hp=10, spirit=0, fx=dict(spd=-8, dmgm=1.25, rate=-0.6, size=1.5, knock=1), items=[],
+    'benkei': dict(name='Benkei', title='Der Kriegermönch', desc='Ein Bollwerk: blockt in jedem Raum einen Treffer.',
+                   hp=10, spirit=0, fx=dict(spd=-8, dmgm=1.25, rate=-0.6, size=1.5, knock=1, shield=1), items=[],
                    active='kagura_suzu', coins=0, keys=0, salts=2, unlock='Besiege insgesamt 500 Yokai'),
     'okiku': dict(name='Okiku', title='Der Brunnengeist', desc='Nur Geisterherzen. Fliegt, Schüsse durch Wände.',
                   hp=0, spirit=6, fx=dict(fly=1, spectral=1, dmgm=0.95), items=[], active='onryo_kerze',
@@ -374,8 +374,8 @@ CHARS = {
     'akago': dict(name='Akago', title='Das Oni-Kind', desc='Wird stärker, je verletzter es ist.',
                   hp=8, spirit=0, fx=dict(rage=1, dmgm=1.1), items=['oni_sake'], active=None,
                   coins=0, keys=0, salts=1, unlock='Schließe 3 Oni-Pakte'),
-    'susanoo': dict(name='Susanoo', title='Der Sturmgott', desc='Ein Gott unter Sterblichen. Mit Kusanagi.',
-                    hp=8, spirit=0, fx=dict(dmgm=1.2, rate=0.3), items=['kusanagi'], active='raijin_taiko',
+    'susanoo': dict(name='Susanoo', title='Der Sturmgott', desc='Ein Gott unter Sterblichen. Seine Schüsse rufen Blitze.',
+                    hp=8, spirit=0, fx=dict(dmgm=1.2, rate=0.3, raijin_chance=0.08), items=['kusanagi'], active='raijin_taiko',
                     coins=0, keys=0, salts=3, unlock='Besiege Amatsu-Mikaboshi in Takamagahara'),
 }
 CHAR_ORDER = ['hana', 'kenji', 'kuzunoha', 'ponpoko', 'benkei', 'okiku', 'kotaro', 'seimei', 'akago', 'susanoo']
@@ -441,6 +441,8 @@ CHAMPIONS = {
     'lila': dict(name='Violetter', col=(200, 120, 255), hp=1.3, explode=True),
     'gruen': dict(name='Grüner', col=(130, 240, 140), hp=1.3, regen=True),
     'weiss': dict(name='Weißer', col=(255, 255, 255), hp=1.5, speed=1.4),
+    'geist': dict(name='Geisterhafter', col=(170, 220, 255), hp=1.3, ghost=True),
+    'teiler': dict(name='Teilender', col=(255, 170, 120), hp=1.2, splitter=True),
 }
 
 # =====================================================================  BOSSE (Infos; Logik in bosses.py)
