@@ -8,7 +8,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
-from sculpt import Canvas, ramp, mix  # noqa: E402
+from sculpt import Canvas, ramp, mix, cel  # noqa: E402
 
 INK = '#140d18'
 BONEW = '#e8e0c8'
@@ -18,23 +18,23 @@ def M(**kw):
     return kw
 
 
-# Gemeinsame Materialien (gedeckte, ernste Farbwelt)
-SKIN_K = ramp('#56785a', 6, hue_shift=22)
-BELLY_K = ramp('#9a9a6a', 5, hue_shift=16)
-SHELL = ramp('#5a4632', 6, hue_shift=16)
-SHELLRIM = ramp('#8a7048', 5)
-BEAK = ramp('#5e5a30', 5, hue_shift=18)
-HAIR_D = ramp('#262a2e', 4, hue_shift=12, dark=0.5, light=0.35)
-WATER = ramp('#4a8ea8', 5, hue_shift=14)
-ONI_R = ramp('#a8382c', 6, hue_shift=20)
-TIGER = ramp('#c8902a', 5, hue_shift=16)
-IRON = ramp('#55505e', 6, hue_shift=14, light=0.5)
-HAIR_W = ramp('#3a2a2a', 4, hue_shift=10, dark=0.5)
-HORN = ramp('#d8c8a0', 5, hue_shift=12)
-GAKI_S = ramp('#8a8a72', 6, hue_shift=18)
-CLOTH_R = ramp('#5a4a46', 5, hue_shift=14)
-WEASEL = ramp('#a07a52', 6, hue_shift=18)
-BLADE = ramp('#9aa2b4', 5, hue_shift=10, light=0.75)
+# Gemeinsame Materialien – satt, kontrastreich, 16-Bit-Stil
+SKIN_K = cel('#3fa04a')
+BELLY_K = cel('#c8c870')
+SHELL = cel('#7a5030')
+SHELLRIM = cel('#c89a50')
+BEAK = cel('#e8b020')
+HAIR_D = cel('#2a3a5a', 16)
+WATER = cel('#50b8e8')
+ONI_R = cel('#e0302a', 18)
+TIGER = cel('#f0b020')
+IRON = cel('#5a6080', 14)
+HAIR_W = cel('#3a2a3a', 12)
+HORN = cel('#f0e0b0', 12)
+GAKI_S = cel('#a0a888', 18)
+CLOTH_R = cel('#7a4a8a', 16)
+WEASEL = cel('#d89a50')
+BLADE = cel('#b8c8e0', 10)
 WIND = '#c8d8e8'
 
 
@@ -115,55 +115,87 @@ def kappa(pose):
 
 # ------------------------------------------------------------------ Oni
 def oni(pose):
+    """Roter Oni: muskulös, Mähne, zwei Hörner, Hauer, Tigerfell, eiserner Kanabō."""
     w, bob, atk = pose_vals(pose)
-    c = Canvas(64, 64, M(skin=ONI_R, tiger=TIGER, iron=IRON, hair=HAIR_W, horn=HORN), ox=14, oy=10)
+    c = Canvas(72, 74, M(skin=ONI_R, tiger=TIGER, iron=IRON, hair=HAIR_W, horn=HORN, nail=cel('#f0e8d0', 8)), ox=16, oy=12)
     y0 = bob
-    # Keule je nach Angriffsphase
+    L = '#5a0c10'                              # Muskel-/Faltenlinien (dunkelrot)
     if atk == 0:
-        club = [(28, 14 + y0), (36, -6 + y0)]          # hoch über die Schulter
+        club = [(30, 16 + y0), (40, -8 + y0)]
     elif atk == 1:
-        club = [(6, 26 + y0), (-12, 40 + y0)]          # nach vorn unten geschmettert
+        club = [(4, 30 + y0), (-15, 46 + y0)]
     else:
-        club = [(10, 24 + y0), (2, 6 + y0)]
-    # hinteres Bein / Arm
-    c.limb([(26, 34 + y0), (29 - w, 44), (29 - w, 51)], 9, 7, 'skin')
-    c.poly([(24 - w, 50), (33 - w, 50), (34 - w, 53), (23 - w, 53)], 'skin', bulge=0.3)
-    c.limb([(30, 16 + y0), (35, 25 + y0), (33, 33 + y0)], 7, 6, 'skin')
-    # Rumpf, muskulös
-    c.ellipse(8, 10 + y0, 34, 38 + y0, 'skin', bulge=1.2)
-    c.line(20, 17 + y0, 21, 32 + y0, ONI_R[1]); c.line(13, 22 + y0, 19, 23 + y0, ONI_R[1]); c.line(22, 23 + y0, 29, 22 + y0, ONI_R[1])
-    # Tigerfell-Lendenschurz
-    c.poly([(7, 31 + y0), (34, 31 + y0), (36, 42 + y0), (30, 40 + y0), (25, 43 + y0), (19, 40 + y0), (13, 43 + y0), (6, 40 + y0)], 'tiger', bulge=0.7)
-    for x in (10, 16, 22, 28):
-        c.line(x, 32 + y0, x + 2, 39 + y0, '#20160e')
-    # vorderes Bein
-    c.limb([(14, 38 + y0), (12 + w, 45), (11 + w, 51)], 10, 8, 'skin')
-    c.poly([(5 + w, 50), (15 + w, 50), (16 + w, 53), (4 + w, 53)], 'skin', bulge=0.3)
-    # Keule
-    c.limb(club, 6, 9, 'iron', bulge=0.8)
+        club = [(9, 27 + y0), (1, 6 + y0)]
+    # ---- hinteres Bein
+    c.limb([(29, 40 + y0), (32 - w, 50), (31 - w, 57)], 11, 9, 'skin')
+    c.poly([(25 - w, 56), (36 - w, 56), (37 - w, 60), (24 - w, 60)], 'skin', bulge=0.4)
+    for x in (26, 29, 32, 35):
+        c.px(x - w, 60, '#f0e8d0')
+    # ---- hinterer Arm
+    c.limb([(34, 18 + y0), (40, 27 + y0), (38, 36 + y0)], 9, 8, 'skin')
+    c.circle(38, 37 + y0, 4, 'skin', bulge=0.6)
+    c.line(36, 39 + y0, 37, 41 + y0, L); c.line(39, 39 + y0, 40, 41 + y0, L)
+    # ---- Rumpf: Brust, Bauch
+    c.ellipse(8, 12 + y0, 38, 44 + y0, 'skin', bulge=1.2)
+    c.ellipse(10, 15 + y0, 23, 26 + y0, 'skin', bulge=0.8)              # Brustmuskel vorn
+    c.ellipse(22, 15 + y0, 35, 26 + y0, 'skin', bulge=0.8)              # Brustmuskel hinten
+    c.line(22, 17 + y0, 22, 40 + y0, L)
+    for yy in (29, 33, 37):
+        c.line(15, yy + y0, 21, yy + y0, L); c.line(23, yy + y0, 29, yy + y0, L)
+    c.line(12, 25 + y0, 20, 27 + y0, L); c.line(24, 27 + y0, 33, 25 + y0, L)
+    c.px(16, 22 + y0, L); c.px(29, 22 + y0, L)
+    # ---- Tigerfell-Lendenschurz mit Gürtelstrick
+    c.poly([(7, 38 + y0), (38, 38 + y0), (40, 50 + y0), (34, 47 + y0), (28, 51 + y0), (22, 47 + y0), (16, 51 + y0), (10, 47 + y0), (6, 50 + y0)], 'tiger', bulge=0.7)
+    for x in (10, 16, 22, 28, 34):
+        c.dpoly([(x, 39 + y0), (x + 2, 39 + y0), (x + 3, 46 + y0), (x + 1, 44 + y0)], '#1a1008')
+    c.limb([(6, 38 + y0), (39, 38 + y0)], 3, 3, 'horn', bulge=0.3)
+    # ---- vorderes Bein
+    c.limb([(15, 45 + y0), (13 + w, 52), (12 + w, 57)], 12, 10, 'skin')
+    c.poly([(5 + w, 56), (17 + w, 56), (18 + w, 60), (4 + w, 60)], 'skin', bulge=0.4)
+    c.line(9 + w, 50, 15 + w, 51, L)
+    for x in (5, 8, 11, 14):
+        c.px(x + w, 60, '#f0e8d0')
+    # ---- Kanabō mit Eisenbuckeln
+    c.limb(club, 7, 11, 'iron', bulge=0.9)
     (ax, ay), (bx, by) = club
-    for f in (0.35, 0.55, 0.75, 0.95):
+    for f in (0.3, 0.45, 0.6, 0.75, 0.9):
         x, y = ax + (bx - ax) * f, ay + (by - ay) * f
-        c.px(int(x) - 2, int(y), '#c8c4d0'); c.px(int(x) + 2, int(y) + 1, '#8a86a0')
-    # vorderer Arm hält Keule
-    c.limb([(12, 14 + y0), (8, 20 + y0), (ax, ay)], 8, 7, 'skin')
-    c.circle(ax, ay, 4, 'skin', bulge=0.6)
-    # Kopf: zackige Mähne, Hörner, Fratze
-    mane = [(2, 14), (0, 6), (5, 7), (4, -1), (10, 3), (14, -4), (18, 2), (24, -3), (27, 4), (34, 1), (32, 9), (37, 12), (32, 16), (35, 22), (29, 21), (28, 25), (8, 24), (6, 20), (1, 21), (4, 16)]
-    c.poly([(x, y + y0) for x, y in mane], 'hair', bulge=0.5)
-    c.ellipse(8, 1 + y0, 29, 22 + y0, 'skin', bulge=1.1)
-    c.limb([(11, 4 + y0), (8, -2 + y0), (7, -9 + y0)], 4, 1.5, 'horn', bulge=0.6)
-    c.limb([(25, 3 + y0), (29, -3 + y0), (31, -10 + y0)], 4, 1.5, 'horn', bulge=0.6)
-    c.line(10, 8 + y0, 16, 10 + y0, '#1a0a0a'); c.line(10, 7 + y0, 15, 8 + y0, '#1a0a0a')
-    c.line(27, 8 + y0, 21, 10 + y0, '#1a0a0a'); c.line(27, 7 + y0, 22, 8 + y0, '#1a0a0a')
-    c.dpoly([(11, 11 + y0), (16, 11 + y0), (15, 12 + y0), (12, 12 + y0)], '#f0d040'); c.px(14, 11 + y0, '#140806')
-    c.dpoly([(21, 11 + y0), (26, 11 + y0), (25, 12 + y0), (22, 12 + y0)], '#f0d040'); c.px(23, 11 + y0, '#140806')
-    c.line(18, 12 + y0, 17, 15 + y0, ONI_R[1]); c.line(16, 15 + y0, 19, 15 + y0, ONI_R[0])
-    mo = 2 if atk == 1 else 0
-    c.dpoly([(12, 17 + y0), (25, 17 + y0), (23, 20 + y0 + mo), (14, 20 + y0 + mo)], '#2a0808')
-    for x in range(14, 24, 2):
-        c.px(x, 17 + y0, BONEW)
-    c.line(13, 19 + y0 + mo, 13, 15 + y0, BONEW); c.line(24, 19 + y0 + mo, 24, 15 + y0, BONEW)
+        c.circle(int(x - 3), int(y), 1, 'nail', bulge=0.3, rim=False)
+        c.circle(int(x + 3), int(y + 1), 1, 'nail', bulge=0.3, rim=False)
+    # ---- vorderer Arm mit Faust um die Keule
+    c.limb([(12, 16 + y0), (7, 23 + y0), (ax + 2, ay)], 10, 8, 'skin')
+    c.circle(ax, ay, 5, 'skin', bulge=0.7)
+    for d in (-2, 0, 2):
+        c.line(ax - 4, ay + d, ax - 1, ay + d, L)
+    c.line(9, 20 + y0, 11, 25 + y0, L)
+    # ---- Kopf: wilde Mähne, Hörner, Fratze
+    mane = [(1, 16), (-2, 8), (4, 8), (1, -1), (9, 3), (11, -6), (17, 0), (22, -7), (26, 0), (33, -4), (33, 4), (40, 4), (36, 11), (41, 16), (35, 18), (38, 25), (31, 23), (30, 28), (9, 27), (7, 22), (1, 23), (5, 18)]
+    c.poly([(x, y + y0) for x, y in mane], 'hair', bulge=0.6)
+    for x0, y1 in ((4, 8), (11, -2), (22, -5), (33, 0), (38, 14)):
+        c.line(x0 + 3, y1 + 6 + y0, x0, y1 + y0, mix(HAIR_W[2], HAIR_W[3], 0.5))
+    c.ellipse(8, 2 + y0, 31, 25 + y0, 'skin', bulge=1.1)
+    c.limb([(11, 6 + y0), (7, -1 + y0), (5, -10 + y0)], 5, 1.5, 'horn', bulge=0.7)
+    c.limb([(27, 5 + y0), (31, -2 + y0), (34, -11 + y0)], 5, 1.5, 'horn', bulge=0.7)
+    for k in range(3):
+        c.line(7 - k // 2, 2 - k * 3 + y0, 10 - k // 2, 1 - k * 3 + y0, HORN[0])
+    # Stirnfalten, buschige Brauen
+    c.line(14, 6 + y0, 25, 6 + y0, L); c.line(16, 4 + y0, 23, 4 + y0, L)
+    c.dpoly([(9, 9 + y0), (18, 11 + y0), (17, 13 + y0), (10, 11 + y0)], '#1a0a0a')
+    c.dpoly([(30, 9 + y0), (21, 11 + y0), (22, 13 + y0), (29, 11 + y0)], '#1a0a0a')
+    # Augen: gelb, glühend, kleine Pupille
+    c.dpoly([(11, 13 + y0), (17, 13 + y0), (16, 15 + y0), (12, 15 + y0)], '#ffe040'); c.px(15, 14 + y0, '#140806'); c.px(12, 13 + y0, '#fff8c0')
+    c.dpoly([(22, 13 + y0), (28, 13 + y0), (27, 15 + y0), (23, 15 + y0)], '#ffe040'); c.px(23, 14 + y0, '#140806'); c.px(27, 13 + y0, '#fff8c0')
+    # Nase
+    c.dpoly([(18, 15 + y0), (21, 15 + y0), (22, 18 + y0), (17, 18 + y0)], ONI_R[0]); c.px(18, 18 + y0, '#1a0a0a'); c.px(21, 18 + y0, '#1a0a0a')
+    # Maul mit Zahnreihe und Hauern
+    mo = 3 if atk == 1 else (1 if atk == 0 else 0)
+    c.dpoly([(12, 20 + y0), (27, 20 + y0), (25, 23 + y0 + mo), (14, 23 + y0 + mo)], '#2a0608')
+    if mo:
+        c.dpoly([(15, 22 + y0 + mo), (24, 22 + y0 + mo), (23, 23 + y0 + mo), (16, 23 + y0 + mo)], '#c83a4a')
+    for x in range(14, 26, 2):
+        c.px(x, 20 + y0, BONEW); c.px(x + 1, 20 + y0, '#c8c0a8')
+    c.dpoly([(12, 23 + y0 + mo), (14, 23 + y0 + mo), (13, 17 + y0)], BONEW)
+    c.dpoly([(25, 23 + y0 + mo), (27, 23 + y0 + mo), (26, 17 + y0)], BONEW)
     return c.render()
 
 

@@ -843,7 +843,7 @@ class Enemy:
         self.r = d['r']
         if sheets.has(d['sprite']):
             sw, sh = sheets.size_of(d['sprite'])
-            self.r = max(self.r, int(min(sw, sh) * 0.34))
+            self.r = max(self.r, int(min(sw, sh) * 0.25))
         elif d['sprite'] in art.ARTS:
             sp = art.make(d['sprite'])
             self.r = max(self.r, int(min(sp.get_width(), sp.get_height()) * 0.36))
@@ -1143,6 +1143,7 @@ class Enemy:
             if self.d['move'] == 'charge' and self.state != 'idle':
                 return
         self.acd = a['cd'] * random.uniform(0.85, 1.15)
+        self.fire_t = self.t
         sp = a['speed'] * (1.15 if self.champ == 'blau' else 1.0)
         k = a['kind']
         ang = math.atan2(p.y - self.y, p.x - self.x)
@@ -1178,6 +1179,26 @@ class Enemy:
                 e = run.spawn_enemy(a['what'], self.x + random.uniform(-10, 10), self.y + 8)
                 e.spawn_t = 0.2
                 self.spawned.append(e)
+
+    def anim_frame(self, name):
+        """Wählt Lauf- oder Angriffsbild (Ausholen vor dem Schuss, Zuschlagen, Zurückziehen)."""
+        m = sheets.META.get(name, {})
+        atk = m.get('atk')
+        if atk is not None:
+            if self.state == 'wind':
+                return atk
+            if self.state == 'charge':
+                return atk + 1
+            since = self.t - getattr(self, 'fire_t', -9)
+            if since < 0.14:
+                return atk + 1
+            if since < 0.32:
+                return atk + 2
+            a = self.d.get('attack') or {}
+            if a.get('kind') not in (None, 'mirror') and 0 < getattr(self, 'acd', 9) < 0.3:
+                return atk
+            return int(self.t * 8) % m.get('walk', 4)
+        return int(self.t * (12 if self.state == 'charge' else 6))
 
     def draw(self, s, t):
         if self.spawn_t > 0:
@@ -1219,7 +1240,7 @@ class Enemy:
             if sheets.META[name]['kind'] == 'strip':
                 dd = sheets.hdir((self.charge_dir[0] if self.d['move'] == 'charge' and self.state in ('charge', 'wind') and self.charge_dir else p.x - self.x))
             sc = sheets.scale_of(name) + (1 if getattr(self, 'mini', False) else 0)
-            spr = sheets.frame(name, dd, int(self.t * (12 if self.state == 'charge' else 6)), sc, self.flash > 0, tint)
+            spr = sheets.frame(name, dd, self.anim_frame(name), sc, self.flash > 0, tint)
         else:
             if not self.fly and self.d['move'] in ('chase', 'wander', 'side', 'charge'):
                 frame = (0, 1, 0, 2)[int(self.t * (14 if self.state == 'charge' else 7)) % 4]

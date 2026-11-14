@@ -67,7 +67,8 @@ class Part:
 class Canvas:
     """Zeichenfläche. Materialien: name -> Rampe (Liste von Hex-Farben, dunkel->hell)."""
 
-    def __init__(self, w, h, mats, outline='#140d18', ox=0, oy=0):
+    def __init__(self, w, h, mats, outline='#0c0812', ox=0, oy=0, style='cel'):
+        self.style = style
         self.w, self.h = w, h
         self.mats = dict(mats)
         self.outline_col = outline
@@ -178,7 +179,13 @@ class Canvas:
                 # Hauptlicht + leichtes Umgebungslicht, Kontrast leicht gestreckt
                 val = np.clip(0.18 + 0.95 * dot, 0, 1)
                 val = val ** 1.15
-                idx = np.clip((val * (n - 0.01)).astype(int), 0, n - 1)
+                if self.style == 'cel':
+                    # 16-Bit-Cel-Look: große flache Flächen, harte Stufen, kleiner Glanzpunkt
+                    th = np.array([0.30, 0.62, 0.86, 0.97])[:n - 1]
+                    idx = np.searchsorted(th, val)
+                    idx = np.clip(idx, 0, n - 1)
+                else:
+                    idx = np.clip((val * (n - 0.01)).astype(int), 0, n - 1)
             cols = np.array([hexrgb(c) for c in ramp_], np.uint8)
             out[vis, :3] = cols[idx[vis]]
             out[vis, 3] = 255
@@ -193,11 +200,11 @@ class Canvas:
                 e2 = edge & below
                 # Lichtseite (oben/links) nur eine Stufe dunkler, Schattenseite die dunkelste
                 yy, xx = np.mgrid[0:H, 0:W]
-                darkest = cols[0]
+                darkest = np.array(hexrgb(self.outline_col), np.uint8) if self.style == 'cel' else cols[0]
                 mid = cols[max(0, min(n - 1, 1))]
                 out[e2, :3] = darkest
                 lit = e2 & (np.roll(top, 1, 0) != i) & (np.roll(top, -1, 0) == i)
-                out[lit, :3] = mid
+                out[lit, :3] = mid if self.style != 'cel' else cols[0]
         alpha = out[..., 3] > 0
         if outline:
             dil = ndimage.binary_dilation(alpha, structure=np.array([[0, 1, 0], [1, 1, 1], [0, 1, 0]]))
@@ -245,3 +252,9 @@ def preview(frames_list, path, scale=3, bg=(48, 52, 58), cols=4, gap=6):
             sheet.alpha_composite(f, (x, y + ch - gap - f.height))
             x += f.width + gap
     sheet.resize((sheet.width * scale, sheet.height * scale), Image.NEAREST).save(path)
+
+
+def cel(base, hs=22):
+    """Satte 4-Stufen-Rampe im 16-Bit-Stil: Schatten, Grundton, Licht, Glanz."""
+    r = ramp(base, 5, hue_shift=hs, dark=0.55, light=0.6, sat_drop=0.25)
+    return [r[0], r[2], r[3], r[4]]
