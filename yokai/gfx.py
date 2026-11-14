@@ -231,6 +231,18 @@ SPRITES = {
         "....ffff....", "...fhhhhf...", "..fhsssshf..", "..fhskskhf..", "..fhssmshf..",
         "...fhhhhf...", ".nnnnnnnnnn.", "nnffnnnnffnn", "nfoofnnfoofn", "nnffnnnnffnn",
         ".nnnnnnnnnn.", "............"],
+    'azukiarai': [
+        "...hhhhh....", "..hhhhhhh...", "..hssssshh..", "..hskskshh..", "...sSSSs....",
+        "..nnnnnnn...", ".snnnnnnns..", "..nnnnnnn...", ".NNNNNNNNNN.", ".NrrRrrRrrN.",
+        "..NNNNNNNN..", "............"],
+    'bake_danuki': [
+        "....gg......", "...gGg......", "..n.g....n..", "..nnnnnnnn..", ".nkkwnnwkkn.",
+        ".nkewnnwekn.", ".nnnnkknnnn.", "..nnSSSSnn..", ".nnSSSSSSnn.", ".nnSnnnnSnn.",
+        "..NN....NN..", "............"],
+    'nuppeppo': [
+        "............", "...SSSSSS...", "..SssssssS..", ".SsSssssSsS.", ".SsssssssssS",
+        "SssskssksssS", "SsssssssssSS", "SsssSSSSsssS", ".SssssssssS.", ".SSsssssSSs.",
+        "..SS.SS.SS..", "............"],
     'sazae_oni': [
         ".....n......", "....nnn.....", "...nmnmn....", "..nnnnnnn...", ".nmnnmnnmn..",
         "nnnnnnnnnnn.", ".mmmmmmmmm..", ".mkemmkemm..", ".mmmmmmmmm..", "..m.m.m.m...",

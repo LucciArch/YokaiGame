@@ -215,7 +215,7 @@ class Run:
             self.boss_intro = 2.2
             audio.play('boss')
             b = self.biome['music']
-            audio.get().music((b[0], b[1], 138, 'boss', b[4] + 100))
+            audio.get().music(('iwato' if self.depth >= 4 else b[0], b[1], 132 + self.depth * 4, 'boss', b[4] + 100 + self.depth))
         elif prev is not None and prev.kind == 'boss' or (prev and prev.kind.startswith('shrine')):
             audio.get().music(self.biome['music'])
         self.flow_src = None
@@ -892,6 +892,20 @@ class Run:
     def update(self, dt, inp):
         if getattr(self, 'descend', 0) > 0:
             self.descend -= dt
+        if self.player.dead and self.result is None:
+            if getattr(self, 'death_t', None) is None:
+                self.death_t = 1.6
+                self.shake(8)
+                audio.play('roar', 0.7)
+                audio.get().music(None)
+                burst(self, self.player.x, self.player.y, (230, 50, 60), 30, 120, 0.8, 3)
+                self.particles.append(Particle(self.player.x, self.player.y - 6, 0, -22, 1.6, (150, 210, 255), 3, kind='soul'))
+            self.death_t -= dt
+            self.update_fx(dt)
+            if self.death_t <= 0:
+                self.result = 'dead'
+                self.end_run(False)
+            return
         if self.slide:
             self.slide[2] += dt
             if self.slide[2] >= 0.24:
@@ -977,9 +991,6 @@ class Run:
         if self.challenge == 'zeitlauf' and self.time > 900 and not p.dead:
             p.dead = True
             self.banner('Die Sonne geht auf…', 'Zu spät!', (255, 200, 120), True)
-        if p.dead and self.result is None:
-            self.result = 'dead'
-            self.end_run(False)
 
     def update_bullets(self, dt):
         p = self.player

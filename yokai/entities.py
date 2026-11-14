@@ -673,6 +673,15 @@ class Player:
 
     def draw(self, s, t):
         run = self.run
+        dt_ = getattr(run, 'death_t', None)
+        if self.dead and dt_ is not None:
+            f = 1 - dt_ / 1.6
+            spr = gfx.sprite(self.char, self.flip)
+            rot = pygame.transform.rotate(spr, -90 * min(1, f * 2))
+            rot.set_alpha(int(255 * max(0, 1 - f)))
+            s.blit(rot, (int(self.x) - rot.get_width() // 2, int(self.y) - rot.get_height() + 5))
+            gfx.draw_glow(s, int(self.x), int(self.y - 20 * f), 12, (150, 210, 255), int(150 * (1 - f)))
+            return
         if self.iframes > 0 and int(t * 20) % 2 == 0 and self.dash_t <= 0:
             vis = False
         else:
@@ -1232,8 +1241,10 @@ class Pickup:
         gfx.shadow(s, (x - 5, int(self.y) + 4, 10, 3))
         k = self.kind
         if k in ('heart', 'half'):
+            gfx.draw_glow(s, x, y - 1, 9, (255, 60, 80), int(40 + 35 * math.sin(self.t * 5)))
             gfx.heart(s, x - 4, y - 5, 'red', 2 if k == 'heart' else 1)
         elif k == 'spirit':
+            gfx.draw_glow(s, x, y - 1, 9, (90, 140, 255), int(40 + 35 * math.sin(self.t * 5)))
             gfx.heart(s, x - 4, y - 5, 'spirit', 2)
         elif k in ('coin', 'coin5'):
             c = (232, 190, 70) if k == 'coin' else (200, 210, 230)

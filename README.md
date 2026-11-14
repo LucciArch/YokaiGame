@@ -28,9 +28,9 @@ Jeder Push auf `main` baut über GitHub Actions automatisch eine neue `.exe`.
 
 - **6 Ebenen, 17 Biome**: Bambuswald, Inari-Torii-Pfad, Kappa-Flussufer, Geistertempel, Alter Friedhof, Spukvilla, Kurama-Berg, Schneeberg, Ōe-Berg, Drachenpalast, Geisterküste, Tiefsee, Yomi, Höllenfeuer, Hof des Enma, Takamagahara und Mondpalast
 - **23 Bosse** mit je eigenen Angriffsmustern und zweiter Phase: Ōmukade, Kappa-Ō, Jorōgumo, Gashadokuro, Rokurokubi, Nue, Sōjōbō, Raijū, Yuki-onna, Umibōzu, Ryūjin, Bake-kujira, Yamata no Orochi, Shuten-dōji, Tamamo-no-Mae Ōnyūdō, Nurarihyon, die drei Kamaitachi, Akkorokamui, Enma-Daiō sowie in Takamagahara Amatsu-Mikaboshi, Izanami und Kagutsuchi
-- **47 Yokai-Gegnertypen** plus 8 Champion-Varianten (rot, blau, gold, violett, grün, weiß, geisterhaft, teilend)
+- **51 Yokai-Gegnertypen** plus 8 Champion-Varianten (rot, blau, gold, violett, grün, weiß, geisterhaft, teilend)
 - **146 passive Items** und **15 aktive Items**, **14 Omamori-Anhänger** (ein tauschbarer Slot), Itempools für Schatzraum, Laden, Boss, Kami-Schrein und Oni-Schrein
-- **57 Synergien** (z. B. die drei Throninsignien *Kusanagi + Yata no Kagami + Yasakani no Magatama*)
+- **69 Synergien** (z. B. die drei Throninsignien *Kusanagi + Yata no Kagami + Yasakani no Magatama*)
 - **9 Transformationen**: 3 Items eines Themas verwandeln dich (Kitsune, Donnergott, Oni, Onmyōji, Yūrei, Tengu, Drache, Kami, Tanuki)
 - **10 Charaktere** zum Freischalten, jeweils mit eigener Fähigkeit, eigenen Werten und Startitems
 - **44 Erfolge**, die Charaktere, Items, den Oni-Modus und Takamagahara freischalten

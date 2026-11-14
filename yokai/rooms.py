@@ -549,6 +549,7 @@ def generate_floor(rng, depth, labyrinth=False, hard=False):
         for r in rooms.values():
             r.cleared = r.kind not in ('normal', 'boss', 'challenge', 'dojo')
             r.layout_seed = rng.randrange(1 << 30)
+            r.depth = depth
             for d, (dx, dy) in DIRS.items():
                 n = (r.pos[0] + dx, r.pos[1] + dy)
                 if n in rooms:
@@ -585,7 +586,8 @@ def build_room_tiles(room, rng):
         if rng.random() < 0.22:
             tpl = random_layout(rng)
         else:
-            tpl = rng.choice(TEMPLATES)
+            pool = TEMPLATES if getattr(room, 'depth', 3) >= 3 else TEMPLATES[:66]
+            tpl = rng.choice(pool)
         room.tiles, room.spawns = parse(tpl, rng)
     elif room.kind == 'secret':
         tpl = ["............."
