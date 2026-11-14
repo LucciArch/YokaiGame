@@ -4,7 +4,7 @@ import random
 import pygame
 from collections import defaultdict
 from .settings import *
-from . import gfx, audio
+from . import gfx, audio, art, sheets
 from .data import ITEMS, ENEMIES, CHAMPIONS, ACTIVES, CHARS, SYNERGIES, TRANSFORMS, TRINKETS
 
 ONE_TIME = ('hp', 'heal', 'spirit', 'coins', 'keys', 'salts', 'fullheal')
@@ -330,6 +330,7 @@ class Player:
                 else:
                     f[k] += v
         self.f = f
+        old = dict(self.s) if self.s else None
         self.s = dict(
             dmg=max(0.5, (3.5 + f['dmg']) * dm),
             rate=clamp((2.6 + f['rate']) * rm, 0.8, 12),
@@ -339,6 +340,11 @@ class Player:
             size=clamp(3 + f['size'] * 1.0, 1.5, 9),
             luck=f['luck'],
         )
+        if old and getattr(self.run, 'stat_delta', None) is not None:
+            for k, v in self.s.items():
+                dlt = v - old.get(k, v)
+                if abs(dlt) > 1e-6:
+                    self.run.stat_delta[k] = [dlt, 3.0]
         want = int(f['familiar'])
         while len(self.familiars) < want:
             fm = Familiar(len(self.familiars))
@@ -392,7 +398,8 @@ class Player:
         self.recalc()
         run = self.run
         if not silent:
-            run.banner(it['name'], it['desc'], it['col'])
+            from .texts import fx_lines
+            run.banner(it['name'], it['desc'], it['col'], fx=', '.join(fx_lines(it['fx'])))
             audio.play('item')
             run.hold = [it['icon'], it['col'], 1.4]
         run.on_item(iid)
@@ -402,7 +409,8 @@ class Player:
                 self.synergies.append(s['id'])
                 self.apply_once(s['fx'])
                 self.recalc()
-                run.banner('Synergie: ' + s['name'], s['desc'], (255, 220, 120), big=True)
+                from .texts import fx_lines
+                run.banner('Synergie: ' + s['name'], s['desc'], (255, 220, 120), big=True, fx=', '.join(fx_lines(s['fx'])))
                 audio.play('synergy')
                 run.on_synergy(s['id'])
         # Transformationen (3 Items gleichen Themas)
@@ -415,7 +423,9 @@ class Player:
                 self.transforms.append(t)
                 self.apply_once(TRANSFORMS[t]['fx'])
                 self.recalc()
-                run.banner('Transformation: ' + TRANSFORMS[t]['name'], TRANSFORMS[t]['desc'], TRANSFORMS[t]['col'], big=True)
+                from .texts import fx_lines
+                run.banner('Transformation: ' + TRANSFORMS[t]['name'], TRANSFORMS[t]['desc'], TRANSFORMS[t]['col'], big=True,
+                           fx=', '.join(fx_lines(TRANSFORMS[t]['fx'])))
                 audio.play('unlock')
                 run.on_transform(t)
 
@@ -692,7 +702,7 @@ class Player:
             gfx.draw_glow(s, int(self.x), int(self.y), rad, (255, 210, 120), 40)
             pygame.draw.circle(s, (255, 220, 150), (int(self.x), int(self.y)), rad, 1)
         # Schatten
-        gfx.shadow(s, (int(self.x) - 6, int(self.y) + 4, 12, 4))
+        gfx.shadow(s, (int(self.x) - 8, int(self.y) + 6, 16, 5))
         # Transformations-Effekte hinter der Figur
         if 'kitsune' in self.transforms:
             for i in range(5):
@@ -709,8 +719,21 @@ class Player:
             pygame.draw.ellipse(s, (255, 230, 120), (int(self.x) - 6, int(self.y) - 18, 12, 4), 1)
         if vis:
             bob = int(abs(math.sin(self.anim * 9)) * 1.5) if self.moving else 0
-            frame = (0, 1, 0, 2)[int(self.anim * 8) % 4] if self.moving and not self.f['fly'] else 0
-            spr = gfx.sprite(self.char, self.flip, frame=frame)
+            if sheets.has(self.char):
+                shooting = getattr(self, 'recoil', 0) > 0 or self.shoot_cd > 0.05
+                if shooting:
+                    dd = sheets.dir_from(*self.facing)
+                elif self.moving:
+                    dd = sheets.dir_from(self.vx, self.vy)
+                else:
+                    dd = getattr(self, '_last_dir', sheets.DOWN)
+                self._last_dir = dd
+                fr = int(self.anim * 9) % 4 if self.moving else 0
+                spr = sheets.frame(self.char, dd, fr)
+                bob = 0
+            else:
+                frame = (0, 1, 0, 2)[int(self.anim * 8) % 4] if self.moving and not self.f['fly'] else 0
+                spr = gfx.sprite(self.char, self.flip, frame=frame)
             alpha_s = spr
             if 'yurei' in self.transforms or self.char == 'okiku':
                 alpha_s = spr.copy()
@@ -719,7 +742,7 @@ class Player:
                 alpha_s = spr.copy(); alpha_s.set_alpha(150)
             rx = int(-self.facing[0] * 1.5) if self.recoil > 0 else 0
             ry = int(-self.facing[1] * 1.5) if self.recoil > 0 else 0
-            s.blit(alpha_s, (int(self.x) - spr.get_width() // 2 + rx, int(self.y) - spr.get_height() + 5 - bob + ry))
+            s.blit(alpha_s, (int(self.x) - spr.get_width() // 2 + rx, int(self.y) - spr.get_height() + 9 - bob + ry))
             if 'oni' in self.transforms:
                 pygame.draw.polygon(s, (250, 230, 120), [(self.x - 4, self.y - 13), (self.x - 6, self.y - 18), (self.x - 2, self.y - 13)])
                 pygame.draw.polygon(s, (250, 230, 120), [(self.x + 4, self.y - 13), (self.x + 6, self.y - 18), (self.x + 2, self.y - 13)])
@@ -818,6 +841,11 @@ class Enemy:
         self.name = d['name']
         self.x, self.y = x, y
         self.r = d['r']
+        if sheets.has(d['sprite']):
+            self.r = max(self.r, int(16 * sheets.scale_of(d['sprite']) * 0.33))
+        elif d['sprite'] in art.ARTS:
+            sp = art.make(d['sprite'])
+            self.r = max(self.r, int(min(sp.get_width(), sp.get_height()) * 0.36))
         mult = (1 + 0.2 * (run.depth - 1)) * (1.3 if run.hard else 1.0) * run.loop_mult
         self.champ = champ
         cm = CHAMPIONS[champ] if champ else {}
@@ -1180,9 +1208,19 @@ class Enemy:
             tint = (170, 220, 255)
         flip = self.vx < 0
         frame = 0
-        if not self.fly and self.d['move'] in ('chase', 'wander', 'side', 'charge'):
-            frame = (0, 1, 0, 2)[int(self.t * (14 if self.state == 'charge' else 7)) % 4]
-        spr = gfx.sprite(self.d['sprite'], flip, self.flash > 0, tint, frame=frame, scale=2 if getattr(self, 'mini', False) else 1)
+        name = self.d['sprite']
+        if sheets.has(name):
+            p = self.run.player
+            if self.d['move'] == 'charge' and self.state in ('charge', 'wind') and self.charge_dir:
+                dd = sheets.dir_from(*self.charge_dir)
+            else:
+                dd = sheets.dir_from(p.x - self.x, p.y - self.y)
+            sc = sheets.scale_of(name) + (1 if getattr(self, 'mini', False) else 0)
+            spr = sheets.frame(name, dd, int(self.t * (12 if self.state == 'charge' else 6)), sc, self.flash > 0, tint)
+        else:
+            if not self.fly and self.d['move'] in ('chase', 'wander', 'side', 'charge'):
+                frame = (0, 1, 0, 2)[int(self.t * (14 if self.state == 'charge' else 7)) % 4]
+            spr = gfx.sprite(name, flip, self.flash > 0, tint, frame=frame, scale=2 if getattr(self, 'mini', False) else 1)
         if getattr(self, 'mini', False):
             gfx.draw_glow(s, int(self.x), int(self.y), 26, (255, 80, 80), 50)
         bob = 0
@@ -1198,7 +1236,8 @@ class Enemy:
         if alpha < 255:
             spr = spr.copy(); spr.set_alpha(alpha)
         if self.state == 'wind' and int(t * 30) % 2:
-            spr = gfx.sprite(self.d['sprite'], flip, True)
+            spr = spr.copy()
+            spr.fill((255, 255, 255), special_flags=pygame.BLEND_RGB_MAX)
         s.blit(spr, (int(self.x) - spr.get_width() // 2, int(self.y) - spr.get_height() // 2 - bob - 2))
         if self.champ:
             pygame.draw.circle(s, CHAMPIONS[self.champ]['col'], (int(self.x), int(self.y) - spr.get_height() // 2 - 5 - bob), 2)
@@ -1295,6 +1334,13 @@ class Pedestal:
         self.cool = 0.6
         self.r = 8
         self.taken = False
+
+    def fxinfo(self):
+        from .texts import fx_lines
+        if self.item.startswith('active:'):
+            a = ACTIVES[self.item[7:]]
+            return 'Aktives Item (Taste E) – lädt sich in %d Räumen auf' % a['charge']
+        return ', '.join(fx_lines(ITEMS[self.item]['fx']))
 
     def info(self):
         if self.item.startswith('active:'):

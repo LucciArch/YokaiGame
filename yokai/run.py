@@ -86,7 +86,9 @@ class Run:
         self.boss_pos = None
         self.curse = None
         self.last_boss = None
+        self.stat_delta = None
         self.player = Player(self, char_id)
+        self.stat_delta = {}
         self.save.stat('runs')
         self.apply_challenge()
         self.new_floor()
@@ -150,8 +152,13 @@ class Run:
             self.enter_room(start, None)
         self.title_t = 3.0
         audio.get().music(self.biome['music'])
+        audio.get().prepare(self.boss_music())
         if self.curse:
             self.banner(CURSES[self.curse], '', (190, 120, 255))
+
+    def boss_music(self):
+        b = self.biome['music']
+        return ('iwato' if self.depth >= 4 else b[0], b[1], 132 + self.depth * 4, 'boss', b[4] + 100 + self.depth)
 
     def go_deeper(self, depth=None):
         self.depth = depth or self.depth + 1
@@ -215,7 +222,7 @@ class Run:
             self.boss_intro = 2.2
             audio.play('boss')
             b = self.biome['music']
-            audio.get().music(('iwato' if self.depth >= 4 else b[0], b[1], 132 + self.depth * 4, 'boss', b[4] + 100 + self.depth))
+            audio.get().music(self.boss_music())
         elif prev is not None and prev.kind == 'boss' or (prev and prev.kind.startswith('shrine')):
             audio.get().music(self.biome['music'])
         self.flow_src = None
@@ -318,7 +325,7 @@ class Run:
             base = random.choice([e for e in self.enemies])
             big = self.spawn_enemy(base.id, RX + RW / 2, RY + RH / 2 - 20, None)
             big.mini = True
-            big.r = int(big.r * 1.8)
+            big.r = int(big.r * 1.5)
             big.hp = big.maxhp = big.maxhp * 6
             big.speed *= 0.8
             big.name = 'Ō-' + big.name
@@ -432,8 +439,8 @@ class Run:
             self.player.hurt(1)
 
     # ======================================================================  Hilfen
-    def banner(self, title, sub='', col=(255, 240, 200), big=False):
-        self.banners.append((title, sub, col, big))
+    def banner(self, title, sub='', col=(255, 240, 200), big=False, fx=''):
+        self.banners.append((title, sub, col, big, fx))
 
     def shake(self, a):
         if self.save['settings'].get('shake', True):
@@ -983,6 +990,10 @@ class Run:
         # Raum geschafft?
         if not self.room.cleared and not self.enemies:
             self.on_room_clear()
+        for k in list(self.stat_delta):
+            self.stat_delta[k][1] -= dt
+            if self.stat_delta[k][1] <= 0:
+                del self.stat_delta[k]
         if self.hold:
             self.hold[2] -= dt
             if self.hold[2] <= 0:
@@ -1419,7 +1430,7 @@ class Run:
         # Banner
         if self.cur_banner is None and self.banners:
             self.cur_banner = self.banners.popleft()
-            self.banner_t = 2.8 if self.cur_banner[3] else 2.2
+            self.banner_t = 3.4 if (self.cur_banner[3] or self.cur_banner[4]) else 2.2
         if self.cur_banner:
             self.banner_t -= dt
             if self.banner_t <= 0:
@@ -1674,12 +1685,14 @@ class Run:
                 near, nd = pd, dd
         if near and not self.hold:
             name, desc, icon, col = near.info()
-            bx = clamp(near.x, RX + 70, RX + RW - 70)
-            by = near.y - 44
-            w = max(gfx.text_w(name, 8), gfx.text_w(desc, 6)) + 12
-            gfx.panel(s, (int(bx - w / 2), int(by), int(w), 22), 200, col)
+            fxs = near.fxinfo()
+            w = max(gfx.text_w(name, 8), gfx.text_w(desc, 6), gfx.text_w(fxs, 6)) + 12
+            bx = clamp(near.x, RX + w / 2 + 2, RX + RW - w / 2 - 2)
+            by = near.y - 52
+            gfx.panel(s, (int(bx - w / 2), int(by), int(w), 31), 215, col)
             gfx.TEXT.add(name, bx, by + 2, 8, col, 'c')
             gfx.TEXT.add(desc, bx, by + 12, 6, (230, 225, 210), 'c')
+            gfx.TEXT.add(fxs, bx, by + 21, 6, (170, 220, 255), 'c')
         if self.hold:
             icon, col, ht = self.hold
             yy = p.y - 28 - (1 - min(1, (1.4 - ht) * 4)) * 6
@@ -1828,6 +1841,8 @@ class Run:
         T.add('%s – %s' % (self.biome['jp'], self.biome['name']), 300, 3, 8, (230, 220, 190))
         info = ('Prüfung  •  ' if self.challenge else '') + ('%d:%02d  •  ' % (max(0, 900 - self.time) // 60, max(0, 900 - self.time) % 60) if self.challenge == 'zeitlauf' else '') + 'Ebene %d' % self.depth + ('  •  Schleife %d' % (self.loop + 1) if self.endless else '') + ('  •  Oni-Modus' if self.hard else '') + ('  •  ' + CURSES[self.curse] if self.curse else '')
         T.add(info, 300, 15, 6, (190, 170, 150))
+        # Werte-Leiste
+        self.draw_statbar(s, t)
         # Minikarte
         if self.curse != 'nebel' and not self.room.kind.startswith('shrine'):
             self.draw_minimap(s, W - 8, RY - 12)
@@ -1883,15 +1898,39 @@ class Run:
             T.add('Ebene %d' % self.depth, W // 2 + 70, 170, 7, (190, 160, 150), 'c', alpha=a)
         # Banner
         if self.cur_banner:
-            title, sub, col, big = self.cur_banner
-            a = int(255 * min(1, self.banner_t * 3, (2.8 - self.banner_t) * 6 + 0.2))
+            title, sub, col, big, fxs = self.cur_banner
+            a = int(255 * min(1, self.banner_t * 3, (3.4 - self.banner_t) * 6 + 0.2))
             a = max(0, min(255, a))
-            ov = pygame.Surface((W, 34), pygame.SRCALPHA)
-            ov.fill((10, 6, 14, int(a * 0.7)))
-            s.blit(ov, (0, RY + RH - 44))
-            T.add(title, W // 2, RY + RH - 42, 12 if big else 10, col, 'c', alpha=a)
+            hh = 44 if fxs else 34
+            ov = pygame.Surface((W, hh), pygame.SRCALPHA)
+            ov.fill((10, 6, 14, int(a * 0.75)))
+            y0 = RY + RH - 10 - hh
+            s.blit(ov, (0, y0))
+            T.add(title, W // 2, y0 + 2, 12 if big else 10, col, 'c', alpha=a)
             if sub:
-                T.add(sub, W // 2, RY + RH - 25, 7, (230, 225, 210), 'c', alpha=a)
+                T.add('„%s“' % sub if fxs else sub, W // 2, y0 + 19, 7, (230, 225, 210), 'c', alpha=a)
+            if fxs:
+                T.add(fxs, W // 2, y0 + 31, 7, (170, 220, 255), 'c', alpha=a)
+
+    def draw_statbar(self, s, t):
+        p = self.player
+        T = gfx.TEXT
+        y = RY + RH + 19
+        pygame.draw.rect(s, (14, 9, 18), (0, y - 2, W, 14))
+        items = [('dmg', 'Schaden', '%.2f' % p.damage(), (240, 90, 80)), ('rate', 'Feuerrate', '%.2f/s' % p.s['rate'], (250, 200, 90)),
+                 ('spd', 'Tempo', '%d' % p.s['spd'], (120, 220, 140)), ('range', 'Reichweite', '%d' % p.s['range'], (120, 180, 250)),
+                 ('shotspd', 'Schussgeschw.', '%d' % p.s['shotspd'], (180, 140, 250)), ('luck', 'Glück', '%g' % p.s['luck'], (120, 230, 200))]
+        x = 14
+        for k, name, val, col in items:
+            pygame.draw.circle(s, col, (x + 2, y + 4), 3)
+            T.add(name, x + 8, y, 6, (175, 165, 155))
+            vx = x + 8 + gfx.text_w(name, 6) + 3
+            T.add(val, vx, y, 6, (250, 245, 235))
+            d = self.stat_delta.get(k)
+            if d:
+                T.add(('+' if d[0] > 0 else '') + ('%.2f' % d[0] if k in ('dmg', 'rate') else '%g' % round(d[0], 1)),
+                      vx + gfx.text_w(val, 6) + 2, y, 6, (120, 255, 140) if d[0] > 0 else (255, 120, 110), alpha=int(255 * min(1, d[1])))
+            x += 78
 
     def draw_minimap(self, s, right, top):
         cw, ch = 9, 6

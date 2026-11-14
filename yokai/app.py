@@ -6,61 +6,13 @@ import random
 import sys
 import pygame
 from .settings import *
-from . import gfx, audio
+from . import gfx, audio, sheets
 from .save import Save
 from .data import (ITEMS, ITEM_IDS, CHARS, CHAR_ORDER, ACHIEVEMENTS, ACTIVES, SYNERGIES, TRANSFORMS, BOSSES,
                    BIOMES, CHALLENGES)
 from .run import Run
 
-FX_NAMES = {
-    'dmg': ('Schaden', '+'), 'dmgm': ('Schaden', '×'), 'rate': ('Feuerrate', '+'), 'ratem': ('Feuerrate', '×'),
-    'spd': ('Tempo', '+'), 'shotspd': ('Schussgeschw.', '+'), 'range': ('Reichweite', '+'), 'luck': ('Glück', '+'),
-    'size': ('Talismangröße', '+'), 'hp': ('Herzcontainer', '+'), 'heal': ('Heilung (½)', '+'),
-    'spirit': ('Geisterherzen (½)', '+'), 'coins': ('Mon', '+'), 'keys': ('Schlüssel', '+'), 'salts': ('Salz', '+'),
-    'fullheal': ('Volle Heilung', ''), 'homing': ('Zielsuchend', ''), 'pierce': ('Durchbohrend', ''),
-    'bounce': ('Abprallend', ''), 'spectral': ('Durch Wände', ''), 'explode': ('Explosiv', ''), 'burn': ('Brennen', ''),
-    'slow': ('Verlangsamen', ''), 'poison': ('Gift', ''), 'chain': ('Kettenblitz', ''), 'split': ('Teilen sich', ''),
-    'boomerang': ('Bumerang', ''), 'wave': ('Wellenflug', ''), 'knock': ('Rückstoß', ''), 'crit': ('Krit-Chance', '%'),
-    'freeze': ('Einfrieren', '%'), 'multishot': ('Zusatzschüsse', '+'), 'back': ('Schuss nach hinten', '+'),
-    'side': ('Seitenschüsse', '+'), 'orbital': ('Umkreisende Schilde', '+'), 'familiar': ('Shikigami-Begleiter', '+'),
-    'aura': ('Schadensaura', '+'), 'fly': ('Fliegen', ''), 'dash_fire': ('Feuerspur beim Rollen', ''),
-    'dash_dmg': ('Rolle verletzt Feinde', ''), 'dash_reflect': ('Rolle löscht Geschosse', ''),
-    'hurt_ring': ('Talismanring bei Treffer', ''), 'hurt_dmg': ('Wut bei Treffer', ''),
-    'kill_heal': ('Heilung bei Kill', '%'), 'kill_explode': ('Explosion bei Kill', '%'),
-    'clear_heal': ('Heilung bei Raumende', '%'), 'money_dmg': ('Schaden durch Mon', ''), 'shield': ('Schild pro Raum', ''),
-    'revive': ('Extra-Leben', '+'), 'map': ('Zeigt die Karte', ''), 'magnet': ('Münzmagnet', ''),
-    'discount': ('Rabatt im Laden', ''), 'gold_shots': ('Goldene Talismane', '%'), 'big_every': ('Jeder N. Schuss mächtig', ''),
-    'rage': ('Stärker bei wenig Leben', ''), 'salts_regen': ('Salz bei Raumende', '%'), 'curse_immune': ('Immun gegen Flüche', ''),
-    'raijin_chance': ('Blitz-Chance', '%'),
-}
-TAG_NAMES = {'kitsune': 'Kitsune', 'raijin': 'Donner', 'oni': 'Oni', 'shikigami': 'Shikigami', 'yurei': 'Yūrei',
-             'tengu': 'Tengu', 'ryu': 'Drache', 'kami': 'Kami', 'tanuki': 'Tanuki'}
-
-
-def star(s, x, y, col):
-    pts = []
-    for i in range(10):
-        a = i / 10 * math.tau - math.pi / 2
-        r = 3.5 if i % 2 == 0 else 1.5
-        pts.append((x + math.cos(a) * r, y + math.sin(a) * r))
-    pygame.draw.polygon(s, col, pts)
-
-
-def fx_lines(fx):
-    out = []
-    for k, v in fx.items():
-        if k not in FX_NAMES:
-            continue
-        n, m = FX_NAMES[k]
-        if m == '+':
-            out.append('%s %s%s' % (n, '+' if v > 0 else '', ('%g' % v)))
-        elif m == '×':
-            out.append('%s ×%g' % (n, v))
-        elif m == '%':
-            out.append('%s %d%%' % (n, round(v * 100)) if v < 1 else n)
-        else:
-            out.append(n if k != 'big_every' else 'Jeder %d. Schuss ist mächtig' % v)
-    return out
+from .texts import FX_NAMES, TAG_NAMES, fx_lines, star
 
 
 class Game:
@@ -98,7 +50,7 @@ class Game:
         self.au.music(('yo', 220, 76, 'calm', 99))
         try:
             ic = pygame.Surface((32, 32), pygame.SRCALPHA)
-            ic.blit(pygame.transform.scale(gfx.sprite('hana'), (24, 28)), (4, 2))
+            ic.blit(sheets.frame('hana', 0, 0, 2), (0, 0))
             pygame.display.set_icon(ic)
         except Exception:
             pass
@@ -345,8 +297,8 @@ class Game:
         for i in range(16):
             x = (t * 18 + i * 34) % (W + 60) - 40
             nm = names[i % len(names)]
-            spr = gfx.sprite(nm, False)
-            bob = abs(math.sin(t * 6 + i)) * 3
+            spr = sheets.frame(nm, sheets.RIGHT, int(t * 6 + i), 2 if sheets.scale_of(nm) >= 2 else 1) if sheets.has(nm) else gfx.sprite(nm, False)
+            bob = 0
             s.blit(spr, (int(x), int(250 - spr.get_height() - bob)))
 
     # ================================================================  Zustände
@@ -437,7 +389,7 @@ class Game:
             y = 32 + i * 26
             sel = i == self.ch_sel
             gfx.panel(s, (30, y, W - 60, 23), 210 if sel else 150, (255, 210, 120) if sel else (90, 80, 90))
-            spr = gfx.sprite(c['char'])
+            spr = sheets.frame(c['char'], 0, 0, 1)
             s.blit(spr, (38, y + 5))
             T.add(c['name'], 58, y + 2, 9, (255, 230, 150) if sel else (220, 210, 200))
             T.add(c['desc'], 58, y + 13, 6, (210, 200, 190))
@@ -473,12 +425,12 @@ class Game:
             y = 42 + row_i * 62
             sel = i == self.char_sel
             gfx.panel(s, (x - 30, y, 60, 54), 200 if sel else 140, (255, 210, 120) if sel else (110, 90, 80))
-            spr = pygame.transform.scale(gfx.sprite(cid), (36, 42))
+            spr = sheets.frame(cid, 0, int(self.t * 6) if sel else 0, 2)
             if cid not in unlocked:
                 spr = spr.copy()
                 spr.fill((0, 0, 0), special_flags=pygame.BLEND_RGB_MULT)
             bob = int(abs(math.sin(self.t * 5)) * 2) if sel else 0
-            s.blit(spr, (x - 18, y + 4 - bob))
+            s.blit(spr, (x - spr.get_width() // 2, y + 7 - bob))
             T.add(CHARS[cid]['name'] if cid in unlocked else '???', x, y + 44, 7, (240, 230, 210) if cid in unlocked else (130, 120, 120), 'c')
             wins = self.save['char_wins'].get(cid, 0)
             if wins:

@@ -3,6 +3,7 @@ import math
 import random
 import pygame
 from .settings import *
+from . import art
 
 PAL = {
     'k': (22, 16, 28), 'w': (240, 236, 226), 'l': (170, 168, 180), 'd': (70, 66, 84),
@@ -258,7 +259,7 @@ def _legs(base, frame):
     out = base.copy()
     half = w // 2
     x0, x1 = (0, half) if frame == 1 else (half, w)
-    rows = 2
+    rows = max(2, h // 12)
     for y in range(h - rows, h):
         for x in range(x0, x1):
             out.set_at((x, y - 1), base.get_at((x, y)))
@@ -281,6 +282,8 @@ def sprite(name, flip=False, flash=False, tint=None, scale=1, frame=0):
             s = _post(s, flip, flash, tint, scale)
         _cache[key] = s
         return s
+    if (name, False, False, None, 1, 0) not in _cache and name in art.ARTS:
+        _cache[(name, False, False, None, 1, 0)] = art.make(name)
     if (name, False, False, None, 1, 0) not in _cache:
         rows = SPRITES[name]
         w, h = len(rows[0]), len(rows)
@@ -332,7 +335,22 @@ def glow(radius, color, alpha=90):
     return g
 
 
+_aglow = {}
+
+
 def draw_glow(surf, x, y, radius, color, alpha=90):
+    if surf.get_flags() & pygame.SRCALPHA:
+        key = (int(radius), color, alpha)
+        g = _aglow.get(key)
+        if g is None:
+            r = max(1, int(radius))
+            g = pygame.Surface((r * 2, r * 2), pygame.SRCALPHA)
+            for i in range(r, 0, -1):
+                a = int(min(190, alpha * 1.4) * (1 - i / r) ** 1.6)
+                pygame.draw.circle(g, color + (a,), (r, r), i)
+            _aglow[key] = g
+        surf.blit(g, (x - radius, y - radius))
+        return
     surf.blit(glow(int(radius), color, alpha), (x - radius, y - radius), special_flags=pygame.BLEND_RGB_ADD)
 
 

@@ -30,7 +30,7 @@ jobs:
         run: python -c "import yokai.app, yokai.run, yokai.bosses; print('Import OK')"
 
       - name: EXE bauen
-        run: pyinstaller --noconfirm --onefile --windowed --name YokaiNoMichi --icon icon.png --collect-data pygame main.py
+        run: pyinstaller --noconfirm --onefile --windowed --name YokaiNoMichi --icon icon.png --collect-data pygame --add-data "yokai/assets;yokai/assets" main.py
 
       - name: Als Artefakt hochladen
         uses: actions/upload-artifact@v4
