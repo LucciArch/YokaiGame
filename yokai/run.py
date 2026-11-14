@@ -268,6 +268,16 @@ class Run:
                 gx = clamp(x + random.uniform(-14, 14) * (gi > 0), RX + 10, RX + RW - 10)
                 gy = clamp(y + random.uniform(-14, 14) * (gi > 0), RY + 10, RY + RH - 10)
                 self.spawn_enemy(eid, gx, gy, champ)
+        if room.kind == 'normal' and self.depth >= 2 and random.random() < 0.08 + 0.02 * self.loop and self.enemies:
+            base = random.choice([e for e in self.enemies])
+            big = self.spawn_enemy(base.id, RX + RW / 2, RY + RH / 2 - 20, None)
+            big.mini = True
+            big.r = int(big.r * 1.8)
+            big.hp = big.maxhp = big.maxhp * 6
+            big.speed *= 0.8
+            big.name = 'Ō-' + big.name
+            room.extra['mini'] = True
+            self.banner('Mini-Boss: ' + big.name, 'Ein besonders mächtiger Yokai!', (255, 110, 90))
         if not self.enemies:
             room.cleared = True
 
@@ -629,6 +639,7 @@ class Run:
         self.ebullets.clear()
         self.boss = None
         self.last_boss = b.id
+        self.bullet_speed_mult = (1.12 if self.hard else 1.0) + 0.07 * self.loop
         s = self.save
         first = s.add_to('bosses', b.id)
         self.achieve('first_boss')
@@ -749,6 +760,20 @@ class Run:
                 ang = math.atan2(tgt.y - b.y, tgt.x - b.x) if tgt else random.uniform(0, math.tau)
                 self.fire_player_bullet(b.x, b.y, ang, dmg, 220, 3, 1.5, {'homing': 1})
             self.ebullets.clear()
+        elif a == 'oni_trommel':
+            p.temp.append([{'dmgm': 1.8}, 6.0])
+            p.recalc()
+            self.shake(4)
+            audio.play('roar', 0.6)
+        elif a == 'kitsune_laterne':
+            p.temp.append([{'orbital': 4, 'burn': 1}, 10.0])
+            p.recalc()
+        elif a == 'horagai':
+            for e in self.enemies:
+                if e.active():
+                    e.frozen = 2.5 if not e.is_boss else 0.6
+            audio.play('roar', 0.5)
+            self.particles.append(Particle(p.x, p.y, 0, 0, 0.5, (240, 220, 200), 200, kind='ring'))
         elif a == 'tengu_uchiwa':
             for e in self.enemies:
                 if e.active():
@@ -1012,6 +1037,10 @@ class Run:
             self.pedestals.append(Pedestal(self.pick_item('T', 0.1), cx, cy))
             self.achieve('challenge')
             self.save.stat('challenges')
+        elif room.extra.get('mini'):
+            self.spawn_pickup('chest', cx, cy)
+            if random.random() < 0.3:
+                self.pedestals.append(Pedestal(self.pick_item('T', 0.1), cx, cy - 30))
         elif random.random() < 0.36 + 0.03 * p.s['luck']:
             self.random_drop(cx, cy)
 
@@ -1256,7 +1285,18 @@ class Run:
                 col = (230, 255, 140) if amb == 'fireflies' else (255, 240, 180)
                 self.ambient.append(Particle(x, random.uniform(RY, RY + RH), random.uniform(-6, 6), random.uniform(-6, 6),
                                              3, col, 1))
-        self.ambient = [pt for pt in self.ambient if pt.update(dt) and RY - 10 < pt.y < RY + RH + 10][-120:]
+        w = self.biome.get('weather')
+        if w and not self.room.kind.startswith('shrine'):
+            rate = {'rain': 60, 'rain_dark': 30, 'blizzard': 70, 'ash': 18}[w]
+            for _ in range(int(rate * dt) + (1 if random.random() < (rate * dt) % 1 else 0)):
+                x = random.uniform(RX, RX + RW)
+                if w.startswith('rain'):
+                    self.ambient.append(Particle(x, RY - 2, 60, 340, 0.8, (150, 170, 210), 1, kind='rain'))
+                elif w == 'blizzard':
+                    self.ambient.append(Particle(RX - 2, random.uniform(RY, RY + RH), random.uniform(140, 220), random.uniform(10, 40), 2.5, (240, 245, 255), 2))
+                else:
+                    self.ambient.append(Particle(x, RY - 2, random.uniform(-10, 10), random.uniform(15, 30), 8, (120, 110, 110), 1))
+        self.ambient = [pt for pt in self.ambient if pt.update(dt) and RY - 10 < pt.y < RY + RH + 10 and pt.x < RX + RW + 10][-260:]
 
     # ======================================================================  Erfolge & Ende
     def achieve(self, aid):

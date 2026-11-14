@@ -139,6 +139,15 @@ class Boss(Enemy):
             audio.play('roar')
             run.shake(6)
             self.on_phase2()
+        if self.phase == 2 and self.hp < self.maxhp * 0.25 and not getattr(self, 'enraged', False):
+            self.enraged = True
+            self.rest *= 0.75
+            run.bullet_speed_mult *= 1.1
+            audio.play('roar')
+            run.shake(8)
+            run.banner(self.name + ' rast vor Wut!', '', (255, 90, 80))
+        if getattr(self, 'enraged', False) and random.random() < 0.3:
+            run.particles.append(Particle(self.x + random.uniform(-self.r, self.r), self.y + random.uniform(-self.r, self.r), 0, -40, 0.4, (255, 80, 60), 2))
         self.move(dt * sp)
         # Koroutinen-Angriffe
         if self.co is None:

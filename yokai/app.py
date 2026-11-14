@@ -326,6 +326,19 @@ class Game:
             pygame.draw.rect(s, (90, 90, 100), (lx - 2, 222, 4, 12))
             pygame.draw.rect(s, (120, 120, 130), (lx - 6, 212, 12, 10))
             pygame.draw.rect(s, (255, 200, 120), (lx - 4, 214, 8, 5))
+        # Kirschbaum & fallende Blüten
+        pygame.draw.line(s, (50, 30, 30), (470, 240), (440, 120), 6)
+        pygame.draw.line(s, (50, 30, 30), (448, 150), (410, 120), 3)
+        for i in range(40):
+            rr = random.Random(i)
+            bx, by = 400 + rr.randint(0, 80), 95 + rr.randint(0, 60)
+            pygame.draw.circle(s, (240, 160 + rr.randint(0, 40), 190), (bx, by), rr.randint(5, 10))
+        for i in range(30):
+            rr = random.Random(100 + i)
+            ph = (t * rr.uniform(0.05, 0.12) + rr.random()) % 1
+            px = (rr.uniform(0, W) - ph * 140 + math.sin(t + i) * 10) % W
+            py = ph * H
+            pygame.draw.ellipse(s, (250, 190, 215), (int(px), int(py), 3, 2))
         # Hyakki Yagyō – die Parade der hundert Dämonen
         names = ['hitodama', 'kasa_obake', 'chochin', 'kappa', 'bakeneko', 'nopperabo', 'oni', 'karasu_tengu',
                  'onibi', 'gaki', 'ittan_momen', 'kitsunebi_e', 'heikegani', 'yamabiko', 'shikome', 'bakezori']

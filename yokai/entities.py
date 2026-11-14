@@ -95,6 +95,10 @@ class Particle:
             pygame.draw.circle(s, self.col, (int(self.x), int(self.y)), r, 1)
         elif self.kind == 'petal':
             pygame.draw.ellipse(s, self.col, (int(self.x), int(self.y), 3, 2))
+        elif self.kind == 'rain':
+            pygame.draw.line(s, self.col, (self.x, self.y), (self.x - 2, self.y - 7), 1)
+            if self.life < 0.05 or self.y > RY + RH - 4:
+                pygame.draw.circle(s, self.col, (int(self.x), int(self.y)), 2, 1)
         elif self.kind == 'soul':
             x, y = int(self.x + math.sin(self.life * 9) * 2), int(self.y)
             gfx.draw_glow(s, x, y, 7, self.col, int(110 * f))
@@ -292,6 +296,7 @@ class Player:
         self.s = {}
         self.f = defaultdict(float)
         self.bonus = defaultdict(float)
+        self.temp = []   # [fx-dict, rest-zeit]
         self.recalc()
         run.player = self
         for iid in c['items']:
@@ -304,6 +309,7 @@ class Player:
         out += [s['fx'] for s in SYNERGIES if s['id'] in self.synergies]
         out += [TRANSFORMS[t]['fx'] for t in self.transforms]
         out.append(self.bonus)
+        out += [t[0] for t in getattr(self, 'temp', [])]
         return out
 
     def recalc(self):
@@ -476,6 +482,13 @@ class Player:
         self.anim += dt
         for k in ('iframes', 'dash_cd', 'shoot_cd', 'hurt_buff', 'kagura', 'room_dmg_buff', 'aura_cd'):
             setattr(self, k, max(0.0, getattr(self, k) - dt))
+        if self.temp:
+            for tfx in self.temp:
+                tfx[1] -= dt
+            n = len(self.temp)
+            self.temp = [t for t in self.temp if t[1] > 0]
+            if len(self.temp) != n:
+                self.recalc()
         mvx, mvy = inp['move']
         fly = bool(self.f['fly'])
         self.moving = abs(mvx) + abs(mvy) > 0.1
@@ -524,6 +537,9 @@ class Player:
         self.move(dx, dy, fly)
         if self.moving:
             self.flip = mvx < 0 if abs(mvx) > 0.1 else self.flip
+            if not fly and random.random() < dt * 9:
+                run.particles.append(Particle(self.x + random.uniform(-3, 3), self.y + 4, random.uniform(-10, 10), -8, 0.35,
+                                              gfx._c(run.biome['floor'], 1.35), 2))
         # Stacheln
         t, _, _ = tile_at(run.room, self.x, self.y + 3)
         if t == T_SPIKE and not fly and self.dash_t <= 0:
@@ -1115,7 +1131,9 @@ class Enemy:
         frame = 0
         if not self.fly and self.d['move'] in ('chase', 'wander', 'side', 'charge'):
             frame = (0, 1, 0, 2)[int(self.t * (14 if self.state == 'charge' else 7)) % 4]
-        spr = gfx.sprite(self.d['sprite'], flip, self.flash > 0, tint, frame=frame)
+        spr = gfx.sprite(self.d['sprite'], flip, self.flash > 0, tint, frame=frame, scale=2 if getattr(self, 'mini', False) else 1)
+        if getattr(self, 'mini', False):
+            gfx.draw_glow(s, int(self.x), int(self.y), 26, (255, 80, 80), 50)
         bob = 0
         if self.fly:
             bob = int(math.sin(self.t * 4) * 2)
