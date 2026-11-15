@@ -1259,10 +1259,11 @@ class Game:
                 ('Vollbild', 'An' if self.fullscreen else 'Aus'), ('Bildschirmwackeln', 'An' if st.get('shake', True) else 'Aus'),
                 ('Schadenszahlen', 'An' if st.get('dmgnums', True) else 'Aus'), ('Tipps', 'An' if st.get('hints', True) else 'Aus'),
                 ('Spielweise', 'Entspannt' if st.get('relaxed') else 'Normal'),
+                ('Blitzeffekte', 'Reduziert' if st.get('flash', True) is False else 'Voll'),
                 ('Spielstand löschen', ''), ('Zurück', '')]
         T.add('Optionen', W // 2, 30, 14, (255, 230, 170), 'c')
         for i, (k, v) in enumerate(opts):
-            y = 70 + i * 20
+            y = 62 + i * 18
             if i == self.sel:
                 gfx.panel(s, (W // 2 - 120, y - 2, 240, 16), 180, (200, 120, 90))
             T.add(k, W // 2 - 110, y, 9, (255, 230, 150) if i == self.sel else (220, 210, 200))
@@ -1270,6 +1271,7 @@ class Game:
         T.add('Links/Rechts – ändern     Esc – Zurück', W // 2, 270, 7, (160, 150, 150), 'c')
         info = {'Spielweise': 'Entspannt: +1 Herz, nur halbe Herzen Schaden, langsamere Geschosse (ab dem nächsten Lauf)',
                 'Tipps': 'Einmalige Hinweise beim ersten Betreten besonderer Räume',
+                'Blitzeffekte': 'Reduziert: keine Weißblitze, schwächeres rotes Aufleuchten bei Treffern',
                 'Spielstand löschen': 'Löscht alle Freischaltungen, Erfolge und Statistiken'}.get(opts[self.sel][0])
         if info:
             T.add(info, W // 2, 254, 7, (200, 210, 170), 'c')
@@ -1311,6 +1313,8 @@ class Game:
                     st['dmgnums'] = not st.get('dmgnums', True)
                 elif k == 'Tipps':
                     st['hints'] = not st.get('hints', True)
+                elif k == 'Blitzeffekte':
+                    st['flash'] = st.get('flash', True) is False
                 elif k == 'Spielweise':
                     st['relaxed'] = not st.get('relaxed', False)
                     if st['relaxed']:

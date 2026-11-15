@@ -2321,8 +2321,11 @@ class Run:
         low = p.total_hp() <= 2 and not p.dead
         if self.hurt_flash > 0 or low:
             a = int(self.hurt_flash * 600) if self.hurt_flash > 0 else int(60 + 50 * math.sin(t * 5))
+            if self.save['settings'].get('flash', True) is False:
+                a = int(a * 0.4) if self.hurt_flash > 0 else 60
             gfx.color_grade_edge(s, (200, 0, 30), min(220, a))
-        if self.flash_white > 0:
+        calm = self.save['settings'].get('flash', True) is False
+        if self.flash_white > 0 and not calm:
             ov = pygame.Surface((W, H), pygame.SRCALPHA)
             ov.fill((255, 255, 255, int(min(1, self.flash_white * 4) * 150)))
             s.blit(ov, (0, 0))
