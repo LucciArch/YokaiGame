@@ -355,9 +355,10 @@ class Game:
         T = gfx.TEXT
         T.add('Yōkai no Michi', W // 2, 30, 28, (255, 240, 220), 'c')
         T.add('– Hyakki Yagyō –', W // 2, 66, 11, (230, 140, 130), 'c')
-        items = self.MENU
+        items = self.menu_items()
+        step = 15 if len(items) <= 10 else 14
         for i, m in enumerate(items):
-            y = 84 + i * 15
+            y = 84 + i * step
             sel = i == self.sel
             col = (255, 230, 150) if sel else (210, 200, 190)
             if sel:
@@ -372,7 +373,7 @@ class Game:
             elif isinstance(n, tuple) and n[0] == 'click':
                 mx, my = n[1]
                 for i in range(len(items)):
-                    if W // 2 - 70 < mx < W // 2 + 70 and 84 + i * 15 - 2 < my < 84 + i * 15 + 12:
+                    if W // 2 - 70 < mx < W // 2 + 70 and 84 + i * step - 2 < my < 84 + i * step + 12:
                         self.sel = i
                         self.title_select(i)
             elif n == 'ok':
@@ -380,9 +381,37 @@ class Game:
             elif n == 'back':
                 pass
 
+    def menu_items(self):
+        from .run import run_file
+        has = os.path.exists(run_file())
+        return (['Fortsetzen'] if has else []) + self.MENU
+
+    def continue_run(self):
+        from .run import load_run_file, clear_run_file
+        d = load_run_file()
+        if not d or d.get('char') not in CHARS:
+            clear_run_file()
+            self.toast('Kein Spielstand', 'Der gespeicherte Lauf ließ sich nicht laden.', (230, 150, 140))
+            return
+        try:
+            self.run = Run(self, d['char'], d['seed'], d.get('hard', False), d.get('daily', False), d.get('endless', False),
+                           None, restore=d)
+        except Exception as e:                       # beschädigter Spielstand: lieber verwerfen als abstürzen
+            print('Fortsetzen fehlgeschlagen:', e)
+            clear_run_file()
+            self.run = None
+            self.toast('Kein Spielstand', 'Der gespeicherte Lauf ließ sich nicht laden.', (230, 150, 140))
+            return
+        self.last_char = d['char']
+        self.state = 'play'
+        self.show_tab = False
+
     def title_select(self, i):
         audio.play('select')
-        m = self.MENU[i]
+        m = self.menu_items()[i]
+        if m == 'Fortsetzen':
+            self.continue_run()
+            return
         if m == 'Neuer Lauf':
             self.state = 'chars'
             self.char_sel = CHAR_ORDER.index(self.last_char) if self.last_char in CHAR_ORDER else 0
@@ -639,7 +668,8 @@ class Game:
         ov = pygame.Surface((W, H), pygame.SRCALPHA)
         ov.fill((0, 0, 0, 150))
         s.blit(ov, (0, 0))
-        items = ['Weiter', 'Items & Werte', 'Optionen', 'Lauf aufgeben', 'Hauptmenü']
+        items = ['Weiter', 'Items & Werte', 'Optionen', 'Lauf aufgeben',
+                 'Hauptmenü' if (run.challenge or run.daily) else 'Speichern & Hauptmenü']
         if self.confirm:
             gfx.panel(s, (W // 2 - 110, 110, 220, 60), 230)
             gfx.TEXT.add('Wirklich? Der Lauf geht verloren.', W // 2, 118, 9, (255, 220, 200), 'c')
@@ -705,6 +735,12 @@ class Game:
                     self.confirm = 'giveup'
                 elif m == 'Hauptmenü':
                     self.confirm = 'menu'
+                elif m == 'Speichern & Hauptmenü':        # Lauf bleibt gespeichert (Stand: Beginn dieser Ebene)
+                    self.run = None
+                    self.state = 'title'
+                    self.sel = 0
+                    self.au.music(('yo', 220, 76, 'calm', 99))
+                    self.toast('Lauf gespeichert', 'Weiter mit „Fortsetzen“ – ab Beginn der Ebene', (200, 220, 160))
 
     def st_over(self, dt, events, nav):
         run = self.run

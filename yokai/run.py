@@ -32,6 +32,29 @@ CURSES = {'dunkel': 'Fluch der Dunkelheit', 'nebel': 'Fluch des Nebels', 'labyri
 _CROP = {}
 
 
+def run_file():
+    import os
+    from .settings import save_dir
+    return os.path.join(save_dir(), 'lauf.json')
+
+
+def clear_run_file():
+    import os
+    try:
+        os.remove(run_file())
+    except OSError:
+        pass
+
+
+def load_run_file():
+    import json
+    try:
+        with open(run_file(), encoding='utf-8') as f:
+            return json.load(f)
+    except (OSError, ValueError):
+        return None
+
+
 class _TileSpr:
     __slots__ = ('img', 'x', 'top', 'y')
 
@@ -44,7 +67,7 @@ class _TileSpr:
 
 
 class Run:
-    def __init__(self, game, char_id, seed=None, hard=False, daily=False, endless=False, challenge=None):
+    def __init__(self, game, char_id, seed=None, hard=False, daily=False, endless=False, challenge=None, restore=None):
         self.game = game
         self.save = game.save
         self.seed = seed if seed is not None else random.randrange(1, 10 ** 8)
@@ -110,9 +133,67 @@ class Run:
         self.stat_delta = None
         self.player = Player(self, char_id)
         self.stat_delta = {}
-        self.save.stat('runs')
-        self.apply_challenge()
+        if restore:
+            self.restore_state(restore)
+        else:
+            self.save.stat('runs')
+            self.apply_challenge()
+            clear_run_file()
+            self.save_run_file()
         self.new_floor()
+
+    # ---------------------------------------------------------------- Lauf speichern / fortsetzen
+    RUN_KEYS = ('depth', 'stage', 'floor_no', 'loop', 'loop_mult', 'time', 'kills', 'rooms_cleared', 'coins_got',
+                'pool', 'active_pool', '_prev_biome', '_prev_boss')
+    PLAYER_SKIP = {'run', 'x', 'y', 'iframes', 'dash_t', 'dash_cd', 'dash_dir', 'dash_hit', 'dash_trail', 'shoot_cd',
+                   'facing', 'flip', 'moving', 'anim', 'familiars', 'orb_angle', 'orb_hit_cd', 'aura_cd', 'knock',
+                   'wind', 'vx', 'vy', 'hurt_buff', 'kagura', 'room_dmg_buff', 'recoil', 'temp', 'dead', 's', 'f'}
+
+    def state_dict(self):
+        import json
+        p = self.player
+        pl = {}
+        for k, v in p.__dict__.items():
+            if k in self.PLAYER_SKIP:
+                continue
+            try:
+                json.dumps(v)
+            except (TypeError, ValueError):
+                continue
+            pl[k] = v
+        st = self.rng.getstate()
+        d = {k: getattr(self, k) for k in self.RUN_KEYS}
+        d.update(version=1, char=self.char, seed=self.seed, hard=self.hard, daily=self.daily, endless=self.endless,
+                 challenge=self.challenge, rng=[st[0], list(st[1]), st[2]], player=pl)
+        return d
+
+    def restore_state(self, d):
+        from collections import defaultdict as _dd
+        for k in self.RUN_KEYS:
+            if k in d:
+                setattr(self, k, d[k])
+        st = d['rng']
+        self.rng.setstate((st[0], tuple(st[1]), st[2]))
+        p = self.player
+        for k, v in d['player'].items():
+            cur = getattr(p, k, None)
+            if isinstance(cur, _dd):
+                nv = _dd(cur.default_factory)
+                nv.update(v)
+                v = nv
+            setattr(p, k, v)
+        p.recalc()
+
+    def save_run_file(self):
+        if self.challenge or self.daily:
+            return
+        import json, os
+        from .settings import save_dir
+        try:
+            with open(os.path.join(save_dir(), 'lauf.json'), 'w', encoding='utf-8') as f:
+                json.dump(self.state_dict(), f)
+        except (OSError, TypeError, ValueError) as e:
+            print('Lauf nicht gespeichert:', e)
 
     def apply_challenge(self):
         c = self.challenge
@@ -266,6 +347,7 @@ class Run:
             self.banner('Schleife %d' % (self.loop + 1), 'Die Nacht beginnt von vorn – stärker als zuvor', (200, 140, 255), big=True)
         audio.play('stairs')
         self.fade = 1.0
+        self.save_run_file()
         self.new_floor()
         p = self.player
         p.x, p.y = RX + RW / 2, RY + RH / 2 + 20
@@ -1857,6 +1939,7 @@ class Run:
             self.achieve('kuzunoha')
 
     def end_run(self, win):
+        clear_run_file()
         s = self.save
         if win and self.challenge:
             self.achieve('ch_' + self.challenge)
