@@ -1228,16 +1228,17 @@ class Game:
         rows = [('Bewegen', 'W A S D', 'Linker Stick'), ('Ofuda werfen', 'Pfeiltasten / linke Maustaste', 'Rechter Stick'),
                 ('Ausweichrolle', 'Leertaste / Shift / rechte Maustaste', 'A / RB'), ('Aktives Item', 'E', 'Y / LB'),
                 ('Reinigungssalz', 'Q', 'X'), ('Items & Werte', 'Tab (halten)', '–'), ('Pause', 'Esc / P', 'Start'),
-                ('Vollbild', 'F11', '–')]
+                ('Vollbild', 'F11', '–'), ('Seed (Figurenwahl)', 'E', '–'),
+                ('Oni / Endlos (Figurenwahl)', 'H / N', '–')]
         T.add('Aktion', 40, 34, 8, (200, 180, 150)); T.add('Tastatur / Maus', 150, 34, 8, (200, 180, 150)); T.add('Controller', 360, 34, 8, (200, 180, 150))
         for i, (a, k, c) in enumerate(rows):
-            y = 52 + i * 18
-            gfx.panel(s, (32, y - 3, W - 64, 16), 140, (80, 70, 90))
+            y = 50 + i * 16
+            gfx.panel(s, (32, y - 3, W - 64, 15), 140, (80, 70, 90))
             T.add(a, 40, y, 8, (250, 240, 220)); T.add(k, 150, y, 8, (220, 220, 240)); T.add(c, 360, y, 8, (220, 220, 240))
         tips = ['Die Rolle macht dich kurz unverwundbar.', 'Salz löscht alle Geschosse und öffnet Geheimräume an rissigen Wänden.',
                 'Rot aufleuchtende Yokai greifen gleich an.']
         for i, t_ in enumerate(tips):
-            T.add(t_, W // 2, 205 + i * 13, 7, (200, 190, 170), 'c')
+            T.add(t_, W // 2, 222 + i * 12, 7, (200, 190, 170), 'c')
         T.add('Esc – Zurück', W // 2, 285, 6, (150, 140, 140), 'c')
         for n in nav:
             if n in ('back', 'ok'):
