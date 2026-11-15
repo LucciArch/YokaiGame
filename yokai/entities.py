@@ -905,7 +905,7 @@ class Enemy:
         elif d['sprite'] in art.ARTS:
             sp = art.make(d['sprite'])
             self.r = max(self.r, int(min(sp.get_width(), sp.get_height()) * 0.36))
-        mult = (1 + 0.2 * (run.depth - 1)) * (1.3 if run.hard else 1.0) * run.loop_mult
+        mult = (1 + 0.3 * (run.depth - 1)) * (1.3 if run.hard else 1.0) * run.loop_mult
         self.champ = champ
         cm = CHAMPIONS[champ] if champ else {}
         self.maxhp = self.hp = d['hp'] * mult * cm.get('hp', 1)
@@ -936,7 +936,7 @@ class Enemy:
         self.hop_from = self.hop_to = None
         self.alpha = 255
         self.gold_hit = False
-        self.contact = 1
+        self.contact = run.enemy_dmg
 
     def active(self):
         if self.champ == 'geist' and (self.t % 2.4) > 1.6:
@@ -1200,7 +1200,7 @@ class Enemy:
                 return
             if self.d['move'] == 'charge' and self.state != 'idle':
                 return
-        self.acd = a['cd'] * random.uniform(0.85, 1.15)
+        self.acd = a['cd'] * random.uniform(0.85, 1.15) * max(0.72, 1 - 0.06 * (self.run.depth - 1))
         self.fire_t = self.t
         audio.play('eshot', 0.45)
         sp = a['speed'] * (1.15 if self.champ == 'blau' else 1.0)

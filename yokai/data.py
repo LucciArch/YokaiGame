@@ -629,3 +629,9 @@ ITEMS['kusanagi']['fx']['sword_wave'] = 1
 for _c, _w in (('kenji', 'w_sword'), ('benkei', 'w_spear'), ('kotaro', 'w_fan'), ('susanoo', 'w_sword'), ('akago', 'w_club')):
     CHARS[_c]['fx'][_w] = 1
 CHARS['susanoo']['fx']['sword_wave'] = 1
+
+
+# Gegner thematisch zu den Biomen (keine Katzen an der Küste/in der Hölle, himmlische Wächter im Himmel)
+BIOMES['uminobe']['enemies'] = ['funayurei', 'heikegani', 'isonade', 'ningyo', 'onibi', 'sazae_oni']
+BIOMES['jigoku']['enemies'] = ['oni', 'shikome', 'shinigami', 'onibi', 'tsuchigumo', 'kasha', 'wanyudo', 'gaki']
+BIOMES['takamagahara']['enemies'] = ['karasu_tengu', 'yamabiko', 'kamaitachi', 'katawaguruma', 'nurikabe', 'kitsunebi_e', 'ningyo', 'shinigami']

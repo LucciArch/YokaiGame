@@ -120,8 +120,14 @@ class Run:
         p.recalc()
 
     # ======================================================================  Ebenen
+    @property
+    def enemy_dmg(self):
+        """Ab Ebene 4 kosten Treffer ein ganzes Herz."""
+        return 2 if self.depth >= 4 or self.loop else 1
+
     def new_floor(self):
         rng = self.rng
+        self.bullet_speed_mult = (1.12 if self.hard else 1.0) + 0.07 * self.loop + 0.045 * (self.depth - 1)
         self.biome_id = rng.choice(DEPTH_BIOMES[self.depth])
         self.biome = BIOMES[self.biome_id]
         bs = self.save.data.setdefault('biomes_seen', [])
@@ -312,7 +318,7 @@ class Run:
         ground = [e for e in pool if e not in fliers]
         rng = random
         spawns = room.spawns or [(rng.randint(2, 10), rng.randint(1, 5), 'x') for _ in range(rng.randint(3, 5))]
-        n_extra = 1 if (self.hard or self.depth >= 4) and rng.random() < 0.5 else 0
+        n_extra = (1 if (self.hard or self.depth >= 3) and rng.random() < 0.6 else 0) + (1 if self.depth >= 5 and rng.random() < 0.6 else 0)
         chosen = list(spawns)
         for _ in range(n_extra):
             chosen.append((rng.randint(2, 10), rng.randint(1, 5), 'x'))
@@ -721,8 +727,8 @@ class Run:
 
     def random_drop(self, x, y, luck_bonus=0.0):
         luck = self.player.s['luck'] + luck_bonus
-        table = [('coin', 34), ('half', 10), ('heart', 10), ('key', 11), ('salt', 7), ('chest', 6 + luck), ('trinket', 2.5),
-                 ('spirit', 5 + luck * 0.5), ('battery', 3), ('coin5', 4 + luck)]
+        table = [('coin', 36), ('half', 8), ('heart', 5), ('key', 10), ('salt', 6), ('chest', 5 + luck), ('trinket', 2.5),
+                 ('spirit', 3.5 + luck * 0.5), ('battery', 3), ('coin5', 3 + luck)]
         if self.player.spirit_only:
             table = [(k, w * (0.2 if k in ('half', 'heart') else 1)) for k, w in table]
         kinds, ws = zip(*table)
@@ -736,7 +742,7 @@ class Run:
             x, y = RX + tx * TILE + 16, RY + ty * TILE + 16
             burst(self, x, y, (150, 100, 70) if t == T_POT else self.biome['rock'], 12, 70, 0.5, 3)
             audio.play('hit', 0.7)
-            if t == T_POT and random.random() < 0.28 + 0.02 * self.player.s['luck']:
+            if t == T_POT and random.random() < 0.18 + 0.02 * self.player.s['luck']:
                 self.random_drop(x, y)
             self.flow_src = None
 
@@ -885,7 +891,7 @@ class Run:
                 self.random_drop(e.x, e.y)
             if e.gold_hit and random.random() < 0.45:
                 self.spawn_pickup('coin', e.x, e.y)
-            elif random.random() < 0.035 + 0.004 * p.s['luck']:
+            elif random.random() < 0.025 + 0.004 * p.s['luck']:
                 self.random_drop(e.x, e.y)
             if p.f['kill_heal'] and random.random() < p.f['kill_heal']:
                 if p.heal(1):
@@ -916,7 +922,7 @@ class Run:
         self.boss = None
         self.last_boss = b.id
         self.bosses_beaten = getattr(self, 'bosses_beaten', []) + [b.id]
-        self.bullet_speed_mult = (1.12 if self.hard else 1.0) + 0.07 * self.loop
+        self.bullet_speed_mult = (1.12 if self.hard else 1.0) + 0.07 * self.loop + 0.045 * (self.depth - 1)
         s = self.save
         first = s.add_to('bosses', b.id)
         self.achieve('first_boss')
@@ -1270,7 +1276,7 @@ class Run:
                 if p.dash_t > 0 and p.f['dash_reflect']:
                     burst(self, b.x, b.y, (220, 220, 255), 4, 40)
                     continue
-                if p.hurt(1) and b.eff == 'slow':
+                if p.hurt(self.enemy_dmg) and b.eff == 'slow':
                     self.slow_player = 2.0
                 elif b.eff == 'slow' and p.iframes > 0:
                     pass
@@ -1352,7 +1358,7 @@ class Run:
             self.spawn_pickup('chest', cx, cy)
             if random.random() < 0.3:
                 self.pedestals.append(Pedestal(self.pick_item('T', 0.1), cx, cy - 30))
-        elif random.random() < 0.36 + 0.03 * p.s['luck']:
+        elif random.random() < 0.27 + 0.03 * p.s['luck']:
             self.random_drop(cx, cy)
 
     def collect(self):
