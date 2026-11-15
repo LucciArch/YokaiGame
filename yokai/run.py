@@ -2435,7 +2435,7 @@ class Run:
             gfx.draw_icon(s, tr['icon'], tr['col'], 271, 14)
         # Ebene
         T.add('%s – %s' % (self.biome['jp'], self.biome['name']), 300, 3, 8, (230, 220, 190))
-        info = ('Prüfung  •  ' if self.challenge else '') + ('%d:%02d  •  ' % (max(0, 900 - self.time) // 60, max(0, 900 - self.time) % 60) if self.challenge == 'zeitlauf' else '') + self.floor_label() + ('  •  Schleife %d' % (self.loop + 1) if self.endless else '') + ('  •  Oni-Modus' if self.hard else '') + ('  •  ' + CURSES[self.curse] if self.curse else '') + ('  •  Segen: ' + BLESSINGS[self.blessing][0].split()[-1] if self.blessing else '')
+        info = ('Prüfung  •  ' if self.challenge else '') + ('%d:%02d  •  ' % (max(0, 900 - self.time) // 60, max(0, 900 - self.time) % 60) if self.challenge == 'zeitlauf' else '') + self.floor_label() + ('  •  Schleife %d' % (self.loop + 1) if self.endless else '') + ('  •  Oni-Modus' if self.hard else '') + ('  •  Fluch: ' + {'dunkel': 'Dunkelheit', 'nebel': 'Nebel', 'labyrinth': 'Labyrinth', 'verirrt': 'Verirrte'}.get(self.curse, '') if self.curse else '') + ('  •  Segen: ' + BLESSINGS[self.blessing][0].split()[-1] if self.blessing else '')
         T.add(info, 300, 15, 6, (190, 170, 150))
         # Werte-Leiste
         self.draw_statbar(s, t)
