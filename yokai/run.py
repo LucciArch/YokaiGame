@@ -2065,6 +2065,17 @@ class Run:
         self.bg = bg
         self.bg_dirty = False
 
+    def draw_lantern_light(self, s, t):
+        """Warmer, leicht flackernder Lichtkreis der Steinlaternen auf dem Boden."""
+        tiles = self.room.tiles
+        for ty in range(ROWS):
+            row = tiles[ty]
+            for tx in range(COLS):
+                if row[tx] == T_LANTERN:
+                    x, y = RX + tx * TILE + 16, RY + ty * TILE + 20
+                    fl = 0.85 + 0.15 * math.sin(t * 7.3 + tx * 1.7) * math.sin(t * 3.1 + ty)
+                    gfx.draw_glow(s, x, y, 30, (255, 170, 80), int(46 * fl) // 2 * 2)
+
     def draw_pits(self, s, t):
         kind = self.biome.get('pit', 'void')
         if kind not in ('water', 'lava'):
@@ -2147,6 +2158,7 @@ class Run:
             self.render_bg()
         s.blit(self.bg, (0, 0))
         self.draw_pits(s, t)
+        self.draw_lantern_light(s, t)
         self.draw_doors(s, t)
         p = self.player
         # Tutorial-Hinweise
