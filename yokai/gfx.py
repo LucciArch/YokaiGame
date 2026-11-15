@@ -1189,6 +1189,9 @@ def tinted(surf, mode):
             im.fill((255, 255, 255, 0), special_flags=pygame.BLEND_RGB_MAX)
         elif mode == 'shadow':
             im.fill((14, 10, 22, 0), special_flags=pygame.BLEND_RGB_MULT)
+        elif mode == 'ghost':
+            im.fill((120, 100, 170, 0), special_flags=pygame.BLEND_RGB_MULT)
+            im.fill((20, 10, 40, 0), special_flags=pygame.BLEND_RGB_ADD)
         else:
             im.fill((150, 210, 255, 0), special_flags=pygame.BLEND_RGB_MULT)
         if tr:

@@ -1012,6 +1012,10 @@ class Game:
                           lore='Zashiki-warashi ist ein Hausgeist in Kindergestalt. Solange sie bleibt, wohnt das Glück im Haus – '
                                'und manchmal spielt sie Verstecken mit den Bewohnern.',
                           ingame='Zerschlage die Urne, in der sie sich versteckt. Zwei Versuche.'),
+        'hyakki': dict(name='Hyakki Yagyō', spr='chochin',
+                       lore='In manchen Nächten ziehen hundert Dämonen in einer langen Parade durch die Straßen – Schirme, '
+                            'Laternen, Sandalen und Oni. Wer ihr begegnet, versteckt sich besser, bis sie vorbei ist.',
+                       ingame='Weiche den Reihen der Parade aus. Ohne Treffer bleiben zwei Truhen zurück.'),
         'ema': dict(name='Ema-Wand', spr=None,
                     lore='Ema sind kleine Holztafeln, auf die man in Schreinen seine Wünsche schreibt. Früher opferte man '
                          'den Göttern Pferde – heute genügt ein gemaltes.',

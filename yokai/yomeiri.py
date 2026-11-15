@@ -9,7 +9,7 @@ import random
 
 from . import gfx, sheets, audio
 from .settings import RX, RY, RW, RH
-from .entities import Pedestal, burst, Particle
+from .entities import Pedestal, Pickup, burst, Particle
 
 SPEED = 24.0
 ORDER = ('kitsune_gefolge', 'kitsune_gefolge', 'kitsune_braut', 'kitsune_gefolge', 'kitsune_gefolge')
@@ -226,3 +226,72 @@ def kakurenbo_break(run, tx, ty):
             run.event_done('kakurenbo')
         else:
             run.banner('Leer…', 'Noch ein Versuch', (220, 200, 210))
+
+
+# ---------------------------------------------------------------- Hyakki Yagyō (Nachtparade)
+PARADE = ['kasa_obake', 'chochin', 'oni', 'bakezori', 'nopperabo', 'ittan_momen', 'karasu_tengu', 'kappa', 'gozu',
+          'bakeneko', 'yamauba', 'heikegani', 'mezu', 'hitodama']
+
+
+class Marcher:
+    def __init__(self, parade, name, x, y, vx):
+        self.parade, self.name, self.x, self.y, self.vx = parade, name, x, y, vx
+        self.t = random.uniform(0, 1)
+
+    def draw(self, s, t):
+        edge = min((RX + RW - 6 - self.x) / 18.0, (self.x - RX - 2) / 18.0)
+        a = int(210 * max(0.0, min(1.0, edge, self.parade.fade)))
+        if a <= 0:
+            return
+        spr = sheets.frame(self.name, sheets.RIGHT if self.vx > 0 else sheets.LEFT, int(self.t * 7) % 4)
+        spr = gfx.tinted(spr, 'ghost')
+        gfx.draw_glow(s, int(self.x), int(self.y) - 10, 16, (150, 110, 220), int(40 * a / 210))
+        gfx.hi_blit(spr, self.x, self.y + 1, a)
+
+
+class Parade:
+    """Die Parade der hundert Dämonen zieht in Reihen durch den Raum. Wer ausweicht, findet danach eine Truhe."""
+
+    def __init__(self, run, room):
+        self.run, self.room = run, room
+        self.fade = 1.0
+        self.hits = 0
+        self.marchers = []
+        names = [n for n in PARADE if sheets.has(n) and sheets.is_hi(n)]
+        random.shuffle(names)
+        cy = RY + RH / 2
+        lanes = [(cy - 44, 1, 0), (cy + 40, -1, 3.0), (cy - 4, 1, 7.5)]           # (y, Richtung, Verzögerung in s)
+        k = 0
+        for ly, d, delay in lanes:
+            for i in range(5):
+                x0 = (RX - 30 - i * 40 - delay * 46) if d > 0 else (RX + RW + 30 + i * 40 + delay * 46)
+                self.marchers.append(Marcher(self, names[k % len(names)], x0, ly, 46 * d))
+                k += 1
+        run.banner('Hyakki Yagyō', 'Die Parade der hundert Dämonen zieht vorbei – weiche ihr aus!', (190, 150, 255))
+
+    @property
+    def foxes(self):                     # für die Zeichen-Sortierung wie beim Hochzeitszug
+        return self.marchers
+
+    def update(self, dt):
+        run, p = self.run, self.run.player
+        for m in self.marchers:
+            m.x += m.vx * dt
+            m.t += dt
+            if RX < m.x < RX + RW and abs(m.x - p.x) < 9 and abs(m.y - 6 - p.y) < 11:
+                if p.hurt(1, 'die Dämonenparade'):
+                    self.hits += 1
+        if all((m.vx > 0 and m.x > RX + RW + 24) or (m.vx < 0 and m.x < RX - 24) for m in self.marchers):
+            self.room.extra['parade_done'] = True
+            cx, cy = RX + RW / 2, RY + RH / 2
+            run.pickups.append(Pickup('chest', cx, cy, pop=False))
+            if self.hits == 0:
+                run.pickups.append(Pickup('chest', cx + 30, cy, pop=False))
+                run.banner('Die Parade ist vorüber', 'Unberührt – zwei Truhen bleiben zurück', (210, 180, 255))
+                run.achieve('hyakki')
+            else:
+                run.banner('Die Parade ist vorüber', 'Eine Truhe bleibt zurück', (210, 180, 255))
+            audio.play('bell', 0.5)
+            run.event_done('hyakki')
+            return False
+        return True

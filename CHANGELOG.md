@@ -4,6 +4,7 @@
 
 - Neues Ereignis **Kitsune no Yomeiri**: Eine Fuchshochzeit zieht durch einen Raum – wer sie nicht stört, bekommt ein Geschenk der Braut
 - Neues Ereignis **Kakurenbo**: Zashiki-warashi versteckt sich in einer von vier Urnen – zwei Versuche
+- Neues Ereignis **Hyakki Yagyō**: Die Nachtparade zieht in drei Reihen durch den Raum – ausweichen lohnt sich
 - Neues Ereignis **Ema-Wand**: Drei Votivtafeln, nur ein Wunsch geht in Erfüllung
 - 2 neue Items nur aus Ereignisräumen: **Schleier der Fuchsbraut** und **Temari-Ball**
 - Controller vibrieren bei Treffern und Explosionen (an „Bildschirmwackeln“ gekoppelt)

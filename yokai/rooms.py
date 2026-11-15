@@ -663,6 +663,8 @@ def generate_floor(rng, depth, labyrinth=False, hard=False):
             extras.append('kakurenbo')
         if rng.random() < 0.45:
             extras.append('ema')
+        if depth >= 2 and rng.random() < 0.4:
+            extras.append('hyakki')
         rng.shuffle(extras)
         for p, k in zip(rest[2:], extras):
             if k == 'treasure2':
