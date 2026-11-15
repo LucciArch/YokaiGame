@@ -4,7 +4,7 @@ import random
 import pygame
 from collections import deque, defaultdict
 from .settings import *
-from . import gfx, audio
+from . import gfx, props, audio
 from .data import (TRINKETS, BIOMES, DEPTH_BIOMES, BOSS_POOL, ITEMS, ITEM_IDS, ACTIVES, ENEMIES, CHAMPIONS, BOSSES,
                    BOSS_REWARD, CHARS, ACHIEVEMENTS, TRANSFORMS, SYNERGIES, CHAR_ORDER)
 from .rooms import generate_floor, build_room_tiles, Room
@@ -1620,41 +1620,17 @@ class Run:
                      'teahouse': (110, 170, 90), 'slots': (230, 120, 70)}.get(other.kind, (110, 70, 45))
             if self.curse == 'verirrt' and not other.visited:
                 frame = (110, 70, 45)
-            pygame.draw.rect(s, (16, 10, 14), rect.inflate(6, 6))
-            pygame.draw.rect(s, frame, rect.inflate(6, 6), 3)
-            if open_ and not other.locked:
-                pygame.draw.rect(s, (8, 4, 10), rect)
-            else:
-                pygame.draw.rect(s, (226, 216, 190), rect)
-                if horiz:
-                    for i in range(1, 4):
-                        pygame.draw.line(s, (120, 80, 50), (rect.x + i * w // 4, rect.y), (rect.x + i * w // 4, rect.bottom))
-                else:
-                    for i in range(1, 4):
-                        pygame.draw.line(s, (120, 80, 50), (rect.x, rect.y + i * h // 4), (rect.right, rect.y + i * h // 4))
-                if other.locked:
-                    pygame.draw.rect(s, (230, 190, 70), (x - 4, y - 3, 8, 7))
-                    pygame.draw.circle(s, (230, 190, 70), (x, y - 4), 3, 1)
+            state = 'open' if (open_ and not other.locked) else ('locked' if other.locked else 'closed')
+            img = props.door(frame, state, d, other.kind == 'boss')
+            off = {'n': (0, -2), 's': (0, 2), 'w': (-2, 0), 'e': (2, 0)}[d]
             if other.kind == 'boss':
-                gfx.draw_glow(s, x, y, 16, (255, 50, 50), 60)
-                tc = (200, 40, 40)
-                if horiz:
-                    yy = rect.y - 6 if d == 'n' else rect.bottom + 2
-                    pygame.draw.rect(s, (30, 10, 10), (rect.x - 7, yy, rect.w + 14, 4))
-                    pygame.draw.rect(s, tc, (rect.x - 5, yy + 1, rect.w + 10, 2))
-                    pygame.draw.rect(s, tc, (rect.x - 2, rect.y - 2, 3, rect.h + 4))
-                    pygame.draw.rect(s, tc, (rect.right - 1, rect.y - 2, 3, rect.h + 4))
-                else:
-                    xx = rect.x - 6 if d == 'w' else rect.right + 2
-                    pygame.draw.rect(s, (30, 10, 10), (xx, rect.y - 7, 4, rect.h + 14))
-                    pygame.draw.rect(s, tc, (xx + 1, rect.y - 5, 2, rect.h + 10))
-                    pygame.draw.rect(s, tc, (rect.x - 2, rect.y - 2, rect.w + 4, 3))
-                    pygame.draw.rect(s, tc, (rect.x - 2, rect.bottom - 1, rect.w + 4, 3))
+                gfx.draw_glow(s, x, y, 18, (255, 50, 50), 50 + int(20 * math.sin(t * 3)))
+            s.blit(img, img.get_rect(center=(rect.centerx + off[0], rect.centery + off[1])))
 
     def hi_light(self, x, y):
         """Helligkeit für Hi-Res-Sprites (gleiche Logik wie draw_dark: Lichtkreis um den Spieler)."""
         dark = self.biome['dark'] + (150 if self.curse == 'dunkel' else 0)
-        if dark <= 0 or self.room.kind.startswith('shrine'):
+        if y < RY or dark <= 0 or self.room.kind.startswith('shrine'):
             return 1.0
         a = min(215, dark) / 255
         d = math.hypot(x - self.player.x, y - 8 - self.player.y)
@@ -1814,19 +1790,22 @@ class Run:
         full = p.hp // 2
         for k in range(p.maxhp // 2):
             fill = 2 if k < full else (1 if k == full and p.hp % 2 else 0)
-            gfx.heart(s, x0 + (i % 12) * 10, y0 + (i // 12) * 9, 'red', fill)
+            gfx.heart(s, x0 + (i % 10) * 12, y0 + (i // 10) * 10, 'red', fill)
             i += 1
         for k in range((p.spirit + 1) // 2):
             fill = 2 if (k * 2 + 2) <= p.spirit else 1
-            gfx.heart(s, x0 + (i % 12) * 10, y0 + (i // 12) * 9, 'spirit', fill)
+            gfx.heart(s, x0 + (i % 10) * 12, y0 + (i // 10) * 10, 'spirit', fill)
             i += 1
         # Ressourcen
         rx, ry = 130, 4
-        pygame.draw.circle(s, (232, 190, 70), (rx + 4, ry + 4), 4); pygame.draw.rect(s, (60, 40, 20), (rx + 3, ry + 3, 2, 2))
+        if not gfx.hud_icon('coin', rx + 4, ry + 4):
+            pygame.draw.circle(s, (232, 190, 70), (rx + 4, ry + 4), 4); pygame.draw.rect(s, (60, 40, 20), (rx + 3, ry + 3, 2, 2))
         T.add('%02d' % p.coins, rx + 11, ry - 1, 8)
-        pygame.draw.circle(s, (250, 210, 90), (rx + 34, ry + 4), 3, 1); pygame.draw.rect(s, (250, 210, 90), (rx + 36, ry + 3, 6, 2))
+        if not gfx.hud_icon('key', rx + 38, ry + 4):
+            pygame.draw.circle(s, (250, 210, 90), (rx + 34, ry + 4), 3, 1); pygame.draw.rect(s, (250, 210, 90), (rx + 36, ry + 3, 6, 2))
         T.add('%02d' % p.keys, rx + 45, ry - 1, 8)
-        pygame.draw.polygon(s, (250, 250, 255), [(rx + 66, ry + 8), (rx + 74, ry + 8), (rx + 70, ry + 1)])
+        if not gfx.hud_icon('salt', rx + 70, ry + 4):
+            pygame.draw.polygon(s, (250, 250, 255), [(rx + 66, ry + 8), (rx + 74, ry + 8), (rx + 70, ry + 1)])
         T.add('%d' % p.salts, rx + 77, ry - 1, 8)
         # Aktives Item
         if p.active:

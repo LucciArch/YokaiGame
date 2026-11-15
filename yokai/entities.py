@@ -4,7 +4,7 @@ import random
 import pygame
 from collections import defaultdict
 from .settings import *
-from . import gfx, audio, art, sheets
+from . import gfx, audio, art, sheets, props
 from .data import ITEMS, ENEMIES, CHAMPIONS, ACTIVES, CHARS, SYNERGIES, TRANSFORMS, TRINKETS
 
 ONE_TIME = ('hp', 'heal', 'spirit', 'coins', 'keys', 'salts', 'fullheal')
@@ -216,6 +216,11 @@ class Bullet:
             if self.big:
                 gfx.draw_glow(s, x, y, int(r * 3), (255, 120, 120), 70)
             col = self.col
+            if gfx.HI_MODE and self.delay <= 0:
+                img = props.ofuda(tuple(col), r, ang)
+                if img is not None:
+                    gfx.hi_blit(img, x, y + img.get_height() / 4)
+                    return
             # Ofuda: kleiner Papierstreifen
             c, si = math.cos(ang), math.sin(ang)
             hw, hh = r * 1.5, r * 0.85
@@ -229,9 +234,8 @@ class Bullet:
                 pygame.draw.circle(s, self.col, (x, y), max(1, int(self.r * 0.6)), 1)
                 return
             gfx.draw_glow(s, x, y, int(self.r * 2.6), self.col, 80)
-            pygame.draw.circle(s, (20, 10, 24), (x, y), self.r + 1)
-            pygame.draw.circle(s, self.col, (x, y), self.r)
-            pygame.draw.circle(s, (255, 255, 255), (x - 1, y - 1), max(1, self.r // 2))
+            img = props.orb(tuple(self.col), int(self.r))
+            s.blit(img, (x - self.r - 2, y - self.r - 2))
 
 
 def ebullet(run, x, y, ang, speed, col=(240, 80, 120), r=3, eff=None, **kw):
@@ -1405,9 +1409,8 @@ class Pedestal:
     def draw(self, s, t):
         x, y = int(self.x), int(self.y)
         D = pygame.draw
-        D.rect(s, (60, 36, 24), (x - 9, y + 2, 18, 9))
-        D.rect(s, (120, 76, 46), (x - 10, y, 20, 4))
-        D.rect(s, (160, 110, 70), (x - 10, y, 20, 1))
+        img = props.pedestal(self.taken)
+        s.blit(img, (x - img.get_width() // 2, y - 3))
         if self.taken:
             return
         name, desc, icon, col = self.info()

@@ -1040,8 +1040,31 @@ def panel(surf, rect, alpha=210, border=(200, 170, 110)):
     pygame.draw.rect(surf, _c(border, 0.5), r.inflate(-4, -4), 1)
 
 
+_hud_crop = {}
+
+
+def hud_icon(name, cx, cy):
+    """HUD-Symbol aus assets/items/hud als Hi-Res-Bild (Mittelpunkt cx, cy). False wenn nicht verfügbar."""
+    if not HI_MODE:
+        return False
+    im = _hud_crop.get(name)
+    if im is None:
+        src = item_img('hud', name)
+        if src is None:
+            return False
+        im = src.subsurface(src.get_bounding_rect()).copy()
+        _hud_crop[name] = im
+    hi_blit(im, cx, cy + im.get_height() / 4)
+    return True
+
+
 def heart(surf, x, y, kind, fill):
     """kind: 'red'/'spirit'/'empty'; fill 0,1,2 Hälften."""
+    nm = 'heart_soul' if kind == 'spirit' else ('heart_full' if fill == 2 else 'heart_half' if fill == 1 else 'heart_empty')
+    if kind == 'spirit' and fill == 1:
+        nm = 'heart_soul'
+    if hud_icon(nm, x + 4, y + 4):
+        return
     col = {'red': (220, 40, 60), 'spirit': (110, 150, 240), 'empty': (40, 30, 40)}[kind]
     D = pygame.draw
     out = (16, 8, 18)
