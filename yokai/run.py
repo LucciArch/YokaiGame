@@ -1190,7 +1190,7 @@ class Run:
             self.objs.append(Obj('victory', cx, cy + 40))
         else:
             self.objs.append(Obj('torii', cx, cy + 40))
-            ch = 0.28 + (0.3 if not p.hit_this_floor else 0) + 0.03 * p.s['luck']
+            ch = 1.0 if self.stage == 1 else 0.28 + (0.3 if not p.hit_this_floor else 0) + 0.03 * p.s['luck']   # Kapitelende: immer ein Schrein
             if random.random() < ch:
                 oni = random.random() < (0.35 if not p.hit_this_floor else 0.6)
                 self.objs.append(Obj('shrine', cx + 110, cy - 30, oni=oni))
