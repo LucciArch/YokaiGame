@@ -292,7 +292,7 @@ class Game:
         # Kirschbaum (gecachte Pixel-Grafik)
         if not hasattr(self, '_sakura'):
             self._sakura = self.make_sakura()
-        s.blit(self._sakura, (380, 80))
+        s.blit(self._sakura, (372, 72))
         for i in range(30):
             rr = random.Random(100 + i)
             ph = (t * rr.uniform(0.05, 0.12) + rr.random()) % 1
@@ -313,24 +313,38 @@ class Game:
 
     def make_sakura(self):
         from . import props
-        S = pygame.Surface((100, 165), pygame.SRCALPHA)
-        bark = (58, 36, 40)
-        pygame.draw.line(S, bark, (90, 160), (62, 40), 7)
-        pygame.draw.line(S, props.sh(bark, 1.3), (88, 160), (60, 40), 2)
-        pygame.draw.line(S, bark, (68, 70), (30, 40), 4)
-        pygame.draw.line(S, bark, (75, 95), (98, 62), 3)
-        rr = random.Random(7)
-        blobs = [(rr.randint(8, 98), rr.randint(8, 80), rr.randint(6, 11)) for _ in range(34)]
-        base = (236, 156, 186)
-        for x, y, r in blobs:
-            pygame.draw.circle(S, props.sh(base, 0.62), (x + 1, y + 2), r)
-        for x, y, r in blobs:
-            pygame.draw.circle(S, base, (x, y), r - 1)
-        for x, y, r in blobs:
-            pygame.draw.circle(S, props.sh(base, 1.35), (x - r // 3, y - r // 3), max(1, r // 3))
-        for _ in range(40):
-            S.set_at((rr.randint(4, 99), rr.randint(4, 88)), (255, 236, 244))
-        return props._outline(S)
+        S = pygame.Surface((110, 170), pygame.SRCALPHA)
+        bark, barkl = (46, 30, 38), (84, 58, 62)
+        rr = random.Random(11)
+        tips = []
+
+        def branch(x, y, ang, ln, w, depth):
+            x2, y2 = x + math.cos(ang) * ln, y + math.sin(ang) * ln
+            pygame.draw.line(S, bark, (x, y), (x2, y2), max(1, int(w)))
+            if w >= 2:
+                pygame.draw.line(S, barkl, (x - 1, y), (x2 - 1, y2), 1)
+            if depth == 0:
+                tips.append((x2, y2))
+                return
+            for da in (-0.5, 0.45) if depth > 1 else (-0.6, 0.0, 0.55):
+                branch(x2, y2, ang + da + rr.uniform(-0.15, 0.15), ln * rr.uniform(0.62, 0.78), w * 0.62, depth - 1)
+
+        branch(96, 170, -1.95, 52, 7, 4)
+        pal = [(150, 74, 108), (204, 112, 150), (238, 162, 192), (255, 214, 230)]
+        for (tx, ty) in tips:                                    # Blütenbüschel an den Zweigspitzen
+            for _ in range(90):
+                a_ = rr.uniform(0, math.tau)
+                d_ = rr.uniform(0, 1) ** 0.7 * 12
+                x, y = int(tx + math.cos(a_) * d_), int(ty + math.sin(a_) * d_ * 0.75)
+                if not (0 <= x < 110 and 0 <= y < 170):
+                    continue
+                lvl = 3 - min(3, int((y - ty + 10) / 6 + rr.random() * 0.9))   # oben hell, unten dunkel
+                S.fill(pal[max(0, lvl)], (x, y, 2, 2))
+                if rr.random() < 0.35:
+                    S.set_at((x, y), pal[min(3, lvl + 1)])
+        for _ in range(26):                                      # einzelne fallende Blüten nah am Baum
+            S.set_at((rr.randint(10, 105), rr.randint(60, 168)), pal[2])
+        return S
 
     # ================================================================  Zustände
     MENU = ['Neuer Lauf', 'Tägliche Prüfung', 'Herausforderungen', 'Codex der Items', 'Erfolge', 'Statistik', 'Steuerung', 'Optionen', 'Beenden']
