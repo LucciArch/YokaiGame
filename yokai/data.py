@@ -296,6 +296,8 @@ TRINKETS = {
 
 # =====================================================================  SYNERGIEN
 SYNERGIES = [
+    dict(id='fuchshochzeit', name='Fuchshochzeit', desc='Die Braut trägt die Maske ihres Gottes', items=['brautschleier', 'inari_maske'], fx=dict(luck=2, homing=1, multishot=1)),
+    dict(id='gluecksheim', name='Glückliches Haus', desc='Wo Zashiki-warashi spielt, wohnt das Glück', items=['zashiki_temari', 'maneki_neko'], fx=dict(luck=3, rate=0.3)),
     dict(id='a_un', name='A und Un', desc='Zwei Wächter: Anfang und Ende', items=['komainu', 'komainu_glocke'], fx=dict(hurt_ring=1, dmg=0.8, orbital=1)),
     dict(id='sternenfall', name='Sternenfall', desc='Federn aus Licht, Staub aus Sternen', items=['tennin_feder', 'mikaboshi_staub'], fx=dict(multishot=1, crit=0.08, homing=1)),
     dict(id='yomotsu', name='Yomotsu Hirasaka', desc='Der Pass zwischen den Welten ist versiegelt', items=['yomi_stein', 'shimenawa'], fx=dict(shield=1, hp=1, dmgm=1.15)),
