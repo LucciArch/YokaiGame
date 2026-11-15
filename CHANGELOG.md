@@ -16,6 +16,10 @@
 - Läufe speichern und fortsetzen („Speichern & Hauptmenü“, im Titel „Fortsetzen“)
 - Neue Spielweise „Entspannt“ in den Optionen: +1 Herz, nur halbe Herzen Schaden, langsamere Geschosse
 - Türen, Item-Altäre, Felsen, Urnen und Laternen in doppelter Pixeldichte; Gruben mit Abbruchkante
+- Segen: Manche Ebenen sind gesegnet (Vollmond: Karte aufgedeckt, Füchse: Rabatt, Reichtum: doppelt Mon, Kami: Heilung)
+- Item-Tooltips zeigen „Neu!“, vervollständigte Synergien und Transformations-Fortschritt
+- Boss-Lebensbalken mit Schadensspur und Wut-Markierung; Steinlaternen werfen Licht
+- Absturzschutz mit `fehler.log`
 - 16 neue Raumvorlagen für tiefere Kapitel, 4 neue Erfolge, Lauf-Pfad auf dem Endbildschirm
 
 ## 1.2.0 – „Morgengrauen-Update“

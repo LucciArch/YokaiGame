@@ -25,6 +25,10 @@ _GRADE = {'chikurin': (40, 90, 30), 'inari': (120, 50, 20), 'kawabe': (20, 70, 8
           'oeyama': (90, 30, 10), 'ryugu': (10, 70, 90), 'uminobe': (30, 40, 60), 'shinkai': (0, 20, 80),
           'yomi': (90, 0, 30), 'jigoku': (120, 30, 0), 'enma_cho': (110, 20, 10), 'takamagahara': (120, 100, 40), 'tsukiyomi': (60, 70, 140)}
 Q_WEIGHT = {0: 1.0, 1: 1.0, 2: 0.8, 3: 0.42, 4: 0.18}
+BLESSINGS = {'vollmond': ('Segen des Vollmonds', 'Die ganze Ebene liegt im Mondlicht – die Karte ist aufgedeckt'),
+             'fuchs': ('Segen der Füchse', 'Die Tanuki-Händler geben 30 % Rabatt'),
+             'reichtum': ('Segen des Reichtums', 'Auf dieser Ebene fallen doppelt so viele Mon'),
+             'kami': ('Segen der Kami', 'Ein Herz geheilt und ein Seelenherz geschenkt')}
 CURSES = {'dunkel': 'Fluch der Dunkelheit', 'nebel': 'Fluch des Nebels', 'labyrinth': 'Fluch des Labyrinths',
           'verirrt': 'Fluch der Verirrten'}
 
@@ -130,6 +134,7 @@ class Run:
         self.shrine_room = None
         self.boss_pos = None
         self.curse = None
+        self.blessing = None
         self.last_boss = None
         self.stat_delta = None
         self.player = Player(self, char_id)
@@ -303,6 +308,9 @@ class Run:
             self.curse = rng.choice(list(CURSES.keys()))
         if self.challenge == 'dunkle_nacht':
             self.curse = 'dunkel'
+        self.blessing = None
+        if not self.curse and self.floor_no > 1 and rng.random() < 0.18:
+            self.blessing = rng.choice(list(BLESSINGS.keys()))
         self.rooms, start, self.boss_pos = generate_floor(rng, self.depth, self.curse == 'labyrinth', self.hard)
         for r in self.rooms.values():
             if self.challenge == 'fuchspfad' and r.kind == 'shop':
@@ -338,6 +346,12 @@ class Run:
         audio.get().prepare(self.boss_music())
         if self.curse:
             self.banner(CURSES[self.curse], '', (190, 120, 255))
+        if self.blessing:
+            name, sub = BLESSINGS[self.blessing]
+            self.banner(name, sub, (255, 225, 140))
+            if self.blessing == 'kami':
+                self.player.heal(2)
+                self.player.spirit += 2
 
     def boss_music(self):
         b = self.biome['music']
@@ -557,7 +571,7 @@ class Run:
             else:
                 self.pedestals.append(Pedestal(self.pick_item('T', 0.14), cx, cy))
         elif k == 'shop':
-            disc = 0.66 if self.player.f['discount'] else 1.0
+            disc = (0.66 if self.player.f['discount'] else 1.0) * (0.7 if self.blessing == 'fuchs' else 1.0)
             xs = [-120, -60, 0, 60, 120]
             for i, dx in enumerate(xs[:4] if random.random() < 0.6 else xs):
                 if i < 3:
@@ -911,7 +925,7 @@ class Run:
 
     def random_drop(self, x, y, luck_bonus=0.0):
         luck = self.player.s['luck'] + luck_bonus
-        table = [('coin', 36), ('half', 8), ('heart', 5), ('key', 10), ('salt', 6), ('chest', 5 + luck), ('trinket', 2.5),
+        table = [('coin', 36 * (2 if self.blessing == 'reichtum' else 1)), ('half', 8), ('heart', 5), ('key', 10), ('salt', 6), ('chest', 5 + luck), ('trinket', 2.5),
                  ('spirit', 3.5 + luck * 0.5), ('battery', 3), ('coin5', 3 + luck)]
         if self.player.spirit_only:
             table = [(k, w * (0.2 if k in ('half', 'heart') else 1)) for k, w in table]
@@ -2402,7 +2416,7 @@ class Run:
             gfx.draw_icon(s, tr['icon'], tr['col'], 271, 14)
         # Ebene
         T.add('%s – %s' % (self.biome['jp'], self.biome['name']), 300, 3, 8, (230, 220, 190))
-        info = ('Prüfung  •  ' if self.challenge else '') + ('%d:%02d  •  ' % (max(0, 900 - self.time) // 60, max(0, 900 - self.time) % 60) if self.challenge == 'zeitlauf' else '') + self.floor_label() + ('  •  Schleife %d' % (self.loop + 1) if self.endless else '') + ('  •  Oni-Modus' if self.hard else '') + ('  •  ' + CURSES[self.curse] if self.curse else '')
+        info = ('Prüfung  •  ' if self.challenge else '') + ('%d:%02d  •  ' % (max(0, 900 - self.time) // 60, max(0, 900 - self.time) % 60) if self.challenge == 'zeitlauf' else '') + self.floor_label() + ('  •  Schleife %d' % (self.loop + 1) if self.endless else '') + ('  •  Oni-Modus' if self.hard else '') + ('  •  ' + CURSES[self.curse] if self.curse else '') + ('  •  ' + BLESSINGS[self.blessing][0] if self.blessing else '')
         T.add(info, 300, 15, 6, (190, 170, 150))
         # Werte-Leiste
         self.draw_statbar(s, t)
@@ -2547,7 +2561,7 @@ class Run:
     def draw_minimap(self, s, right, top):
         cw, ch = 11, 7
         rooms = self.rooms
-        show_all = bool(self.player.f['map'])
+        show_all = bool(self.player.f['map']) or self.blessing == 'vollmond'
         xs = [p[0] for p in rooms]
         ys = [p[1] for p in rooms]
         minx, maxx, miny, maxy = min(xs), max(xs), min(ys), max(ys)
