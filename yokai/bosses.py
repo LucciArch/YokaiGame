@@ -205,7 +205,7 @@ class Boss(Enemy):
                         p.dash_hit.add(id(self))
                         run.damage_enemy(self, p.damage() * 2.5, None)
                     else:
-                        p.hurt(self.contact)
+                        p.hurt(self.contact, self.name)
                     break
         if abs(self.kx) + abs(self.ky) > 1:
             self.kx *= 0.7; self.ky *= 0.7

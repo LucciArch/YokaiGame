@@ -691,7 +691,7 @@ class Run:
         if k == 'curse' and not room.extra.get('hurt'):
             room.extra['hurt'] = True
             self.player.iframes = 0
-            self.player.hurt(1)
+            self.player.hurt(1, 'den Fluch')
 
     # ======================================================================  Hilfen
     HINTS_OFF = False
@@ -996,7 +996,7 @@ class Run:
         elif dmg > 0:
             p = self.player
             if math.hypot(p.x - x, p.y - y) < r + p.hitr:
-                p.hurt(1)
+                p.hurt(1, getattr(self, 'cur_src', None) or 'eine Explosion')
 
     def lightning(self, x, y, dmg):
         self.hazards.append(Hazard(x, y, 14, 0.0, 0.14, dmg, 'p', 'strike'))
@@ -1427,7 +1427,12 @@ class Run:
         # Gegner
         for e in self.enemies:
             if not e.dead:
+                self.cur_src = e.name
+                nh = len(self.hazards)
                 e.update(dt)
+                for h in self.hazards[nh:]:
+                    h.src = e.name
+        self.cur_src = None
         self.enemies = [e for e in self.enemies if not e.dead]
         # Geschosse
         if getattr(self, 'yomeiri', None) is not None and not self.yomeiri.update(dt):
@@ -1453,6 +1458,7 @@ class Run:
         self.update_fx(dt)
         if self.challenge == 'zeitlauf' and self.time > 900 and not p.dead:
             p.dead = True
+            p.last_src = 'die Morgensonne'
             self.banner('Die Sonne geht auf…', 'Zu spät!', (255, 200, 120), True)
 
     def update_bullets(self, dt):
@@ -1517,7 +1523,7 @@ class Run:
                 if p.dash_t > 0 and p.f['dash_reflect']:
                     burst(self, b.x, b.y, (220, 220, 255), 4, 40)
                     continue
-                if p.hurt(self.enemy_dmg) and b.eff == 'slow':
+                if p.hurt(self.enemy_dmg, b.src or 'ein Geschoss') and b.eff == 'slow':
                     self.slow_player = 2.0
                 elif b.eff == 'slow' and p.iframes > 0:
                     pass
@@ -1811,7 +1817,7 @@ class Run:
             else:
                 self.banner('Kyō – Pech!', 'Binde den Zettel an den Baum…', (200, 120, 255))
                 p.iframes = 0
-                p.hurt(1)
+                p.hurt(1, 'ein Unglückslos')
         elif k == 'tea':
             if o.used or p.coins < o.data['price']:
                 return
@@ -2010,7 +2016,7 @@ class Run:
         hist = self.save.data.setdefault('history', [])
         hist.append({'date': _dt.date.today().strftime('%d.%m.'), 'char': self.char, 'floor': self.floor_no, 'win': bool(win),
                      'where': self.biome['name'] if self.biome else '', 'time': int(self.time), 'relaxed': self.relaxed,
-                     'items': len(self.player.items)})
+                     'items': len(self.player.items), 'by': '' if win else (getattr(self.player, 'last_src', '') or '')})
         del hist[:-20]
         if not (self.challenge or self.daily):
             clear_run_file()

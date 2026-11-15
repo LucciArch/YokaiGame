@@ -256,7 +256,7 @@ class Game:
             dim = 1.0
             light = r.hi_light if self.state == 'play' else None
             gfx.hi_flush(self.window, sc, ox + shake[0], oy + shake[1], dim, light)
-        elif self.state in ('title', 'chars', 'lexicon', 'epilogue', 'codex') and gfx.HI:
+        elif gfx.HI:
             gfx.hi_flush(self.window, sc, ox, oy, 1.0, None)
         else:
             gfx.HI.clear()
@@ -284,7 +284,7 @@ class Game:
             y += 32
 
     # ================================================================  Hintergrund (Titel)
-    def draw_night(self, s):
+    def draw_night(self, s, parade=True):
         t = self.t
         for y in range(H):
             f = y / H
@@ -339,8 +339,8 @@ class Game:
             pygame.draw.ellipse(s, (250, 190, 215), (int(px), int(py), 3, 2))
         # Hyakki Yagyō – die Parade der hundert Dämonen
         names = ['hitodama', 'kasa_obake', 'chochin', 'kappa', 'kawauso', 'bakeneko', 'zashiki', 'oni', 'karasu_tengu',
-                 'yamauba', 'nopperabo', 'ittan_momen', 'kitsunebi_e', 'heikegani', 'gozu', 'tennin', 'bakezori']
-        for i in range(16):
+                 'yamauba', 'nopperabo', 'ittan_momen', 'kitsunebi_e', 'heikegani', 'gozu', 'tennin', 'kitsune_gefolge', 'bakezori']
+        for i in range(16 if parade else 0):
             x = (t * 18 + i * 34) % (W + 60) - 40
             nm = names[i % len(names)]
             spr = sheets.frame(nm, sheets.RIGHT, int(t * 6 + i), 2 if sheets.scale_of(nm) >= 2 else 1) if sheets.has(nm) else gfx.sprite(nm, False)
@@ -841,7 +841,10 @@ class Game:
                   W // 2, 60, 9, (240, 230, 210), 'c')
         else:
             T.add('Du bist gefallen…', W // 2, 30, 22, (230, 110, 110), 'c')
-            T.add('Ebene %d – %s' % (run.floor_no, run.biome['name']) + ('  (Entspannt)' if run.relaxed else ''), W // 2, 60, 9, (230, 210, 200), 'c')
+            ks = getattr(run.player, 'last_src', None)
+            T.add('Ebene %d – %s' % (run.floor_no, run.biome['name']) + ('  (Entspannt)' if run.relaxed else ''), W // 2, 56, 9, (230, 210, 200), 'c')
+            if ks:
+                T.add('Bezwungen von: ' + ks, W // 2, 68, 7, (220, 150, 140), 'c')
         p = run.player
         gfx.panel(s, (60, 80, W - 120, 150), 200)
         rows = [('Charakter', CHARS[p.char]['name']), ('Zeit', '%d:%02d' % (run.time // 60, run.time % 60)),
@@ -882,8 +885,11 @@ class Game:
     # ---------------------------------------------------------------- Codex
     def menu_bg(self, s, a=185):
         """Hintergrund für Menüseiten: Nachthimmel mit Torii, abgedunkelt."""
-        self.draw_night(s)
-        gfx.HI.clear()
+        gfx.HI_MODE = True
+        n0 = len(gfx.HI)
+        self.draw_night(s, parade=False)
+        f = max(0.0, 1.0 - a / 255.0)
+        gfx.HI[n0:] = [(e[0], e[1], e[2], e[3], f, True) for e in gfx.HI[n0:]]
         ov = self.__dict__.get('_menu_ov')
         if ov is None or ov.get_alpha() != a:
             ov = pygame.Surface((W, H))
@@ -1201,8 +1207,12 @@ class Game:
                 T.add(h.get('date', ''), 40, yy, 7, (170, 160, 160))
                 T.add(CHARS.get(h.get('char'), {}).get('name', '?'), 110, yy, 7, (240, 230, 210))
                 T.add('Ebene %d' % h.get('floor', 0), 180, yy, 7, (240, 230, 210))
-                T.add(('Sieg' if won else 'Gefallen: ' + h.get('where', '')) + ('  (Entspannt)' if h.get('relaxed') else ''),
-                      240, yy, 7, (150, 230, 150) if won else (230, 150, 140))
+                txt = ('Sieg' if won else 'Gefallen: ' + h.get('where', '')) + ('  (Entspannt)' if h.get('relaxed') else '')
+                if not won and h.get('by'):
+                    t2 = txt + ' – ' + h['by']
+                    if gfx.text_w(t2, 7) <= W - 80 - 240:
+                        txt = t2
+                T.add(txt, 240, yy, 7, (150, 230, 150) if won else (230, 150, 140))
                 T.add('%d:%02d' % (h.get('time', 0) // 60, h.get('time', 0) % 60), W - 40, yy, 7, (200, 190, 180), 'r')
         else:
             from .run import Run

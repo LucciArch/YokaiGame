@@ -126,7 +126,7 @@ def burst(run, x, y, col, n=8, spd=60, life=0.4, size=2, grav=0):
 # =========================================================================  Geschosse
 class Bullet:
     __slots__ = ('x', 'y', 'vx', 'vy', 'dmg', 'r', 'life', 'maxlife', 'owner', 'fl', 'col', 'bounces', 'hit',
-                 't', 'eff', 'acc', 'ay', 'curve', 'returned', 'big', 'gold', 'delay', 'dead', 'kind', 'arrow', 'crescent', 'wind')
+                 't', 'eff', 'acc', 'ay', 'curve', 'returned', 'big', 'gold', 'delay', 'dead', 'kind', 'arrow', 'crescent', 'wind', 'src')
 
     def __init__(self, x, y, vx, vy, dmg, r, life, owner, col, fl=None, eff=None, acc=0.0, ay=0.0, curve=0.0,
                  delay=0.0, kind='orb'):
@@ -135,6 +135,7 @@ class Bullet:
         self.owner, self.col, self.fl = owner, col, fl or {}
         self.bounces = 2 if self.fl.get('bounce') else 0
         self.hit = set()
+        self.src = None
         self.t = 0.0
         self.eff, self.acc, self.ay, self.curve = eff, acc, ay, curve
         self.returned = False
@@ -253,6 +254,7 @@ class Bullet:
 def ebullet(run, x, y, ang, speed, col=(240, 80, 120), r=3, eff=None, **kw):
     sp = speed * run.bullet_speed_mult
     b = Bullet(x, y, math.cos(ang) * sp, math.sin(ang) * sp, 1, r, 6.0, 'e', col, eff=eff, **kw)
+    b.src = getattr(run, 'cur_src', None)
     run.ebullets.append(b)
     return b
 
@@ -460,6 +462,8 @@ class Player:
             burst(run, self.x, self.y, (140, 200, 255), 16, 90)
             return False
         self.hit_this_floor = True
+        if src:
+            self.last_src = src
         run.boss_hit = True
         run.hitstop = 0.07
         while amount > 0 and self.spirit > 0:
@@ -574,7 +578,7 @@ class Player:
         # Stacheln
         t, _, _ = tile_at(run.room, self.x, self.y + 3)
         if t == T_SPIKE and not fly and self.dash_t <= 0:
-            self.hurt(1)
+            self.hurt(1, 'Stacheln')
         # Schießen
         sx, sy = inp['shoot']
         if abs(sx) + abs(sy) > 0.1:
@@ -841,7 +845,7 @@ class Hazard:
             return self.t < self.warn + self.act
         if self.owner == 'e':
             if math.hypot(p.x - self.x, p.y - self.y) < self.r + p.hitr:
-                p.hurt(1)
+                p.hurt(1, getattr(self, 'src', None) or 'eine Falle')
         else:
             tick = int((self.t - self.warn) / 0.3)
             for e in run.enemies:
@@ -1007,7 +1011,7 @@ class Enemy:
                     p.dash_hit.add(id(self))
                     run.damage_enemy(self, p.damage() * 2.5, None)
                 else:
-                    p.hurt(self.contact)
+                    p.hurt(self.contact, self.name)
 
     # -------------------------------------------------------------- KI
     def ai(self, dt, spd):
