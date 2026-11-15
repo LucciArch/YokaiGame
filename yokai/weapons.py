@@ -104,7 +104,7 @@ def fire(p, d, wk):
         melee(run, x + d[0] * 5, y + d[1] * 5, ang, 26 + 3 * p.s['size'], math.radians(110), dmg * 2.8, knock=320, kind=wk, col=(255, 200, 160))
         audio.play('ehit', 1.0)
     elif wk == 'w_scythe':
-        melee(run, x, y, ang, 36 + 4 * p.s['size'], math.tau, dmg * 1.7, kind=wk, col=(200, 170, 255))
+        melee(run, x, y, ang, 36 + 4 * p.s['size'], math.tau, dmg * 2.6, kind=wk, col=(200, 170, 255))
         audio.play('slash', 1.0)
     elif wk == 'w_spear':
         melee(run, x + d[0] * 4, y + d[1] * 4, ang, 54 + 4 * p.s['size'], math.radians(26), dmg * 2.0, knock=120, kind=wk, col=(255, 230, 160))
@@ -126,7 +126,7 @@ def fire(p, d, wk):
     elif wk == 'w_fan':
         for i in range(5):
             a = ang + (i - 2) * 0.22
-            b = run.fire_player_bullet(x, y, a, dmg * 0.75, p.s['shotspd'] * 1.1, p.s['size'] * 1.2, 0.35, {'knock': 2, 'pierce': 1})
+            b = run.fire_player_bullet(x, y, a, dmg * 0.5, p.s['shotspd'] * 1.1, p.s['size'] * 1.2, 0.42, {'knock': 2, 'pierce': 1})
             b.wind = True
             b.col = (190, 240, 210)
         audio.play('gust', 0.5)
