@@ -572,6 +572,8 @@ ACHIEVEMENTS = [
     ('floor8', 'Tief in der Nacht', 'Erreiche Ebene 8', None),
     ('floor11', 'Über den Wolken', 'Erreiche Ebene 11', None),
     ('items40', 'Schatzkammer', 'Trage 40 Items in einem Lauf', None),
+    ('lexikon_half', 'Yōkai-Kundige', 'Begegne der Hälfte aller Yōkai', None),
+    ('lexikon_all', 'Hyakki Yagyō', 'Begegne allen Yōkai des Lexikons', None),
     ('kenji', 'Herrenlos', 'Besiege einen Boss in Kapitel II', ('char', 'kenji')),
     ('kuzunoha', 'Neun Schwänze', 'Werde zum Kitsune-Avatar', ('char', 'kuzunoha')),
     ('ponpoko', 'Reicher Tanuki', 'Sammle insgesamt 300 Mon', ('char', 'ponpoko')),

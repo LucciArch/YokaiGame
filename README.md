@@ -33,7 +33,7 @@ Jeder Push auf `main` baut über GitHub Actions automatisch eine neue `.exe`.
 - **84 Synergien** (z. B. die drei Throninsignien *Kusanagi + Yata no Kagami + Yasakani no Magatama*)
 - **9 Transformationen**: 3 Items eines Themas verwandeln dich (Kitsune, Donnergott, Oni, Onmyōji, Yūrei, Tengu, Drache, Kami, Tanuki)
 - **10 Charaktere** zum Freischalten, jeweils mit eigener Fähigkeit, eigenen Werten und Startitems
-- **51 Erfolge**, die Charaktere, Items, den Oni-Modus und Takamagahara freischalten
+- **53 Erfolge**, die Charaktere, Items, den Oni-Modus und Takamagahara freischalten
 - Prozedurale Ebenen mit 92 Raumvorlagen + zufällig generierten Räumen (gespiegelt → hunderte Varianten)
 - Spezialräume: Schatzraum (verschlossen ab Kapitel II), Laden, Fluchraum, Kampfraum, Geheimräume (mit Reinigungssalz an rissigen Wänden aufdecken), Omikuji-Schrein, heiße Quelle (Onsen), Schriftrollenarchiv (1 von 3 Items), Dōjō (Champion-Kampf), Teehaus (dauerhafte Werte-Upgrades), Tanuki-Spielautomat, Kami- und Oni-Schreine nach Bossen
 - Flüche (Dunkelheit, Nebel, Labyrinth, Verirrte), Oni-Modus (schwer), **Endlose Nacht** (endlose Schleifen mit steigender Schwierigkeit), tägliche Prüfung mit festem Seed, **8 Herausforderungen** mit Sonderregeln (Glaskanone, Boss-Ansturm, Wettlauf gegen den Morgen, Papiermeister …)

@@ -521,6 +521,13 @@ class Run:
         base = {'gaki_small': 'gaki', 'nuppeppo_klein': 'nuppeppo', 'kappa_small': 'kappa'}.get(eid, eid)
         if base not in self.save.data.setdefault('enemies_seen', []):
             self.save.data['enemies_seen'].append(base)
+            from .bestiary import LORE, SKIP
+            total = [k for k in ENEMIES if k in LORE and k not in SKIP]
+            n = len([k for k in total if k in self.save.data['enemies_seen']])
+            if n * 2 >= len(total):
+                self.achieve('lexikon_half')
+            if n >= len(total):
+                self.achieve('lexikon_all')
         return e
 
     def spawn_room_enemies(self, room):
