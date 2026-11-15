@@ -286,6 +286,90 @@ class Boss(Enemy):
         pygame.draw.circle(s, (200, 50, 50), (int(self.x), int(self.y)), self.r)
 
 
+def hi_tube(pts, radii, cols, belly=None, spikes=None, fin=None, extra=None, scales=False):
+    """Glatte Röhre (Schlangenleib, Hals, Knochen) in der Hi-Res-Ebene.
+    pts: Weltpunkte, radii: Radien (Welt) je Punkt, cols: (Umriss, Schatten, Grund, Licht)."""
+    if len(pts) < 2:
+        return
+    # auf ~0.5 Welt-Pixel nachrastern
+    res, rr = [], []
+    for (x0, y0), (x1, y1), r0, r1 in zip(pts, pts[1:], radii, radii[1:]):
+        d = math.hypot(x1 - x0, y1 - y0)
+        n = max(1, int(d / 0.6))
+        for k in range(n):
+            f = k / n
+            res.append((x0 + (x1 - x0) * f, y0 + (y1 - y0) * f))
+            rr.append(r0 + (r1 - r0) * f)
+    res.append(pts[-1]); rr.append(radii[-1])
+    pad = max(rr) + 8
+    xs = [p_[0] for p_ in res]; ys = [p_[1] for p_ in res]
+    x0, y0 = min(xs) - pad, min(ys) - pad
+    w, h = int((max(xs) + pad - x0) * 2), int((max(ys) + pad - y0) * 2)
+    surf = pygame.Surface((w, h), pygame.SRCALPHA)
+    D = pygame.draw
+    P = [((x - x0) * 2, (y - y0) * 2) for x, y in res]
+    R = [r * 2 for r in rr]
+    out, dark, base, light = cols
+    for (x, y), r in zip(P, R):
+        D.circle(surf, out, (int(x), int(y)), int(r + 2))
+    for (x, y), r in zip(P, R):
+        D.circle(surf, dark, (int(x), int(y)), int(r))
+    for (x, y), r in zip(P, R):
+        D.circle(surf, base, (int(x - r * 0.2), int(y - r * 0.3)), max(1, int(r * 0.72)))
+    if belly:
+        for i in range(0, len(P), 2):
+            x, y = P[i]; r = R[i]
+            D.circle(surf, belly, (int(x + r * 0.25), int(y + r * 0.45)), max(1, int(r * 0.42)))
+    if scales:
+        for i in range(3, len(P) - 3, 7):                          # Schuppenbögen
+            x, y = P[i]; r = R[i]
+            if r < 4:
+                continue
+            (ax, ay), (bx, by) = P[i - 3], P[i + 3]
+            ang = math.degrees(math.atan2(-(by - ay), bx - ax))
+            rect = pygame.Rect(0, 0, int(r * 1.1), int(r * 1.1)); rect.center = (int(x - r * 0.15), int(y - r * 0.2))
+            D.arc(surf, dark, rect, math.radians(ang + 90), math.radians(ang + 270), 2)
+    for i in range(0, len(P)):
+        x, y = P[i]; r = R[i]
+        D.circle(surf, light, (int(x - r * 0.45), int(y - r * 0.6)), max(1, int(r * 0.22)))
+    if spikes:
+        col, every = spikes
+        for i in range(every, len(P) - 2, every):
+            x, y = P[i]; r = R[i]
+            (ax, ay), (bx, by) = P[i - 1], P[i + 1]
+            dx, dy = bx - ax, by - ay
+            dl = math.hypot(dx, dy) or 1
+            nx, ny = dy / dl, -dx / dl
+            if ny > 0:
+                nx, ny = -nx, -ny
+            tip = (x + nx * (r + 7), y + ny * (r + 7))
+            b1 = (x + nx * r - dx / dl * 3, y + ny * r - dy / dl * 3)
+            b2 = (x + nx * r + dx / dl * 3, y + ny * r + dy / dl * 3)
+            D.polygon(surf, out, [tip, b1, b2]); D.polygon(surf, col, [(tip[0], tip[1] + 1), b1, b2])
+    if fin:
+        col, col2 = fin
+        (ax, ay), (bx, by) = P[-3], P[-1]
+        dx, dy = bx - ax, by - ay
+        dl = math.hypot(dx, dy) or 1
+        dx, dy = dx / dl, dy / dl
+        nx, ny = -dy, dx
+        tx, ty = P[-1]
+        poly = [(tx, ty), (tx + dx * 14 + nx * 12, ty + dy * 14 + ny * 12), (tx + dx * 8, ty + dy * 8),
+                (tx + dx * 14 - nx * 12, ty + dy * 14 - ny * 12)]
+        D.polygon(surf, out, [(x + (1 if x > tx else -1), y) for x, y in poly])
+        D.polygon(surf, col, poly)
+        D.line(surf, col2, (tx, ty), (tx + dx * 12 + nx * 9, ty + dy * 12 + ny * 9), 1)
+        D.line(surf, col2, (tx, ty), (tx + dx * 12 - nx * 9, ty + dy * 12 - ny * 9), 1)
+    if extra:
+        extra(surf, lambda x, y: ((x - x0) * 2, (y - y0) * 2))
+    gfx.hi_blit(surf, x0 + w / 4, y0 + h / 2, transient=True)
+
+
+JADE = ((10, 22, 26), (26, 84, 78), (50, 140, 118), (150, 220, 190))
+SNAKE = ((10, 20, 12), (30, 66, 36), (62, 112, 56), (150, 196, 120))
+BONE = ((20, 16, 14), (150, 140, 120), (226, 218, 196), (255, 250, 236))
+
+
 def eyes(s, x, y, dx, col=(255, 230, 90), r=2):
     pygame.draw.circle(s, (20, 10, 10), (int(x - dx), int(y)), r + 1)
     pygame.draw.circle(s, (20, 10, 10), (int(x + dx), int(y)), r + 1)
@@ -548,15 +632,40 @@ class Gashadokuro(Boss):
     sheet = ('boss_gashadokuro', 1, None)
 
     def render_extra(self, s, t):
-        bone = (232, 226, 206)
-        x, y = int(self.x), int(self.y)
+        x, y = self.x, self.y
         for i, h in enumerate(self.hands):
-            hx, hy = int(h[0]), int(h[1])
-            pygame.draw.line(s, bone, (x + (-20 if i == 0 else 20), y + 20), (hx, hy), 5)
-            pygame.draw.circle(s, bone, (hx, hy), 9)
-            for f in range(4):
-                a = math.pi / 2 + (f - 1.5) * 0.4
-                pygame.draw.line(s, bone, (hx, hy), (hx + math.cos(a) * 14, hy + math.sin(a) * 14), 3)
+            sx = -1 if i == 0 else 1
+            sh_ = (x + sx * 18, y + 14)
+            hx, hy = h[0], h[1]
+            mx, my = (sh_[0] + hx) / 2 + sx * 14, (sh_[1] + hy) / 2 - 10    # Ellbogen nach außen-oben
+            # Oberarm (ein Knochen), Unterarm (zwei parallele Knochen)
+            hi_tube([sh_, (mx, my)], [3.4, 3.0], BONE)
+            dx, dy = hx - mx, hy - my
+            dl = math.hypot(dx, dy) or 1
+            nx, ny = -dy / dl * 2.2, dx / dl * 2.2
+            hi_tube([(mx + nx, my + ny), (hx + nx * 0.6, hy + ny * 0.6)], [2.0, 1.8], BONE)
+            hi_tube([(mx - nx, my - ny), (hx - nx * 0.6, hy - ny * 0.6)], [2.0, 1.8], BONE)
+            # Gelenkknubbel
+            hi_tube([(mx - 0.5, my), (mx + 0.5, my)], [3.8, 3.8], BONE)
+
+            def hand(surf, P, hx=hx, hy=hy, sx=sx):
+                D = pygame.draw
+                cx, cy = P(hx, hy)
+                D.ellipse(surf, BONE[0], (cx - 13, cy - 11, 26, 22))
+                D.ellipse(surf, BONE[2], (cx - 11, cy - 9, 22, 18))
+                D.ellipse(surf, BONE[3], (cx - 8, cy - 7, 8, 6))
+                for f in range(4):
+                    a = math.pi / 2 + (f - 1.5) * 0.42
+                    px_, py_ = cx + math.cos(a) * 9, cy + math.sin(a) * 7
+                    for seg in range(3):
+                        qx, qy = px_ + math.cos(a) * 7, py_ + math.sin(a) * 7
+                        D.line(surf, BONE[0], (px_, py_), (qx, qy), 7)
+                        D.line(surf, BONE[2], (px_, py_), (qx, qy), 4)
+                        D.circle(surf, BONE[3], (int(px_), int(py_)), 2)
+                        px_, py_ = qx, qy
+                        a += 0.18
+                    D.polygon(surf, BONE[1], [(px_ - 2, py_), (px_ + 2, py_), (px_ + math.cos(a) * 5, py_ + math.sin(a) * 5)])
+            hi_tube([(hx, hy - 0.5), (hx, hy + 0.5)], [0.5, 0.5], BONE, extra=hand)
 
     r = 20
 
@@ -1197,16 +1306,11 @@ class Ryujin(Omukade):
         yield 1.0
 
     def render(self, s, t):
-        D = pygame.draw
         segs = self.seg_pos()
-        for i, (x, y) in enumerate(reversed(segs)):
-            j = len(segs) - i
-            if sheets.has('boss_ryujin_seg') and j % 2 == 0:
-                sheets.blit_center(s, 'boss_ryujin_seg', x, y, sheets.hdir(math.cos(self.heading)), self.af('boss_ryujin_seg', t, 6, j), 2 if False else None)
-            elif not sheets.has('boss_ryujin_seg'):
-                r = 9 if j < 6 else 7 if j < 12 else 5
-                D.circle(s, (10, 40, 40), (int(x), int(y)), r + 1)
-                D.circle(s, (60, 170, 140), (int(x), int(y)), r)
+        pts = [(self.x - math.cos(self.heading) * 6, self.y - math.sin(self.heading) * 6)] + list(segs)
+        n = len(pts)
+        radii = [7.5 - 5.5 * (i / max(1, n - 1)) ** 1.3 for i in range(n)]
+        hi_tube(pts, radii, JADE, belly=(150, 140, 96), spikes=((236, 196, 80), 10), fin=((236, 196, 80), (255, 240, 170)), scales=True)
         hx, hy = int(self.x), int(self.y)
         sheets.blit_center(s, 'boss_ryujin_head', hx, hy, sheets.hdir(math.cos(self.heading)), self.af('boss_ryujin_head', t, 8, 0))
         return
@@ -1363,22 +1467,26 @@ class Orochi(Boss):
             yield 0.05
 
     def render(self, s, t):
-        D = pygame.draw
-        x, y = int(self.x), int(self.y)
-        for i in range(8):
+        x, y = self.x, self.y
+        # zusammengerollter Leib (drei Windungen)
+        for k, (rx, ry, rad) in enumerate(((26, 12, 8), (19, 8, 7.5), (11, 5, 7))):
+            pts = []
+            for j in range(25):
+                a = math.pi * 0.15 + j / 24 * math.pi * 1.9
+                pts.append((x + math.cos(a) * rx, y + 6 - k * 7 + math.sin(a) * ry))
+            hi_tube(pts, [rad] * len(pts), SNAKE, belly=(120, 118, 70), scales=True)
+        # acht Hälse
+        order = sorted(range(8), key=lambda i: self.head_pos(i)[1])
+        for i in order:
             hx, hy = self.head_pos(i)
-            n = 10
-            for k in range(n + 1):
-                f = k / n
-                cx = x + (hx - x) * f + math.sin(f * 6 + t * 3 + i) * 3
-                cy = y + (hy - y) * f
-                D.circle(s, (40, 90, 50), (int(cx), int(cy)), 5)
-                D.circle(s, (80, 150, 80), (int(cx), int(cy)), 4)
+            pts = []
+            for k in range(9):
+                f = k / 8
+                cx = x + (hx - x) * f + math.sin(f * 5 + t * 3 + i) * 4 * (1 - f)
+                cy = y - 10 + (hy - y + 10) * f - math.sin(f * math.pi) * 8
+                pts.append((cx, cy))
+            hi_tube(pts, [5.5 - 1.8 * k / 8 for k in range(9)], SNAKE, belly=(120, 118, 70), scales=True)
             sheets.blit_center(s, 'boss_orochi_head', hx, hy, sheets.hdir(self.p.x - hx), self.af('boss_orochi_head', t, 6, i))
-        D.circle(s, (30, 60, 30), (x, y), 20)
-        D.circle(s, (70, 130, 70), (x, y), 19)
-        for i in range(6):
-            D.arc(s, (50, 100, 50), (x - 16 + i * 4, y - 14, 10, 10), 0, 3.1, 1)
 
 
 class ShutenDoji(Boss):

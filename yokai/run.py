@@ -2126,20 +2126,7 @@ class Run:
         if self.boss_intro > 0 and self.boss:
             a = int(255 * min(1, self.boss_intro))
             if self.portrait is None or self.portrait[0] is not self.boss:
-                tmp = pygame.Surface((W, H), pygame.SRCALPHA)
-                b = self.boss
-                old = b.spawn_t
-                b.spawn_t = 0
-                try:
-                    b.render(tmp, 0.0)
-                except Exception:
-                    pass
-                b.spawn_t = old
-                box = pygame.Rect(0, 0, 130, 110)
-                box.center = (int(b.x), int(b.y) - 4)
-                box.clamp_ip(pygame.Rect(0, 0, W, H))
-                crop = tmp.subsurface(box).copy()
-                self.portrait = (b, pygame.transform.scale(crop, (195, 165)))
+                self.portrait = (self.boss, self.make_portrait(self.boss))
             img = self.portrait[1]
             slide = min(1, (2.2 - self.boss_intro) * 4)
             ov = pygame.Surface((W, 110), pygame.SRCALPHA)
@@ -2147,9 +2134,8 @@ class Run:
             s.blit(ov, (0, 95))
             pygame.draw.line(s, (200, 60, 60), (0, 95), (W, 95), 2)
             pygame.draw.line(s, (200, 60, 60), (0, 204), (W, 204), 2)
-            im = img.copy()
-            im.set_alpha(a)
-            s.blit(im, (int(-200 + 220 * slide), 68), area=pygame.Rect(0, 27, 195, 110 + 27))
+            if img is not None:
+                gfx.hi_blit(img, int(-200 + 300 * slide) + 30, 203, a)
             T.add(self.boss.name, W // 2 + 70, 122, 20, (255, 210, 190), 'c', alpha=a)
             T.add(self.boss.title, W // 2 + 70, 152, 9, (230, 190, 170), 'c', alpha=a)
             T.add('Ebene %d' % self.depth, W // 2 + 70, 170, 7, (190, 160, 150), 'c', alpha=a)
@@ -2188,6 +2174,34 @@ class Run:
                 T.add(('+' if d[0] > 0 else '') + ('%.2f' % d[0] if k in ('dmg', 'rate') else '%g' % round(d[0], 1)),
                       vx + gfx.text_w(val, 6) + 2, y, 6, (120, 255, 140) if d[0] > 0 else (255, 120, 110), alpha=int(255 * min(1, d[1])))
             x += 78
+
+    def make_portrait(self, b):
+        """Porträt des Bosses für das Intro: rendert die Hi-Res-Teile auf eine eigene Fläche, vergrößert."""
+        tmp = pygame.Surface((W, H), pygame.SRCALPHA)
+        n0 = len(gfx.HI)
+        old_sp, old_fl = b.spawn_t, b.flash
+        b.spawn_t, b.flash = 0, 0
+        try:
+            if getattr(b, 'sheet', None):
+                b.render_sheet(tmp, 0.0)
+            else:
+                b.render(tmp, 0.0)
+        except Exception:
+            pass
+        b.spawn_t, b.flash = old_sp, old_fl
+        ents = gfx.HI[n0:]
+        del gfx.HI[n0:]
+        hi = pygame.transform.scale(tmp, (W * 2, H * 2))
+        for e in ents:
+            im, cx, by = e[0], e[1], e[2]
+            hi.blit(im, (int(cx * 2 - im.get_width() / 2), int(by * 2 - im.get_height())))
+        bb = hi.get_bounding_rect()
+        if bb.w < 4 or bb.h < 4:
+            return None
+        crop = hi.subsurface(bb).copy()
+        f = min(2.0, 300 / bb.w, 210 / bb.h)
+        f = max(0.5, math.floor(f * 2) / 2)
+        return pygame.transform.scale(crop, (int(bb.w * f), int(bb.h * f)))
 
     def draw_minimap(self, s, right, top):
         cw, ch = 11, 7
