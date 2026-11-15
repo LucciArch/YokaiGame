@@ -668,10 +668,10 @@ BIOMES['jigoku']['enemies'] = ['oni', 'shikome', 'shinigami', 'onibi', 'tsuchigu
 BIOMES['takamagahara']['enemies'] = ['karasu_tengu', 'yamabiko', 'kamaitachi', 'katawaguruma', 'nurikabe', 'kitsunebi_e', 'ningyo', 'shinigami']
 
 
-# Exklusive Item-Pools: jedes Item gehört genau einer Raumart (Schatzraum T, Laden S, Boss B, Kami-Schrein K, Oni-Schrein O)
+# Exklusive Item-Pools: jedes Item gehört genau einer Raumart (Schatzraum T, Laden S, Boss B, Kami-Schrein K, Oni-Schrein O, Ereignis Y)
 def _exclusive_pools():
     for k, it in ITEMS.items():
-        ps = [p for p in it['pools'] if p in 'TSBKO']
+        ps = [p for p in it['pools'] if p in 'TSBKOY']
         if len(ps) > 1:
             for pref in 'OKBS':
                 if pref in ps:

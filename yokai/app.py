@@ -985,6 +985,11 @@ class Game:
         else:
             T.add('???', 28, 206, 11, (160, 150, 170))
             T.add('Noch nicht entdeckt.', 28, 224, 8, (210, 200, 190))
+            where = {'T': 'Schatzräume', 'S': 'Laden', 'B': 'Bosse', 'K': 'Kami-Schreine und Geheimräume', 'O': 'Oni-Schreine und Fluchräume',
+                     'Y': 'nur in Ereignisräumen'}
+            places = [where[c] for c in it['pools'] if c in where]
+            if places:
+                T.add('Fundort: ' + ', '.join(places), 28, 240, 7, (190, 180, 150))
         T.add('Esc – Zurück', W - 24, 280, 6, (150, 140, 140), 'r')
         for n in nav:
             if n == 'left': self.codex_sel = (self.codex_sel - 1) % len(ids)
