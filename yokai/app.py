@@ -991,7 +991,9 @@ class Game:
                 y = self._wrap('Im Spiel: ' + ingame, 154, y + 6, W - 172, 7, (170, 205, 240))
                 biomes = [BIOMES[b]['name'] for b in BIOMES if eid in BIOMES[b]['enemies']]
                 if biomes:
-                    self._wrap('Vorkommen: ' + ', '.join(biomes), 154, y + 4, W - 172, 7, (200, 190, 160))
+                    y = self._wrap('Vorkommen: ' + ', '.join(biomes), 154, y + 4, W - 172, 7, (200, 190, 160))
+                n = self.save.data.get('kill_counts', {}).get(eid, 0)
+                T.add('Besiegt: %d' % n, 154, y + 4, 7, (230, 170, 150))
             else:
                 b = BOSSES[eid]
                 kanji, lore = bestiary.BOSS_LORE[eid]
@@ -1006,7 +1008,8 @@ class Game:
                 else:
                     y0 = 80
                 beaten = eid in self.save['bosses']
-                T.add('Besiegt' if beaten else 'Noch nicht besiegt', cx, y0, 7, (150, 220, 150) if beaten else (220, 150, 140), 'c')
+                nk = self.save.data.get('kill_counts', {}).get(eid, 0)
+                T.add(('Besiegt' + (' (%d×)' % nk if nk > 1 else '')) if beaten else 'Noch nicht besiegt', cx, y0, 7, (150, 220, 150) if beaten else (220, 150, 140), 'c')
                 self._wrap(lore, 154, y0 + 14, W - 172, 8, (230, 225, 210))
         else:
             spr = ENEMIES[eid]['sprite'] if self.lex_tab == 0 else None

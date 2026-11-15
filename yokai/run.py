@@ -1048,6 +1048,9 @@ class Run:
         audio.play('kill', 0.6)
         self.kills += 1
         self.save.stat('kills')
+        base = {'gaki_small': 'gaki', 'nuppeppo_klein': 'nuppeppo', 'kappa_small': 'kappa'}.get(e.id, e.id)
+        kc = self.save.data.setdefault('kill_counts', {})
+        kc[base] = kc.get(base, 0) + 1
         if self.save['stats']['kills'] >= 1:
             self.achieve('first_blood')
         if self.save['stats']['kills'] >= 500:
