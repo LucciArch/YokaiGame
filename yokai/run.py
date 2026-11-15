@@ -2081,8 +2081,9 @@ class Run:
             floor = gfx.make_floor(self.biome if not room.kind.startswith('shrine') else
                                    dict(self.biome, floor=(60, 20, 30) if room.kind == 'shrine_oni' else (200, 190, 150),
                                         floor_pat='stone'), rng)
-            room._bgcache = (self.biome_id, floor, gfx.make_walls(self.biome, rng))
-        _, floor, walls = room._bgcache
+            walls = gfx.make_walls(self.biome, rng)
+            room._bgcache = (self.biome_id, floor, walls, gfx.scale2x(walls))
+        _, floor, walls, self.walls_hi = room._bgcache
         bg = pygame.Surface((W, H))
         bg.fill((12, 8, 16))
         bg.blit(floor, (RX, RY))
@@ -2160,11 +2161,23 @@ class Run:
             other = self.rooms[n]
             x, y = DOOR_POS[d]
             horiz = d in 'ns'
-            if not other.revealed:
-                col = (40, 30, 30)
-                for i in range(4):
-                    a = random.Random(i + n[0] * 7 + n[1]).uniform(0, math.tau)
-                    pygame.draw.line(s, col, (x, y), (x + math.cos(a) * 9, y + math.sin(a) * 6), 1)
+            if not other.revealed:                       # Risse in der Wand (Hi-Res, liegen über den Wänden)
+                key = ('crack', n)
+                cr = _CROP.get(key)
+                if cr is None:
+                    cr = pygame.Surface((40, 28), pygame.SRCALPHA)
+                    rr = random.Random(n[0] * 7 + n[1])
+                    for i in range(5):
+                        a = rr.uniform(0, math.tau)
+                        pts = [(20, 14)]
+                        for k in range(3):
+                            a += rr.uniform(-0.6, 0.6)
+                            px_, py_ = pts[-1]
+                            pts.append((px_ + math.cos(a) * rr.uniform(4, 7), py_ + math.sin(a) * rr.uniform(3, 5)))
+                        pygame.draw.lines(cr, (24, 16, 20), False, pts, 2)
+                        pygame.draw.lines(cr, (120, 100, 96), False, [(q[0] + 1, q[1] + 1) for q in pts], 1)
+                    _CROP[key] = cr
+                gfx.hi_blit(cr, x, y + 7)
                 continue
             w, h = (34, 18) if horiz else (18, 34)
             rect = pygame.Rect(0, 0, w, h)
@@ -2212,6 +2225,9 @@ class Run:
         s.blit(self.bg, (0, 0))
         self.draw_pits(s, t)
         self.draw_lantern_light(s, t)
+        wh = getattr(self, 'walls_hi', None)
+        if wh is not None and self.slide is None:
+            gfx.HI.append((wh, W / 2, H, 255, 1.0, True))     # Wände in Hi-Res, ohne Lichtabfall
         self.draw_doors(s, t)
         p = self.player
         # Tutorial-Hinweise

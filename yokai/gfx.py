@@ -659,6 +659,29 @@ def env_walls(biome, rng):
     return s
 
 
+def scale2x(surf):
+    """Scale2x/EPX: verdoppelt Pixelgrafik und glättet Treppenkanten, ohne neue Farben."""
+    import numpy as _np
+    a = pygame.surfarray.pixels3d(surf).copy().transpose(1, 0, 2)
+    al = pygame.surfarray.pixels_alpha(surf).copy().T
+    a = _np.dstack([a, al])
+    h, w = a.shape[:2]
+    p = _np.pad(a, ((1, 1), (1, 1), (0, 0)), mode='edge')
+    B, D, E_, F, H_ = p[0:h, 1:w + 1], p[1:h + 1, 0:w], p[1:h + 1, 1:w + 1], p[1:h + 1, 2:w + 2], p[2:h + 2, 1:w + 1]
+    eq = lambda x, y: _np.all(x == y, axis=2)
+    c = (~eq(B, H_)) & (~eq(D, F))
+    E0 = _np.where((c & eq(D, B))[..., None], D, E_)
+    E1 = _np.where((c & eq(B, F))[..., None], F, E_)
+    E2 = _np.where((c & eq(D, H_))[..., None], D, E_)
+    E3 = _np.where((c & eq(H_, F))[..., None], F, E_)
+    out = _np.zeros((h * 2, w * 2, 4), _np.uint8)
+    out[0::2, 0::2] = E0; out[0::2, 1::2] = E1; out[1::2, 0::2] = E2; out[1::2, 1::2] = E3
+    res = pygame.Surface((w * 2, h * 2), pygame.SRCALPHA)
+    pygame.surfarray.pixels3d(res)[:] = out[:, :, :3].transpose(1, 0, 2)
+    pygame.surfarray.pixels_alpha(res)[:] = out[:, :, 3].T
+    return res
+
+
 def hi_tile(t, x, y, biome):
     """Hi-Res-Bild für stehende Requisiten (Fels, Urne, Laterne) oder None."""
     bid = biome.get('_id', '')
@@ -1165,7 +1188,7 @@ def hi_flush(win, sc, ox, oy, dim=1.0, light=None):
         w, h = surf.get_size()
         tw, th = max(1, int(w * sc / 2)), max(1, int(h * sc / 2))
         f = dim * (ent[4] if len(ent) > 4 else 1.0)
-        if light is not None:
+        if light is not None and not (len(ent) > 5 and ent[5]):
             f *= light(cx, by)
         fq = round(f * 8) / 8
         key = (id(surf), tw, th, fq)
