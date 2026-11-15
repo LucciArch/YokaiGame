@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.3.0 – „Kapitel-Update“
+## 1.4.0 – „Hyakki-Update“ (enthält 1.3 „Kapitel-Update“)
 
 - **11 statt 6 Ebenen:** Kapitel I–V haben je zwei Ebenen, die zweite mit anderer Gegend und anderem Boss
 - Schwierigkeit steigt jetzt pro Ebene statt pro Kapitel (Gegner- und Boss-HP, Feuerrate, Geschosstempo)
