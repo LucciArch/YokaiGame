@@ -315,9 +315,12 @@ class Game:
         s.blit(self._title_torii, (tx - self._title_torii.get_width() // 2, 236 - self._title_torii.get_height()))
         # Laternen (Stein-Tōrō aus den Umgebungs-Tiles)
         lt = gfx.env_img('_shared', 'lantern', 32)
+        lth = gfx.env_img('_shared', 'lantern_hi', 64)
         for i, lx in enumerate((160, 240, 320, 420)):
             gfx.draw_glow(s, lx, 216, 18, (255, 170, 80), 80)
-            if lt:
+            if lth and gfx.HI_MODE:
+                gfx.hi_blit(lth[0], lx, 236)
+            elif lt:
                 s.blit(lt[0], (lx - 16, 236 - 32))
         # Kirschbaum (gecachte Pixel-Grafik)
         if not hasattr(self, '_sakura'):
@@ -381,6 +384,7 @@ class Game:
 
     def st_title(self, dt, events, nav):
         s = self.screen
+        gfx.HI_MODE = True
         self.draw_night(s)
         T = gfx.TEXT
         T.add('Yōkai no Michi', W // 2, 30, 28, (255, 240, 220), 'c')
