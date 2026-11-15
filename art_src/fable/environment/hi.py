@@ -17,7 +17,6 @@ def build():
     for n in ORDER:
         strip(rocks(n), os.path.join(DST, n, 'rock_hi.png'))
     shared_hi.build(os.path.join(DST, '_shared'))
-    strip([shared.spikes(False), shared.spikes(True)], os.path.join(DST, '_shared', 'spikes_hi.png'))
 
 
 if __name__ == '__main__':

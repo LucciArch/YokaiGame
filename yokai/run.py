@@ -939,6 +939,9 @@ class Run:
         col = gfx.PAL['w'] if not e.champ else CHAMPIONS[e.champ]['col']
         burst(self, e.x, e.y, col, 14, 90, 0.5, 2)
         burst(self, e.x, e.y, (40, 30, 50), 8, 40, 0.7, 3)
+        if not e.is_boss and (e.champ or e.maxhp >= 60):
+            self.hitstop = max(self.hitstop, 0.05)     # schwere Gegner fallen mit Gewicht
+            self.shake(2)
         self.particles.append(Particle(e.x, e.y - 4, random.uniform(-6, 6), -28, 1.1, (120, 200, 255), 2, kind='soul'))
         audio.play('kill', 0.6)
         self.kills += 1
@@ -1415,6 +1418,13 @@ class Run:
         self.save.stat('rooms')
         audio.play('door', 0.8)
         p = self.player
+        if room.kind != 'boss':                     # Raum gesäubert: kurzer Halt, Welle, Funken an den Türen
+            self.hitstop = max(self.hitstop, 0.09)
+            self.particles.append(Particle(p.x, p.y - 6, 0, 0, 0.6, (255, 230, 170), 90, kind='wave'))
+            for d in room.doors:
+                if self.rooms[room.doors[d]].revealed:
+                    dx, dy = DOOR_POS[d]
+                    burst(self, dx, dy, (255, 215, 140), 6, 45, 0.45, 2)
         if p.active:
             p.charge = min(ACTIVES[p.active]['charge'], p.charge + 1)
         if p.f['clear_heal'] and random.random() < p.f['clear_heal']:

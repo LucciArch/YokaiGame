@@ -233,15 +233,6 @@
   "w": 156,
   "walk": 4
  },
- "boss_ryujin_seg": {
-  "atk": 4,
-  "h": 47,
-  "hi": true,
-  "kind": "strip",
-  "n": 7,
-  "w": 44,
-  "walk": 4
- },
  "boss_shuten_doji": {
   "atk": 4,
   "h": 106,
