@@ -219,6 +219,7 @@ class Run:
         elif not room.cleared:
             self.spawn_room_enemies(room)
         self.fade = 0.6
+        self._quirk_t = 3.0
         rh = {'shop': 'Laden: Mon gegen Items tauschen. Der Saisen-Kasten nimmt Spenden an – manchmal lohnt es sich.',
               'curse': 'Fluchraum: Betreten kostet Leben, dafür lockt ein dunkler Schatz.',
               'challenge': 'Prüfungsraum: Mehrere Wellen überstehen, dann gibt es eine Belohnung.',
@@ -453,6 +454,58 @@ class Run:
 
     # ======================================================================  Hilfen
     HINTS_OFF = False
+
+    QUIRK_TEXT = {
+        'ice': 'Eisiger Boden: Auf dem Schneeberg rutschst du nach.',
+        'gust': 'Tengu-Wind: Auf dem Kurama-Berg treiben Böen dich zur Seite.',
+        'lava': 'Glühende Gruben speien im Kampf Funken – Abstand halten!',
+        'souls': 'Auf dem Friedhof treiben Irrlichter. Berühre sie für ein Seelenherz.',
+    }
+    QUIRKS = {'yukiyama': 'ice', 'kurama': 'gust', 'jigoku': 'lava', 'enma_cho': 'lava', 'hakaba': 'souls'}
+
+    def biome_quirk(self, dt):
+        """Kleine Eigenheit pro Biom (nur in normalen Räumen, nicht in Schreinen)."""
+        q = self.QUIRKS.get(self.biome_id)
+        p = self.player
+        p.ice = q == 'ice'
+        if not q or self.room.kind.startswith('shrine') or self.room.kind == 'boss':
+            return
+        self.hint('biome_' + q, self.QUIRK_TEXT[q])
+        fighting = any(e.active() for e in self.enemies)
+        qt = getattr(self, '_quirk_t', 0.0) - dt
+        if q == 'gust' and fighting:
+            if qt <= 0:
+                d = random.choice((-1, 1))
+                self.wind = (d * 75, 0, 1.3)
+                for i in range(14):
+                    self.particles.append(Particle(RX + (0 if d > 0 else RW), RY + random.uniform(10, RH - 10), d * random.uniform(160, 260), random.uniform(-10, 10), 1.6, (190, 170, 110), 2, kind='petal'))
+                audio.play('dash', 0.4)
+                qt = random.uniform(6, 9)
+        elif q == 'lava' and fighting:
+            if qt <= 0:
+                pits = [(tx, ty) for ty in range(ROWS) for tx in range(COLS) if self.room.tiles[ty][tx] == T_PIT]
+                if pits:
+                    tx, ty = random.choice(pits)
+                    x, y = RX + tx * TILE + 16, RY + ty * TILE + 16
+                    if math.hypot(x - p.x, y - p.y) > 50:
+                        burst(self, x, y, (255, 150, 60), 10, 60, 0.5, 2)
+                        for i in range(5):
+                            ebullet(self, x, y, i / 5 * math.tau + random.random(), 55, (255, 120, 40), r=3)
+                qt = random.uniform(2.2, 3.4)
+        elif q == 'souls' and self.room.cleared:
+            lucky = False
+            if qt <= 0 and not self.room.extra.get('wisp_rolled'):
+                self.room.extra['wisp_rolled'] = True          # nur ein Versuch pro Raum
+                lucky = random.random() < 0.35
+            if lucky:
+                x, y = RX + random.uniform(40, RW - 40), RY + random.uniform(30, RH - 30)
+                pk = Pickup('spirit', x, y, pop=False)
+                pk.wisp = True
+                self.pickups.append(pk)
+                burst(self, x, y, (140, 200, 255), 10, 40, 0.6, 2)
+            if qt <= 0:
+                qt = 9999                      # einmal pro Raum
+        self._quirk_t = qt
 
     def hint(self, hid, text):
         """Einmaliger Kontext-Tipp (pro Spielstand), unten im Raum eingeblendet."""
@@ -974,6 +1027,7 @@ class Run:
             if self.boss_intro > 0.6:
                 self.update_fx(dt)
                 return
+        self.biome_quirk(dt)
         wx, wy, wd = self.wind
         if wd > 0:
             p.wind = (wx, wy)

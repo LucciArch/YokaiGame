@@ -540,7 +540,7 @@ class Player:
             tvx, tvy = mvx * sp, mvy * sp
             if self.run.slow_player > 0:
                 tvx *= 0.6; tvy *= 0.6
-            a = min(1, dt * 14)
+            a = min(1, dt * (3.5 if getattr(self, 'ice', False) else 14))
             self.vx += (tvx - self.vx) * a
             self.vy += (tvy - self.vy) * a
             vx, vy = self.vx, self.vy
