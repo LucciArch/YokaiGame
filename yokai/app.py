@@ -184,9 +184,39 @@ class Game:
 
     # ================================================================  Hauptschleife
     def loop(self):
+        errors = 0
         while True:
             dt = min(1 / 30, self.clock.tick(FPS) / 1000)
-            self.frame(dt, pygame.event.get())
+            try:
+                self.frame(dt, pygame.event.get())
+                errors = 0
+            except SystemExit:
+                raise
+            except Exception:
+                errors += 1
+                self.recover(errors)
+
+    def recover(self, n):
+        """Fehler im Spiel: Bericht schreiben, zurück ins Titelmenü statt das Fenster zu schließen.
+        Der Lauf bleibt ab Beginn der Ebene erhalten (Fortsetzen)."""
+        import traceback
+        from .settings import save_dir
+        txt = traceback.format_exc()
+        print(txt)
+        try:
+            with open(os.path.join(save_dir(), 'fehler.log'), 'a', encoding='utf-8') as f:
+                f.write('--- %s  v%s  Zustand: %s\n%s\n' % (datetime.datetime.now().isoformat(timespec='seconds'), VERSION, self.state, txt))
+        except OSError:
+            pass
+        if n > 20:
+            raise SystemExit(1)
+        gfx.HI.clear(); gfx.TEXT.clear(); gfx.NOCACHE.clear()
+        self.run = None
+        self.epi = None
+        self.confirm = None
+        self.state = 'title'
+        self.sel = 0
+        self.toast('Ein Fehler ist aufgetreten', 'Dein Lauf wurde ab Beginn der Ebene gesichert – „Fortsetzen“.', (240, 150, 140))
 
     def frame(self, dt, events):
         self.t += dt
