@@ -64,6 +64,24 @@ def anchors(spr):
     return a
 
 
+# Kopf-Oberkante und Kopfmitte (Hi-Res-Pixel) im ersten Laufbild jeder Figur, von Hand ausgemessen
+HEAD0 = {'hana': (41, 8), 'kenji': (45, 9), 'kuzunoha': (38, 9), 'ponpoko': (52, 8), 'benkei': (71, 13),
+         'okiku': (62, 7), 'kotaro': (64, 22), 'seimei': (62, 8), 'akago': (48, 9), 'susanoo': (57, 16)}
+
+
+def head_anchor(player, frame_idx):
+    """Kopfanker für ein Bild: Handmessung aus Bild 0 + Verschiebung, die die Automatik zwischen Bild 0 und diesem Bild sieht."""
+    base = HEAD0.get(player.char)
+    f0 = sheets.frame(player.char, sheets.LEFT, 0)
+    ff = sheets.frame(player.char, sheets.LEFT, frame_idx)
+    a0, af = anchors(f0), anchors(ff)
+    if base is None:
+        return af[0], af[1]
+    dx = max(-6, min(6, af[0] - a0[0]))
+    dy = max(-6, min(6, af[1] - a0[1]))
+    return base[0] + dx, base[1] + dy
+
+
 def parts_for(player):
     out = []
     for t in player.transforms:
@@ -84,7 +102,8 @@ def draw(player, spr, x, by, facing_right, t, layer, alpha=255):
     if not names:
         return
     w, h = spr.get_size()
-    hx, top, mid = anchors(spr)
+    _, _, mid = anchors(spr)
+    hx, top = head_anchor(player, getattr(player, '_cur_frame', 0))
     if facing_right:
         hx = w - 1 - hx
     left = x - w / 4

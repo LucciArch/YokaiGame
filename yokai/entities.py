@@ -739,6 +739,7 @@ class Player:
                     self._last_dir = dd
                     fr = int(self.anim * 9) % 4 if self.moving else 0
                 spr = sheets.frame(self.char, dd, fr)
+                self._cur_frame = fr
                 bob = 0
             else:
                 frame = (0, 1, 0, 2)[int(self.anim * 8) % 4] if self.moving and not self.f['fly'] else 0
