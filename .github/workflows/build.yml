@@ -41,8 +41,8 @@ jobs:
       - name: Release veröffentlichen
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0.${{ github.run_number }}
-          name: Yōkai no Michi – Build ${{ github.run_number }}
+          tag_name: v1.1.${{ github.run_number }}
+          name: Yōkai no Michi 1.1 – Build ${{ github.run_number }}
           files: dist/YokaiNoMichi.exe
           body: |
             **Herunterladen:** `YokaiNoMichi.exe` unten anklicken, speichern, doppelklicken – fertig.
