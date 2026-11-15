@@ -1227,15 +1227,23 @@ class Enemy:
         return int(self.t * (12 if self.state == 'charge' else 6))
 
     def draw(self, s, t):
+        spawn_alpha = 255
         if self.spawn_t > 0:
             f = 1 - self.spawn_t / 0.55
-            for i in range(6):
-                a = i / 6 * math.tau + f * 2
-                rr = 4 + f * 10
-                c = int(200 - 80 * f)
-                pygame.draw.circle(s, (c, c, c + 10), (int(self.x + math.cos(a) * rr), int(self.y + math.sin(a) * rr * 0.6)), max(1, int(5 * (1 - f)) + 1))
-            if f < 0.5:
+            x0, y0 = int(self.x), int(self.y) + self.r - 2
+            gfx.draw_glow(s, x0, y0 - 4, 16, (150, 90, 255), int(90 * (1 - f) + 20))
+            rr = 4 + f * 10                                          # Beschwörungskreis am Boden
+            pygame.draw.ellipse(s, (120, 70, 210), (x0 - rr, y0 - rr * 0.4, rr * 2, rr * 0.8), 1)
+            if rr > 6:
+                pygame.draw.ellipse(s, (200, 160, 255), (x0 - rr + 3, y0 - rr * 0.4 + 1, rr * 2 - 6, rr * 0.8 - 2), 1)
+            for i in range(5):                                       # aufsteigende Geisterfunken
+                a = i / 5 * math.tau + f * 3
+                px_ = x0 + math.cos(a) * rr * 0.8
+                py_ = y0 - f * 16 - (i % 2) * 4
+                s.set_at((int(px_), int(py_)), (230, 210, 255))
+            if f < 0.45:
                 return
+            spawn_alpha = int(255 * min(1, (f - 0.45) / 0.45))
         if self.hidden:
             if self.state == 'falling':
                 f = 1 - self.st / 0.8
@@ -1283,15 +1291,20 @@ class Enemy:
         if self.champ == 'geist':
             ph = self.t % 2.4
             alpha = 60 if ph > 1.6 else 230
-        if alpha < 255:
-            spr = spr.copy(); spr.set_alpha(alpha)
+        alpha = min(alpha, spawn_alpha)
+        hi = sheets.has(name) and sheets.is_hi(name)
         if self.state == 'wind' and int(t * 30) % 2:
-            spr = spr.copy()
-            spr.fill((255, 255, 255), special_flags=pygame.BLEND_RGB_MAX)
+            if hi:
+                spr = gfx.tinted(spr, 'white')
+            else:
+                spr = spr.copy()
+                spr.fill((255, 255, 255), special_flags=pygame.BLEND_RGB_MAX)
+        if alpha < 255 and not hi:
+            spr = spr.copy(); spr.set_alpha(alpha)
         hh = spr.get_height()
-        if sheets.has(name) and sheets.is_hi(name):
+        if hi:
             hh //= 2
-            gfx.hi_blit(spr, self.x, self.y + hh / 2 - bob - 2)
+            gfx.hi_blit(spr, self.x, self.y + hh / 2 - bob - 2, alpha)
         else:
             s.blit(spr, (int(self.x) - spr.get_width() // 2, int(self.y) - spr.get_height() // 2 - bob - 2))
         if self.champ:

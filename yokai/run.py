@@ -1004,7 +1004,7 @@ class Run:
             last = self._last
             self.enter_room(self.room.doors[d], d)
             if last is not None:
-                self.slide = [last, d, 0.0]
+                self.slide = [last, d, 0.0, list(getattr(self, '_last_hi', []))]
                 self.fade = 0
             return
         elif d:
@@ -1754,8 +1754,9 @@ class Run:
             ov.fill((255, 255, 255, int(min(1, self.flash_white * 4) * 150)))
             s.blit(ov, (0, 0))
         self._last = s.subsurface((RX - 16, RY - 16, RW + 32, RH + 32)).copy()
+        self._last_hi = list(gfx.HI)
         if self.slide:
-            img, d, st = self.slide
+            img, d, st, old_hi = self.slide
             f = min(1, st / 0.24)
             f = f * f * (3 - 2 * f)
             dx, dy = DIRS[d]
@@ -1767,6 +1768,12 @@ class Run:
             s.blit(cur, (area.x + dx * ow * (1 - f), area.y + dy * oh * (1 - f)))
             s.blit(img, (area.x + ox, area.y + oy))
             s.set_clip(None)
+            nx, ny = dx * ow * (1 - f), dy * oh * (1 - f)
+            def inside(e, sx, sy):
+                return area.x - 20 < e[1] + sx < area.right + 20 and area.y - 10 < e[2] + sy < area.bottom + 30
+            new = [(e[0], e[1] + nx, e[2] + ny, e[3]) for e in gfx.HI]
+            old = [(e[0], e[1] + ox, e[2] + oy, e[3]) for e in old_hi]
+            gfx.HI[:] = [e for e in old if inside(e, 0, 0)] + [e for e in new if inside(e, 0, 0)]
         if self.whiteout > 0:
             fl = pygame.Surface((RW, RH)); fl.fill((255, 246, 230))
             fl.set_alpha(int(min(1, self.whiteout / 0.45) * 170 * (0.5 if self.save['settings'].get('flash', True) is False else 1)))

@@ -1105,6 +1105,8 @@ def tinted(surf, mode):
         im = surf.copy()
         if mode == 'flash':
             im.fill((120, 110, 110, 0), special_flags=pygame.BLEND_RGB_ADD)
+        elif mode == 'white':
+            im.fill((255, 255, 255, 0), special_flags=pygame.BLEND_RGB_MAX)
         elif mode == 'shadow':
             im.fill((14, 10, 22, 0), special_flags=pygame.BLEND_RGB_MULT)
         else:
