@@ -631,11 +631,11 @@
  },
  "nuppeppo": {
   "atk": 4,
-  "h": 84,
+  "h": 71,
   "hi": true,
   "kind": "strip",
   "n": 7,
-  "w": 86,
+  "w": 62,
   "walk": 4
  },
  "nureonna": {
