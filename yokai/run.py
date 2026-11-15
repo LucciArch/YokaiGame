@@ -13,7 +13,12 @@ from .entities import (Player, Bullet, Enemy, Pickup, Pedestal, Obj, Hazard, Par
 from .bosses import make_boss, CX, CY
 
 ACH = {a[0]: a for a in ACHIEVEMENTS}
-TIPS = ['Reinigungssalz an rissigen Wänden öffnet Geheimräume.', 'Die Ausweichrolle macht dich kurz unverwundbar.',
+TIPS = ['Esc → „Speichern & Hauptmenü“: Der Lauf geht später ab dieser Ebene weiter.',
+        'Gesegnete Ebenen erkennst du am goldenen Banner – nutze den Segen, solange er gilt.',
+        'Im Item-Tooltip steht, ob ein Fund eine Synergie vervollständigt.',
+        'Jede Yōkai-Begegnung füllt das Lexikon im Hauptmenü.',
+        'Tiefere Ebenen bergen wertvollere Items – und gefährlichere Champions.',
+        'Reinigungssalz an rissigen Wänden öffnet Geheimräume.', 'Die Ausweichrolle macht dich kurz unverwundbar.',
         'Drei Items eines Themas lösen eine Transformation aus.', 'Ohne Treffer gegen den Boss erscheint öfter ein Schrein.',
         'Oni-Schreine kosten Herzen – Kami-Schreine sind kostenlos.', 'Ab Kapitel II brauchen Schatzräume einen Schlüssel.',
         'Im Codex siehst du, welche Synergien du schon kennst.', 'Rot aufleuchtende Yokai schießen gleich.',
@@ -25,6 +30,8 @@ _GRADE = {'chikurin': (40, 90, 30), 'inari': (120, 50, 20), 'kawabe': (20, 70, 8
           'oeyama': (90, 30, 10), 'ryugu': (10, 70, 90), 'uminobe': (30, 40, 60), 'shinkai': (0, 20, 80),
           'yomi': (90, 0, 30), 'jigoku': (120, 30, 0), 'enma_cho': (110, 20, 10), 'takamagahara': (120, 100, 40), 'tsukiyomi': (60, 70, 140)}
 Q_WEIGHT = {0: 1.0, 1: 1.0, 2: 0.8, 3: 0.42, 4: 0.18}
+CHAPTER_NAMES = {1: '– Die Grenzlande der Nacht –', 2: '– Die Stätten der Toten –', 3: '– Die heiligen Berge –',
+                 4: '– Das Meer der Ertrunkenen –', 5: '– Yomi, das Land der Toten –', 6: '– Die Himmelsgefilde –'}
 BLESSINGS = {'vollmond': ('Segen des Vollmonds', 'Die ganze Ebene liegt im Mondlicht – die Karte ist aufgedeckt'),
              'fuchs': ('Segen der Füchse', 'Die Tanuki-Händler geben 30 % Rabatt'),
              'reichtum': ('Segen des Reichtums', 'Auf dieser Ebene fallen doppelt so viele Mon'),
@@ -2460,6 +2467,8 @@ class Run:
             a = int(255 * min(1, self.title_t))
             T.add(self.floor_label(), W // 2, 92, 9, (230, 210, 170), 'c', alpha=a)
             self.draw_path(s, W // 2, 84, a)
+            if self.stage == 0:
+                T.add(CHAPTER_NAMES.get(self.depth, ''), W // 2, 66, 8, (240, 190, 150), 'c', alpha=a)
             T.add(self.biome['name'], W // 2, 104, 18, (255, 245, 225), 'c', alpha=a)
             T.add(self.biome['jp'], W // 2, 128, 10, (210, 170, 150), 'c', alpha=a)
             if not hasattr(self, 'tip') or self.tip[0] != self.floor_no:
