@@ -784,11 +784,11 @@
  },
  "tsurube_otoshi": {
   "atk": 4,
-  "h": 108,
+  "h": 94,
   "hi": true,
   "kind": "strip",
   "n": 7,
-  "w": 84,
+  "w": 86,
   "walk": 4
  },
  "wanyudo": {
