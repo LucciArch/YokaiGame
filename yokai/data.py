@@ -555,6 +555,10 @@ CHALLENGES = [
 ACHIEVEMENTS = [
     ('first_blood', 'Erster Yokai', 'Besiege deinen ersten Yokai', None),
     ('first_boss', 'Dämonenjäger', 'Besiege deinen ersten Boss', None),
+    ('chapter2', 'Zwei Gesichter', 'Besiege beide Bosse eines Kapitels in einem Lauf', None),
+    ('floor8', 'Tief in der Nacht', 'Erreiche Ebene 8', None),
+    ('floor11', 'Über den Wolken', 'Erreiche Ebene 11', None),
+    ('items40', 'Schatzkammer', 'Trage 40 Items in einem Lauf', None),
     ('kenji', 'Herrenlos', 'Besiege einen Boss in Kapitel II', ('char', 'kenji')),
     ('kuzunoha', 'Neun Schwänze', 'Werde zum Kitsune-Avatar', ('char', 'kuzunoha')),
     ('ponpoko', 'Reicher Tanuki', 'Sammle insgesamt 300 Mon', ('char', 'ponpoko')),

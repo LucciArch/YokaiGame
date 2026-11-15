@@ -784,6 +784,8 @@ class Game:
             bl = getattr(run, 'bosses_beaten', [])
             T.add('Besiegte Bosse: ' + (', '.join(BOSSES[b]['name'] for b in bl) if bl else '–'), W // 2, 233, 7, (240, 200, 170), 'c')
         T.add('R – Nochmal mit %s      Enter – Hauptmenü' % CHARS[p.char]['name'], W // 2, 246, 8, (230, 220, 200), 'c')
+        run.draw_path(s, W // 2, 272, dead=not win)
+        T.add('Ebene %d von %d' % (run.floor_no, len(run.path_nodes())), W // 2, 282, 7, (190, 170, 150), 'c')
         if self.over_t > 0.8:
             for n in nav:
                 if n == 'retry':

@@ -239,7 +239,7 @@ class Run:
             out += [(d, 0), (d, 1)] if two else [(d, 0)]
         return out
 
-    def draw_path(self, s, cx, y, a=255):
+    def draw_path(self, s, cx, y, a=255, dead=False):
         """Fortschrittspfad: ein Punkt je Ebene, Kapitel mit Lücke getrennt, Boss-Ebenen als Raute."""
         nodes = self.path_nodes()
         gaps = len(set(d for d, _ in nodes)) - 1
@@ -264,7 +264,10 @@ class Run:
                 pygame.draw.polygon(surf, col, [(px_, 1), (px_ + 4, 6), (px_, 11), (px_ - 4, 6)])
             else:
                 pygame.draw.circle(surf, col, (px_, 6), 3 if now else 2)
-            if now:
+            if now and dead:
+                pygame.draw.line(surf, (230, 60, 60), (px_ - 3, 3), (px_ + 3, 9), 2)
+                pygame.draw.line(surf, (230, 60, 60), (px_ + 3, 3), (px_ - 3, 9), 2)
+            elif now:
                 pygame.draw.circle(surf, (255, 250, 220), (px_, 6), 1)
             x += 9
         surf.set_alpha(a)
@@ -315,6 +318,10 @@ class Run:
             self.save['stats']['best_floor'] = self.floor_no
         if self.depth >= 5:
             self.achieve('floor5')
+        if self.floor_no >= 8:
+            self.achieve('floor8')
+        if self.floor_no >= 11:
+            self.achieve('floor11')
         if self.challenge == 'bossrush':
             self.enter_room(start, None)
             self.enter_room(self.boss_pos, None)
@@ -471,7 +478,7 @@ class Run:
         return iid
 
     def champ_roll(self):
-        ch = 0.03 + 0.02 * self.depth + (0.08 if self.hard else 0) + (0.12 if self.depth == 6 else 0) + 0.1 * self.loop
+        ch = 0.03 + 0.02 * self.depth + 0.03 * self.stage + (0.08 if self.hard else 0) + (0.12 if self.depth == 6 else 0) + 0.1 * self.loop
         if random.random() < ch:
             return random.choice(list(CHAMPIONS.keys()))
         return None
@@ -1123,6 +1130,10 @@ class Run:
 
     def boss_room_rewards(self):
         cx, cy = RX + RW / 2, RY + RH / 2
+        if self.stage == 1:
+            self.achieve('chapter2')
+        if len(self.player.items) >= 40:
+            self.achieve('items40')
         self.pedestals.append(Pedestal(self.pick_item('B'), cx, cy - 30))
         self.spawn_pickup('heart', cx - 30, cy + 10)
         p = self.player
