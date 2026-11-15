@@ -283,11 +283,22 @@ class Game:
         sys.exit(0)
 
     def draw_toasts(self):
-        y = 34
+        r = self.run
+        y = 68 if (self.state == 'play' and r is not None and r.hint_t > 0 and r.hint_txt) else 34   # unter der Hinweisbox
         for title, sub, col, t in self.toasts[:3]:
             a = int(255 * min(1, t * 2))
             w = max(gfx.text_w(title, 9), gfx.text_w(sub, 7)) + 20
-            gfx.panel(self.screen, (W // 2 - w // 2, y, w, 28), int(a * 0.85), col)
+            key = (title, sub, w, col)
+            cache = self.__dict__.setdefault('_toast_bg', {})
+            bg = cache.get(key)
+            if bg is None:
+                tmp = pygame.Surface((w, 28), pygame.SRCALPHA)
+                gfx.panel(tmp, (0, 0, w, 28), 220, col)
+                bg = pygame.transform.scale(tmp, (w * 2, 56))
+                if len(cache) > 30:
+                    cache.clear()
+                cache[key] = bg
+            gfx.HI.append((bg, W / 2, y + 28, a, 1.0, True))           # über den Figuren
             gfx.TEXT.add(title, W // 2, y + 3, 9, col, 'c', alpha=a)
             gfx.TEXT.add(sub, W // 2, y + 16, 7, (230, 225, 210), 'c', alpha=a)
             y += 32
