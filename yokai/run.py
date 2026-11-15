@@ -2417,8 +2417,18 @@ class Run:
             by = H - 10
             pygame.draw.rect(s, (20, 10, 20), (bx - 2, by - 2, bw + 4, 8))
             f = max(0, b.hp / b.maxhp)
+            tr = getattr(self, '_boss_trail', None)
+            if tr is None or tr[0] is not b:
+                tr = [b, f]
+            tr[1] = f if tr[1] < f else max(f, tr[1] - 0.25 * (1 / 60) - (tr[1] - f) * 0.03)
+            self._boss_trail = tr
             pygame.draw.rect(s, (90, 20, 30), (bx, by, bw, 4))
-            pygame.draw.rect(s, (220, 50, 60), (bx, by, int(bw * f), 4))
+            pygame.draw.rect(s, (255, 214, 150), (bx, by, int(bw * tr[1]), 4))          # Schadensspur
+            rage = f <= 0.25
+            pygame.draw.rect(s, (255, 90, 40) if rage else (220, 50, 60), (bx, by, int(bw * f), 4))
+            pygame.draw.rect(s, (255, 150, 140) if not rage else (255, 200, 120), (bx, by, int(bw * f), 1))
+            tx_ = bx + int(bw * 0.25)                                                      # Wut-Schwelle
+            pygame.draw.line(s, (255, 240, 220), (tx_, by - 2), (tx_, by + 5), 1)
             T.add(b.name, bx - 6, by - 4, 7, (255, 220, 200), 'r')
         # Titelkarte
         if self.title_t > 0 and self.boss_intro <= 0:
