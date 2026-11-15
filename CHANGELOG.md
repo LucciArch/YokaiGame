@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.3.0 – „Kapitel-Update“
+
+- **11 statt 6 Ebenen:** Kapitel I–V haben je zwei Ebenen, die zweite mit anderer Gegend und anderem Boss
+- Schwierigkeit steigt jetzt pro Ebene statt pro Kapitel (Gegner- und Boss-HP, Feuerrate, Geschosstempo)
+- Anzeige „Ebene 7 · Kapitel IV“ im HUD, auf der Titelkarte und im Boss-Intro
+- Fairer: Tsurube-otoshi blitzt nach der Landung kurz auf, bevor er feuert; Nopperabō schießt nicht mehr sofort nach dem Auftauchen
+- Späte Gegner gefährlicher: Shikome schneller, Onibi legen in tiefen Kapiteln Feuerspuren, Funayūrei feuern Fächer
+- Balance-Berichte 2 und 3 unter `design/balance/`
+
 ## 1.2.0 – „Morgengrauen-Update“
 
 ### Neu

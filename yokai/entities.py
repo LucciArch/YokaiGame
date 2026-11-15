@@ -895,6 +895,8 @@ class Enemy:
         self.run = run
         self.id = eid
         d = ENEMIES[eid]
+        if d.get('attack') and d['attack'].get('late') is None and eid == 'onibi' and run.tier < 4:
+            d = dict(d, attack=None)                 # Onibi legen erst in den tiefen Kapiteln Feuerspuren
         self.d = d
         self.name = d['name']
         self.x, self.y = x, y
@@ -1111,7 +1113,7 @@ class Enemy:
                     self.alpha = 255
                     self.state = 'idle'
                     self.st = random.uniform(2.0, 3.2)
-                    self.acd = min(self.acd, 0.35)
+                    self.acd = max(0.6, min(self.acd, 0.8))
             self.vx = dx
         elif mv == 'zigzag':
             base = math.atan2(dy, dx) + (0.9 if int(self.t * 1.5) % 2 else -0.9)
@@ -1132,8 +1134,14 @@ class Enemy:
                     self.state = 'down'
                     self.st = 1.8
                     run.shake(3)
-                    self.do_attack(force=True)
+                    self.ring_wait = 0.4                     # kurzes Aufblitzen, dann erst der Ring
             elif self.state == 'down':
+                rw = getattr(self, 'ring_wait', 0)
+                if rw > 0:
+                    self.ring_wait = rw - dt
+                    self.flash = 0.06 if int(rw * 20) % 2 else 0
+                    if self.ring_wait <= 0:
+                        self.do_attack(force=True)
                 if self.st <= 0:
                     self.state = 'up'
                     self.st = random.uniform(1.0, 2.0)

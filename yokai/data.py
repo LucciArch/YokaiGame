@@ -666,3 +666,15 @@ def _balance_12():
 
 
 _balance_12()
+
+
+# Balance-Check 3 (design/balance/balance-check-3.md): späte Gegner gefährlicher
+def _balance_13():
+    ENEMIES['shikome']['speed'] = 92
+    ENEMIES['onibi']['attack'] = {'kind': 'trail', 'n': 1, 'spread': 0.0, 'speed': 110, 'cd': 0.7, 'col': (110, 160, 255), 'eff': None, 'r': 3}
+    fa = ENEMIES['funayurei']['attack']
+    fa['n'], fa['spread'] = 3, 0.25
+    ENEMIES['kappa_small']['speed'] = 62
+
+
+_balance_13()
