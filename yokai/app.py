@@ -386,15 +386,27 @@ class Game:
         T.add('Yōkai no Michi', W // 2, 30, 28, (255, 240, 220), 'c')
         T.add('– Hyakki Yagyō –', W // 2, 66, 11, (230, 140, 130), 'c')
         items = self.menu_items()
-        step = 15 if len(items) <= 10 else 14
+        step = 15 if len(items) <= 10 else 13
         for i, m in enumerate(items):
             y = 84 + i * step
             sel = i == self.sel
             col = (255, 230, 150) if sel else (210, 200, 190)
             if sel:
-                gfx.panel(s, (W // 2 - 70, y - 2, 140, 15), 170, (200, 120, 90))
+                gfx.panel(s, (W // 2 - 70, y - 2, 140, min(15, step + 1)), 170, (200, 120, 90))
             T.add(m, W // 2, y, 10, col, 'c')
         T.add('v' + VERSION + '   •   F11 Vollbild', W - 6, H - 12, 6, (140, 130, 150), 'r')
+        if items and items[self.sel % len(items)] == 'Fortsetzen':
+            info = getattr(self, '_cont_info', None)
+            if info is None:
+                from .run import load_run_file
+                d = load_run_file() or {}
+                roman = ['', 'I', 'II', 'III', 'IV', 'V', 'VI']
+                info = self._cont_info = ('%s  ·  Ebene %d  ·  Kapitel %s  ·  %d Items' % (
+                    CHARS.get(d.get('char'), {}).get('name', '?'), d.get('floor_no', 0) + 1, roman[min(6, max(1, d.get('depth', 1)))],
+                    len(d.get('player', {}).get('items', []))) if d else '')
+            T.add(info, W // 2 + 76, 85, 6, (200, 220, 170))
+        else:
+            self._cont_info = None
         for n in nav:
             if n == 'up':
                 self.sel = (self.sel - 1) % len(items); audio.play('move')
