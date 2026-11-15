@@ -226,7 +226,7 @@ class Game:
             dim = 1.0
             light = r.hi_light if self.state == 'play' else None
             gfx.hi_flush(self.window, sc, ox + shake[0], oy + shake[1], dim, light)
-        elif self.state in ('title', 'chars', 'lexicon') and gfx.HI:
+        elif self.state in ('title', 'chars', 'lexicon', 'epilogue') and gfx.HI:
             gfx.hi_flush(self.window, sc, ox, oy, 1.0, None)
         else:
             gfx.HI.clear()
@@ -570,6 +570,32 @@ class Game:
             self.state = 'over'
             self.over_t = 0
             audio.get().music(('in', 196, 70, 'calm', 77) if run.result == 'dead' else ('yo', 262, 90, 'calm', 78))
+            if run.result == 'win' and not run.challenge and not run.daily:
+                from .epilogue import Epilogue
+                self.epi = Epilogue(self, run)
+                self.state = 'epilogue'
+
+    def st_epilogue(self, dt, events, nav):
+        gfx.HI_MODE = True
+        if self.epi.frame(self.screen, dt, nav):
+            self.epi = None
+            gfx.HI.clear()
+            self.state = 'over'
+            self.over_t = 0
+
+    def _wrap_c(self, txt, cx, y, w, size, col, alpha=255):
+        lines, line = [], ''
+        for word in txt.split():
+            t = (line + ' ' + word).strip()
+            if gfx.text_w(t, size) > w and line:
+                lines.append(line)
+                line = word
+            else:
+                line = t
+        if line:
+            lines.append(line)
+        for i, l in enumerate(lines):
+            gfx.TEXT.add(l, cx, y + i * size * 1.6, size, col, 'c', alpha=alpha)
 
     def draw_itemlist(self, s):
         run = self.run

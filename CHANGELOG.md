@@ -1,5 +1,27 @@
 # Changelog
 
+## 1.2.0 – „Morgengrauen-Update“
+
+### Neu
+- **Yōkai-Lexikon** im Hauptmenü: 48 Yōkai und 23 Bosse mit Folklore, Verhalten im Spiel und Fundorten;
+  Einträge schalten sich bei der ersten Begegnung frei
+- **Epilog nach dem Sieg**: Morgendämmerung, der Zug der Yōkai verblasst, eigenes Ende für jede Figur
+  (normaler und wahrer Sieg), Abspann
+- Waffenarten: Schwert, Speer, Keule, Bogen, Fächer, Sense und Laser für Figuren und Items
+
+### Grafik
+- Felsen, Urnen und Steinlaternen in doppelter Pixeldichte, nach Tiefe mit den Figuren sortiert
+- Art Bible als verbindliche Stilvorgabe (`design/art/art-bible.md`)
+
+### Balance
+- Jedes Item gehört genau einer Raumart (Schatzraum, Laden, Boss, Kami- oder Oni-Schrein)
+- Tiefer = stärker: mehr Gegner-HP und schnellere Geschosse pro Ebene, Tiefe 6 zusätzlich härter
+- Weniger Drops, ab Tiefe 4 ganze Herzen Schaden
+- Stärkerer Laden, mehr Gegnervielfalt in Tiefe 4
+
+### Entwicklung
+- Claude Code Game Studios eingebunden (`.claude/`), Spielkonzept und Balance-Bericht unter `design/`
+
 ## 1.1.0 – „Mondlicht-Update“
 
 ### Grafik
