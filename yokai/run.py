@@ -14,6 +14,8 @@ from .bosses import make_boss, CX, CY
 from .yomeiri import Procession, Apparition, kakurenbo_start, kakurenbo_break
 
 ACH = {a[0]: a for a in ACHIEVEMENTS}
+MATSURI = ('yo', 60, 96, 'matsuri', 55)          # Nachtmarkt-Musik für Laden und Ereignisräume
+MATSURI_ROOMS = ('shop', 'yomeiri', 'kakurenbo', 'teahouse', 'slots')
 TIPS = ['Esc → „Speichern & Hauptmenü“: Der Lauf geht später ab dieser Ebene weiter.',
         'Gesegnete Ebenen erkennst du am goldenen Banner – nutze den Segen, solange er gilt.',
         'Im Item-Tooltip steht, ob ein Fund eine Synergie vervollständigt.',
@@ -458,7 +460,9 @@ class Run:
             audio.play('boss')
             b = self.biome['music']
             audio.get().music(self.boss_music())
-        elif prev is not None and prev.kind == 'boss' or (prev and prev.kind.startswith('shrine')):
+        elif room.kind in MATSURI_ROOMS:
+            audio.get().music(MATSURI)
+        elif prev is not None and prev.kind == 'boss' or (prev and (prev.kind.startswith('shrine') or prev.kind in MATSURI_ROOMS)):
             audio.get().music(self.biome['music'])
         self.flow_src = None
 

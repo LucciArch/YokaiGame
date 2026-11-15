@@ -431,6 +431,8 @@ class Audio:
             return 'gameover'
         if seed == 78:
             return 'victory'
+        if seed == 55:
+            return 'matsuri'
         if mood == 'boss':
             return 'boss_final' if (seed - 100) // 10 >= 5 else 'boss'
         return {1: 'forest', 2: 'temple', 3: 'mountain', 4: 'sea', 5: 'underworld', 6: 'heaven'}.get(seed // 10)

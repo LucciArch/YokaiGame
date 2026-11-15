@@ -291,9 +291,30 @@ def victory():
     return s
 
 
+# ============================================================ Laden & Ereignisse: Yomise (Nachtmarkt)
+def matsuri():
+    s = Song(96, 60, 'yo', 16, seed=701)
+    s.windfx(0, 16, 0.08, 900)
+    prog = [0, 0, 3, 3, 1, 1, 0, 0]
+    # Shamisen-Ostinato, leicht und federnd
+    for b in range(0, 16):
+        s.shamisen("0/1 2/1 4/1 2/1 | 3/1 2/1 0/1 2/1" if b % 2 == 0 else "1/1 2/1 4/1 5/1 | 4/1 2/1 1/1 0/1", b, octv=0, vel=0.42, pan=-0.25)
+    mel = "4/2 5/2 4/2 2/2 | 3/4 2/4 | 0/2 2/2 3/2 4/2 | 2/8 | 4/2 5/2 7/2 5/2 | 4/4 3/2 2/2 | 3/2 2/2 0/2 1/2 | 0/8"
+    s.wind(mel, 0, 'fue', octv=1, vel=0.55, pan=0.2, rev=0.35)
+    s.wind(mel.replace('7/2', '5/2'), 8, 'fue', octv=1, vel=0.5, pan=0.2, rev=0.35)
+    s.koto("r/4 4/4 | r/4 2/4 | r/4 3/4 | r/4 0/4 | r/4 4/4 | r/4 5/4 | r/4 2/4 | 0/8", 8, octv=1, vel=0.4, pan=-0.1)
+    s.arp(prog, 0, pattern=(0, 2, 4, 2), octv=-1, vel=0.22, per_bar=4, pan=0.0)
+    s.arp(prog, 8, pattern=(0, 2, 4, 2), octv=-1, vel=0.22, per_bar=4, pan=0.0)
+    for b in range(0, 16):
+        s.drums("k.s.s.ss" if b % 4 == 3 else "k...s.k.", b, vel=0.45, swing=0.12)
+    for b in (0, 4, 8, 12):
+        s.bell(4, b, 0, octv=1, vel=0.15)
+    return s
+
+
 TRACKS = {'title': title, 'forest': forest, 'temple': temple, 'mountain': mountain, 'sea': sea,
           'underworld': underworld, 'heaven': heaven, 'boss': boss, 'boss_final': boss_final,
-          'gameover': gameover, 'victory': victory}
+          'gameover': gameover, 'victory': victory, 'matsuri': matsuri}
 
 if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True)
