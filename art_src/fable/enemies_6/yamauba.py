@@ -9,35 +9,42 @@ common.D = os.path.dirname(os.path.abspath(__file__)) + '/'
 
 CW, CH = 104, 88
 OX, OY = 30, 8                         # lokale Grundlinie y = 76
-col('o0', '#3a2228'); col('o1', '#6e4a46'); col('o2', '#a07a66'); col('o3', '#c8a68a')   # alte, fahle Haut
+col('j0', '#1e1c34'); col('j1', '#3c3c5a'); col('j2', '#66688a')
+col('o0', '#3a2228'); col('o1', '#6e4a46'); col('o2', '#a07a66'); col('o3', '#c8a68a'); col('o4', '#e6caa6')   # alte, fahle Haut
 add_rim('o0 o1 o2', 'xs')
 SKIN = ('o1', 'o2', 'o3')
 SKINF = ('o0', 'o1', 'o2')
-HAIR = ('v1', 'v2', 'v3')
+HAIR = ('v0', 'v1', 'v2')
 KIM = ('s1', 's2', 's3')
 KIMF = ('s0', 's1', 's2')
 
-LEG = dict(zip('abcdKeYqWwvxV', ['o0', 'o1', 'o2', 'o3', 'K', 'e1', 'y3', 'q', 'b3', 'v2', 'v1', 'v3', 'v0']))
+LEG = dict(zip('abcdeKrYqWwvxu', ['o0', 'o1', 'o2', 'o3', 'o4', 'K', 'e1', 'y3', 'q', 'b3', 'v2', 'v1', 'v3', 'v0']))
+# Dreiviertelansicht nach links: Profilkante links (Stirn, Hakennase, spitzes Kinn), tiefliegende glühende Augen
+# unter buschigen weißen Brauen, eingefallene Wange, breites Grinsen mit wenigen Zähnen, wildes Haar
 HEAD = """
-.......xxxwwwww.....
-.....xxwwwwwwvwww...
-....xwwwwwvvwwwwvw..
-...xwwwwcddbwwwwwvw.
-..xwwwcdddddbwwvwwv.
-..wwwcddddccbbwwvwwv
-..wwvKKKdcKKKbwwvwwv
-..wvdeYKccceKbawvwwv
-..wvdKKccbbKbaawvwwv
-..KdddcccbbbaawwvwwV
-.Kddddccbbbbaawvwwvv
-Kdddccbbbbbaawwvwwv.
-.KKccbbbabbaa.wvwwv.
-...cKKKKKbaa..wvwv..
-...KWqWqKbaa..wwvv..
-...cKqqKbaa...wvw...
-....cbbbba....vv....
-.....cbba......v....
-......ba............
+...........xx.xwwu.w......
+.......xx.xwwxwvwwuwwv....
+.....xxwwxwwvvwuwwvwvwwu..
+....xwvwxwuvvwwxwvuwvvwwv.
+...xwvxwwvdwwuvxwwvwwvwuwv
+..xwuxwddddvwwuwwuvwwvuwwv
+..wxwvddeedvcwwvwuwvwwvvwv
+..wwvdeedddccbwuwvwwuvwwvu
+..wxwxxxxdcxxxxbwwvwwwvwwv
+..wwKKKxccKKKKbbvwwwvwwvwu
+..wdKrYKcbKrYKbavwwvwwvwwu
+..ddaKKbcbaKKbbaavwwvwvwu.
+.Kdedccbcbbbbbbaavwvwwvwu.
+Kddddcbbcbbaabaawvwwvwwu..
+Kdeddccbbbbaaaaawvwvwwvu..
+.KKddcbbabbaaaavwwvwwvu...
+..KcbbaaKKbbaauwvwvwu.....
+..cKKKKKKKKbaauvwvwu......
+..cKWqqWqWKbaa.uvwu.......
+...KqqqqqqKba...uu........
+...cKKKKKKbaa.............
+....ccbbbaa...............
+.....bbaa.................
 """
 CLAW = """
 .cc.
@@ -86,15 +93,6 @@ def draw(**kw):
         return P(pt[0] + lean, pt[1] + bob)
 
     hs = S['hair']
-    # ---- Haarmähne hinten: fällt über den gebeugten Rücken bis zur Hüfte
-    p = C()
-    mane = PG([B((30, 10)), B((44, 8)), B((52, 16)), B((58 + hs, 30)), B((60 + hs, 44)), B((56 + hs, 52)),
-               B((52, 46)), B((50 + hs, 54)), B((46, 44)), B((44, 30)), B((36, 22))])
-    p.form(mane, HAIR, sd=3, hl=1)
-    for (a_, b_) in (((40, 12), (54 + hs, 40)), ((46, 14), (57 + hs, 46)), ((38, 18), (49 + hs, 48))):
-        p.line([B(a_), B(b_)], 'v1', only=mane)
-    p.line([B((42, 11)), B((52 + hs, 30))], 'v3', only=mane)
-    c.stamp(p, 'K')
     # ---- ferner Arm (hängt nach vorn, Kralle)
     fs, fe, fh = B(S['fsh']), B(S['fel']), B(S['fhd'])
     p = C()
@@ -125,24 +123,64 @@ def draw(**kw):
     p.form(obi, ('w0', 'w1', 'w2'), sd=1, hl=1)                                  # Strick als Gürtel
     for k in range(5):
         p.pxs([B((32 + k * 4, 46 - k * 0.8))], 'w0')
-    for (x, y) in ((44, 54), (36, 57)):                                           # Risse im Stoff
-        p.line([B((x, y)), B((x + 2, y + 3)), B((x + 1, y + 5))], 's0', only=body)
+    # Kasuri-Muster: kleine verblasste Kreuzchen im Stoff, nicht im Gürtel
+    for (x, y) in ((34, 36), (42, 34), (48, 46), (38, 52), (46, 56), (31, 56), (52, 54), (40, 42)):
+        q = B((x, y))
+        cross = (R(q[0] - 1, q[1], q[0] + 1, q[1]) | R(q[0], q[1] - 1, q[0], q[1] + 1)) & body & ~obi
+        p.fill(cross, 's1')
+    # Flicken aus anderem Stoff (verblasstes Indigo) mit grober Naht
+    patch = PG([B((44, 58)), B((50, 57)), B((51, 62)), B((45, 63))]) & body
+    p.form(patch, ('s0', 's1', 's2'), sd=1, hl=0)
+    for k in range(3):
+        p.pxs([B((45 + k * 2, 57.5)), B((51, 59 + k * 1.2))], 'c1')
+    # zerfetzter Saum: hängende Stoffstreifen
+    for (x, ln) in ((28, 5), (35, 4), (44, 6), (53, 4)):
+        q = B((x, 63))
+        p.form(tri(q, 95, ln, 3.2) & ~body, KIMF, sd=0, hl=1)
     # Kragen: Haut im Ausschnitt, weißes Untergewand
     neck = PG([B((32, 26)), B((38, 25)), B((36, 32)), B((33, 33))]) & body
     p.form(neck, SKIN, sd=1, hl=0)
     p.line([B((37, 25)), B((34, 34))], 'v2', only=body)
     c.stamp(p, 'K')
+    # ---- Haarmähne hinten: einzelne verfilzte Strähnen, jede eigene Form, fallen über den Rücken bis zur Hüfte
+    import random as _r
+    rg = _r.Random(11)
+    locks = []
+    for i in range(11):                                   # verfilzte, wellige Strähnen vom Hinterkopf über den Rücken
+        t = i / 10
+        root = (30 + t * 18, 9 + t * 12)
+        ln = 24 + rg.uniform(0, 14) - t * 8
+        ang = math.radians(86 - t * 30 + rg.uniform(-6, 6))
+        wob = rg.choice((-1, 1)) * rg.uniform(2, 4)
+        pts = []
+        for k in range(4):
+            f = k / 3
+            px_ = root[0] + math.cos(ang) * ln * f + math.sin(f * math.pi * 1.5) * wob + hs * f
+            py_ = root[1] + math.sin(ang) * ln * f
+            pts.append((px_, py_))
+        locks.append((pts, 3.6 - (i % 3) * 0.4))
+    order = sorted(range(len(locks)), key=lambda i: -locks[i][0][0][0])   # hintere Strähnen zuerst
+    for i in order:
+        pts, r_ = locks[i]
+        Q = [B(q) for q in pts]
+        p = C()
+        lock = L(*Q[0], r_, *Q[1], r_ * 0.9) | L(*Q[1], r_ * 0.9, *Q[2], r_ * 0.6) | L(*Q[2], r_ * 0.6, *Q[3], 0.7)
+        p.form(lock, HAIR, sd=1, hl=1)
+        p.line([lerp(Q[0], Q[1], 0.3), Q[1], lerp(Q[1], Q[2], 0.6)], 'v2' if i % 2 else 'v0', only=erode(lock, 1))
+        c.stamp(p, 'K')
     # ---- Kopf: weit nach vorn gereckt
     p = C()
-    p.grid(*B((14, 10)), HEAD, LEG)
+    p.grid(*B((10, 6)), HEAD, LEG)
     c.stamp(p, 'K', skip=('v1', 'v2', 'v3'))
     # ---- Messerarm vorn
     ks, ke, kh = B(S['ksh']), B(S['kel']), B(S['khd'])
     knife(c, kh, S['kang'])
     p = C()
-    sleeve = L(*ks, 4.6, *ke, 4.0)
+    sleeve = L(*ks, 4.6, *ke, 4.0) | PG([lerp(ks, ke, 0.2), (ke[0] + 1, ke[1] + 2), (ke[0] + 3, ke[1] + 9), (ke[0] + 6, ke[1] + 6),
+                                          (ke[0] + 8, ke[1] + 10), (ks[0] + 5, ks[1] + 7)])
     p.form(sleeve, KIM, sd=2, hl=1)
     p.line([(ks[0] - 1, ks[1] + 2), (ke[0] + 1, ke[1] + 1)], 's1', only=sleeve)
+    p.line([lerp(ks, ke, 0.5), (ke[0] + 5, ke[1] + 8)], 's1', only=sleeve)
     c.stamp(p, 'K')
     p = C()
     p.form(L(*ke, 2.4, *kh, 2.0), SKIN, sd=1, hl=1)                              # dürrer Unterarm

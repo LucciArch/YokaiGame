@@ -712,11 +712,11 @@
  },
  "shikome": {
   "atk": 4,
-  "h": 77,
+  "h": 76,
   "hi": true,
   "kind": "strip",
   "n": 7,
-  "w": 94,
+  "w": 88,
   "walk": 4
  },
  "shinigami": {
@@ -815,7 +815,7 @@
   "hi": true,
   "kind": "strip",
   "n": 7,
-  "w": 98,
+  "w": 100,
   "walk": 4
  },
  "yosuzume": {
