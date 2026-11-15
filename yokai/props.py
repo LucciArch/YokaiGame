@@ -241,6 +241,43 @@ def pedestal(taken=False):
     return s
 
 
+def pedestal_hi(taken=False):
+    """Steinaltar (Hi-Res, 52x34): Sockel mit Stufe, Schaft, Platte mit rotem Tuch, Shide-Papier, Moos."""
+    key = ('ped_hi', taken)
+    if key in _cache:
+        return _cache[key]
+    W, H = 52, 34
+    s = pygame.Surface((W, H), pygame.SRCALPHA)
+    st = (112, 108, 128)
+    _box(s, 6, 24, 40, 9, sh(st, 0.78))                          # Fuß
+    _box(s, 10, 20, 32, 5, sh(st, 0.9))                          # Stufe
+    _box(s, 14, 10, 24, 11, st)                                  # Schaft
+    s.fill(sh(st, 0.7), (32, 11, 5, 9))                          # Schattenseite
+    _box(s, 4, 4, 44, 7, sh(st, 1.08))                           # Platte
+    s.fill(sh(st, 1.5), (5, 4, 42, 1))
+    s.fill(sh(st, 0.6), (4, 10, 44, 1))
+    for (x, y, w) in ((18, 15, 3), (27, 27, 4), (12, 29, 2), (40, 7, 3)):   # Risse
+        s.fill(sh(st, 0.55), (x, y, w, 1)); s.set_at((x + w, y + 1), sh(st, 0.55))
+    moss, mossl = (58, 92, 56), (96, 140, 74)
+    for (x, y, w) in ((7, 31, 6), (35, 32, 7), (42, 24, 3), (15, 20, 3)):
+        s.fill(moss, (x, y, w, 2)); s.fill(mossl, (x + 1, y, w - 2, 1))
+    if not taken:                                                # rotes Tuch mit Goldsaum, hängt vorn über
+        s.fill((120, 26, 40), (16, 3, 20, 4))
+        s.fill((168, 40, 52), (16, 3, 20, 1))
+        s.fill((150, 34, 46), (18, 7, 16, 6))
+        s.fill((120, 26, 40), (31, 7, 3, 6))
+        s.fill((228, 182, 72), (18, 12, 16, 1))
+        s.fill((255, 228, 140), (19, 12, 4, 1))
+        for k, x in enumerate((10, 40)):                         # zwei Shide
+            for j in range(3):
+                dx = 0 if j % 2 == 0 else 2
+                s.fill((246, 244, 236), (x + dx, 10 + j * 3, 3, 3))
+                s.fill((190, 186, 204), (x + dx, 12 + j * 3, 3, 1))
+    s = _outline(s)
+    _cache[key] = s
+    return s
+
+
 # ---------------------------------------------------------------- Gegner-Geschosse
 def orb(col, r):
     key = ('orb', col, r)

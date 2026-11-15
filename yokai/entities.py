@@ -1469,8 +1469,8 @@ class Pedestal:
     def draw(self, s, t):
         x, y = int(self.x), int(self.y)
         D = pygame.draw
-        img = props.pedestal(self.taken)
-        s.blit(img, (x - img.get_width() // 2, y - 3))
+        img = props.pedestal_hi(self.taken)
+        gfx.hi_blit(img, x, y - 3 + img.get_height() / 2)
         if self.taken:
             return
         name, desc, icon, col = self.info()

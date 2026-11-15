@@ -2026,11 +2026,9 @@ class Run:
             h.draw(s, t)
         for o in self.objs:
             o.draw(s, t)
-        for pd in self.pedestals:
-            pd.draw(s, t)
         for pk in self.pickups:
             pk.draw(s, t)
-        ents = [e for e in self.enemies] + [p] + self.standing_tiles()
+        ents = [e for e in self.enemies] + [p] + self.standing_tiles() + list(self.pedestals)
         ents.sort(key=lambda e: e.y)
         for e in ents:
             e.draw(s, t)
