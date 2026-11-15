@@ -138,8 +138,9 @@ class Run:
         else:
             self.save.stat('runs')
             self.apply_challenge()
-            clear_run_file()
-            self.save_run_file()
+            if not (self.challenge or self.daily):     # Prüfungen überschreiben keinen gespeicherten Lauf
+                clear_run_file()
+                self.save_run_file()
         self.new_floor()
 
     # ---------------------------------------------------------------- Lauf speichern / fortsetzen
@@ -1519,7 +1520,8 @@ class Run:
         self.save.stat('rooms')
         audio.play('door', 0.8)
         p = self.player
-        if room.kind != 'boss':                     # Raum gesäubert: kurzer Halt, Welle, Funken an den Türen
+        if room.kind != 'boss' and room.kind != 'start':
+            audio.play('bell', 0.25)                     # Raum gesäubert: kurzer Halt, Welle, Funken an den Türen
             self.hitstop = max(self.hitstop, 0.09)
             self.particles.append(Particle(p.x, p.y - 6, 0, 0, 0.6, (255, 230, 170), 90, kind='wave'))
             for d in room.doors:
@@ -1950,7 +1952,8 @@ class Run:
             self.achieve('kuzunoha')
 
     def end_run(self, win):
-        clear_run_file()
+        if not (self.challenge or self.daily):
+            clear_run_file()
         s = self.save
         if win and self.challenge:
             self.achieve('ch_' + self.challenge)
