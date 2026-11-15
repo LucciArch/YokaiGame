@@ -123,6 +123,9 @@ class Run:
         rng = self.rng
         self.biome_id = rng.choice(DEPTH_BIOMES[self.depth])
         self.biome = BIOMES[self.biome_id]
+        bs = self.save.data.setdefault('biomes_seen', [])
+        if self.biome_id not in bs:
+            bs.append(self.biome_id)
         self.curse = None
         if self.depth >= 2 and rng.random() < (0.3 if not self.hard else 0.45) and not self.player.f['curse_immune']:
             self.curse = rng.choice(list(CURSES.keys()))

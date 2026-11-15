@@ -852,10 +852,26 @@ class Game:
             T.add(k, x, 34 + r * 16, 8, (210, 200, 180))
             T.add(str(v), x + 190, 34 + r * 16, 8, (255, 245, 230), 'r')
         y = 172
-        T.add('Bosse:', 40, y, 8, (255, 220, 150))
-        for i, (bid, b) in enumerate(BOSSES.items()):
-            ok = bid in self.save['bosses']
-            T.add(b['name'] if ok else '???', 40 + (i % 4) * 105, y + 14 + (i // 4) * 13, 7, (240, 230, 210) if ok else (120, 110, 120))
+        page = getattr(self, 'stats_page', 0)
+        if page == 0:
+            T.add('Bosse:', 40, y, 8, (255, 220, 150))
+            for i, (bid, b) in enumerate(BOSSES.items()):
+                ok = bid in self.save['bosses']
+                T.add(b['name'] if ok else '???', 40 + (i % 4) * 105, y + 14 + (i // 4) * 13, 7, (240, 230, 210) if ok else (120, 110, 120))
+        else:
+            from .run import Run
+            seen = self.save.data.get('biomes_seen', [])
+            T.add('Biome:  %d / %d besucht' % (len(seen), len(BIOMES)), 40, y, 8, (255, 220, 150))
+            order = sorted(BIOMES, key=lambda k: BIOMES[k]['depth'])
+            for i, bid in enumerate(order):
+                b = BIOMES[bid]
+                ok = bid in seen
+                q = Run.QUIRKS.get(bid)
+                txt = ('%d  %s' % (b['depth'], b['name'])) if ok else '%d  ???' % b['depth']
+                if ok and q:
+                    txt += '  – ' + Run.QUIRK_SHORT[q]
+                T.add(txt, 40 + (i % 3) * 140, y + 14 + (i // 3) * 12, 6, (240, 230, 210) if ok else (120, 110, 120))
+        T.add('Links/Rechts – Bosse / Biome', W // 2, 274, 6, (170, 160, 150), 'c')
         dl = self.save['daily']
         if dl:
             best = sorted(dl.items())[-3:]
@@ -863,6 +879,9 @@ class Game:
         T.add('Esc – Zurück', W // 2, 285, 6, (150, 140, 140), 'c')
         for n in nav:
             if n in ('back', 'ok'): self.state = 'title'
+            elif n in ('left', 'right'):
+                self.stats_page = 1 - getattr(self, 'stats_page', 0)
+                audio.play('move')
 
     def st_controls(self, dt, events, nav):
         s = self.screen
