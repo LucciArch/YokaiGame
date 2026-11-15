@@ -373,8 +373,50 @@ def _c(c, f):
     return tuple(max(0, min(255, int(v * f))) for v in c)
 
 
+_ITEMS = _os_items = None
+_item_cache = {}
+HI_MODE = False
+
+
+def item_img(group, name, frame=0):
+    """Handgesetzte 32x32-Bilder aus assets/items/<group>/<name>.png (Streifen = Animationsbilder)."""
+    key = (group, name)
+    fr = _item_cache.get(key, 0)
+    if fr == 0:
+        import os, sys
+        base = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets', 'items')
+        if not os.path.isdir(base) and hasattr(sys, '_MEIPASS'):
+            base = os.path.join(sys._MEIPASS, 'yokai', 'assets', 'items')
+        p = os.path.join(base, group, name + '.png')
+        fr = None
+        if os.path.exists(p):
+            im = pygame.image.load(p)
+            try:
+                im = im.convert_alpha()
+            except pygame.error:
+                pass
+            h = im.get_height()
+            fr = [im.subsurface((i * h, 0, h, h)).copy() for i in range(max(1, im.get_width() // h))]
+        _item_cache[key] = fr
+    if not fr:
+        return None
+    return fr[frame % len(fr)]
+
+
 def draw_icon(surf, icon, col, x, y):
     """Zeichnet ein 16x16 Item-Icon an (x,y)=Mitte."""
+    hi = item_img('icons', icon)
+    if hi is not None:
+        if HI_MODE:
+            hi_blit(hi, x, y + 8)
+        else:
+            key = ('icon1x', icon)
+            s1 = _cache.get(key)
+            if s1 is None:
+                s1 = pygame.transform.smoothscale(hi, (16, 16))
+                _cache[key] = s1
+            surf.blit(s1, (int(x) - 8, int(y) - 8))
+        return
     key = ('icon', icon, col)
     s = _cache.get(key)
     if s is None:

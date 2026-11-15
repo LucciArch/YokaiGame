@@ -208,6 +208,7 @@ class Game:
         self.present()
 
     def present(self):
+        gfx.HI_MODE = False
         sc, ox, oy = self.view()
         self.window.fill((0, 0, 0))
         shake = (0, 0)

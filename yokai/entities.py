@@ -1323,7 +1323,16 @@ class Pickup:
         D = pygame.draw
         gfx.shadow(s, (x - 5, int(self.y) + 4, 10, 3))
         k = self.kind
-        if k in ('heart', 'half'):
+        hi = gfx.item_img('pickups', 'soul' if k == 'spirit' else k, int(self.t * 3) % 2)
+        if hi is not None:
+            if k in ('heart', 'half', 'spirit', 'salt', 'battery'):
+                col = {'spirit': (90, 140, 255), 'salt': (200, 220, 255), 'battery': (120, 200, 255)}.get(k, (255, 60, 80))
+                gfx.draw_glow(s, x, y - 1, 9, col, int(40 + 35 * math.sin(self.t * 5)))
+            gfx.hi_blit(hi, x, y + 8)
+            k = None
+        if k is None:
+            pass
+        elif k in ('heart', 'half'):
             gfx.draw_glow(s, x, y - 1, 9, (255, 60, 80), int(40 + 35 * math.sin(self.t * 5)))
             gfx.heart(s, x - 4, y - 5, 'red', 2 if k == 'heart' else 1)
         elif k == 'spirit':

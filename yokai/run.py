@@ -1663,6 +1663,7 @@ class Run:
 
     def draw(self, s, t):
         gfx.HI.clear()
+        gfx.HI_MODE = True
         if self.bg_dirty or self.bg is None:
             self.render_bg()
         s.blit(self.bg, (0, 0))
