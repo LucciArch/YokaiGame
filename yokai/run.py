@@ -374,7 +374,8 @@ class Run:
         cands = [i for i in self.pool if pool_letter in ITEMS[i]['pools']]
         if not cands:
             cands = [i for i in self.pool if 'T' in ITEMS[i]['pools']] or ['onigiri']
-        ws = [Q_WEIGHT[ITEMS[i]['q']] * (1 + 0.06 * luck * ITEMS[i]['q']) for i in cands]
+        deep = 1 + 0.15 * (self.tier - 1)            # tiefer = wertvollere Funde
+        ws = [Q_WEIGHT[ITEMS[i]['q']] * (1 + 0.06 * luck * ITEMS[i]['q']) * deep ** (ITEMS[i]['q'] - 2) for i in cands]
         iid = random.choices(cands, ws)[0]
         if iid in self.pool:
             self.pool.remove(iid)
