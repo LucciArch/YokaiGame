@@ -350,6 +350,18 @@ SYNERGIES = [
     dict(id='feuerkind', name='Kind des Feuers', desc='Ölschale und Feuerrad', items=['abura_schale', 'kasha_rad'], fx=dict(orbital=2, explode=1)),
     dict(id='strassenkatze', name='Herrenlose Katze', desc='Ein Rōnin und eine Katze', items=['ronin_schwur', 'neko_gloeckchen'], fx=dict(crit=0.2, dash_dmg=1)),
     dict(id='orochi_kusanagi', name='Aus dem Schwanz der Orochi', desc='Susanoo fand das Schwert in der Schlange', items=['kusanagi', 'yamata_zahn'], fx=dict(dmgm=1.4, pierce=1)),
+    dict(id='leben_tod', name='Leben und Tod', desc='Izanamis Erbe vereint', items=['izanami_kamm', 'izanami_schleier'], fx=dict(dmgm=1.25, homing=1)),
+    dict(id='goetter_arsenal', name='Göttliches Arsenal', desc='Speer und Bogen der Kami', items=['ame_nuboko', 'hachiman_bogen'], fx=dict(pierce=1, multishot=1, crit=0.1)),
+    dict(id='hanami', name='Hanami-Picknick', desc='Unter Kirschblüten schmeckt alles besser', items=['onigiri', 'bento', 'umeboshi'], fx=dict(hp=2, clear_heal=0.2)),
+    dict(id='shogatsu', name='Shōgatsu', desc='Ein gutes neues Jahr!', items=['mochi', 'kagami_mochi'], fx=dict(hp=1, luck=2)),
+    dict(id='pilger', name='Reisender Pilger', desc='Der Weg ist das Ziel', items=['strohhut', 'tenugui'], fx=dict(spd=15, range=40)),
+    dict(id='yamabushi', name='Bergasket', desc='Stab und Muschelhorn der Yamabushi', items=['shakujo', 'horagai'], fx=dict(aura=1, knock=1, shotspd=30, dmg=0.5)),
+    dict(id='tiefsee', name='Herr der Tiefe', desc='Das Meer gehorcht dir', items=['otohime_kamm', 'umibozu_auge'], fx=dict(homing=1, rate=0.5, pierce=1)),
+    dict(id='sturmgott', name='Zorn des Sturmgottes', desc='Susanoo schleudert Blitze', items=['susanoo_zorn', 'raijin_magatama'], fx=dict(raijin_chance=0.12, chain=1)),
+    dict(id='oeyama_bande', name='Ōeyama-Bande', desc='Trinkfest und hart wie Horn', items=['shuten_schale', 'gyuki_horn'], fx=dict(dmgm=1.2, knock=1, hp=1)),
+    dict(id='maskenzug', name='Maskenzug', desc='Die Parade der hundert Gesichter', items=['hyakki_rolle', 'noh_maske'], fx=dict(kill_explode=0.15, crit=0.1)),
+    dict(id='verfluchte_sterne', name='Verfluchte Sterne', desc='Fuchs und Stern leuchten gemeinsam', items=['hoshi_splitter', 'kyubi_juwel'], fx=dict(multishot=1, crit=0.1)),
+    dict(id='sommerwind', name='Sommerwind', desc='Windglocke und Spatzenfeder', items=['furin', 'suzume_feder'], fx=dict(rate=0.4, salts_regen=0.15)),
 ]
 
 # =====================================================================  TRANSFORMATIONEN

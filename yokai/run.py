@@ -471,6 +471,10 @@ class Run:
         'drums': 'Oni-Kriegstrommeln! Bei jedem Schlag stürmen die Yokai auf dich zu.',
         'tide': 'Brandung: Wellen rollen über den Strand und schieben dich mit.',
     }
+    QUIRK_SHORT = {'ice': 'Eisiger Boden', 'gust': 'Tengu-Windböen', 'lava': 'Speiende Lavagruben', 'souls': 'Irrlichter',
+                   'current': 'Meeresströmung', 'polter': 'Poltergeist', 'star': 'Sternschnuppen', 'bamboo': 'Bambus-Fallen',
+                   'foxfire': 'Fuchsfeuer', 'hands': 'Greifende Hände', 'cucumber': 'Kappa-Dank', 'drums': 'Oni-Trommeln',
+                   'tide': 'Brandung'}
     QUIRKS = {'yukiyama': 'ice', 'kurama': 'gust', 'jigoku': 'lava', 'enma_cho': 'lava', 'hakaba': 'souls',
               'ryugu': 'current', 'shinkai': 'current', 'obakedera': 'polter', 'yashiki': 'polter',
               'takamagahara': 'star', 'tsukiyomi': 'star', 'chikurin': 'bamboo', 'inari': 'foxfire', 'yomi': 'hands',
@@ -2070,7 +2074,12 @@ class Run:
             T.add(self.biome['jp'], W // 2, 128, 10, (210, 170, 150), 'c', alpha=a)
             if not hasattr(self, 'tip') or self.tip[0] != self.depth:
                 self.tip = (self.depth, random.choice(TIPS))
-            T.add('Tipp: ' + self.tip[1], W // 2, 148, 7, (200, 190, 170), 'c', alpha=a)
+            q = self.QUIRKS.get(self.biome_id)
+            if q:
+                T.add('Eigenheit: ' + self.QUIRK_SHORT[q], W // 2, 142, 8, (255, 200, 140), 'c', alpha=a)
+                T.add('Tipp: ' + self.tip[1], W // 2, 155, 7, (200, 190, 170), 'c', alpha=a)
+            else:
+                T.add('Tipp: ' + self.tip[1], W // 2, 148, 7, (200, 190, 170), 'c', alpha=a)
         if self.boss_intro > 0 and self.boss:
             a = int(255 * min(1, self.boss_intro))
             if self.portrait is None or self.portrait[0] is not self.boss:
