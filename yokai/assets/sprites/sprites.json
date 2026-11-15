@@ -218,10 +218,13 @@
   "w": 34
  },
  "hana": {
-  "h": 32,
-  "kind": "dir4",
-  "n": 4,
-  "w": 32
+  "atk": 4,
+  "h": 70,
+  "hi": true,
+  "kind": "strip",
+  "n": 7,
+  "w": 82,
+  "walk": 4
  },
  "heikegani": {
   "h": 20,
@@ -275,10 +278,11 @@
  },
  "kappa": {
   "atk": 4,
-  "h": 42,
+  "h": 56,
+  "hi": true,
   "kind": "strip",
   "n": 7,
-  "w": 48,
+  "w": 64,
   "walk": 4
  },
  "kappa_small": {
@@ -403,10 +407,11 @@
  },
  "oni": {
   "atk": 4,
-  "h": 74,
+  "h": 106,
+  "hi": true,
   "kind": "strip",
   "n": 7,
-  "w": 63,
+  "w": 152,
   "walk": 4
  },
  "onibi": {

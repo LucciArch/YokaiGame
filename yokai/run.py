@@ -1651,7 +1651,18 @@ class Run:
                     pygame.draw.rect(s, tc, (rect.x - 2, rect.y - 2, rect.w + 4, 3))
                     pygame.draw.rect(s, tc, (rect.x - 2, rect.bottom - 1, rect.w + 4, 3))
 
+    def hi_light(self, x, y):
+        """Helligkeit für Hi-Res-Sprites (gleiche Logik wie draw_dark: Lichtkreis um den Spieler)."""
+        dark = self.biome['dark'] + (150 if self.curse == 'dunkel' else 0)
+        if dark <= 0 or self.room.kind.startswith('shrine'):
+            return 1.0
+        a = min(215, dark) / 255
+        d = math.hypot(x - self.player.x, y - 8 - self.player.y)
+        rr = min(1.0, d / 90)
+        return 1 - a * rr ** 1.5
+
     def draw(self, s, t):
+        gfx.HI.clear()
         if self.bg_dirty or self.bg is None:
             self.render_bg()
         s.blit(self.bg, (0, 0))

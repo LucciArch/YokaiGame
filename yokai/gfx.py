@@ -911,3 +911,58 @@ def heart(surf, x, y, kind, fill):
     if fill > 0:
         shape(col, fill == 1)
         surf.set_at((x + 2, y + 2), (255, 255, 255))
+
+
+# =========================================================================  Hi-Res-Sprite-Ebene
+# Figuren-Sprites sind mit doppelter Pixeldichte gezeichnet. Sie werden nicht in die 480x320-Welt
+# geblittet, sondern gesammelt und beim Darstellen in Fensterauflösung (halbe Größe) gezeichnet.
+HI = []
+_hi_cache = {}
+
+
+def hi_blit(surf, cx, by, alpha=255):
+    """surf: Hi-Res-Bild; (cx, by): Mittelpunkt unten in Weltkoordinaten."""
+    HI.append((surf, cx, by, alpha))
+
+
+_tint_cache = {}
+
+
+def tinted(surf, mode):
+    key = (id(surf), mode)
+    im = _tint_cache.get(key)
+    if im is None:
+        im = surf.copy()
+        if mode == 'flash':
+            im.fill((120, 110, 110, 0), special_flags=pygame.BLEND_RGB_ADD)
+        else:
+            im.fill((150, 210, 255, 0), special_flags=pygame.BLEND_RGB_MULT)
+        if len(_tint_cache) > 600:
+            _tint_cache.clear()
+        _tint_cache[key] = im
+    return im
+
+
+def hi_flush(win, sc, ox, oy, dim=1.0, light=None):
+    for surf, cx, by, alpha in HI:
+        w, h = surf.get_size()
+        tw, th = max(1, int(w * sc / 2)), max(1, int(h * sc / 2))
+        f = dim
+        if light is not None:
+            f *= light(cx, by)
+        fq = round(f * 8) / 8
+        key = (id(surf), tw, th, fq)
+        img = _hi_cache.get(key)
+        if img is None:
+            img = pygame.transform.scale(surf, (tw, th))
+            if fq < 1:
+                v = int(255 * fq)
+                img.fill((v, v, v), special_flags=pygame.BLEND_RGB_MULT)
+            if len(_hi_cache) > 4000:
+                _hi_cache.clear()
+            _hi_cache[key] = img
+        if alpha < 255:
+            img = img.copy()
+            img.set_alpha(alpha)
+        win.blit(img, (int(ox + cx * sc - tw / 2), int(oy + by * sc - th)))
+    HI.clear()

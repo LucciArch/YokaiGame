@@ -219,6 +219,13 @@ class Game:
         else:
             img = pygame.transform.scale(self.screen, (int(W * sc), int(H * sc)))
         self.window.blit(img, (ox + shake[0], oy + shake[1]))
+        r = self.run
+        if r and not getattr(r, 'slide', None) and self.state in ('play', 'pause', 'items', 'over'):
+            dim = 1.0 if self.state == 'play' else 0.45
+            light = r.hi_light if hasattr(r, 'hi_light') else None
+            gfx.hi_flush(self.window, sc, ox + shake[0], oy + shake[1], dim, light)
+        else:
+            gfx.HI.clear()
         gfx.TEXT.flush(self.window, sc, ox + shake[0], oy + shake[1])
         pygame.display.flip()
 

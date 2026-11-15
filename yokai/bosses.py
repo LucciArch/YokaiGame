@@ -52,8 +52,8 @@ class Boss(Enemy):
         self.setup()
         if self.sheet:
             try:
-                im = sheets.frame(self.sheet[0], 0, 0, self.sheet[1], tint=self.sheet[2])
-                self.r = max(self.r, int(min(im.get_width(), im.get_height()) * 0.36))
+                ww, hh = sheets.size_of(self.sheet[0])
+                self.r = max(self.r, int(min(ww, hh) * 0.36))
             except Exception:
                 pass
 
@@ -70,13 +70,30 @@ class Boss(Enemy):
         y = self.y if y is None else y
         return math.atan2(self.p.y - y, self.p.x - x)
 
+    def af(self, name, t, speed=7, off=0):
+        """Animationsbild: Laufschleife, nach einem Schuss Zuschlagen/Zurückziehen."""
+        m = sheets.META.get(name, {})
+        atk = m.get('atk')
+        if atk is None:
+            return int(t * speed) + off
+        since = self.t - getattr(self, 'fire_t', -9)
+        if since < 0.16:
+            return atk + 1
+        if since < 0.42:
+            return atk + 2
+        if 0 < getattr(self, 'wait', 0) < 0.25 and getattr(self, 'co', None) is not None:
+            return atk
+        return (int(t * speed) + off) % m.get('walk', 4)
+
     def ring(self, n, sp, off=0.0, col=(240, 80, 120), x=None, y=None, r=3, **kw):
+        self.fire_t = self.t
         x = self.x if x is None else x
         y = self.y if y is None else y
         for i in range(n):
             ebullet(self.run, x, y, off + i / n * math.tau, sp, col, r, **kw)
 
     def fan(self, n, spread, sp, col=(240, 80, 120), x=None, y=None, ang=None, r=3, **kw):
+        self.fire_t = self.t
         x = self.x if x is None else x
         y = self.y if y is None else y
         a0 = self.ang_p(x, y) if ang is None else ang
@@ -215,6 +232,7 @@ class Boss(Enemy):
         gfx.shadow(s, (int(self.x) - self.r, int(self.y) + self.r - 4, self.r * 2, 7))
         oy = self.y
         self.y += math.sin(t * 2.2) * 1.2
+        n0 = len(gfx.HI)
         try:
             if getattr(self, 'sheet', None):
                 self.render_sheet(target, t)
@@ -222,6 +240,13 @@ class Boss(Enemy):
                 self.render(target, t)
         finally:
             self.y = oy
+        for i in range(n0, len(gfx.HI)):
+            im, cx, by, a = gfx.HI[i]
+            if self.flash > 0:
+                im = gfx.tinted(im, 'flash')
+            elif self.frozen > 0:
+                im = gfx.tinted(im, 'frozen')
+            gfx.HI[i] = (im, cx, by, min(a, self.alpha))
         if True:
             m = pygame.mask.from_surface(surf, 200)
             ol = m.to_surface(setcolor=(18, 10, 22, 255), unsetcolor=(0, 0, 0, 0))
@@ -248,7 +273,7 @@ class Boss(Enemy):
 
     def render_sheet(self, s, t):
         name, sc, tint = self.sheet
-        sheets.blit_center(s, name, self.x, self.y - 4, self.face_dir(), int(t * 7), sc, tint)
+        sheets.blit_center(s, name, self.x, self.y - 4, self.face_dir(), self.af(name, t, 7, 0), sc, tint)
         self.render_extra(s, t)
 
     def render_extra(self, s, t):
@@ -336,8 +361,8 @@ class Omukade(Boss):
         if type(self) is Omukade:
             segs = self.seg_pos()
             for i, (x, y) in enumerate(reversed(segs)):
-                sheets.blit_center(s, 'boss_omukade_seg', x, y, sheets.hdir(math.cos(self.heading)), int(t * 8) + i)
-            sheets.blit_center(s, 'boss_omukade_head', self.x, self.y, sheets.hdir(math.cos(self.heading)), int(t * 8))
+                sheets.blit_center(s, 'boss_omukade_seg', x, y, sheets.hdir(math.cos(self.heading)), self.af('boss_omukade_seg', t, 8, i))
+            sheets.blit_center(s, 'boss_omukade_head', self.x, self.y, sheets.hdir(math.cos(self.heading)), self.af('boss_omukade_head', t, 8, 0))
             return
         segs = self.seg_pos()
         for i, (x, y) in enumerate(reversed(segs)):
@@ -363,7 +388,7 @@ class KappaOu(Boss):
     sheet = ('boss_kappa_ou', 1, None)
 
     def render_sheet(self, s, t):
-        img = sheets.blit_center(s, 'boss_kappa_ou', self.x, self.y - self.z - 6, self.face_dir(), int(t * 7))
+        img = sheets.blit_center(s, 'boss_kappa_ou', self.x, self.y - self.z - 6, self.face_dir(), self.af('boss_kappa_ou', t, 7, 0))
         return
         x, y = int(self.x), int(self.y - self.z - 6 - img.get_height() / 2)
         pygame.draw.polygon(s, (245, 205, 70), [(x - 12, y + 6), (x - 13, y - 6), (x - 6, y + 1), (x, y - 9), (x + 6, y + 1), (x + 13, y - 6), (x + 12, y + 6)])
@@ -690,7 +715,7 @@ class Rokurokubi(Boss):
             cy = by + (self.y - by) * f
             D.circle(s, (240, 210, 190), (int(cx), int(cy)), 4)
         x, y = int(self.x), int(self.y)
-        sheets.blit_center(s, 'boss_rokuro_head', x, y, sheets.hdir(self.p.x - x), int(t * 4))
+        sheets.blit_center(s, 'boss_rokuro_head', x, y, sheets.hdir(self.p.x - x), self.af('boss_rokuro_head', t, 4, 0))
         return
         D.circle(s, (20, 10, 20), (x, y - 3), 11)
         D.circle(s, (248, 222, 204), (x, y), 8)
@@ -1111,7 +1136,7 @@ class Ryujin(Omukade):
                 for side in (-1, 1):
                     D.line(s, (240, 210, 90), (x, y), (x + side * 9, y + 6), 2)
         hx, hy = int(self.x), int(self.y)
-        sheets.blit_center(s, 'boss_ryujin_head', hx, hy, sheets.hdir(math.cos(self.heading)), int(t * 8))
+        sheets.blit_center(s, 'boss_ryujin_head', hx, hy, sheets.hdir(math.cos(self.heading)), self.af('boss_ryujin_head', t, 8, 0))
         return
         hd = self.heading
         for side in (-1, 1):
@@ -1277,7 +1302,7 @@ class Orochi(Boss):
                 cy = y + (hy - y) * f
                 D.circle(s, (40, 90, 50), (int(cx), int(cy)), 5)
                 D.circle(s, (80, 150, 80), (int(cx), int(cy)), 4)
-            sheets.blit_center(s, 'boss_orochi_head', hx, hy, sheets.hdir(self.p.x - hx), int(t * 6) + i)
+            sheets.blit_center(s, 'boss_orochi_head', hx, hy, sheets.hdir(self.p.x - hx), self.af('boss_orochi_head', t, 6, i))
         D.circle(s, (30, 60, 30), (x, y), 20)
         D.circle(s, (70, 130, 70), (x, y), 19)
         for i in range(6):
@@ -1379,9 +1404,9 @@ class Tamamo(Boss):
             pygame.draw.circle(s, (255, 250, 240), (int(tx), int(ty)), 4)
         gfx.draw_glow(s, int(self.x), int(self.y), 34, (255, 190, 90), 60)
         if self.phase == 2:
-            sheets.blit_center(s, 'kitsunebi_e', self.x, self.y - 4, self.face_dir(), int(t * 8), 3)
+            sheets.blit_center(s, 'kitsunebi_e', self.x, self.y - 4, self.face_dir(), self.af('kitsunebi_e', t, 8, 0), 1)
         else:
-            sheets.blit_center(s, 'boss_tamamo', self.x, self.y - 6, self.face_dir(), int(t * 7))
+            sheets.blit_center(s, 'boss_tamamo', self.x, self.y - 6, self.face_dir(), self.af('boss_tamamo', t, 7, 0))
 
     r = 11
 
@@ -1562,7 +1587,7 @@ class Oonyudo(Boss):
 
     def render_sheet(self, s, t):
         gfx.draw_glow(s, int(self.x), int(self.y), int(40 * self.size), (80, 60, 120), 70)
-        sheets.blit_center(s, 'boss_oonyudo', self.x, self.y - 8, self.face_dir(), int(t * 6))
+        sheets.blit_center(s, 'boss_oonyudo', self.x, self.y - 8, self.face_dir(), self.af('boss_oonyudo', t, 6, 0))
 
     """Ein riesiger Mönch, der immer größer wird."""
     r = 16
@@ -1789,7 +1814,7 @@ class KamaitachiTrio(Boss):
         D = pygame.draw
         for i, (x, y) in enumerate(self.pos):
             gfx.shadow(s, (int(x) - 10, int(y) + 10, 20, 5))
-            sheets.blit_center(s, 'kamaitachi', x, y, sheets.hdir(self.p.x - x), int(t * 9) + i, 1,
+            sheets.blit_center(s, 'kamaitachi', x, y, sheets.hdir(self.p.x - x), self.af('kamaitachi', t, 9, i), 1,
                                [(255, 255, 255), (230, 230, 255), (200, 255, 200)][i])
         return
         for i, (x, y) in enumerate(self.pos):

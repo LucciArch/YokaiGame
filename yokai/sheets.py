@@ -46,9 +46,17 @@ def scale_of(name):
     return 1
 
 
+def is_hi(name):
+    return bool(META.get(name, {}).get('hi'))
+
+
 def size_of(name):
+    """Größe in Weltpixeln (Hi-Res-Sprites zählen halb)."""
     m = META.get(name, {})
-    return m.get('w', 16), m.get('h', 16)
+    w, h = m.get('w', 16), m.get('h', 16)
+    if m.get('hi'):
+        return w // 2, h // 2
+    return w, h
 
 
 def frame_count(name):
@@ -99,6 +107,12 @@ def dir_from(dx, dy):
 
 
 def blit_center(surf, name, x, y, d=DOWN, f=0, scale=None, tint=None, flash=False, alpha=255):
-    img = frame(name, d, f, scale, flash, tint, alpha)
+    img = frame(name, d, f, scale, flash, tint, 255)
+    if is_hi(name):
+        from . import gfx
+        gfx.hi_blit(img, x, y + img.get_height() / 4, alpha)
+        return img
+    if alpha < 255:
+        img = img.copy(); img.set_alpha(alpha)
     surf.blit(img, (int(x - img.get_width() / 2), int(y - img.get_height() / 2)))
     return img

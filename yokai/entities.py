@@ -721,14 +721,26 @@ class Player:
             bob = int(abs(math.sin(self.anim * 9)) * 1.5) if self.moving else 0
             if sheets.has(self.char):
                 shooting = getattr(self, 'recoil', 0) > 0 or self.shoot_cd > 0.05
-                if shooting:
-                    dd = sheets.dir_from(*self.facing)
-                elif self.moving:
-                    dd = sheets.dir_from(self.vx, self.vy)
+                m = sheets.META[self.char]
+                if m['kind'] == 'strip':
+                    hx = self.facing[0] if shooting else (self.vx if self.moving else 0)
+                    dd = sheets.hdir(hx) if abs(hx) > 0.05 else getattr(self, '_last_dir', sheets.RIGHT)
+                    self._last_dir = dd
+                    if 'atk' in m and getattr(self, 'recoil', 0) > 0:
+                        fr = m['atk'] + 1
+                    elif 'atk' in m and self.shoot_cd > 0.12:
+                        fr = m['atk'] + 2
+                    else:
+                        fr = int(self.anim * 8) % 4 if self.moving else 0
                 else:
-                    dd = getattr(self, '_last_dir', sheets.DOWN)
-                self._last_dir = dd
-                fr = int(self.anim * 9) % 4 if self.moving else 0
+                    if shooting:
+                        dd = sheets.dir_from(*self.facing)
+                    elif self.moving:
+                        dd = sheets.dir_from(self.vx, self.vy)
+                    else:
+                        dd = getattr(self, '_last_dir', sheets.DOWN)
+                    self._last_dir = dd
+                    fr = int(self.anim * 9) % 4 if self.moving else 0
                 spr = sheets.frame(self.char, dd, fr)
                 bob = 0
             else:
@@ -742,7 +754,10 @@ class Player:
                 alpha_s = spr.copy(); alpha_s.set_alpha(150)
             rx = int(-self.facing[0] * 1.5) if self.recoil > 0 else 0
             ry = int(-self.facing[1] * 1.5) if self.recoil > 0 else 0
-            s.blit(alpha_s, (int(self.x) - spr.get_width() // 2 + rx, int(self.y) - spr.get_height() + 9 - bob + ry))
+            if sheets.has(self.char) and sheets.is_hi(self.char):
+                gfx.hi_blit(spr, self.x + rx, self.y + 9 - bob + ry, alpha_s.get_alpha() if alpha_s is not spr and alpha_s.get_alpha() is not None else 255)
+            else:
+                s.blit(alpha_s, (int(self.x) - spr.get_width() // 2 + rx, int(self.y) - spr.get_height() + 9 - bob + ry))
             if 'oni' in self.transforms:
                 pygame.draw.polygon(s, (250, 230, 120), [(self.x - 4, self.y - 13), (self.x - 6, self.y - 18), (self.x - 2, self.y - 13)])
                 pygame.draw.polygon(s, (250, 230, 120), [(self.x + 4, self.y - 13), (self.x + 6, self.y - 18), (self.x + 2, self.y - 13)])
@@ -843,7 +858,7 @@ class Enemy:
         self.r = d['r']
         if sheets.has(d['sprite']):
             sw, sh = sheets.size_of(d['sprite'])
-            self.r = max(self.r, int(min(sw, sh) * 0.25))
+            self.r = max(self.r, int(min(sw, sh) * 0.3))
         elif d['sprite'] in art.ARTS:
             sp = art.make(d['sprite'])
             self.r = max(self.r, int(min(sp.get_width(), sp.get_height()) * 0.36))
@@ -1262,9 +1277,14 @@ class Enemy:
         if self.state == 'wind' and int(t * 30) % 2:
             spr = spr.copy()
             spr.fill((255, 255, 255), special_flags=pygame.BLEND_RGB_MAX)
-        s.blit(spr, (int(self.x) - spr.get_width() // 2, int(self.y) - spr.get_height() // 2 - bob - 2))
+        hh = spr.get_height()
+        if sheets.has(name) and sheets.is_hi(name):
+            hh //= 2
+            gfx.hi_blit(spr, self.x, self.y + hh / 2 - bob - 2)
+        else:
+            s.blit(spr, (int(self.x) - spr.get_width() // 2, int(self.y) - spr.get_height() // 2 - bob - 2))
         if self.champ:
-            pygame.draw.circle(s, CHAMPIONS[self.champ]['col'], (int(self.x), int(self.y) - spr.get_height() // 2 - 5 - bob), 2)
+            pygame.draw.circle(s, CHAMPIONS[self.champ]['col'], (int(self.x), int(self.y) - hh // 2 - 5 - bob), 2)
         a = self.d.get('attack')
         if a and a['kind'] in ('aimed', 'ring', 'cross', 'spiral') and 0 < self.acd < 0.32 and self.d['move'] not in ('burrow', 'drop'):
             gfx.draw_glow(s, int(self.x), int(self.y) - 2, self.r + 8, (255, 70, 60), int(160 * (1 - self.acd / 0.32)))
