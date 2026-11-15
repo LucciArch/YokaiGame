@@ -545,8 +545,109 @@ def _noise(surf, rect, base, amount, count, rng):
         surf.set_at((x0 + rng.randrange(w), y0 + rng.randrange(h)), _c(base, f))
 
 
+
+# =========================================================================  Umgebungs-Tilesets (handgesetzt)
+import os as _os
+import sys as _sys
+_ENV = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), 'assets', 'env')
+if not _os.path.isdir(_ENV) and hasattr(_sys, '_MEIPASS'):
+    _ENV = _os.path.join(_sys._MEIPASS, 'yokai', 'assets', 'env')
+_env_cache = {}
+
+
+def env_img(folder, name, fw=None):
+    """Lädt assets/env/<folder>/<name>.png und teilt es in Bilder der Breite fw."""
+    key = (folder, name, fw)
+    if key in _env_cache:
+        return _env_cache[key]
+    p = _os.path.join(_ENV, folder, name + '.png')
+    res = None
+    if _os.path.exists(p):
+        im = pygame.image.load(p)
+        try:
+            im = im.convert_alpha()
+        except pygame.error:
+            pass
+        if fw:
+            res = [im.subsurface((i * fw, 0, fw, im.get_height())).copy() for i in range(max(1, im.get_width() // fw))]
+        else:
+            res = [im]
+    _env_cache[key] = res
+    return res
+
+
+def env_ok(biome):
+    return env_img(biome.get('_id', ''), 'floor', 32) is not None
+
+
+def env_floor(biome, rng):
+    s = pygame.Surface((RW, RH))
+    tiles = env_img(biome['_id'], 'floor', 32)
+    plain, deco = tiles[:4], tiles[4:] or tiles[:4]
+    for ty in range(0, RH, 32):
+        for tx in range(0, RW, 32):
+            t = rng.choice(deco) if rng.random() < 0.08 else rng.choice(plain)
+            s.blit(t, (tx, ty))
+    return s
+
+
+def env_walls(biome, rng):
+    bid = biome['_id']
+    s = pygame.Surface((W, H), pygame.SRCALPHA)
+    top = env_img(bid, 'wall_h')[0]
+    bot = (env_img(bid, 'wall_h_bottom') or [top])[0]
+    side = env_img(bid, 'wall_v')[0]
+    corner = env_img(bid, 'wall_corner')[0]
+    deco = env_img(bid, 'wall_deco', 32) or []
+    x0, y0 = RX - 16, RY - 16
+    for tx in range(RX, RX + RW, 32):
+        t = top
+        if deco and rng.random() < 0.18:
+            t = rng.choice(deco)
+        s.blit(t, (tx, y0))
+        s.blit(bot, (tx, RY + RH))
+    rside = pygame.transform.flip(side, True, False)
+    for ty in range(RY, RY + RH, 32):
+        s.blit(side, (x0, ty))
+        s.blit(rside, (RX + RW, ty))
+    s.blit(corner, (x0, y0))
+    s.blit(pygame.transform.flip(corner, True, False), (RX + RW, y0))
+    s.blit(pygame.transform.flip(corner, False, True), (x0, RY + RH))
+    s.blit(pygame.transform.flip(corner, True, True), (RX + RW, RY + RH))
+    return s
+
+
+def env_tile(surf, t, x, y, biome):
+    """Gibt True zurück, wenn ein handgesetztes Tile gezeichnet wurde."""
+    bid = biome.get('_id', '')
+    if t == T_ROCK:
+        r = env_img(bid, 'rock', 32)
+        if r:
+            surf.blit(r[(x * 7 + y * 13) // 32 % len(r)], (x, y))
+            return True
+    elif t == T_POT:
+        r = env_img('_shared', 'pot', 32)
+        if r:
+            surf.blit(r[0], (x, y)); return True
+    elif t == T_LANTERN:
+        r = env_img('_shared', 'lantern', 32)
+        if r:
+            surf.blit(r[0], (x, y)); return True
+    elif t == T_SPIKE:
+        r = env_img('_shared', 'spikes', 32)
+        if r:
+            surf.blit(r[-1], (x, y)); return True
+    elif t == T_PIT:
+        r = env_img('_shared', 'pit_' + biome.get('pit', 'void'), 32)
+        if r:
+            surf.blit(r[0], (x, y)); return True
+    return False
+
+
 def make_floor(biome, rng):
     """Erzeugt die Bodenfläche für einen Raum (RW x RH)."""
+    if env_ok(biome):
+        return env_floor(biome, rng)
     s = pygame.Surface((RW, RH))
     base = biome['floor']
     s.fill(base)
@@ -665,6 +766,8 @@ def _decor(s, kind, base, rng):
 
 def make_walls(biome, rng):
     """Wandrahmen (ganzer Bildschirm, transparent in der Mitte)."""
+    if env_ok(biome):
+        return env_walls(biome, rng)
     s = pygame.Surface((W, H), pygame.SRCALPHA)
     wc = biome['wall']
     D = pygame.draw
@@ -735,6 +838,8 @@ def make_walls(biome, rng):
 
 
 def draw_tile(surf, t, x, y, biome, var=0):
+    if env_tile(surf, t, x, y, biome):
+        return
     D = pygame.draw
     if t == T_ROCK:
         rc = biome['rock']

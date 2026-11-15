@@ -586,3 +586,7 @@ ACHIEVEMENTS = [
     ('ch_bossrush', 'Prüfung: Boss-Ansturm', 'Bestehe die Prüfung „Boss-Ansturm“', None),
     ('ch_papiermeister', 'Prüfung: Papiermeister', 'Bestehe die Prüfung „Papiermeister“', None),
 ]
+
+
+for _k, _b in BIOMES.items():
+    _b['_id'] = _k

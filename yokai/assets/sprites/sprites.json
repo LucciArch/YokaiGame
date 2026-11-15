@@ -1,21 +1,30 @@
 {
  "abura_akago": {
-  "h": 23,
+  "atk": 4,
+  "h": 61,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 20
+  "n": 7,
+  "w": 134,
+  "walk": 4
  },
  "akago": {
-  "h": 32,
-  "kind": "dir4",
-  "n": 4,
-  "w": 32
+  "atk": 4,
+  "h": 60,
+  "hi": true,
+  "kind": "strip",
+  "n": 7,
+  "w": 96,
+  "walk": 4
  },
  "azukiarai": {
-  "h": 25,
+  "atk": 4,
+  "h": 48,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 19
+  "n": 7,
+  "w": 104,
+  "walk": 4
  },
  "bake_danuki": {
   "h": 26,
@@ -24,58 +33,85 @@
   "w": 25
  },
  "bakeneko": {
-  "h": 22,
+  "atk": 4,
+  "h": 55,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 27
+  "n": 7,
+  "w": 108,
+  "walk": 4
  },
  "bakezori": {
-  "h": 21,
+  "atk": 4,
+  "h": 50,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 23
+  "n": 7,
+  "w": 74,
+  "walk": 4
  },
  "benkei": {
-  "h": 32,
-  "kind": "dir4",
-  "n": 4,
-  "w": 32
+  "atk": 4,
+  "h": 80,
+  "hi": true,
+  "kind": "strip",
+  "n": 7,
+  "w": 148,
+  "walk": 4
  },
  "boss_akkorokamui": {
-  "h": 61,
+  "atk": 4,
+  "h": 121,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 68
+  "n": 7,
+  "w": 322,
+  "walk": 4
  },
  "boss_bake_kujira": {
-  "h": 41,
+  "atk": 4,
+  "h": 122,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 68
+  "n": 7,
+  "w": 160,
+  "walk": 4
  },
  "boss_enma": {
-  "h": 58,
+  "atk": 4,
+  "h": 145,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 50
+  "n": 7,
+  "w": 288,
+  "walk": 4
  },
  "boss_gashadokuro": {
-  "h": 68,
+  "atk": 4,
+  "h": 181,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 68
+  "n": 7,
+  "w": 198,
+  "walk": 4
  },
  "boss_izanami": {
-  "h": 55,
+  "atk": 4,
+  "h": 126,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 44
+  "n": 7,
+  "w": 348,
+  "walk": 4
  },
  "boss_jorogumo": {
-  "h": 54,
+  "atk": 4,
+  "h": 135,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 56
+  "n": 7,
+  "w": 202,
+  "walk": 4
  },
  "boss_kagutsuchi": {
   "h": 59,
@@ -84,34 +120,49 @@
   "w": 52
  },
  "boss_kappa_ou": {
-  "h": 59,
+  "atk": 4,
+  "h": 141,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 52
+  "n": 7,
+  "w": 150,
+  "walk": 4
  },
  "boss_nue": {
-  "h": 46,
+  "atk": 4,
+  "h": 123,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 54
+  "n": 7,
+  "w": 268,
+  "walk": 4
  },
  "boss_nurarihyon": {
-  "h": 50,
+  "atk": 4,
+  "h": 95,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 38
+  "n": 7,
+  "w": 232,
+  "walk": 4
  },
  "boss_omukade_head": {
-  "h": 29,
+  "atk": 4,
+  "h": 78,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 28
+  "n": 7,
+  "w": 106,
+  "walk": 4
  },
  "boss_omukade_seg": {
-  "h": 22,
+  "atk": 4,
+  "h": 47,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 24
+  "n": 7,
+  "w": 36,
+  "walk": 4
  },
  "boss_oonyudo": {
   "h": 67,
@@ -120,10 +171,13 @@
   "w": 56
  },
  "boss_orochi_head": {
-  "h": 25,
+  "atk": 4,
+  "h": 61,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 26
+  "n": 7,
+  "w": 110,
+  "walk": 4
  },
  "boss_raiju": {
   "h": 40,
@@ -132,22 +186,40 @@
   "w": 52
  },
  "boss_rokuro_body": {
-  "h": 35,
+  "atk": 4,
+  "h": 76,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 36
+  "n": 7,
+  "w": 72,
+  "walk": 4
  },
  "boss_rokuro_head": {
-  "h": 27,
+  "atk": 4,
+  "h": 66,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 28
+  "n": 7,
+  "w": 112,
+  "walk": 4
  },
  "boss_ryujin_head": {
-  "h": 33,
+  "atk": 4,
+  "h": 89,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 36
+  "n": 7,
+  "w": 156,
+  "walk": 4
+ },
+ "boss_ryujin_seg": {
+  "atk": 4,
+  "h": 47,
+  "hi": true,
+  "kind": "strip",
+  "n": 7,
+  "w": 44,
+  "walk": 4
  },
  "boss_shuten_doji": {
   "h": 54,
@@ -168,48 +240,67 @@
   "w": 52
  },
  "boss_umibozu": {
-  "h": 63,
+  "atk": 4,
+  "h": 163,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 68
+  "n": 7,
+  "w": 396,
+  "walk": 4
  },
  "boss_yuki_onna": {
-  "h": 51,
+  "atk": 4,
+  "h": 106,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 36
+  "n": 7,
+  "w": 200,
+  "walk": 4
  },
  "chochin": {
-  "h": 28,
+  "atk": 4,
+  "h": 65,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 20
+  "n": 7,
+  "w": 114,
+  "walk": 4
  },
  "enenra": {
-  "h": 27,
+  "atk": 4,
+  "h": 68,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 27
+  "n": 7,
+  "w": 126,
+  "walk": 4
  },
  "funayurei": {
-  "h": 29,
+  "atk": 4,
+  "h": 81,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 21
+  "n": 7,
+  "w": 152,
+  "walk": 4
  },
  "gaki": {
   "atk": 4,
-  "h": 44,
+  "h": 66,
+  "hi": true,
   "kind": "strip",
   "n": 7,
-  "w": 33,
+  "w": 78,
   "walk": 4
  },
  "gaki_small": {
-  "h": 17,
+  "atk": 4,
+  "h": 47,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 16
+  "n": 7,
+  "w": 58,
+  "walk": 4
  },
  "gyuki": {
   "h": 30,
@@ -227,16 +318,22 @@
   "walk": 4
  },
  "heikegani": {
-  "h": 20,
+  "atk": 4,
+  "h": 69,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 26
+  "n": 7,
+  "w": 146,
+  "walk": 4
  },
  "hitodama": {
-  "h": 24,
+  "atk": 4,
+  "h": 47,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 20
+  "n": 7,
+  "w": 106,
+  "walk": 4
  },
  "hyosube": {
   "h": 25,
@@ -245,36 +342,49 @@
   "w": 21
  },
  "isonade": {
-  "h": 22,
+  "atk": 4,
+  "h": 71,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 30
+  "n": 7,
+  "w": 112,
+  "walk": 4
  },
  "ittan_momen": {
-  "h": 19,
+  "atk": 4,
+  "h": 51,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 33
+  "n": 7,
+  "w": 168,
+  "walk": 4
  },
  "jinmenju": {
-  "h": 32,
+  "atk": 4,
+  "h": 95,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 29
+  "n": 7,
+  "w": 112,
+  "walk": 4
  },
  "kamaitachi": {
   "atk": 4,
-  "h": 30,
+  "h": 76,
+  "hi": true,
   "kind": "strip",
   "n": 7,
-  "w": 52,
+  "w": 102,
   "walk": 4
  },
  "kamikiri": {
-  "h": 24,
+  "atk": 4,
+  "h": 61,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 20
+  "n": 7,
+  "w": 82,
+  "walk": 4
  },
  "kappa": {
   "atk": 4,
@@ -292,28 +402,40 @@
   "w": 19
  },
  "karasu": {
-  "h": 15,
+  "atk": 4,
+  "h": 64,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 20
+  "n": 7,
+  "w": 72,
+  "walk": 4
  },
  "karasu_tengu": {
-  "h": 26,
+  "atk": 4,
+  "h": 85,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 28
+  "n": 7,
+  "w": 114,
+  "walk": 4
  },
  "kasa_obake": {
-  "h": 28,
+  "atk": 4,
+  "h": 83,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 24
+  "n": 7,
+  "w": 88,
+  "walk": 4
  },
  "kasha": {
-  "h": 23,
+  "atk": 4,
+  "h": 72,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 28
+  "n": 7,
+  "w": 114,
+  "walk": 4
  },
  "katawaguruma": {
   "h": 32,
@@ -322,52 +444,76 @@
   "w": 31
  },
  "kenji": {
-  "h": 32,
-  "kind": "dir4",
-  "n": 4,
-  "w": 32
+  "atk": 4,
+  "h": 72,
+  "hi": true,
+  "kind": "strip",
+  "n": 7,
+  "w": 82,
+  "walk": 4
  },
  "kerakera_onna": {
-  "h": 36,
+  "atk": 4,
+  "h": 101,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 32
+  "n": 7,
+  "w": 148,
+  "walk": 4
  },
  "kitsunebi_e": {
-  "h": 23,
+  "atk": 4,
+  "h": 45,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 20
+  "n": 7,
+  "w": 108,
+  "walk": 4
  },
  "kodama": {
-  "h": 24,
+  "atk": 4,
+  "h": 43,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 20
+  "n": 7,
+  "w": 44,
+  "walk": 4
  },
  "kotaro": {
-  "h": 32,
-  "kind": "dir4",
-  "n": 4,
-  "w": 32
+  "atk": 4,
+  "h": 83,
+  "hi": true,
+  "kind": "strip",
+  "n": 7,
+  "w": 136,
+  "walk": 4
  },
  "kumo": {
-  "h": 14,
+  "atk": 4,
+  "h": 41,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 16
+  "n": 7,
+  "w": 82,
+  "walk": 4
  },
  "kuzunoha": {
-  "h": 32,
-  "kind": "dir4",
-  "n": 4,
-  "w": 32
+  "atk": 4,
+  "h": 67,
+  "hi": true,
+  "kind": "strip",
+  "n": 7,
+  "w": 98,
+  "walk": 4
  },
  "mokumokuren": {
-  "h": 26,
+  "atk": 4,
+  "h": 62,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 26
+  "n": 7,
+  "w": 182,
+  "walk": 4
  },
  "nekomata": {
   "h": 22,
@@ -376,16 +522,22 @@
   "w": 28
  },
  "ningyo": {
-  "h": 20,
+  "atk": 4,
+  "h": 60,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 26
+  "n": 7,
+  "w": 156,
+  "walk": 4
  },
  "nopperabo": {
-  "h": 28,
+  "atk": 4,
+  "h": 66,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 22
+  "n": 7,
+  "w": 76,
+  "walk": 4
  },
  "nuppeppo": {
   "h": 26,
@@ -394,16 +546,22 @@
   "w": 26
  },
  "nurikabe": {
-  "h": 40,
+  "atk": 4,
+  "h": 93,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 40
+  "n": 7,
+  "w": 110,
+  "walk": 4
  },
  "okiku": {
-  "h": 32,
-  "kind": "dir4",
-  "n": 4,
-  "w": 32
+  "atk": 4,
+  "h": 62,
+  "hi": true,
+  "kind": "strip",
+  "n": 7,
+  "w": 124,
+  "walk": 4
  },
  "oni": {
   "atk": 4,
@@ -415,70 +573,103 @@
   "walk": 4
  },
  "onibi": {
-  "h": 23,
+  "atk": 4,
+  "h": 58,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 20
+  "n": 7,
+  "w": 114,
+  "walk": 4
  },
  "ponpoko": {
-  "h": 32,
-  "kind": "dir4",
-  "n": 4,
-  "w": 32
+  "atk": 4,
+  "h": 60,
+  "hi": true,
+  "kind": "strip",
+  "n": 7,
+  "w": 126,
+  "walk": 4
  },
  "sazae_oni": {
-  "h": 22,
+  "atk": 4,
+  "h": 61,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 24
+  "n": 7,
+  "w": 90,
+  "walk": 4
  },
  "seimei": {
-  "h": 32,
-  "kind": "dir4",
-  "n": 4,
-  "w": 32
+  "atk": 4,
+  "h": 68,
+  "hi": true,
+  "kind": "strip",
+  "n": 7,
+  "w": 126,
+  "walk": 4
  },
  "shikome": {
-  "h": 27,
+  "atk": 4,
+  "h": 72,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 24
+  "n": 7,
+  "w": 92,
+  "walk": 4
  },
  "shinigami": {
-  "h": 33,
+  "atk": 4,
+  "h": 124,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 26
+  "n": 7,
+  "w": 136,
+  "walk": 4
  },
  "susanoo": {
-  "h": 32,
-  "kind": "dir4",
-  "n": 4,
-  "w": 32
+  "atk": 4,
+  "h": 83,
+  "hi": true,
+  "kind": "strip",
+  "n": 7,
+  "w": 130,
+  "walk": 4
  },
  "tenome": {
-  "h": 28,
+  "atk": 4,
+  "h": 64,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 24
+  "n": 7,
+  "w": 156,
+  "walk": 4
  },
  "tesso": {
-  "h": 15,
+  "atk": 4,
+  "h": 45,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 17
+  "n": 7,
+  "w": 96,
+  "walk": 4
  },
  "tsuchigumo": {
-  "h": 25,
+  "atk": 4,
+  "h": 96,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 33
+  "n": 7,
+  "w": 166,
+  "walk": 4
  },
  "tsuchinoko": {
-  "h": 18,
+  "atk": 4,
+  "h": 47,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 29
+  "n": 7,
+  "w": 138,
+  "walk": 4
  },
  "tsurube_otoshi": {
   "h": 31,
@@ -493,21 +684,30 @@
   "w": 31
  },
  "yamabiko": {
-  "h": 24,
+  "atk": 4,
+  "h": 65,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 23
+  "n": 7,
+  "w": 82,
+  "walk": 4
  },
  "yosuzume": {
-  "h": 14,
+  "atk": 4,
+  "h": 47,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 17
+  "n": 7,
+  "w": 54,
+  "walk": 4
  },
  "yuki_warashi": {
-  "h": 24,
+  "atk": 4,
+  "h": 62,
+  "hi": true,
   "kind": "strip",
-  "n": 2,
-  "w": 21
+  "n": 7,
+  "w": 98,
+  "walk": 4
  }
 }
