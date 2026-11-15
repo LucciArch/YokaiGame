@@ -1090,8 +1090,14 @@ HI = []
 _hi_cache = {}
 
 
-def hi_blit(surf, cx, by, alpha=255):
-    """surf: Hi-Res-Bild; (cx, by): Mittelpunkt unten in Weltkoordinaten."""
+NOCACHE = set()
+
+
+def hi_blit(surf, cx, by, alpha=255, transient=False):
+    """surf: Hi-Res-Bild; (cx, by): Mittelpunkt unten in Weltkoordinaten.
+    transient=True für Bilder, die jedes Bild neu erzeugt werden (nicht cachen)."""
+    if transient:
+        NOCACHE.add(id(surf))
     HI.append((surf, cx, by, alpha))
 
 
@@ -1100,7 +1106,8 @@ _tint_cache = {}
 
 def tinted(surf, mode):
     key = (id(surf), mode)
-    im = _tint_cache.get(key)
+    tr = id(surf) in NOCACHE
+    im = None if tr else _tint_cache.get(key)
     if im is None:
         im = surf.copy()
         if mode == 'flash':
@@ -1111,6 +1118,9 @@ def tinted(surf, mode):
             im.fill((14, 10, 22, 0), special_flags=pygame.BLEND_RGB_MULT)
         else:
             im.fill((150, 210, 255, 0), special_flags=pygame.BLEND_RGB_MULT)
+        if tr:
+            NOCACHE.add(id(im))
+            return im
         if len(_tint_cache) > 600:
             _tint_cache.clear()
         _tint_cache[key] = im
@@ -1127,20 +1137,23 @@ def hi_flush(win, sc, ox, oy, dim=1.0, light=None):
             f *= light(cx, by)
         fq = round(f * 8) / 8
         key = (id(surf), tw, th, fq)
-        img = _hi_cache.get(key)
+        tr = id(surf) in NOCACHE
+        img = None if tr else _hi_cache.get(key)
         if img is None:
             img = pygame.transform.scale(surf, (tw, th))
             if fq < 1:
                 v = int(255 * fq)
                 img.fill((v, v, v), special_flags=pygame.BLEND_RGB_MULT)
-            if len(_hi_cache) > 4000:
-                _hi_cache.clear()
-            _hi_cache[key] = img
+            if not tr:
+                if len(_hi_cache) > 4000:
+                    _hi_cache.clear()
+                _hi_cache[key] = img
         if alpha < 255:
             img = img.copy()
             img.set_alpha(alpha)
         win.blit(img, (int(ox + cx * sc - tw / 2), int(oy + by * sc - th)))
     HI.clear()
+    NOCACHE.clear()
 
 
 _mini_cache = {}

@@ -654,8 +654,80 @@ class Gashadokuro(Boss):
         D.polygon(s, (20, 10, 10), [(x, y + 4), (x - 3, y + 9), (x + 3, y + 9)])
 
 
+_NECK_ANCHOR = {}
+
+
+def _anchor(img, body):
+    """Endpunkt des Halsstummels im Sprite (Hautfarbe): beim Körper ganz oben, beim Kopf ganz unten."""
+    key = (id(img), body)
+    if key in _NECK_ANCHOR:
+        return _NECK_ANCHOR[key]
+    arr = pygame.surfarray.pixels3d(img)
+    al = pygame.surfarray.pixels_alpha(img)
+    best = None
+    w, h = img.get_size()
+    for xx in range(w):
+        for yy in range(h):
+            if al[xx, yy] == 0:
+                continue
+            r_, g_, b_ = int(arr[xx, yy, 0]), int(arr[xx, yy, 1]), int(arr[xx, yy, 2])
+            if r_ > 190 and g_ > 130 and 100 < b_ < 200 and r_ - b_ > 40:
+                sc = -yy if body else yy
+                if best is None or sc > best[0]:
+                    best = (sc, xx, yy)
+    del arr, al
+    res = (best[1], best[2]) if best else (w // 2, 0 if body else h)
+    _NECK_ANCHOR[key] = (res, w, h)
+    return _NECK_ANCHOR[key]
+
+
 class Rokurokubi(Boss):
     r = 9
+
+    def draw_neck(self, t, bx, by, hx, hy):
+        """Langer Hals als glatte Röhre in der Hi-Res-Ebene zwischen Körper- und Kopfstummel."""
+        bd = sheets.hdir(self.p.x - bx)
+        hd = sheets.hdir(self.p.x - hx)
+        bimg = sheets.frame('boss_rokuro_body', bd, self.af('boss_rokuro_body', t, 4, 0))
+        himg = sheets.frame('boss_rokuro_head', hd, self.af('boss_rokuro_head', t, 4, 0))
+        (ax_, ay_), bw, bh = _anchor(bimg, True)
+        (ex_, ey_), hw, hh = _anchor(himg, False)
+        A = (bx - bw / 4 + ax_ / 2, by - bh / 4 + ay_ / 2 + 2.0)
+        B = (hx - hw / 4 + ex_ / 2, hy - hh / 4 + ey_ / 2)
+        side = -1 if hd == sheets.RIGHT else 1          # Kopf schaut zum Spieler, Stummel zeigt nach hinten-unten
+        hdx, hdy = 0.6 * side / 1.166, 1.0 / 1.166
+        B = (B[0] - hdx * 1.5, B[1] - hdy * 1.5)
+        c1 = (A[0], A[1] - 34)
+        L = math.hypot(B[0] - A[0], B[1] - A[1]) + 40
+        K = max(28, 0.45 * L)                         # Hals führt den Stummel fort und schwingt im Bogen zum Körper
+        c2 = (B[0] + hdx * K, B[1] + hdy * K)
+        n = max(24, int(L * 1.6))
+        pts = []
+        for i in range(n + 1):
+            u = i / n
+            mu = 1 - u
+            px_ = mu ** 3 * A[0] + 3 * mu * mu * u * c1[0] + 3 * mu * u * u * c2[0] + u ** 3 * B[0]
+            py_ = mu ** 3 * A[1] + 3 * mu * mu * u * c1[1] + 3 * mu * u * u * c2[1] + u ** 3 * B[1]
+            pts.append([px_, py_])
+        base = [q[:] for q in pts]
+        for i in range(1, n):                         # Schlängeln quer zur Laufrichtung
+            dx_, dy_ = base[i + 1][0] - base[i - 1][0], base[i + 1][1] - base[i - 1][1]
+            dl = math.hypot(dx_, dy_) or 1
+            u = i / n
+            amp = 7 * math.sin(math.pi * u) * math.sin(u * math.pi * 3 + t * 3)
+            pts[i][0] += -dy_ / dl * amp
+            pts[i][1] += dx_ / dl * amp
+        xs = [q[0] for q in pts]; ys = [q[1] for q in pts]
+        m = 4
+        x0, y0 = min(xs) - m, min(ys) - m
+        sw, shh = int((max(xs) - x0 + m) * 2) + 2, int((max(ys) - y0 + m) * 2) + 2
+        surf = pygame.Surface((sw, shh), pygame.SRCALPHA)
+        hp = [((q[0] - x0) * 2, (q[1] - y0) * 2) for q in pts]
+        D = pygame.draw
+        for col, rad, off in (((10, 8, 20), 4.6, 0), ((201, 128, 108), 3.4, 0.6), ((240, 188, 152), 2.4, -0.4), ((255, 230, 204), 0.9, -1.4)):
+            for q in hp:
+                D.circle(surf, col, (int(q[0] + off), int(q[1] + off * 0.3)), max(1, int(round(rad))))
+        gfx.hi_blit(surf, x0 + sw / 4, y0 + shh / 2, transient=True)
 
     def setup(self):
         self.body = (CX, RY + 40)
@@ -712,20 +784,9 @@ class Rokurokubi(Boss):
             sheets.blit_center(s, 'boss_rokuro_body', bx, by + 6, sheets.hdir(self.p.x - bx), self.af('boss_rokuro_body', t, 4, 0))
         else:
             D.ellipse(s, (180, 50, 70), (bx - 18, by - 2, 36, 26))
-        # Hals (blass, mit dunklem Umriss, schlängelt sich)
-        n = 22
-        pts = []
-        for i in range(n + 1):
-            f = i / n
-            cx = bx + (self.x - bx) * f + math.sin(f * math.pi * 3 + t * 3) * 10 * (1 - abs(f - 0.5) * 2)
-            cy = by - 6 + (self.y - by + 6) * f
-            pts.append((int(cx), int(cy)))
-        for (cx, cy) in pts:
-            D.circle(s, (20, 10, 22), (cx, cy), 4)
-        for (cx, cy) in pts:
-            D.circle(s, (201, 128, 108), (cx, cy), 3)
-        for (cx, cy) in pts:
-            D.circle(s, (240, 188, 152), (cx - 1, cy - 1), 1)
+        x, y = int(self.x), int(self.y)
+        if sheets.has('boss_rokuro_body') and sheets.has('boss_rokuro_head'):
+            self.draw_neck(t, bx, by + 6, x, y)
         x, y = int(self.x), int(self.y)
         sheets.blit_center(s, 'boss_rokuro_head', x, y, sheets.hdir(self.p.x - x), self.af('boss_rokuro_head', t, 4, 0))
         return

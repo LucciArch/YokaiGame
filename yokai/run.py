@@ -1846,7 +1846,7 @@ class Run:
         return 1 - a * rr ** 1.5
 
     def draw(self, s, t):
-        gfx.HI.clear()
+        gfx.HI.clear(); gfx.NOCACHE.clear()
         gfx.HI_MODE = True
         if self.bg_dirty or self.bg is None:
             self.render_bg()
