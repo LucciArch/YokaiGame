@@ -1687,13 +1687,16 @@ class Run:
         self.draw_doors(s, t)
         p = self.player
         # Tutorial-Hinweise
-        if self.room.extra.get('tutorial'):
+        if self.room.extra.get('tutorial') and (self.cur_banner or self.banners):
+            self._tut_a = 0.0
+        elif self.room.extra.get('tutorial'):
+            self._tut_a = min(1.0, getattr(self, '_tut_a', 0.0) + 1 / 40)
             cx = RX + RW / 2
             lines = ['WASD – Bewegen', 'Pfeiltasten / Maus – Ofuda werfen', 'Leertaste – Ausweichrolle',
                      'E – Aktives Item     Q – Reinigungssalz', 'Tab – Items & Werte    Esc – Pause',
                      'Tipp: Salz an rissigen Wänden deckt Geheimräume auf']
             for i, l in enumerate(lines):
-                gfx.TEXT.add(l, cx, RY + 22 + i * 13, 8, (230, 220, 190), 'c', alpha=170)
+                gfx.TEXT.add(l, cx, RY + 22 + i * 13, 8, (230, 220, 190), 'c', alpha=int(170 * self._tut_a))
         for h in self.hazards:
             h.draw(s, t)
         for o in self.objs:
