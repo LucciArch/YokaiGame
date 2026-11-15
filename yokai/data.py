@@ -728,6 +728,11 @@ ENEMIES['nureonna'] = {'name': 'Nure-onna', 'sprite': 'nureonna', 'hp': 26, 'spe
                                   'eff': None, 'r': 3}}
 for _b in ('uminobe', 'shinkai', 'ryugu'):
     BIOMES[_b]['enemies'].append('nureonna')
+ENEMIES['gozu'] = {'name': 'Gozu', 'sprite': 'gozu', 'hp': 52, 'speed': 30, 'r': 11, 'move': 'chase',
+                   'attack': {'kind': 'ring', 'n': 10, 'spread': 0.0, 'speed': 80, 'cd': 3.2, 'col': (230, 120, 70),
+                              'eff': None, 'r': 3}}
+for _b in ('enma_cho', 'jigoku'):
+    BIOMES[_b]['enemies'].append('gozu')
 for _b in ('takamagahara', 'tsukiyomi'):
     BIOMES[_b]['enemies'] += ['komainu', 'tennin']
 BIOMES['takamagahara']['enemies'] = [e for e in BIOMES['takamagahara']['enemies'] if e != 'ningyo']

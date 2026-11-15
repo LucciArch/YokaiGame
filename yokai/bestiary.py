@@ -100,6 +100,8 @@ LORE = {
               'Rast umher und hinterlässt Feuer.'),
     'wanyudo': ('輪入道', 'Der Kopf eines Mannes in einem brennenden Rad, der die Seelen derer stiehlt, die ihn ansehen.',
                 'Prallt durch den Raum und zieht Flammen nach.'),
+    'gozu': ('牛頭', 'Der Ochsenköpfige, zusammen mit dem Pferdeköpfigen Mezu Wächter der Hölle. Sie fangen die Seelen der Sünder mit gegabelten Stangen und führen sie vor Enma.',
+             'Stapft unaufhaltsam heran; sein Stampfen schickt einen Feuerring aus.'),
     'nureonna': ('濡女', 'Eine Schlange mit dem Kopf einer Frau und triefend nassem Haar. Sie bittet Fischer, ihr Kind zu halten – das Kind wird schwer wie Stein, und sie kommt zurück.',
                  'Schlängelt sich im Zickzack heran und spuckt Fächer aus Meerwasser.'),
     'kawauso': ('川獺', 'Fischotter, die sich in hübsche Mädchen oder Mönche verwandeln, mit Strohhut und Laterne am Ufer warten und Wanderer ins Wasser locken.',

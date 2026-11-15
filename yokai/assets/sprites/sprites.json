@@ -323,6 +323,15 @@
   "w": 58,
   "walk": 4
  },
+ "gozu": {
+  "atk": 4,
+  "h": 105,
+  "hi": true,
+  "kind": "strip",
+  "n": 7,
+  "w": 50,
+  "walk": 4
+ },
  "gyuki": {
   "atk": 4,
   "h": 96,
