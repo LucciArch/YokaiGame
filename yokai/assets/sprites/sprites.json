@@ -613,11 +613,11 @@
  },
  "ningyo": {
   "atk": 4,
-  "h": 60,
+  "h": 44,
   "hi": true,
   "kind": "strip",
   "n": 7,
-  "w": 156,
+  "w": 88,
   "walk": 4
  },
  "nopperabo": {
