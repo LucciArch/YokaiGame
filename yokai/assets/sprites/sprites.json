@@ -1,11 +1,11 @@
 {
  "abura_akago": {
   "atk": 4,
-  "h": 66,
+  "h": 56,
   "hi": true,
   "kind": "strip",
   "n": 7,
-  "w": 66,
+  "w": 82,
   "walk": 4
  },
  "akago": {

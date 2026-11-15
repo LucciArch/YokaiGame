@@ -1,120 +1,122 @@
-"""Abura-akago – Geisterkind, das nachts das Lampenöl aufleckt. Komplett neu (Runde 105): krabbelndes Kleinkind
-in richtiger Anatomie (Kopf etwa ein Drittel der Körperlänge, Speckfalten an Hand- und Fußgelenken, Knie auf dem
-Boden, Fußsohlen nach oben), fahle Geisterhaut, rotes Bauchlätzchen (haragake), Haarbüschel am Scheitel.
-Leckt mit langer Zunge aus einer Öllampenschale; über dem Rücken schwebt ein Irrlicht.
-Angriff: richtet sich auf, das Irrlicht lodert, spuckt Feuer."""
+"""Abura-akago – das Kind aus dem Irrlicht, das in den Häusern das Lampenöl aufleckt. Zweiter Neuentwurf
+(Runde 107): schwebendes Kleinkind in Sitzhaltung (Knie angezogen), eingehüllt von einem Irrlicht, dessen
+Flammen hinter ihm zum Schweif auslaufen. Warme, vom Feuer angestrahlte Haut, großer Kopf mit Karako-Frisur
+(kahl rasiert, Büschel an Stirn und Schläfe), runde dunkle Augen mit Glutpunkt, Pausbacken. Hält mit beiden
+Händchen eine Öllampenschale vors Gesicht und leckt daran. Rotes Bauchlätzchen.
+Angriff: lässt die Schale sinken, reißt den Mund auf und spuckt Feuer – die Flammen lodern auf."""
 import sys, os, math
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'enemies_4'))
 from common import *
 import common
 common.D = os.path.dirname(os.path.abspath(__file__)) + '/'
 
-CW, CH = 80, 72
-OX, OY = 8, 14                     # lokale Grundlinie y = 52
-col('ab0', '#2e2644'); col('ab1', '#7a6a8e'); col('ab2', '#c0aec0'); col('ab3', '#ece0e2')
-add_rim('ab0 ab1 ab2', 'ab3'); DARK.update(ab3='ab2', ab2='ab1', ab1='ab0')
-SK = ('ab1', 'ab2', 'ab3')
-SKF = ('ab0', 'ab1', 'ab2')
+CW, CH = 92, 72
+OX, OY = 8, 8
+col('hb', '#1a1738')
+SK = ('k1', 'k2', 'k3')
+SKD = ('k0', 'k1', 'k2')
+LEG = dict(zip('abcdKqWhHeEm', ['k0', 'k1', 'k2', 'k3', 'K', 'q', 'y2', 'h0', 'hb', 'e1', 'y3', 'm2']))
+# Kopf im Dreiviertelprofil nach links: rasierter Schädel (Haut), Stirnbüschel + Schläfenbüschel, große Augen
+HEAD = """
+.......hhhh......
+.....hhHHHhccc...
+....hHHHhddddcbb.
+...hHhhdddddcccbb
+...hhddddddccccbb
+..cddddddddcccccbh
+..ddKKKddKKKcccbbh
+.cdKKWKdKKWKcccbhH
+.cdKKKKdKKKKccbbhH
+.ddcKKcddKKcccbbhh
+dddddddcdcccccbb.
+.ddmmdcddcccccbbb.
+.cddddqqqdcccbbba.
+..ccccqmqcccbbbaa.
+...ccccccccbbbaa..
+....bbbbbbbbaaa...
+......aaaaaa......
+"""
 
 
 def P(x, y):
     return (x + OX, y + OY)
 
 
-def limb(c, pts, rs, ramp, crease=True):
-    p = C()
-    m = None
-    for (a, b), (ra, rb) in zip(zip(pts, pts[1:]), zip(rs, rs[1:])):
-        s_ = L(*a, ra, *b, rb)
-        m = s_ if m is None else m | s_
-    p.form(m, ramp, sd=2, hl=1)
-    if crease:
-        for j in pts[1:-1]:
-            p.pxs([(j[0], j[1] + 1), (j[0] + 1, j[1] + 1)], ramp[0])
-    c.stamp(p, 'K')
-    return m
-
-
-def draw(bob=0, rise=0, ha=0, hb=0, tongue=1, flare=0, mouth=0, fl=0):
+def draw(bob=0, flare=0, mouth=0, dish=1, kick=0, wv=0.0):
     setsize(CW, CH)
     c = C()
 
     def B(x, y):
         return P(x, y + bob)
-    hx, hy = 18 + rise * 0.6, 28 - rise * 1.6
-    # ---- Irrlicht hinter dem Rücken
-    flame(c, [B(44, 16 + fl)], [(B(44, 16 + fl), B(42 - flare, 2 - flare * 3 + fl), 4.4 + flare * 0.6),
-                                 (B(44, 16 + fl), B(48, 6 - flare * 2 + fl), 3.0)], w=4.4)
-    # ---- Öllampenschale
+
+    # ---- Irrlicht: Flammenzungen steigen hinter dem Rücken auf
+    tips = []
+    for k in range(4):
+        t = k / 3
+        base = B(44 + t * 4, 32 + t * 14)
+        tip = B(58 + t * 12 + flare * 2 + math.sin(wv + k * 1.7) * 2, 16 + t * 14 - flare * 2)
+        tips.append((base, tip, 5.4 - t * 1.4 + flare * 0.3))
+    flame(c, None, tips, w=5)
+    # ---- fernes Bein (angezogen)
     p = C()
-    dish = E(*P(6, 50), 6.4, 2.2)
-    p.form(dish, ('w0', 'w1', 'w2'), sd=1, hl=1)
-    p.fill(E(*P(6, 49), 4.6, 1.0), 'y0')                               # Öl
-    p.pxs([P(4, 49), P(5, 49)], 'y2')
-    p.line([P(9, 49), P(12, 47)], 'v2')                                # Docht
+    p.form(L(*B(42, 44), 4.0, *B(34 - kick, 48), 3.2) | L(*B(34 - kick, 48), 3.0, *B(40 - kick, 53), 2.4), SKD, sd=1, hl=0)
     c.stamp(p, 'K')
-    # ---- ferne Gliedmaßen
-    limb(c, [B(32 - rise * 0.3, 34 - rise), B(30 - ha, 42 - rise * 0.5), B(28 - ha, 50 - rise * 0.8)], [3.4, 2.8, 2.4], SKF)
-    limb(c, [B(48, 38), B(46 + hb, 49), B(58 + hb, 49)], [4.4, 3.4, 2.4], SKF)
-    # ---- Rumpf: rundlicher Babybauch, Po höher als Schultern
+    # ---- Rumpf: Babybauch
     p = C()
-    tor = E(*B(36, 38 - rise * 0.6), 10.4, 7.4) | E(*B(47, 36 - rise * 0.2), 7.4, 7.4)
+    tor = E(*B(38, 38), 8.4, 9.4)
     p.form(tor, SK, sd=3, hl=1)
-    bib = PG([B(27, 34 - rise), B(33, 33 - rise), B(40, 44 - rise * 0.5), B(34, 47 - rise * 0.5), B(28, 45 - rise)]) & sh(tor, 0, 1)
+    bib = PG([B(31, 32), B(40, 31), B(44, 38), B(40, 47), B(32, 46)]) & sh(tor, 0, 1)
     p.form(bib, ('m1', 'm2', 'm3'), sd=1, hl=1)
-    p.line([B(28, 36 - rise), B(34, 35 - rise)], 'y1', only=bib)       # Goldborte
-    p.fill(E(*B(34, 41 - rise * 0.7), 1.6, 1.6) & bib, 'y1')            # Glückssymbol
-    p.pxs([B(48, 33)], 'ab1')                                           # Grübchen am Po
+    p.line([B(31, 33), B(40, 32)], 'y1', only=bib)
+    p.fill(E(*B(37, 39), 1.6, 1.6) & bib, 'y1')
+    p.pxs([B(37, 39)], 'm1')
     c.stamp(p, 'K')
-    # ---- nahes Bein: Knie am Boden, Fußsohle nach oben
-    lg = limb(c, [B(46, 39), B(42 + hb, 50), B(54 + hb, 50)], [5.0, 3.8, 2.6], SK)
+    # ---- nahes Bein: Oberschenkel nach vorn, Unterschenkel hängt, Fußsohle sichtbar
     p = C()
-    sole = E(*B(56 + hb, 48), 2.8, 2.2)
-    p.form(sole, SK, sd=1, hl=1)
+    th = L(*B(42, 45), 4.2, *B(33 - kick, 50), 3.4)
+    sn = L(*B(33 - kick, 50), 3.2, *B(37 - kick * 0.5, 57), 2.4)
+    p.form(th | sn, SK, sd=2, hl=1)
+    p.pxs([B(31 - kick, 52), B(32 - kick, 52)], 'k1')                 # Speckfalte in der Kniekehle
+    foot = E(*B(39 - kick * 0.5, 58), 3.2, 2.0)
+    p.form(foot, SK, sd=1, hl=1)
     for k in range(3):
-        p.pxs([B(58 + hb, 46 + k * 1.2)], 'ab1')
+        p.pxs([B(41 - kick * 0.5, 57 + k)], 'k1')
     c.stamp(p, 'K')
-    # ---- Kopf: groß, Hinterkopf rund, Pausbacken
+    # ---- Kopf
     p = C()
-    head = E(*B(hx, hy), 10.4, 9.4)
-    cheek = E(*B(hx - 4, hy + 4), 5.4, 4.4)
-    p.form(head | cheek, SK, sd=3, hl=1)
-    p.pxs([B(hx - 9, hy + 1)], 'ab1')                                   # Stupsnase
-    p.pxs([B(hx - 10, hy + 1)], 'ab3')
-    # Auge: dunkle Höhle mit fahlem Glimmen
-    p.fill(E(*B(hx - 5, hy - 1.5), 2.8, 2.4), 'ab1')                    # Augenringe
-    p.fill(E(*B(hx - 5, hy - 2), 2.0, 1.8), 'K')
-    p.pxs([B(hx - 5.5, hy - 2.5), B(hx - 4.5, hy - 2.5)], 'a2')
-    p.line([B(hx - 8, hy - 5), B(hx - 3, hy - 5.5)], 'ab1')            # Brauenbogen
-    p.line([B(hx + 3, hy - 1), B(hx + 4, hy + 2), B(hx + 3, hy + 3)], 'ab1')   # Ohr
-    # Mund + Zunge
-    mo = E(*B(hx - 7, hy + 5 + mouth * 0.5), 2.2 + mouth * 0.6, 1.4 + mouth * 0.8)
-    p.fill(mo, 'q')
-    c.stamp(p, 'K')
-    if tongue:
+    p.grid(*[int(v) for v in B(20, 12)], HEAD, LEG)
+    if mouth:
+        p.fill(E(*B(28, 25), 2.2 + mouth * 0.4, 1.2 + mouth * 0.7), 'q')
+        p.pxs([B(28, 25 + mouth * 0.5)], 'm2')
+    c.stamp(p, 'K', skip=('h0', 'hb'))
+    # ---- Arme + Ölschale
+    hy = 31 if dish else 38
+    if dish:
         p = C()
-        tx, ty = B(hx - 8, hy + 6)
-        tp = (P(9, 48)[0], P(9, 48)[1]) if not rise else (tx - 5, ty + 2)
-        p.form(L(tx, ty, 1.4, *tp, 0.9), ('m1', 'm2', 'm3'), sd=0, hl=1)
+        sc = E(*B(19, hy), 6.4, 2.4)
+        p.form(sc, ('w0', 'w1', 'w2'), sd=1, hl=1)
+        p.fill(E(*B(19, hy - 1), 5.0, 1.0), 'y1')
+        p.pxs([B(17, hy - 1)], 'y3')
         c.stamp(p, 'K')
-    # Haarbüschel am Scheitel
-    p = C()
-    tuft = L(*B(hx + 1, hy - 9), 2.2, *B(hx - 1, hy - 13), 0.8) | E(*B(hx + 1, hy - 9), 3.0, 1.6)
-    p.form(tuft, ('h0', 'hb', 'h2') if 'hb' in px.IDX else ('h0', 'h1', 'h2'), sd=1, hl=1)
-    c.stamp(p, 'K')
-    # ---- naher Arm: auf die Hand gestützt, Speckfalte am Handgelenk
-    limb(c, [B(31 - rise * 0.3, 36 - rise), B(27 + ha, 43 - rise * 0.5), B(24 + ha, 50 - rise * 0.8)], [4.0, 3.2, 2.8], SK)
-    p = C()
-    hand = E(*B(22 + ha, 50 - rise * 0.8), 3.0, 1.8)
-    p.form(hand, SK, sd=1, hl=1)
-    p.pxs([B(20 + ha, 51 - rise * 0.8), B(22 + ha, 51 - rise * 0.8)], 'ab1')
-    c.stamp(p, 'K')
+        p = C()                                                          # Zunge leckt über den Rand
+        p.form(L(*B(27, 26), 1.3, *B(22, hy - 1.5), 1.0), ('m1', 'm2', 'm3'), sd=0, hl=1)
+        c.stamp(p, 'K')
+    for (sx, far) in ((36, True), (32, False)):
+        p = C()
+        sh_ = B(sx, 31)
+        el = B(sx - 3, 38 if dish else 40)
+        hd = B(22 + (4 if far else 0), hy + 1) if dish else B(sx - 9, 42)
+        ramp = SKD if far else SK
+        p.form(L(*sh_, 2.4, *el, 2.0) | L(*el, 2.0, *hd, 1.7), ramp, sd=1, hl=1)
+        p.form(E(hd[0], hd[1], 2.0, 1.8), ramp, sd=1, hl=1)
+        p.pxs([(el[0] + 1, el[1])], ramp[0])
+        c.stamp(p, 'K')
     c.blacken()
     return c
 
 
-WALK = [dict(ha=-2, hb=2), dict(bob=-1, ha=0, hb=0, fl=-1), dict(ha=2, hb=-2), dict(bob=-1, fl=1)]
-ATTACK = [dict(rise=3, tongue=0, mouth=1, flare=2), dict(rise=5, tongue=0, mouth=3, flare=4), dict(rise=2, tongue=0, mouth=2, flare=1)]
+WALK = [dict(wv=0), dict(bob=-1, wv=1.2, kick=1), dict(bob=-2, wv=2.4), dict(bob=-1, wv=3.6, kick=-1)]
+ATTACK = [dict(dish=0, mouth=1, flare=2, wv=1), dict(dish=0, mouth=3, flare=4, wv=2, bob=-1), dict(dish=0, mouth=2, flare=2, wv=3)]
 
 if __name__ == '__main__':
     export('abura_akago', draw, WALK, ATTACK)
