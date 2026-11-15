@@ -88,6 +88,7 @@ class Boss(Enemy):
 
     def ring(self, n, sp, off=0.0, col=(240, 80, 120), x=None, y=None, r=3, **kw):
         self.fire_t = self.t
+        audio.play('eshot', 0.7)
         x = self.x if x is None else x
         y = self.y if y is None else y
         for i in range(n):
@@ -95,6 +96,7 @@ class Boss(Enemy):
 
     def fan(self, n, spread, sp, col=(240, 80, 120), x=None, y=None, ang=None, r=3, **kw):
         self.fire_t = self.t
+        audio.play('eshot', 0.7)
         x = self.x if x is None else x
         y = self.y if y is None else y
         a0 = self.ang_p(x, y) if ang is None else ang

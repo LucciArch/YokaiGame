@@ -1195,6 +1195,7 @@ class Enemy:
                 return
         self.acd = a['cd'] * random.uniform(0.85, 1.15)
         self.fire_t = self.t
+        audio.play('eshot', 0.45)
         sp = a['speed'] * (1.15 if self.champ == 'blau' else 1.0)
         k = a['kind']
         ang = math.atan2(p.y - self.y, p.x - self.x)
@@ -1202,7 +1203,6 @@ class Enemy:
             n = a['n']
             for i in range(n):
                 ebullet(self.run, self.x, self.y, ang + (i - (n - 1) / 2) * a['spread'], sp, a['col'], eff=a['eff'])
-            audio.play('ehit', 0.5)
         elif k == 'ring':
             n = a['n']
             off = random.uniform(0, math.tau)

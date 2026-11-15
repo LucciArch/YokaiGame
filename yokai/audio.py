@@ -8,7 +8,14 @@ try:
 except ImportError:  # ohne numpy: stumm
     np = None
 
-SR = 22050
+SR = 44100
+import os
+MUSIC_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets', 'music')
+
+
+def _set_sr(v):
+    global SR
+    SR = v
 
 
 class Audio:
@@ -28,9 +35,11 @@ class Audio:
             if not pygame.mixer.get_init():
                 pygame.mixer.init(SR, -16, 2, 512)
             pygame.mixer.set_num_channels(24)
+            _set_sr(pygame.mixer.get_init()[0])      # Effekte in der echten Mixer-Rate erzeugen
             self.channels = pygame.mixer.get_init()[2]
             self._build_sfx()
             self._variants()
+            self._load_sfx_files()
             self.music_ch = pygame.mixer.Channel(23)
             pygame.mixer.set_reserved(1)
             self.ok = True
@@ -144,6 +153,26 @@ class Audio:
             'grab': S(T(140, 0.45, 70, 'buzz', 6) * 0.6 + N(0.45, 6, 0.06) * 0.6, 0.4),
             'wisp': S(T(1200, 0.5, 1800, 'sine', 5) * 0.5 + T(1800, 0.5, 2400, 'sine', 7) * 0.25, 0.3),
         }
+
+    def _load_sfx_files(self):
+        """Vorgerenderte Effekte aus assets/sfx (art_src/music/sfx.py) ersetzen die Sofort-Synthese."""
+        d = os.path.join(os.path.dirname(MUSIC_DIR), 'sfx')
+        if not os.path.isdir(d):
+            return
+        groups = {}
+        for fn in sorted(os.listdir(d)):
+            if fn.endswith('.ogg') and '_' in fn:
+                nm = fn.rsplit('_', 1)[0]
+                try:
+                    groups.setdefault(nm, []).append(pygame.mixer.Sound(os.path.join(d, fn)))
+                except Exception:
+                    pass
+        for nm, snds in groups.items():
+            self.sfx[nm] = snds[0]
+            if len(snds) > 1:
+                self.var[nm] = snds
+            else:
+                self.var.pop(nm, None)
 
     def _variants(self):
         """Tonhöhen-Varianten, damit sich häufige Klänge nicht wiederholen."""
@@ -384,19 +413,52 @@ class Audio:
         return self._snd(out)
 
     def prepare(self, key):
+        nm = self.track_for(key)
+        if nm and os.path.exists(os.path.join(MUSIC_DIR, nm + '.ogg')):
+            return
         if self.ok and key and key not in self.music_cache:
             self.music_cache[key] = self._make_music(key)
+
+    @staticmethod
+    def track_for(key):
+        """Ordnet einen Musik-Schlüssel einem komponierten Stück in assets/music zu."""
+        if key is None:
+            return None
+        seed, mood = key[4], key[3]
+        if seed == 99:
+            return 'title'
+        if seed == 77:
+            return 'gameover'
+        if seed == 78:
+            return 'victory'
+        if mood == 'boss':
+            return 'boss_final' if (seed - 100) // 10 >= 5 else 'boss'
+        return {1: 'forest', 2: 'temple', 3: 'mountain', 4: 'sea', 5: 'underworld', 6: 'heaven'}.get(seed // 10)
 
     def music(self, key):
         """key = (skala, grundton, bpm, stimmung, seed)"""
         if not self.ok:
             return
-        if self.cur_music == key:
+        name = self.track_for(key)
+        path = os.path.join(MUSIC_DIR, name + '.ogg') if name else None
+        ident = name if path and os.path.exists(path) else key
+        if self.cur_music == ident:
             return
-        self.cur_music = key
+        self.cur_music = ident
         if key is None:
             self.music_ch.fadeout(400)
+            pygame.mixer.music.fadeout(400)
             return
+        if path and os.path.exists(path):
+            try:
+                self.music_ch.fadeout(300)
+                pygame.mixer.music.load(path)
+                pygame.mixer.music.set_volume(self.vol_music)
+                pygame.mixer.music.play(loops=-1, fade_ms=900)
+                return
+            except Exception as e:  # pragma: no cover
+                print('Musik konnte nicht geladen werden:', e)
+        pygame.mixer.music.fadeout(300)
         if key not in self.music_cache:
             self.music_cache[key] = self._make_music(key)
         self.music_ch.set_volume(self.vol_music)
@@ -407,6 +469,7 @@ class Audio:
         self.vol_music = music
         if self.ok and self.music_ch:
             self.music_ch.set_volume(music)
+            pygame.mixer.music.set_volume(music)
 
 
 AUDIO = None
