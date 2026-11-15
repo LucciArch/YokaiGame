@@ -2001,6 +2001,39 @@ class Run:
                         out.append(_TileSpr(img, x + TILE / 2, y, 0 if t != T_LANTERN else 1))
         return out
 
+    def pit_edges(self, bg, room):
+        """Gruben bekommen eine Abbruchkante: Felswand oben, Lichtkante am Rand, Schatten links/rechts."""
+        kind = self.biome.get('pit', 'void')
+        fl = self.biome['floor'] if not room.kind.startswith('shrine') else (90, 80, 70)
+        face, face2 = gfx._c(fl, 0.42), gfx._c(fl, 0.3)
+        lip = gfx._c(fl, 1.35)
+        tiles = room.tiles
+        D = pygame.draw
+
+        def pit(x, y):
+            return 0 <= x < COLS and 0 <= y < ROWS and tiles[y][x] == T_PIT
+
+        for ty in range(ROWS):
+            for tx in range(COLS):
+                if tiles[ty][tx] != T_PIT:
+                    continue
+                x, y = RX + tx * TILE, RY + ty * TILE
+                if not pit(tx, ty - 1):
+                    depth = 7 if kind in ('void', 'cloud') else 4
+                    bg.fill(face, (x, y, TILE, depth))
+                    bg.fill(face2, (x, y + depth - 2, TILE, 2))
+                    for k in range(3):                       # Gesteinsfugen in der Kante
+                        fx = x + 5 + k * 10 + (tx * 3) % 4
+                        bg.fill(face2, (fx, y + 1, 1, depth - 3))
+                    bg.fill(lip, (x, y, TILE, 1))
+                if not pit(tx - 1, ty):
+                    bg.fill(face2, (x, y, 2, TILE))
+                    bg.fill(lip, (x, y, 1, TILE))
+                if not pit(tx + 1, ty):
+                    bg.fill(face2, (x + TILE - 2, y, 2, TILE))
+                if not pit(tx, ty + 1):
+                    bg.fill(gfx._c(lip, 0.8), (x, y + TILE - 1, TILE, 1))
+
     def render_bg(self):
         room = self.room
         if getattr(room, '_bgcache', None) is None or room._bgcache[0] != self.biome_id:
@@ -2020,6 +2053,7 @@ class Run:
                 if t:
                     gfx.draw_tile(tl, t, RX + tx * TILE, RY + ty * TILE, self.biome)
         bg.blit(tl, (0, 0))
+        self.pit_edges(bg, room)
         bg.blit(walls, (0, 0))
         self.bg = bg
         self.bg_dirty = False
