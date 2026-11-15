@@ -312,7 +312,12 @@ class Game:
             from . import props
             ti = props.torii((170, 34, 36))
             self._title_torii = pygame.transform.scale(ti, (ti.get_width() * 2, ti.get_height() * 2))
-        s.blit(self._title_torii, (tx - self._title_torii.get_width() // 2, 236 - self._title_torii.get_height()))
+        if gfx.HI_MODE:
+            if not hasattr(self, '_title_torii_hi'):
+                self._title_torii_hi = gfx.scale2x(self._title_torii)
+            gfx.hi_blit(self._title_torii_hi, tx, 236)
+        else:
+            s.blit(self._title_torii, (tx - self._title_torii.get_width() // 2, 236 - self._title_torii.get_height()))
         # Laternen (Stein-Tōrō aus den Umgebungs-Tiles)
         lt = gfx.env_img('_shared', 'lantern', 32)
         lth = gfx.env_img('_shared', 'lantern_hi', 64)

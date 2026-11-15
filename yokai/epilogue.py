@@ -135,8 +135,9 @@ class Epilogue:
         # Torii auf dem Hügel
         if not hasattr(self.g, '_title_torii'):
             self.g.draw_night(pygame.Surface((W, H)))
-        ti = self.g._title_torii
-        s.blit(ti, (300 - ti.get_width() // 2, 252 - ti.get_height()))
+        if not hasattr(self.g, '_title_torii_hi'):
+            self.g._title_torii_hi = gfx.scale2x(self.g._title_torii)
+        gfx.hi_blit(self.g._title_torii_hi, 300, 252)
         # Zug der Yōkai zieht nach links davon und verblasst im Morgenlicht
         a = int(255 * max(0.0, 1 - d * 1.4))
         if a > 0:
