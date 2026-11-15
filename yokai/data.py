@@ -597,6 +597,9 @@ ACHIEVEMENTS = [
     ('ch_oni_pakt', 'Prüfung: Pakt mit dem Teufel', 'Bestehe die Prüfung „Pakt mit dem Teufel“', None),
     ('ch_bossrush', 'Prüfung: Boss-Ansturm', 'Bestehe die Prüfung „Boss-Ansturm“', None),
     ('ch_papiermeister', 'Prüfung: Papiermeister', 'Bestehe die Prüfung „Papiermeister“', None),
+    ('foxfire', 'Kitsunebi-Fänger', 'Fange ein Fuchsfeuer im Inari-Schrein', None),
+    ('quirks_all', 'Wanderer der Welten', 'Erlebe die Eigenheiten aller Biome', None),
+    ('synergy25', 'Meister der Harmonie', 'Entdecke 25 verschiedene Synergien', None),
 ]
 
 

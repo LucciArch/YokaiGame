@@ -488,6 +488,10 @@ class Run:
         if not q or self.room.kind.startswith('shrine') or self.room.kind == 'boss':
             return
         self.hint('biome_' + q, self.QUIRK_TEXT[q])
+        if self.save.data.setdefault('quirks_seen', []) is not None and q not in self.save['quirks_seen']:
+            self.save['quirks_seen'].append(q)
+            if len(set(self.save['quirks_seen'])) >= len(set(self.QUIRKS.values())):
+                self.achieve('quirks_all')
         fighting = any(e.active() for e in self.enemies)
         qt = getattr(self, '_quirk_t', 0.0) - dt
         if q == 'gust' and fighting:
@@ -530,6 +534,7 @@ class Run:
                 ff[1] += math.sin(ff[2] * 2.3) * 22 * dt
                 if math.hypot(ff[0] - p.x, ff[1] - p.y) < 12:
                     p.room_dmg_buff = 30.0
+                    self.achieve('foxfire')
                     burst(self, ff[0], ff[1], (120, 200, 255), 16, 70)
                     audio.play('item', 0.5)
                     self.foxfire = None
@@ -1696,6 +1701,8 @@ class Run:
         self.achieve('synergy1')
         if len(self.save['synergies_seen']) >= 10:
             self.achieve('synergy10')
+        if len(self.save['synergies_seen']) >= 25:
+            self.achieve('synergy25')
 
     def on_transform(self, t):
         self.save.stat('transforms')
