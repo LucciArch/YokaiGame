@@ -1238,8 +1238,19 @@ class Game:
             T.add(desc, 40, y + 11, 6, (220, 215, 200) if ok else (140, 130, 140))
             prog = {'ponpoko': ('coins', 300), 'benkei': ('kills', 500), 'okiku': ('deaths', 10),
                     'donor': ('donations', 30)}.get(aid)
-            if prog and not ok:
+            cur = None
+            if prog:
                 cur = min(prog[1], self.save['stats'].get(prog[0], 0))
+            elif aid == 'feste':
+                prog = (None, 4); cur = len(self.save.data.get('events_seen', []))
+            elif aid == 'synergy10':
+                prog = (None, 10); cur = len(self.save['synergies_seen'])
+            elif aid in ('lexikon_half', 'lexikon_all'):
+                tot = [k for k in ENEMIES if k in bestiary.LORE and k not in bestiary.SKIP]
+                n = len([k for k in tot if k in self.save.data.get('enemies_seen', [])])
+                prog = (None, (len(tot) + 1) // 2 if aid == 'lexikon_half' else len(tot)); cur = n
+            if prog and not ok:
+                cur = min(prog[1], cur)
                 bx_ = W // 2 + 10
                 pygame.draw.rect(s, (40, 32, 44), (bx_, y + 8, 90, 4))
                 pygame.draw.rect(s, (200, 170, 90), (bx_, y + 8, int(90 * cur / prog[1]), 4))
