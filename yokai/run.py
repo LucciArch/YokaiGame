@@ -2065,6 +2065,26 @@ class Run:
         self.bg = bg
         self.bg_dirty = False
 
+    def pedestal_extra(self, iid):
+        """Hinweis im Tooltip: vervollständigt dieses Item eine Synergie oder Transformation?"""
+        if iid.startswith('active:') or iid not in ITEMS:
+            return ''
+        have = set(self.player.items)
+        for sy in SYNERGIES:
+            if iid in sy['items'] and iid not in have and all(i in have for i in sy['items'] if i != iid):
+                known = sy['id'] in self.save['synergies_seen']
+                return 'Vervollständigt Synergie: ' + (sy['name'] if known else '???')
+        p = self.player
+        for tg in ITEMS[iid]['tags']:
+            if tg in p.transforms or tg not in TRANSFORMS:
+                continue
+            n = sum(1 for i in p.items if tg in ITEMS[i]['tags'])
+            if n == 2:
+                return 'Löst Transformation aus: ' + TRANSFORMS[tg]['name']
+            if n == 1:
+                return '2 / 3 für ' + TRANSFORMS[tg]['name']
+        return ''
+
     def draw_lantern_light(self, s, t):
         """Warmer, leicht flackernder Lichtkreis der Steinlaternen auf dem Boden."""
         tiles = self.room.tiles
@@ -2190,13 +2210,19 @@ class Run:
         if near and not self.hold:
             name, desc, icon, col = near.info()
             fxs = near.fxinfo()
-            w = max(gfx.text_w(name, 8), gfx.text_w(desc, 6), gfx.text_w(fxs, 6)) + 12
+            extra = self.pedestal_extra(near.item)
+            w = max(gfx.text_w(name, 8), gfx.text_w(desc, 6), gfx.text_w(fxs, 6), gfx.text_w(extra, 6) if extra else 0) + 12
             bx = clamp(near.x, RX + w / 2 + 2, RX + RW - w / 2 - 2)
-            by = near.y - 52
-            gfx.panel(s, (int(bx - w / 2), int(by), int(w), 31), 215, col)
+            hh = 31 + (9 if extra else 0)
+            by = near.y - 52 - (9 if extra else 0)
+            gfx.panel(s, (int(bx - w / 2), int(by), int(w), hh), 215, col)
             gfx.TEXT.add(name, bx, by + 2, 8, col, 'c')
+            if not near.item.startswith('active:') and near.item not in self.save['seen']:
+                gfx.TEXT.add('Neu!', bx + w / 2 - 4, by + 2, 6, (255, 230, 120), 'r')
             gfx.TEXT.add(desc, bx, by + 12, 6, (230, 225, 210), 'c')
             gfx.TEXT.add(fxs, bx, by + 21, 6, (170, 220, 255), 'c')
+            if extra:
+                gfx.TEXT.add(extra, bx, by + 30, 6, (255, 215, 110), 'c')
         ff = getattr(self, 'foxfire', None)
         if ff:
             fx_, fy_ = int(ff[0]), int(ff[1] + math.sin(t * 5) * 2)
