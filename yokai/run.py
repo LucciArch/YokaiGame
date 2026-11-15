@@ -460,8 +460,13 @@ class Run:
         'gust': 'Tengu-Wind: Auf dem Kurama-Berg treiben Böen dich zur Seite.',
         'lava': 'Glühende Gruben speien im Kampf Funken – Abstand halten!',
         'souls': 'Auf dem Friedhof treiben Irrlichter. Berühre sie für ein Seelenherz.',
+        'current': 'Meeresströmung: Unter Wasser treibt dich die Strömung langsam ab.',
+        'polter': 'Poltergeist! Im Kampf fliegen dir Töpfe entgegen – zerschlag sie vorher.',
+        'star': 'Im Himmel fallen nach dem Kampf manchmal Sternschnuppen voller Mon.',
     }
-    QUIRKS = {'yukiyama': 'ice', 'kurama': 'gust', 'jigoku': 'lava', 'enma_cho': 'lava', 'hakaba': 'souls'}
+    QUIRKS = {'yukiyama': 'ice', 'kurama': 'gust', 'jigoku': 'lava', 'enma_cho': 'lava', 'hakaba': 'souls',
+              'ryugu': 'current', 'shinkai': 'current', 'obakedera': 'polter', 'yashiki': 'polter',
+              'takamagahara': 'star', 'tsukiyomi': 'star'}
 
     def biome_quirk(self, dt):
         """Kleine Eigenheit pro Biom (nur in normalen Räumen, nicht in Schreinen)."""
@@ -492,6 +497,32 @@ class Run:
                         for i in range(5):
                             ebullet(self, x, y, i / 5 * math.tau + random.random(), 55, (255, 120, 40), r=3)
                 qt = random.uniform(2.2, 3.4)
+        elif q == 'current' and fighting:
+            cur = self.room.extra.setdefault('current', random.choice(((28, 0), (-28, 0), (0, 22), (0, -22))))
+            if self.wind[2] <= 0:
+                self.wind = (cur[0], cur[1], 0.05)
+            if random.random() < dt * 6:
+                self.particles.append(Particle(RX + random.uniform(0, RW), RY + random.uniform(0, RH), cur[0] * 3, cur[1] * 3, 1.0, (170, 220, 240), 1))
+        elif q == 'polter' and fighting:
+            if qt <= 0:
+                pots = [(tx, ty) for ty in range(ROWS) for tx in range(COLS) if self.room.tiles[ty][tx] == T_POT]
+                if pots:
+                    tx, ty = random.choice(pots)
+                    x, y = RX + tx * TILE + 16, RY + ty * TILE + 16
+                    if math.hypot(x - p.x, y - p.y) > 45:
+                        self.break_tile(tx, ty)
+                        ang = math.atan2(p.y - y, p.x - x)
+                        ebullet(self, x, y, ang, 120, (190, 130, 90), r=5)
+                        audio.play('dash', 0.5)
+                qt = random.uniform(4.5, 6.5)
+        elif q == 'star' and self.room.cleared and not self.room.extra.get('star_rolled'):
+            self.room.extra['star_rolled'] = True
+            if random.random() < 0.3:
+                x, y = RX + random.uniform(60, RW - 60), RY + random.uniform(40, RH - 40)
+                for i in range(12):
+                    self.particles.append(Particle(x - 60 + i * 5, y - 60 + i * 5, 90, 90, 0.6, (255, 240, 170), 2, kind='spark'))
+                self.spawn_pickup('coin5', x, y)
+                audio.play('coin', 0.6)
         elif q == 'souls' and self.room.cleared:
             lucky = False
             if qt <= 0 and not self.room.extra.get('wisp_rolled'):
