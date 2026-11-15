@@ -256,7 +256,7 @@ class Game:
             dim = 1.0
             light = r.hi_light if self.state == 'play' else None
             gfx.hi_flush(self.window, sc, ox + shake[0], oy + shake[1], dim, light)
-        elif self.state in ('title', 'chars', 'lexicon', 'epilogue') and gfx.HI:
+        elif self.state in ('title', 'chars', 'lexicon', 'epilogue', 'codex') and gfx.HI:
             gfx.hi_flush(self.window, sc, ox, oy, 1.0, None)
         else:
             gfx.HI.clear()
@@ -871,12 +871,18 @@ class Game:
     # ---------------------------------------------------------------- Codex
     def st_codex(self, dt, events, nav):
         s = self.screen
-        s.fill((18, 12, 24))
+        gfx.HI_MODE = True
+        self.draw_night(s)
+        gfx.HI.clear()
+        ov = pygame.Surface((W, H), pygame.SRCALPHA)
+        ov.fill((6, 4, 12, 170))
+        s.blit(ov, (0, 0))
         T = gfx.TEXT
         seen = set(self.save['seen'])
         unlocked = set(self.save['items'])
         ids = ITEM_IDS
         cols = 16
+        gfx.panel(s, (18, 24, W - 36, 172), 200)
         T.add('Codex der Items  (%d / %d entdeckt)' % (len([i for i in ids if i in seen]), len(ids)), W // 2, 6, 11, (255, 230, 170), 'c')
         rows_vis = 7
         sel_row = self.codex_sel // cols
@@ -897,7 +903,11 @@ class Game:
                 pygame.draw.rect(s, (110, 90, 70), (x + 6, y + 9, 10, 8))
                 pygame.draw.circle(s, (110, 90, 70), (x + 11, y + 9), 4, 1)
             else:
-                T.add('?', x + 11, y + 3, 9, (120, 110, 130), 'c')
+                hi = gfx.item_img('icons', it['icon'])
+                if hi is not None:
+                    gfx.hi_blit(gfx.tinted(hi, 'shadow'), x + 11, y + 18, 150)
+                else:
+                    T.add('?', x + 11, y + 3, 9, (120, 110, 130), 'c')
         iid = ids[self.codex_sel]
         it = ITEMS[iid]
         gfx.panel(s, (16, 200, W - 32, 92), 220)
