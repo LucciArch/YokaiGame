@@ -2498,6 +2498,15 @@ class Run:
         # Titelkarte
         if self.title_t > 0 and self.boss_intro <= 0:
             a = int(255 * min(1, self.title_t))
+            band = getattr(Run, '_title_band', None)
+            if band is None:
+                bh = 2 * 118
+                band = pygame.Surface((W * 2, bh), pygame.SRCALPHA)
+                for yy in range(bh):
+                    e = min(yy, bh - 1 - yy) / 40.0
+                    band.fill((8, 5, 12, int(150 * min(1.0, e))), (0, yy, W * 2, 1))
+                Run._title_band = band
+            gfx.HI.append((band, W / 2, 170, int(a * 0.85), 1.0, True))
             T.add(self.floor_label(), W // 2, 92, 9, (230, 210, 170), 'c', alpha=a)
             self.draw_path(s, W // 2, 84, a)
             if self.stage == 0:
