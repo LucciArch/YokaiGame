@@ -1576,17 +1576,13 @@ class Tamamo(Boss):
     sheet = ('boss_tamamo', 2, None)
 
     def render_sheet(self, s, t):
-        for i in range(9):
-            a = math.pi * (1.05 + i / 8 * 0.9) + math.sin(t * 2 + i) * 0.05
-            L = 30 if self.phase == 2 else 24
-            tx, ty = self.x + math.cos(a) * L, self.y + 6 + math.sin(a) * L
-            pygame.draw.line(s, (240, 170, 60), (self.x, self.y + 6), (tx, ty), 6)
-            pygame.draw.circle(s, (255, 250, 240), (int(tx), int(ty)), 4)
-        gfx.draw_glow(s, int(self.x), int(self.y), 34, (255, 190, 90), 60)
-        if self.phase == 2:
-            sheets.blit_center(s, 'kitsunebi_e', self.x, self.y - 4, self.face_dir(), self.af('kitsunebi_e', t, 8, 0), 1)
-        else:
-            sheets.blit_center(s, 'boss_tamamo', self.x, self.y - 6, self.face_dir(), self.af('boss_tamamo', t, 7, 0), 2)
+        gfx.draw_glow(s, int(self.x), int(self.y), 34 if self.phase == 1 else 46, (255, 190, 90) if self.phase == 1 else (110, 170, 255), 60)
+        if self.phase == 2:                                   # wahre Gestalt: Fuchsfeuer kreist um sie
+            for i in range(6):
+                a = t * 1.6 + i / 6 * math.tau
+                fx, fy = self.x + math.cos(a) * 26, self.y - 6 + math.sin(a) * 12
+                gfx.draw_glow(s, int(fx), int(fy), 7, (120, 180, 255), 150)
+        sheets.blit_center(s, 'boss_tamamo', self.x, self.y - 6, self.face_dir(), self.af('boss_tamamo', t, 7, 0), 2)
 
     r = 11
 
