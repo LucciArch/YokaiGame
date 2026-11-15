@@ -361,3 +361,141 @@ def stairs_up():
             _box(s, 2 + i * 2, 17 - i * 4, 20 - i * 4, 5, sh(STONE, 0.7 + i * 0.08))
         return s
     return _get(('stairs',), mk)
+
+
+# ---------------------------------------------------------------- Minimap-Symbole (Hi-Res, 2x)
+MAP_COL = {
+    'K': (14, 9, 16), 'W': (250, 246, 236), 'w': (196, 190, 200), 'R': (220, 54, 54), 'r': (140, 28, 38),
+    'Y': (255, 214, 90), 'y': (200, 140, 40), 'o': (120, 70, 24), 'G': (110, 210, 110), 'g': (40, 120, 60),
+    'P': (190, 110, 240), 'p': (100, 50, 150), 'B': (130, 210, 250), 'b': (50, 110, 180), 'O': (255, 150, 60),
+    'D': (150, 100, 60), 'd': (90, 56, 34), 'k': (40, 32, 44), 'S': (240, 170, 200),
+}
+MAP_ICONS = {
+    'boss': """
+..WWWWWW..
+.WWWWWWWW.
+WWkkWWkkWW
+WWkRWWkRWW
+WWWWWWWWWW
+.WWWkkWWW.
+..WkWkWk..
+..WWWWWW..""",
+    'treasure': """
+.oooooooo.
+oyYYYYYYyo
+oyyyyyyyyo
+oooooooooo
+oyyykkyyyo
+oyyykYyyyo
+oyyyyyyyyo
+oooooooooo""",
+    'shop': """
+..YYYYYY..
+.YyyyyyyY.
+YyYYkkYYyY
+YyYkkkkYyY
+YyYkkkkYyY
+YyYYkkYYyY
+.YyyyyyyY.
+..YYYYYY..""",
+    'secret': """
+..wwwww...
+.wW...Ww..
+......Ww..
+....wWw...
+...wW.....
+...ww.....
+..........
+...WW.....""",
+    'curse': """
+...PPPP...
+..PppppP..
+.PpPWWPpP.
+.PPWkkWPP.
+.PpPWWPpP.
+..PppppP..
+...PPPP...
+....pp....""",
+    'challenge': """
+O........O
+.O......O.
+..O....O..
+...O..O...
+....OO....
+...O..O...
+.dd....dd.
+dd......dd""",
+    'omikuji': """
+...WW.....
+..rRRRr...
+..RWWWR...
+..RWkWR...
+..RWkWR...
+..RWWWR...
+..RRRRR...
+..rrrrr...""",
+    'onsen': """
+.B..B..B..
+B..B..B...
+.B..B..B..
+..........
+bBBBBBBBBb
+BWBBBBBBWB
+.BBBBBBBB.
+..bbbbbb..""",
+    'library': """
+.pPPPPPPp.
+.PWWWWWWP.
+.PWkkkkWP.
+.PWWWWWWP.
+.PWkkkWWP.
+.PWWWWWWP.
+.pPPPPPPp.
+..........""",
+    'dojo': """
+....RR....
+...RRRR...
+..RRRRRR..
+.RRWRRWRR.
+RRRRRRRRRR
+..d.dd.d..
+..d.dd.d..
+.dddddddd.""",
+    'teahouse': """
+..w.w.....
+...w.w....
+GGGGGGGG..
+GgggggggGG
+GgggggggG.G
+.GgggggG.G.
+..GGGGG...
+.gggggggg.""",
+    'slots': """
+.D......D.
+DdD....DdD
+DDDDDDDDDD
+DkkWDDWkkD
+DkWkDDkWkD
+DDDDkkDDDD
+.DDWWWWDD.
+..DDDDDD..""",
+}
+
+
+def map_icon(kind):
+    key = ('map', kind)
+    if key in _cache:
+        return _cache[key]
+    g = MAP_ICONS.get(kind)
+    if g is None:
+        return None
+    rows = [r for r in g.strip('\n').split('\n')]
+    w = max(len(r) for r in rows)
+    s = pygame.Surface((w + 2, len(rows) + 2), pygame.SRCALPHA)
+    for j, r in enumerate(rows):
+        for i, ch in enumerate(r):
+            if ch != '.':
+                s.set_at((i + 1, j + 1), MAP_COL[ch])
+    s = _outline(s)
+    _cache[key] = s
+    return s

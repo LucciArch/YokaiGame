@@ -1468,13 +1468,17 @@ class Run:
             if pd.item.startswith('active:'):
                 new = pd.item[7:]
                 old = p.active
+                old_charge = p.charge
                 p.active = new
                 self.hint('active', 'Aktives Item: mit E einsetzen. Es lädt sich mit jedem geräumten Raum auf.')
-                p.charge = ACTIVES[new]['charge']
+                # abgelegte Items behalten ihre Ladung – sonst ließe sich durch Hin- und Hertauschen endlos aufladen
+                stored = getattr(pd, 'stored_charge', None)
+                p.charge = ACTIVES[new]['charge'] if stored is None else min(stored, ACTIVES[new]['charge'])
                 self.banner(ACTIVES[new]['name'], ACTIVES[new]['desc'] + '  [E]', ACTIVES[new]['col'])
                 audio.play('item')
                 if old:
                     pd.item = 'active:' + old
+                    pd.stored_charge = old_charge
                     pd.cool = 1.0
                 else:
                     pd.taken = True
@@ -2169,7 +2173,7 @@ class Run:
             x += 78
 
     def draw_minimap(self, s, right, top):
-        cw, ch = 9, 6
+        cw, ch = 11, 7
         rooms = self.rooms
         show_all = bool(self.player.f['map'])
         xs = [p[0] for p in rooms]
@@ -2195,16 +2199,9 @@ class Run:
                 col = (255, 255, 255)
             pygame.draw.rect(s, col, (rx, ry, cw - 1, ch - 1))
             if r.kind in icons and (r.seen or show_all):
-                c = icons[r.kind]
-                mx, my = rx + cw // 2 - 1, ry + ch // 2 - 1
-                k = r.kind
-                if k == 'boss':
-                    pygame.draw.line(s, c, (mx - 2, my - 2), (mx + 2, my + 2)); pygame.draw.line(s, c, (mx + 2, my - 2), (mx - 2, my + 2))
-                elif k in ('treasure', 'library'):
-                    pygame.draw.polygon(s, c, [(mx - 2, my + 2), (mx - 2, my - 1), (mx, my + 1), (mx + 2, my - 1), (mx + 2, my + 2)])
-                elif k in ('shop', 'slots'):
-                    pygame.draw.circle(s, c, (mx, my), 2)
-                elif k in ('onsen', 'teahouse'):
-                    pygame.draw.rect(s, c, (mx - 2, my, 5, 2)); pygame.draw.line(s, c, (mx, my - 2), (mx, my - 1))
+                img = props.map_icon(r.kind)
+                if img is not None and gfx.HI_MODE:
+                    gfx.hi_blit(img, rx + (cw - 1) / 2, ry + (ch - 1) / 2 + img.get_height() / 4)
                 else:
-                    pygame.draw.rect(s, c, (mx - 1, my - 1, 3, 3))
+                    c = icons[r.kind]
+                    pygame.draw.rect(s, c, (rx + cw // 2 - 2, ry + ch // 2 - 2, 3, 3))
