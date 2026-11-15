@@ -1973,6 +1973,12 @@ class Run:
             self.achieve('kuzunoha')
 
     def end_run(self, win):
+        import datetime as _dt
+        hist = self.save.data.setdefault('history', [])
+        hist.append({'date': _dt.date.today().strftime('%d.%m.'), 'char': self.char, 'floor': self.floor_no, 'win': bool(win),
+                     'where': self.biome['name'] if self.biome else '', 'time': int(self.time), 'relaxed': self.relaxed,
+                     'items': len(self.player.items)})
+        del hist[:-20]
         if not (self.challenge or self.daily):
             clear_run_file()
         s = self.save

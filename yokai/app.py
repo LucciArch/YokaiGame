@@ -1109,6 +1109,20 @@ class Game:
             for i, (bid, b) in enumerate(BOSSES.items()):
                 ok = bid in self.save['bosses']
                 T.add(b['name'] if ok else '???', 40 + (i % 4) * 105, y + 14 + (i // 4) * 13, 7, (240, 230, 210) if ok else (120, 110, 120))
+        elif page == 2:
+            hist = self.save.data.get('history', [])
+            T.add('Letzte Läufe', 40, y, 8, (255, 220, 150))
+            if not hist:
+                T.add('Noch keine Läufe beendet.', 40, y + 16, 7, (170, 160, 160))
+            for i, h in enumerate(reversed(hist[-6:])):
+                yy = y + 14 + i * 12
+                won = h.get('win')
+                T.add(h.get('date', ''), 40, yy, 7, (170, 160, 160))
+                T.add(CHARS.get(h.get('char'), {}).get('name', '?'), 110, yy, 7, (240, 230, 210))
+                T.add('Ebene %d' % h.get('floor', 0), 180, yy, 7, (240, 230, 210))
+                T.add(('Sieg' if won else 'Gefallen: ' + h.get('where', '')) + ('  (Entspannt)' if h.get('relaxed') else ''),
+                      240, yy, 7, (150, 230, 150) if won else (230, 150, 140))
+                T.add('%d:%02d' % (h.get('time', 0) // 60, h.get('time', 0) % 60), W - 40, yy, 7, (200, 190, 180), 'r')
         else:
             from .run import Run
             seen = self.save.data.get('biomes_seen', [])
@@ -1122,7 +1136,7 @@ class Game:
                 if ok and q:
                     txt += '  – ' + Run.QUIRK_SHORT[q]
                 T.add(txt, 40 + (i % 3) * 140, y + 14 + (i // 3) * 12, 6, (240, 230, 210) if ok else (120, 110, 120))
-        T.add('Links/Rechts – Bosse / Biome', W // 2, 274, 6, (170, 160, 150), 'c')
+        T.add('Links/Rechts – Bosse / Biome / Letzte Läufe', W // 2, 274, 6, (170, 160, 150), 'c')
         dl = self.save['daily']
         if dl:
             best = sorted(dl.items())[-3:]
@@ -1131,7 +1145,7 @@ class Game:
         for n in nav:
             if n in ('back', 'ok'): self.state = 'title'
             elif n in ('left', 'right'):
-                self.stats_page = 1 - getattr(self, 'stats_page', 0)
+                self.stats_page = (getattr(self, 'stats_page', 0) + (1 if n == 'right' else -1)) % 3
                 audio.play('move')
 
     def st_controls(self, dt, events, nav):
