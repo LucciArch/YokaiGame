@@ -880,7 +880,7 @@ class Sojobo(Boss):
 
 
 class Raiju(Boss):
-    sheet = ('boss_raiju', 1, None)
+    sheet = ('boss_raiju', 2, None)
 
     r = 12
 

@@ -97,6 +97,9 @@ def jorogumo(**kw):
     for key in ('f4', 'f3', 'f2', 'f1'):
         sleg(c, *LG(S[key], 0.2 if key in ('f3', 'f4') else 0.7), near=False)
 
+    # hintere nahe Beine hinter den Hinterleib (Ebenen-Korrektur)
+    for key in ('n4', 'n3'):
+        sleg(c, *LG(S[key], 0.2), near=True)
     # ---- abdomen
     p = C()
     a0, a1 = Bs((134, 90), 0.1), Bs((164, 80), 0.0)
@@ -122,8 +125,8 @@ def jorogumo(**kw):
     p.form(ceph, BLK, sd=4, hl=1)
     c.stamp(p, 'K')
 
-    for key in ('n4', 'n3', 'n2', 'n1'):
-        sleg(c, *LG(S[key], 0.2 if key in ('n3', 'n4') else 0.7), near=True)
+    for key in ('n2', 'n1'):
+        sleg(c, *LG(S[key], 0.7), near=True)
 
     # ---- long hair down the back
     p = C()

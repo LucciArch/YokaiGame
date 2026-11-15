@@ -94,6 +94,10 @@ def spider(**kw):
         h = HIPS[i]
         leg(c, (cx + h[0] + 3, cy + h[1] - 3), P(*S['far'][i]), BRNF, knee_of(S, 'far', i, cx, cy))
 
+    # ---- hintere nahe Beine HINTER den Hinterleib (sonst verdecken sie ihn)
+    for i in (3, 2):
+        h = HIPS[i]
+        leg(c, (cx + h[0], cy + h[1]), P(*S['near'][i]), BRN, knee_of(S, 'near', i, cx, cy))
     # ---- abdomen: tiger pelt
     p = C()
     ab = E(ax, ay, 24.4, 19.4) | E(ax + 12, ay + 3, 15, 14)
@@ -126,10 +130,6 @@ def spider(**kw):
         p.fill(R(cx + q[0], cy + q[1], cx + q[0] + 1, cy + q[1]), 's1')
     c.stamp(p, 'K')
 
-    # ---- near legs (rear pair first, front pair last)
-    for i in (3, 2):
-        h = HIPS[i]
-        leg(c, (cx + h[0], cy + h[1]), P(*S['near'][i]), BRN, knee_of(S, 'near', i, cx, cy))
     # ---- head
     p = C()
     p.grid(cx - 28, cy - 5 + S['tilt'], HEAD, LEG)

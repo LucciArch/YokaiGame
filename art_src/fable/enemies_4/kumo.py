@@ -76,6 +76,10 @@ def draw(**kw):
         f = S['ff'][i]
         leg(c, hip(i, True), (cx + f[0], BASE + f[1]), S['kh'][i] - 2, FAR, bends[i])
 
+    # hintere nahe Beine hinter den Hinterleib (Ebenen-Korrektur)
+    for i in (3, 2):
+        f = S['nf'][i]
+        leg(c, hip(i), (cx + f[0], BASE + f[1]), S['kh'][i], NEAR, bends[i])
     # abdomen
     p = C()
     abd = E(ab[0] + 2, ab[1], 11.4, 10.4)
@@ -100,7 +104,7 @@ def draw(**kw):
         p.grid(hc[0] - 8, hc[1] + 4, FANGS, LEG)
     c.stamp(p, 'u0')
 
-    for i in (3, 2, 1, 0):
+    for i in (1, 0):
         f = S['nf'][i]
         leg(c, hip(i), (cx + f[0], BASE + f[1]), S['kh'][i], NEAR, bends[i])
     c.blacken()
