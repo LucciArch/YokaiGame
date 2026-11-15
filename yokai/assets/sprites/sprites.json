@@ -568,11 +568,11 @@
  },
  "kumo": {
   "atk": 4,
-  "h": 41,
+  "h": 31,
   "hi": true,
   "kind": "strip",
   "n": 7,
-  "w": 82,
+  "w": 60,
   "walk": 4
  },
  "kuzunoha": {
