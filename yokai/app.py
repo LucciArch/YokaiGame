@@ -1204,7 +1204,7 @@ class Game:
                 ('Synergien entdeckt', '%d / %d' % (len(self.save['synergies_seen']), len(SYNERGIES))),
                 ('Transformationen', '%d / %d' % (len(self.save['transforms_seen']), len(TRANSFORMS))),
                 ('Besiegte Bosse', '%d / %d' % (len(self.save['bosses']), len(BOSSES))), ('Oni-Pakte', st['oni_deals']),
-                ('Tiefste Ebene', st.get('best_floor', 0)), ('Spielzeit', '%d:%02d h' % (pt // 3600, (pt % 3600) // 60))]
+                ('Tiefste Ebene', st.get('best_floor', 0)), ('Ereignisse erlebt', st.get('events', 0)), ('Spielzeit', '%d:%02d h' % (pt // 3600, (pt % 3600) // 60))]
         for i, (k, v) in enumerate(rows):
             col = i // 8
             r = i % 8

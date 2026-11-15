@@ -129,6 +129,7 @@ class Procession:
         audio.play('unlock', 0.6)
         run.banner('Die Braut dankt dir', 'Ein Geschenk der Füchse', (255, 210, 150))
         run.achieve('yomeiri')
+        run.event_done('yomeiri')
 
     def anger(self):
         run = self.run
@@ -136,6 +137,7 @@ class Procession:
         self.room.extra['yomeiri_done'] = True
         audio.play('roar', 0.5)
         run.banner('Die Füchse sind gekränkt!', 'Fuchsfeuer erscheinen', (255, 120, 90))
+        run.event_done('yomeiri')
         for f in self.foxes[:3 if run.depth < 4 else 5]:
             burst(run, f.x, f.y - 10, (120, 180, 255), 12, 60)
             run.spawn_enemy('kitsunebi_e', f.x, f.y - 10)
@@ -197,6 +199,7 @@ def kakurenbo_break(run, tx, ty):
         audio.play('unlock', 0.6)
         run.banner('Gefunden!', 'Zashiki-warashi lässt dir ihr Spielzeug da – Glück +1', (255, 220, 240))
         run.achieve('kakurenbo')
+        run.event_done('kakurenbo')
     else:
         room.extra['kak_tries'] = room.extra.get('kak_tries', 0) + 1
         if room.extra['kak_tries'] >= 2:
@@ -204,5 +207,6 @@ def kakurenbo_break(run, tx, ty):
             hx, hy = room.extra['kak_hide']
             run.apparitions.append(Apparition('zashiki', RX + hx * 32 + 16, RY + hy * 32 + 26, 1.6))
             run.banner('Kichern…', 'Sie ist entwischt', (200, 180, 220))
+            run.event_done('kakurenbo')
         else:
             run.banner('Leer…', 'Noch ein Versuch', (220, 200, 210))

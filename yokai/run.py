@@ -1892,6 +1892,7 @@ class Run:
             burst(self, o.x, o.y - 8, tuple(o.data['col']), 18, 60)
             self.banner('Dein Wunsch wurde erhört', o.data['name'] + ': ' + o.data['desc'], tuple(o.data['col']))
             self.achieve('ema_wunsch')
+            self.event_done('ema')
         elif k == 'slots':
             self.achieve('slots')
             if p.coins < 3:
@@ -2001,6 +2002,17 @@ class Run:
         self.ambient = [pt for pt in self.ambient if pt.update(dt) and RY - 10 < pt.y < RY + RH + 10 and pt.x < RX + RW + 10][-260:]
 
     # ======================================================================  Erfolge & Ende
+    EVENT_KINDS = ('yomeiri', 'kakurenbo', 'ema')
+
+    def event_done(self, kind):
+        """Ein Ereignisraum wurde erlebt (für Statistik und Erfolg)."""
+        self.save.stat('events')
+        seen = self.save.data.setdefault('events_seen', [])
+        if kind not in seen:
+            seen.append(kind)
+        if all(k in seen for k in self.EVENT_KINDS):
+            self.achieve('feste')
+
     def achieve(self, aid):
         s = self.save
         if aid in s['achievements'] or aid not in ACH:
