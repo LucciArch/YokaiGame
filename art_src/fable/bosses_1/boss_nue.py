@@ -42,45 +42,59 @@ def P(x, y):
 
 
 def tleg(c, J, ramp, far=False):
-    """tiger leg: J = (shoulder/hip, elbow/knee, wrist/hock, paw)"""
+    """Tigerbein: J = (Schulter/Hüfte, Ellbogen/Knie, Fessel, Pfote) – weich verjüngt, geschwungene Streifen, Krallen."""
     a, b, d, e = J
     p = C()
-    up = L(*a, 10.4, *b, 7.4)
-    lo = L(*b, 6.6, *d, 4.8)
-    ft = L(*d, 4.6, e[0] + 2, e[1] - 2, 4.2)
-    paw = E(e[0] - 2, e[1], 7.4, 4.4)
-    p.form(up, ramp, sd=4, hl=1)
-    for i_, t0 in enumerate((0.1, 0.3, 0.5, 0.7)):
-        cut = ~sh(up, -7, 0) if i_ % 2 else ~sh(up, 9, 0)
-        p.fill(band(a, b, t0, t0 + 0.12, 12) & up & cut, 'K')
-    p.form(lo, ramp, sd=2, hl=1)
-    for i_, t0 in enumerate((0.15, 0.4, 0.65, 0.9)):
-        cut = ~sh(lo, -5, 0) if i_ % 2 else ~sh(lo, 6, 0)
-        p.fill(band(b, d, t0, t0 + 0.1, 9) & lo & cut, 'K')
-    p.form(ft, ramp, sd=2, hl=1)
-    p.form(paw, ramp, sd=2, hl=1)
-    p.line([(e[0] - 5, e[1] - 1), (e[0] - 5, e[1] + 3)], ramp[0], only=paw)
-    p.line([(e[0] - 1, e[1]), (e[0] - 1, e[1] + 3)], ramp[0], only=paw)
+    up = L(*a, 7.6, *b, 5.4)
+    lo = L(*b, 4.8, *d, 3.6)
+    ft = L(*d, 4.2, e[0] + 1, e[1] - 2, 4.4)
+    paw = E(e[0] - 1, e[1] - 0.5, 7.6, 4.6)
+    leg = up | lo | ft | paw
+    p.form(leg, ramp, sd=4, hl=1)
+    # geschwungene Streifen: schmale schräge Keile, abwechselnd von vorn und hinten
+    for i_, t0 in enumerate((0.25, 0.5, 0.75)):
+        q = lerp(a, b, t0); side = 1 if i_ % 2 else -1
+        p.fill(tri((q[0] + side * 8, q[1] - 1), 160 if side > 0 else 20, 10, 3.6) & up, 's0')
+    for i_, t0 in enumerate((0.3, 0.7)):
+        q = lerp(b, d, t0); side = -1 if i_ % 2 else 1
+        p.fill(tri((q[0] + side * 5, q[1]), 160 if side > 0 else 20, 6, 2.6) & lo, 's0')
     c.stamp(p, 'K')
-    for i in range(3):
-        cx = int(e[0] - 9 + i * 4); cy = int(e[1] + 2)
-        c.pxs([(cx, cy), (cx + 1, cy), (cx, cy + 1)], 'b3' if not far else 'b2')
+    for i in range(4):                                            # Krallen
+        cx = int(e[0] - 8 + i * 3.6); cy = int(e[1] + 3)
+        c.pxs([(cx, cy), (cx - 1, cy + 1)], 'b3' if not far else 'b2')
+
+
+def _spline(pts, k=4):
+    """Catmull-Rom: glatte Kurve durch die Kontrollpunkte (k Zwischenpunkte je Abschnitt)."""
+    out = []
+    P_ = [pts[0]] + list(pts) + [pts[-1]]
+    for i in range(1, len(P_) - 2):
+        p0, p1, p2, p3 = P_[i - 1], P_[i], P_[i + 1], P_[i + 2]
+        for j in range(k):
+            t = j / k
+            out.append(tuple(0.5 * ((2 * p1[a]) + (-p0[a] + p2[a]) * t + (2 * p0[a] - 5 * p1[a] + 4 * p2[a] - p3[a]) * t * t
+                                    + (-p0[a] + 3 * p1[a] - 3 * p2[a] + p3[a]) * t * t * t) for a in (0, 1)))
+    out.append(pts[-1])
+    return out
 
 
 def snake(c, pts, mouth=3):
     """pts: control points from the rump to the neck; head faces along the last segment"""
+    ctrl = pts
+    pts = _spline(pts, 4)
     n = len(pts) - 1
     p = C()
     m = np.zeros((px.H, px.W), bool)
+    belly = np.zeros_like(m)
     for i in range(n):
-        r0_ = 6.2 - i * 0.45; r1_ = 6.2 - (i + 1) * 0.45
+        r0_ = 7.4 - i * 0.62 / 4; r1_ = 7.4 - (i + 1) * 0.62 / 4
         m |= L(*pts[i], r0_, *pts[i + 1], r1_)
     p.form(m, SNK, sd=3, hl=1)
-    # belly scales on the inner side + diamond blotches
-    for i in range(n):
-        for t in (0.25, 0.75):
+    for i in range(0, n, 2):                                      # Rautenmuster auf dem Rücken
+        for t in (0.5,):
             q = lerp(pts[i], pts[i + 1], t)
-            p.fill(band(pts[i], pts[i + 1], t - 0.1, t + 0.1, 8) & m & (p.a == I('g2')), 'g1')
+            r_ = max(1.6, 3.2 - i * 0.25 / 4)
+            p.fill(E(q[0], q[1] - 1.5, r_, r_ * 0.7) & m & ~E(q[0], q[1] + 0.5, r_, r_ * 0.7), 'g0')
     c.stamp(p, 'K')
     # head
     hx, hy = pts[-1]
@@ -159,25 +173,30 @@ def nue(**kw):
     tleg(c, LJ(S['fh'], Bk), TFAR, far=True)
     snake(c, [Bk(q) if i < 2 else P(q[0] + dx, q[1] + dy) for i, q in enumerate(S['snk'])], S['mouth'])
 
-    # ---- tanuki body: shaggy barrel
+    # ---- Tanuki-Leib: Brustkorb vorn höher, Bauch hängt, kräftige Hüfte; Rücken dunkler, Bauch heller
     p = C()
     ch, ru = F((92, 82)), Bk((144, 84))
-    body = L(*ch, 22, *ru, 19)
+    mid = lerp(ch, ru, 0.5)
+    body = (E(ch[0] - 1, ch[1] - 5, 19, 18) | E(mid[0] + 2, mid[1] + 4, 23, 12) | E(ru[0] + 2, ru[1] - 2, 16, 15)
+            | L(ch[0], ch[1] - 2, 15, ru[0], ru[1] - 1, 12))
     tuft = np.zeros_like(body)
-    for t, a_, l_ in ((0.0, 80, 10), (0.2, 75, 11), (0.42, 78, 10), (0.64, 72, 10), (0.86, 70, 9)):   # belly fringe
-        q = lerp(ch, ru, t); tuft |= tri((q[0], q[1] + 17), a_, l_, 9)
-    for t, a_, l_ in ((0.1, 300, 9), (0.3, 305, 10), (0.52, 310, 9), (0.74, 315, 9), (0.96, 330, 10), (1.1, 10, 9)):   # back ridge
-        q = lerp(ch, ru, t); tuft |= tri((q[0], q[1] - 17), a_, l_, 9)
+    for t in (0.0, 0.14, 0.28, 0.42, 0.56, 0.7, 0.84, 0.98):                               # weiche Fellbuckel am Rücken
+        q = lerp(ch, ru, t); tuft |= tri((q[0] + 1, q[1] - 14 - (7 if t < 0.25 else 2 if t < 0.5 else 0)), 290, 5, 7)
+    for t, l_ in ((0.25, 5), (0.45, 6), (0.65, 5)):                                          # Bauchzotteln
+        q = lerp(ch, ru, t); tuft |= tri((q[0], q[1] + 19), 100, l_, 6)
     full = body | tuft
     p.form(full, FUR, sd=6, hl=1)
-    back = full & ~sh(full, 0, 9) & (px.X > ch[0] - 8)                               # dark dorsal saddle
+    back = full & ~sh(full, 0, 8)                                                           # dunkler Sattel
     p.fill(back & (p.a == I('s2')), 's1'); p.fill(back & (p.a == I('s3')), 's2')
-    for t, yo in ((0.1, 2), (0.3, 8), (0.5, 0), (0.7, 7), (0.9, 2), (0.2, -6), (0.6, -7), (0.85, -4)):   # fur ticks
-        q = lerp(ch, ru, t); x_, y_ = int(q[0]), int(q[1] + yo)
-        p.line([(x_, y_), (x_ + 3, y_ + 3)], 's1', only=body)
-    p.form(E(ch[0] - 1, ch[1] + 3, 16, 15) & full, FUR, sd=3, hl=1)                     # shoulder mass
-    p.form(E(ru[0] + 3, ru[1] + 1, 15, 15) & full, FUR, sd=3, hl=1)                     # haunch
-    p.fill(R(ch[0] - 4, ch[1] - 9, ch[0] + 1, ch[1] - 9), 's3', only=full)
+    bel = full & ~sh(full, 0, -7) & (px.X > ch[0] - 6) & (px.X < ru[0] + 4)                # heller Bauch
+    p.fill(bel & (p.a == I('s2')), 's3')
+    import random as _r
+    rg = _r.Random(7)
+    for k in range(34):                                                                    # Fellstriche, schräg nach hinten
+        t = rg.random(); q = lerp(ch, ru, t)
+        x_, y_ = int(q[0] + rg.uniform(-10, 10)), int(q[1] + rg.uniform(-12, 10))
+        if body[min(px.H - 1, max(0, y_)), min(px.W - 1, max(0, x_))]:
+            p.line([(x_, y_), (x_ + 3, y_ + 2)], 's1' if k % 3 else 's3', only=body)
     c.stamp(p, 'K')
 
     tleg(c, LJ(S['nh'], Bk), TIG)
