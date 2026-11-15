@@ -44,3 +44,4 @@ for k in ('brautschleier', 'zashiki_temari'):
 for a in data.ACHIEVEMENTS:
     if sum(1 for b in data.ACHIEVEMENTS if b[0] == a[0]) > 1: print('ach dup', a[0]); bad += 1
 print('items',len(data.ITEMS),'syn',len(data.SYNERGIES),'templates',len(rooms.TEMPLATES),'bad',bad)
+sys.exit(1 if bad else 0)

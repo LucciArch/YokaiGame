@@ -137,4 +137,4 @@ if __name__ == '__main__':
         except Exception:
             traceback.print_exc()
             print('CRASH seed', sd, ch, 'depth', g.run.depth if g.run else None, 'room', g.run.room.kind if g.run else None)
-            break
+            sys.exit(1)

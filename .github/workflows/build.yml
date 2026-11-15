@@ -29,6 +29,22 @@ jobs:
           SDL_AUDIODRIVER: dummy
         run: python -c "import yokai.app, yokai.run, yokai.bosses; print('Import OK')"
 
+      - name: Tests (Daten, Menüs, ein Bot-Lauf)
+        env:
+          SDL_VIDEODRIVER: dummy
+          SDL_AUDIODRIVER: dummy
+          PYTHONIOENCODING: utf-8
+        working-directory: tools
+        run: |
+          python validate.py
+          python uiflow2.py
+          python bot.py 1
+
+      - name: Version lesen
+        id: ver
+        shell: bash
+        run: echo "v=$(python -c 'from yokai.settings import VERSION; print(VERSION)')" >> "$GITHUB_OUTPUT"
+
       - name: EXE bauen
         run: pyinstaller --noconfirm --onefile --windowed --name YokaiNoMichi --icon icon.png --collect-data pygame --add-data "yokai/assets;yokai/assets" main.py
 
@@ -41,8 +57,8 @@ jobs:
       - name: Release veröffentlichen
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.1.${{ github.run_number }}
-          name: Yōkai no Michi 1.1 – Build ${{ github.run_number }}
+          tag_name: v${{ steps.ver.outputs.v }}-build${{ github.run_number }}
+          name: Yōkai no Michi ${{ steps.ver.outputs.v }} – Build ${{ github.run_number }}
           files: dist/YokaiNoMichi.exe
           body: |
             **Herunterladen:** `YokaiNoMichi.exe` unten anklicken, speichern, doppelklicken – fertig.

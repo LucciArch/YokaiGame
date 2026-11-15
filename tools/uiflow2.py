@@ -29,3 +29,4 @@ except SystemExit:
     print('exit')
 except Exception:
     traceback.print_exc()
+    sys.exit(1)
