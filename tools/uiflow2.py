@@ -10,6 +10,10 @@ def step(ev, n=1):
 def menu(i):
     g.state='title'; g.sel=i + (1 if 'Fortsetzen' in g.menu_items() else 0); step([K(pygame.K_RETURN)], 20)
 try:
+    from yokai.settings import VERSION
+    g.save.data.pop('news_seen', None)
+    g.state = 'title'; step([], 3); step([K(pygame.K_SPACE)], 3)
+    assert g.save.data.get('news_seen') == VERSION, 'Neuigkeiten-Fenster lässt sich nicht schließen'
     for i in (3,4,5,6,7):
         menu(i); s=g.state
         for k in (pygame.K_RIGHT, pygame.K_DOWN, pygame.K_LEFT, pygame.K_UP): step([K(k)], 3)

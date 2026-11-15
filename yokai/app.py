@@ -416,7 +416,8 @@ class Game:
         T.add('– Hyakki Yagyō –', W // 2, 66, 11, (230, 140, 130), 'c')
         items = self.menu_items()
         step = 14 if len(items) <= 10 else 13
-        for i, m in enumerate(items):
+        show_news = self.save.data.get('news_seen') != VERSION and not self.headless
+        for i, m in enumerate(items if not show_news else []):
             y = 84 + i * step
             sel = i == self.sel
             col = (255, 230, 150) if sel else (210, 200, 190)
@@ -424,7 +425,7 @@ class Game:
                 gfx.panel(s, (W // 2 - 70, y - 2, 140, min(15, step + 1)), 170, (200, 120, 90))
             T.add(m, W // 2, y, 10, col, 'c')
         T.add('v' + VERSION + '   •   F11 Vollbild', W - 6, H - 12, 6, (140, 130, 150), 'r')
-        if items and items[self.sel % len(items)] == 'Fortsetzen':
+        if items and items[self.sel % len(items)] == 'Fortsetzen' and not show_news:
             info = getattr(self, '_cont_info', None)
             if info is None:
                 from .run import load_run_file
@@ -436,6 +437,21 @@ class Game:
             T.add(info, W // 2 + 76, 85, 6, (200, 220, 170))
         else:
             self._cont_info = None
+        if show_news:
+            from . import news
+            w = max(gfx.text_w(l, 7) for l in news.LINES) + 30
+            h = 34 + len(news.LINES) * 12
+            x0, y0 = W // 2 - w // 2, 92
+            gfx.hi_panel((x0, y0, w, h), 235, (230, 180, 110))
+            T.add(news.TITLE, W // 2, y0 + 5, 10, (255, 225, 150), 'c')
+            for i, l in enumerate(news.LINES):
+                T.add('•  ' + l, x0 + 12, y0 + 22 + i * 12, 7, (235, 228, 210))
+            T.add('Beliebige Taste – weiter', W // 2, y0 + h + 4, 6, (170, 160, 150), 'c')
+            if nav:
+                self.save.data['news_seen'] = VERSION
+                self.save.write()
+                audio.play('select')
+            return
         for n in nav:
             if n == 'up':
                 self.sel = (self.sel - 1) % len(items); audio.play('move')
