@@ -11,7 +11,7 @@ from .rooms import generate_floor, build_room_tiles, Room
 from .entities import (Player, Bullet, Enemy, Pickup, Pedestal, Obj, Hazard, Particle, burst, clamp, norm,
                        tile_at, free_tile_pos, ebullet)
 from .bosses import make_boss, CX, CY
-from .yomeiri import Procession, Apparition, kakurenbo_start, kakurenbo_break
+from .yomeiri import Procession, Apparition, kakurenbo_start, kakurenbo_break, kakurenbo_update
 
 ACH = {a[0]: a for a in ACHIEVEMENTS}
 MATSURI = ('yo', 60, 96, 'matsuri', 55)          # Nachtmarkt-Musik für Laden und Ereignisräume
@@ -449,7 +449,7 @@ class Run:
         rh = {'shop': 'Laden: Mon gegen Items tauschen. Der Saisen-Kasten nimmt Spenden an – manchmal lohnt es sich.',
               'curse': 'Fluchraum: Betreten kostet Leben, dafür lockt ein dunkler Schatz.',
               'yomeiri': 'Fuchshochzeit: Schieß nicht auf den Zug – dann bekommst du ein Geschenk.',
-              'kakurenbo': 'Versteckspiel: Zerschlage die richtige Urne. Du hast zwei Versuche.',
+              'kakurenbo': 'Versteckspiel: Achte auf rosa Funken über einer Urne – zwei Versuche.',
               'ema': 'Ema-Wand: Berühre eine Tafel – nur ein Wunsch geht in Erfüllung.',
               'challenge': 'Prüfungsraum: Mehrere Wellen überstehen, dann gibt es eine Belohnung.',
               'secret': 'Geheimraum! Rissige Wände lassen sich mit Salz aufsprengen.',
@@ -1468,6 +1468,8 @@ class Run:
         # Geschosse
         if getattr(self, 'yomeiri', None) is not None and not self.yomeiri.update(dt):
             self.yomeiri = None
+        if self.room.kind == 'kakurenbo':
+            kakurenbo_update(self, dt)
         if getattr(self, 'apparitions', None):
             self.apparitions = [a for a in self.apparitions if a.update(dt)]
         self.update_bullets(dt)

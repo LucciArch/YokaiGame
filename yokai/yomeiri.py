@@ -175,7 +175,23 @@ def kakurenbo_start(run, room):
     if 'kak_hide' not in room.extra:
         room.extra['kak_hide'] = random.choice(POTS)
         room.extra['kak_tries'] = 0
-    run.banner('Kakurenbo', 'Zashiki-warashi versteckt sich in einer Urne – zwei Versuche!', (240, 200, 220))
+    run.banner('Kakurenbo', 'Sie versteckt sich in einer Urne und kichert manchmal – zwei Versuche!', (240, 200, 220))
+
+
+def kakurenbo_update(run, dt):
+    """Ab und zu ein leises Kichern: ein rosa Funke über der richtigen Urne – wer genau hinsieht, findet sie."""
+    room = run.room
+    if room.extra.get('kak_done') or 'kak_hide' not in room.extra:
+        return
+    t = room.extra.get('kak_t', 2.5) - dt
+    if t <= 0:
+        t = random.uniform(3.0, 5.0)
+        hx, hy = room.extra['kak_hide']
+        x, y = RX + hx * 32 + 16 + random.uniform(-6, 6), RY + hy * 32 + 4
+        for i in range(3):
+            run.particles.append(Particle(x + i * 3 - 3, y, random.uniform(-6, 6), -18 - i * 4, 0.9, (255, 170, 210), 1))
+        audio.play('wisp', 0.12)
+    room.extra['kak_t'] = t
 
 
 def kakurenbo_break(run, tx, ty):
