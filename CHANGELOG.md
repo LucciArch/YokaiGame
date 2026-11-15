@@ -21,6 +21,7 @@
 - Kapitelnamen, eigener Seed (E in der Figurenauswahl), Codex mit Silhouetten, Menüs mit Nachthimmel
 - Neues Ereignis **Kitsune no Yomeiri**: Eine Fuchshochzeit zieht durch einen Raum – wer sie nicht stört, bekommt ein Geschenk der Braut
 - Neues Ereignis **Kakurenbo**: Zashiki-warashi versteckt sich in einer von vier Urnen – zwei Versuche
+- Controller vibrieren bei Treffern und Explosionen (an „Bildschirmwackeln“ gekoppelt)
 - Neues Musikstück **„Yomise“** (Nachtmarkt) für Laden, Teehaus, Spielhalle und Ereignisräume
 - Endbildschirm und „Letzte Läufe“ zeigen, wer dich bezwungen hat
 - Neue Herausforderung **„Der lange Weg“** (alle zehn Ebenen), Option **Blitzeffekte reduziert**, Erzählzeilen zu Kapitelbeginn

@@ -880,6 +880,8 @@ class Run:
     def shake(self, a):
         if self.save['settings'].get('shake', True):
             self.shake_amt = max(self.shake_amt, a)
+            if a >= 3 and getattr(self.game, 'rumble', None):
+                self.game.rumble(min(1.0, a / 10.0), int(60 + a * 18))
 
     def nearest_enemy(self, x, y, maxd=9999):
         best, bd = None, maxd

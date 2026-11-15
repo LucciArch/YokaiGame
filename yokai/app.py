@@ -71,6 +71,14 @@ class Game:
         except Exception:
             self.pads = []
 
+    def rumble(self, strength, ms):
+        """Controller-Vibration (falls der Controller sie kann)."""
+        for p in getattr(self, 'pads', []):
+            try:
+                p.rumble(strength * 0.8, strength, ms)
+            except Exception:
+                pass
+
     def toast(self, title, sub='', col=(255, 220, 120)):
         self.toasts.append([title, sub, col, 3.5])
         audio.play('unlock')
