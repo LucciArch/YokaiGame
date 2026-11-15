@@ -2181,6 +2181,10 @@ class Run:
         n0 = len(gfx.HI)
         old_sp, old_fl = b.spawn_t, b.flash
         b.spawn_t, b.flash = 0, 0
+        old_trail = getattr(b, 'trail', None)
+        if old_trail is not None:                      # Schlangenleib für das Porträt in eine Welle legen
+            b.trail = [(b.x + i * 0.8, b.y + math.sin(i * 0.05) * 14) for i in range(len(old_trail))]
+            b.heading = math.pi
         try:
             if getattr(b, 'sheet', None):
                 b.render_sheet(tmp, 0.0)
@@ -2189,6 +2193,8 @@ class Run:
         except Exception:
             pass
         b.spawn_t, b.flash = old_sp, old_fl
+        if old_trail is not None:
+            b.trail = old_trail
         ents = gfx.HI[n0:]
         del gfx.HI[n0:]
         hi = pygame.transform.scale(tmp, (W * 2, H * 2))
@@ -2196,6 +2202,9 @@ class Run:
             im, cx, by = e[0], e[1], e[2]
             hi.blit(im, (int(cx * 2 - im.get_width() / 2), int(by * 2 - im.get_height())))
         bb = hi.get_bounding_rect()
+        focus = pygame.Rect(0, 0, 300, 220)
+        focus.center = ((bb.centerx + int(b.x * 2)) // 2, (bb.centery + int(b.y * 2)) // 2)
+        bb = bb.clip(focus)
         if bb.w < 4 or bb.h < 4:
             return None
         crop = hi.subsurface(bb).copy()
