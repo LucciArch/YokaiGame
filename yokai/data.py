@@ -635,3 +635,18 @@ CHARS['susanoo']['fx']['sword_wave'] = 1
 BIOMES['uminobe']['enemies'] = ['funayurei', 'heikegani', 'isonade', 'ningyo', 'onibi', 'sazae_oni']
 BIOMES['jigoku']['enemies'] = ['oni', 'shikome', 'shinigami', 'onibi', 'tsuchigumo', 'kasha', 'wanyudo', 'gaki']
 BIOMES['takamagahara']['enemies'] = ['karasu_tengu', 'yamabiko', 'kamaitachi', 'katawaguruma', 'nurikabe', 'kitsunebi_e', 'ningyo', 'shinigami']
+
+
+# Exklusive Item-Pools: jedes Item gehört genau einer Raumart (Schatzraum T, Laden S, Boss B, Kami-Schrein K, Oni-Schrein O)
+def _exclusive_pools():
+    for k, it in ITEMS.items():
+        ps = [p for p in it['pools'] if p in 'TSBKO']
+        if len(ps) > 1:
+            for pref in 'OKBS':
+                if pref in ps:
+                    ps = [pref]
+                    break
+        it['pools'] = ps or ['T']
+
+
+_exclusive_pools()
