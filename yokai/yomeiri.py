@@ -48,6 +48,8 @@ class Procession:
         self.gifted = False
         self.fade = 1.0
         self.rain = 0.0
+        self.beat = 0.4
+        self.nbeat = 0
         run.banner('Kitsune no Yomeiri', 'Eine Fuchshochzeit zieht vorbei – störe sie nicht!', (255, 190, 120))
 
     @property
@@ -67,6 +69,11 @@ class Procession:
         for f in self.foxes:
             f.t += dt
             f.y = f.y0 + math.sin(f.t * 5 + f.i) * 0.8
+        self.beat -= dt
+        if self.beat <= 0 and any(RX < f.x < RX + RW for f in self.foxes):
+            self.beat = 0.8
+            self.nbeat += 1
+            audio.play('bell' if self.nbeat % 4 == 1 else 'drum', 0.18 if self.nbeat % 4 == 1 else 0.1)
         if self.state == 'walk':
             for f in self.foxes:
                 f.x -= SPEED * dt
