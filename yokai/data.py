@@ -561,6 +561,7 @@ CHALLENGES = [
     dict(id='oni_pakt', name='Pakt mit dem Teufel', char='akago', desc='Drei Oni-Items, aber nur ein Herzcontainer.', goal=5),
     dict(id='bossrush', name='Boss-Ansturm', char='benkei', desc='Nur Bosskämpfe – nach jedem Boss ein Item.', goal=6),
     dict(id='papiermeister', name='Papiermeister', char='seimei', desc='Du schießt nicht – nur deine Shikigami kämpfen.', goal=5),
+    dict(id='langer_weg', name='Der lange Weg', char='okiku', desc='Alle zehn Ebenen bis Kapitel V – ohne Läden, Oni-Pakte kosten doppelt.', goal=5),
 ]
 
 # =====================================================================  ERFOLGE
@@ -616,6 +617,7 @@ ACHIEVEMENTS = [
     ('ch_oni_pakt', 'Prüfung: Pakt mit dem Teufel', 'Bestehe die Prüfung „Pakt mit dem Teufel“', None),
     ('ch_bossrush', 'Prüfung: Boss-Ansturm', 'Bestehe die Prüfung „Boss-Ansturm“', None),
     ('ch_papiermeister', 'Prüfung: Papiermeister', 'Bestehe die Prüfung „Papiermeister“', None),
+    ('ch_langer_weg', 'Prüfung: Der lange Weg', 'Bestehe die Prüfung „Der lange Weg“', None),
     ('foxfire', 'Kitsunebi-Fänger', 'Fange ein Fuchsfeuer im Inari-Schrein', None),
     ('quirks_all', 'Wanderer der Welten', 'Erlebe die Eigenheiten aller Biome', None),
     ('synergy25', 'Meister der Harmonie', 'Entdecke 25 verschiedene Synergien', None),

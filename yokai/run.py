@@ -251,14 +251,14 @@ class Run:
 
     @property
     def last_stage(self):
-        return self.stage == 1 or self.depth not in self.TWO_STAGE or bool(self.challenge)   # Prüfungen bleiben kurz
+        return self.stage == 1 or self.depth not in self.TWO_STAGE or (bool(self.challenge) and self.challenge != 'langer_weg')
 
     def path_nodes(self):
         """Alle Ebenen des Laufs als (Kapitel, Abschnitt)."""
         out = []
-        last = 6 if (self.save['heaven_unlocked'] or self.depth >= 6) else 5
+        last = 6 if (self.save['heaven_unlocked'] or self.depth >= 6) and not (self.challenge and self.challenge != 'bossrush') else 5
         for d in range(1, last + 1):
-            two = d in self.TWO_STAGE and not self.challenge
+            two = d in self.TWO_STAGE and (not self.challenge or self.challenge == 'langer_weg')
             out += [(d, 0), (d, 1)] if two else [(d, 0)]
         return out
 
@@ -326,7 +326,7 @@ class Run:
             self.blessing = rng.choice(list(BLESSINGS.keys()))
         self.rooms, start, self.boss_pos = generate_floor(rng, self.depth, self.curse == 'labyrinth', self.hard)
         for r in self.rooms.values():
-            if self.challenge == 'fuchspfad' and r.kind == 'shop':
+            if self.challenge in ('fuchspfad', 'langer_weg') and r.kind == 'shop':
                 r.kind = 'onsen'
             if self.challenge == 'kaufmann' and r.kind == 'treasure':
                 r.kind = 'shop'
@@ -677,7 +677,7 @@ class Run:
                 iid = self.pick_item('O' if oni else 'K')
                 if oni:
                     q = ITEMS[iid]['q']
-                    pd = Pedestal(iid, cx + dx, cy - 10, hearts=1 if q < 4 else 2)
+                    pd = Pedestal(iid, cx + dx, cy - 10, hearts=(1 if q < 4 else 2) * (2 if self.challenge == 'langer_weg' else 1))
                 else:
                     pd = Pedestal(iid, cx + dx, cy - 10, group='kami')
                 pd.shrine = 'oni' if oni else 'kami'
