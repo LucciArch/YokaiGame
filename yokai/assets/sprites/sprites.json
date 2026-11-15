@@ -602,6 +602,15 @@
   "w": 86,
   "walk": 4
  },
+ "nureonna": {
+  "atk": 4,
+  "h": 55,
+  "hi": true,
+  "kind": "strip",
+  "n": 7,
+  "w": 76,
+  "walk": 4
+ },
  "nurikabe": {
   "atk": 4,
   "h": 93,

@@ -19,7 +19,7 @@
 - 4 neue Items (Glocke des Komainu, Feder der Tennin, Fels von Yomotsu, Sternenstaub) und 3 neue Synergien
 - Waffen-, Figuren- und Boss-Balance gemessen und angeglichen (Berichte unter `design/balance/`)
 - Kapitelnamen, eigener Seed (E in der Figurenauswahl), Codex mit Silhouetten, Menüs mit Nachthimmel
-- Neue Gegner: **Kawauso** (Kapitel I), **Zashiki-warashi** (Kapitel II), **Komainu** und **Tennin** (Kapitel VI)
+- Neue Gegner: **Kawauso** (Kapitel I), **Zashiki-warashi** (Kapitel II), **Nure-onna** (Kapitel IV), **Komainu** und **Tennin** (Kapitel VI)
 - Wände in doppelter Pixeldichte; nach dem zweiten Boss eines Kapitels immer ein Schrein
 - Statistik „Letzte Läufe“, Infos zum gespeicherten Lauf im Titelmenü
 - Segen: Manche Ebenen sind gesegnet (Vollmond: Karte aufgedeckt, Füchse: Rabatt, Reichtum: doppelt Mon, Kami: Heilung)

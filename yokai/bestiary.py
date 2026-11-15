@@ -100,6 +100,8 @@ LORE = {
               'Rast umher und hinterlässt Feuer.'),
     'wanyudo': ('輪入道', 'Der Kopf eines Mannes in einem brennenden Rad, der die Seelen derer stiehlt, die ihn ansehen.',
                 'Prallt durch den Raum und zieht Flammen nach.'),
+    'nureonna': ('濡女', 'Eine Schlange mit dem Kopf einer Frau und triefend nassem Haar. Sie bittet Fischer, ihr Kind zu halten – das Kind wird schwer wie Stein, und sie kommt zurück.',
+                 'Schlängelt sich im Zickzack heran und spuckt Fächer aus Meerwasser.'),
     'kawauso': ('川獺', 'Fischotter, die sich in hübsche Mädchen oder Mönche verwandeln, mit Strohhut und Laterne am Ufer warten und Wanderer ins Wasser locken.',
                 'Lockt mit seiner Laterne und wirft Flusskiesel.'),
     'zashiki': ('座敷童子', 'Ein Hausgeist in Kindergestalt mit Pagenkopf und rotem Kimono. Wo er wohnt, herrscht Wohlstand – zieht er aus, verfällt das Haus.',
