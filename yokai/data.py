@@ -259,6 +259,16 @@ I('izanami_schleier', 'Izanamis Schleier', 'Leben und Tod in einem Gewand', 'clo
 I('kagutsuchi_glut', 'Glut des Kagutsuchi', 'Das erste Feuer der Welt', 'flame', (255, 90, 30), 'B', ['kami', 'oni'], 4, True, burn=1, explode=1, dmgm=1.3)
 I('geheimkarte', 'Karte des Diebes', 'Wo sind die verborgenen Räume?', 'scroll', (190, 160, 110), 'TS', [], 2, True, map=1, salts=2)
 
+# ---- v1.3: Fundstücke aus den Himmelsgefilden und aus Yomi
+I('komainu_glocke', 'Glocke des Komainu', 'Wird ihr Träger getroffen, läutet sie für alle', 'komainu_glocke', (236, 190, 70),
+  ['K'], ['kami'], 3, hurt_ring=1, hp=1, luck=1)
+I('tennin_feder', 'Feder der Tennin', 'Leicht wie ein Himmelsgewand', 'tennin_feder', (236, 236, 255),
+  ['T'], ['kami'], 3, homing=1, shotspd=40, spd=8)
+I('yomi_stein', 'Fels von Yomotsu', 'Der Stein, der die Unterwelt verschließt', 'yomi_stein', (120, 128, 160),
+  ['O'], ['oni'], 3, hp=2, spd=-10, knock=1, dmg=0.6)
+I('mikaboshi_staub', 'Sternenstaub', 'Ein Säckchen aus dem Gewand des bösen Sterns', 'mikaboshi_staub', (120, 150, 255),
+  ['B'], ['raijin'], 4, crit=0.12, rate=0.35, luck=1)
+
 ITEM_IDS = ORDER
 
 # ---- Omamori-Anhänger (ein Slot, tauschbar)
@@ -281,6 +291,9 @@ TRINKETS = {
 
 # =====================================================================  SYNERGIEN
 SYNERGIES = [
+    dict(id='a_un', name='A und Un', desc='Zwei Wächter: Anfang und Ende', items=['komainu', 'komainu_glocke'], fx=dict(hurt_ring=1, dmg=0.8, orbital=1)),
+    dict(id='sternenfall', name='Sternenfall', desc='Federn aus Licht, Staub aus Sternen', items=['tennin_feder', 'mikaboshi_staub'], fx=dict(multishot=1, crit=0.08, homing=1)),
+    dict(id='yomotsu', name='Yomotsu Hirasaka', desc='Der Pass zwischen den Welten ist versiegelt', items=['yomi_stein', 'shimenawa'], fx=dict(shield=1, hp=1, dmgm=1.15)),
     dict(id='jingi', name='Sanshu no Jingi', desc='Die drei Throninsignien vereint!', items=['kusanagi', 'yata_kagami', 'yasakani'], fx=dict(dmgm=1.5, multishot=2, homing=1, chain=1)),
     dict(id='sonne_mond', name='Sonne & Mond', desc='Tag und Nacht in deiner Hand', items=['amaterasu', 'tsukuyomi'], fx=dict(dmgm=1.3, split=1)),
     dict(id='sturmgoetter', name='Sturmgötter', desc='Raijin und Fūjin kämpfen mit dir', items=['raijin_trommel', 'fujin_sack'], fx=dict(raijin_chance=0.15, multishot=1, knock=1)),

@@ -16,6 +16,9 @@
 - Läufe speichern und fortsetzen („Speichern & Hauptmenü“, im Titel „Fortsetzen“)
 - Neue Spielweise „Entspannt“ in den Optionen: +1 Herz, nur halbe Herzen Schaden, langsamere Geschosse
 - Türen, Item-Altäre, Felsen, Urnen und Laternen in doppelter Pixeldichte; Gruben mit Abbruchkante
+- 4 neue Items (Glocke des Komainu, Feder der Tennin, Fels von Yomotsu, Sternenstaub) und 3 neue Synergien
+- Waffen-, Figuren- und Boss-Balance gemessen und angeglichen (Berichte unter `design/balance/`)
+- Kapitelnamen, eigener Seed (E in der Figurenauswahl), Codex mit Silhouetten, Menüs mit Nachthimmel
 - Zwei neue Gegner in den Himmelsgefilden: **Komainu** (steinerner Wächterlöwe) und **Tennin** (Himmelsmädchen mit Lichtfächer)
 - Statistik „Letzte Läufe“, Infos zum gespeicherten Lauf im Titelmenü
 - Segen: Manche Ebenen sind gesegnet (Vollmond: Karte aufgedeckt, Füchse: Rabatt, Reichtum: doppelt Mon, Kami: Heilung)
