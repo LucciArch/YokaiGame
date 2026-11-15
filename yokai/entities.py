@@ -4,7 +4,7 @@ import random
 import pygame
 from collections import defaultdict
 from .settings import *
-from . import gfx, audio, art, sheets, props
+from . import gfx, audio, art, sheets, props, costume
 from .data import ITEMS, ENEMIES, CHAMPIONS, ACTIVES, CHARS, SYNERGIES, TRANSFORMS, TRINKETS
 
 ONE_TIME = ('hp', 'heal', 'spirit', 'coins', 'keys', 'salts', 'fullheal')
@@ -714,20 +714,6 @@ class Player:
             pygame.draw.circle(s, (255, 220, 150), (int(self.x), int(self.y)), rad, 1)
         # Schatten
         gfx.shadow(s, (int(self.x) - 8, int(self.y) + 6, 16, 5))
-        # Transformations-Effekte hinter der Figur
-        if 'kitsune' in self.transforms:
-            for i in range(5):
-                a = math.pi / 2 + (i - 2) * 0.35 + math.sin(t * 3 + i) * 0.08
-                ex, ey = self.x + math.cos(a) * -9, self.y - 2 + math.sin(a) * -9
-                pygame.draw.line(s, (240, 150, 60), (self.x, self.y), (ex, ey + 8), 3)
-                pygame.draw.circle(s, (255, 250, 240), (int(ex), int(ey + 8)), 2)
-        if 'tengu' in self.transforms or (self.f['fly'] and self.char != 'okiku'):
-            flap = math.sin(t * 14) * 3
-            for side in (-1, 1):
-                pts = [(self.x + side * 3, self.y - 3), (self.x + side * 13, self.y - 8 - flap), (self.x + side * 10, self.y + 2)]
-                pygame.draw.polygon(s, (40, 40, 50) if 'tengu' in self.transforms else (230, 230, 240), pts)
-        if 'kami' in self.transforms:
-            pygame.draw.ellipse(s, (255, 230, 120), (int(self.x) - 6, int(self.y) - 18, 12, 4), 1)
         if vis:
             bob = int(abs(math.sin(self.anim * 9)) * 1.5) if self.moving else 0
             if sheets.has(self.char):
@@ -766,12 +752,18 @@ class Player:
             rx = int(-self.facing[0] * 1.5) if self.recoil > 0 else 0
             ry = int(-self.facing[1] * 1.5) if self.recoil > 0 else 0
             if sheets.has(self.char) and sheets.is_hi(self.char):
-                gfx.hi_blit(spr, self.x + rx, self.y + 9 - bob + ry, alpha_s.get_alpha() if alpha_s is not spr and alpha_s.get_alpha() is not None else 255)
+                al = alpha_s.get_alpha() if alpha_s is not spr and alpha_s.get_alpha() is not None else 255
+                fr_right = getattr(self, '_last_dir', None) == sheets.RIGHT
+                costume.draw(self, spr, self.x + rx, self.y + 9 - bob + ry, fr_right, t, 'back', al)
+                gfx.hi_blit(spr, self.x + rx, self.y + 9 - bob + ry, al)
+                costume.draw(self, spr, self.x + rx, self.y + 9 - bob + ry, fr_right, t, 'front', al)
             else:
                 s.blit(alpha_s, (int(self.x) - spr.get_width() // 2 + rx, int(self.y) - spr.get_height() + 9 - bob + ry))
-            if 'oni' in self.transforms:
-                pygame.draw.polygon(s, (250, 230, 120), [(self.x - 4, self.y - 13), (self.x - 6, self.y - 18), (self.x - 2, self.y - 13)])
-                pygame.draw.polygon(s, (250, 230, 120), [(self.x + 4, self.y - 13), (self.x + 6, self.y - 18), (self.x + 2, self.y - 13)])
+        tg = getattr(self, 'transform_glow', 0)
+        if tg > 0:
+            self.transform_glow = tg - 1 / 60
+            col = TRANSFORMS[self.transforms[-1]]['col'] if self.transforms else (255, 255, 255)
+            gfx.draw_glow(s, int(self.x), int(self.y) - 8, int(22 + 10 * tg), col, int(80 * min(1, tg)))
         if 'raijin' in self.transforms and random.random() < 0.3:
             run.particles.append(Particle(self.x + random.uniform(-6, 6), self.y - random.uniform(0, 12), 0, -20, 0.2, (255, 240, 120), 1))
         if self.shield_ready:

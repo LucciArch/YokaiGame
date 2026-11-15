@@ -1,0 +1,138 @@
+{
+ "fly_back": {
+  "ax": 48,
+  "ay": 46,
+  "h": 84,
+  "layer": "back",
+  "n": 4,
+  "w": 96
+ },
+ "kami_head": {
+  "ax": 32,
+  "ay": 34,
+  "h": 48,
+  "layer": "back",
+  "n": 4,
+  "w": 64
+ },
+ "kitsune_back": {
+  "ax": 48,
+  "ay": 46,
+  "h": 84,
+  "layer": "back",
+  "n": 4,
+  "w": 96
+ },
+ "kitsune_head": {
+  "ax": 32,
+  "ay": 34,
+  "h": 48,
+  "layer": "front",
+  "n": 1,
+  "w": 64
+ },
+ "oni_back": {
+  "ax": 48,
+  "ay": 46,
+  "h": 84,
+  "layer": "back",
+  "n": 4,
+  "w": 96
+ },
+ "oni_head": {
+  "ax": 32,
+  "ay": 34,
+  "h": 48,
+  "layer": "front",
+  "n": 1,
+  "w": 64
+ },
+ "raijin_back": {
+  "ax": 48,
+  "ay": 46,
+  "h": 84,
+  "layer": "back",
+  "n": 4,
+  "w": 96
+ },
+ "ryu_back": {
+  "ax": 48,
+  "ay": 46,
+  "h": 84,
+  "layer": "back",
+  "n": 4,
+  "w": 96
+ },
+ "ryu_head": {
+  "ax": 32,
+  "ay": 34,
+  "h": 48,
+  "layer": "front",
+  "n": 1,
+  "w": 64
+ },
+ "shikigami_back": {
+  "ax": 48,
+  "ay": 46,
+  "h": 84,
+  "layer": "back",
+  "n": 4,
+  "w": 96
+ },
+ "shikigami_head": {
+  "ax": 32,
+  "ay": 34,
+  "h": 48,
+  "layer": "front",
+  "n": 1,
+  "w": 64
+ },
+ "tanuki_back": {
+  "ax": 48,
+  "ay": 46,
+  "h": 84,
+  "layer": "back",
+  "n": 4,
+  "w": 96
+ },
+ "tanuki_head": {
+  "ax": 32,
+  "ay": 34,
+  "h": 48,
+  "layer": "front",
+  "n": 1,
+  "w": 64
+ },
+ "tengu_back": {
+  "ax": 48,
+  "ay": 46,
+  "h": 84,
+  "layer": "back",
+  "n": 4,
+  "w": 96
+ },
+ "tengu_head": {
+  "ax": 32,
+  "ay": 34,
+  "h": 48,
+  "layer": "front",
+  "n": 1,
+  "w": 64
+ },
+ "yurei_back": {
+  "ax": 48,
+  "ay": 46,
+  "h": 84,
+  "layer": "front",
+  "n": 4,
+  "w": 96
+ },
+ "yurei_head": {
+  "ax": 32,
+  "ay": 34,
+  "h": 48,
+  "layer": "front",
+  "n": 1,
+  "w": 64
+ }
+}

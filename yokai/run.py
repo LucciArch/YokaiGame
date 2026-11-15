@@ -1357,6 +1357,8 @@ class Run:
         for pk in list(self.pickups):
             if pk.age < 0.25:
                 continue
+            if getattr(pk, 'need_leave', False) and math.hypot(pk.x - p.x, pk.y - (p.y - 3)) > 28:
+                pk.need_leave = False
             if math.hypot(pk.x - p.x, pk.y - (p.y - 3)) > 10:
                 continue
             if pk.price:
@@ -1397,7 +1399,7 @@ class Run:
                     audio.play('pickup', 0.7)
                     self.hint('salt', 'Reinigungssalz (Q): bannt Geschosse und sprengt rissige Wände auf.')
             elif k == 'trinket':
-                if pk.age < 0.8 or getattr(pk, 'swapcool', 0) > 0:
+                if pk.age < 0.8 or getattr(pk, 'swapcool', 0) > 0 or getattr(pk, 'need_leave', False):
                     continue
                 old = p.trinket
                 if pk.price:
@@ -1414,6 +1416,7 @@ class Run:
                     pk.tid = old
                     pk.age = 0
                     pk.x += 18
+                    pk.need_leave = True          # erst wieder aufhebbar, wenn man weggegangen ist
                     ok = False
             elif k == 'battery':
                 if p.active and p.charge < ACTIVES[p.active]['charge']:
@@ -1724,6 +1727,20 @@ class Run:
             self.achieve('synergy25')
 
     def on_transform(self, t):
+        # deutlich sichtbarer Verwandlungsmoment: Lichtsäule, Druckwelle, Funken in der Farbe der Gestalt
+        p = self.player
+        col = TRANSFORMS[t]['col']
+        self.whiteout = 0.3
+        self.shake(5)
+        for sz, lf in ((70, 0.7), (110, 1.0)):
+            self.particles.append(Particle(p.x, p.y, 0, 0, lf, col, sz, kind='wave'))
+        for i in range(40):
+            a = i / 40 * math.tau
+            v = random.uniform(60, 160)
+            self.particles.append(Particle(p.x, p.y - 8, math.cos(a) * v, math.sin(a) * v - 40, random.uniform(0.5, 1.0), col, 2, kind='spark'))
+        for i in range(18):
+            self.particles.append(Particle(p.x + random.uniform(-6, 6), p.y, 0, -random.uniform(80, 200), 0.9, (255, 250, 230), 2, kind='spark'))
+        p.transform_glow = 2.0
         self.save.stat('transforms')
         self.save.add_to('transforms_seen', t)
         self.achieve('transform')
