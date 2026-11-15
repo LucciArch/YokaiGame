@@ -1002,7 +1002,7 @@ class Run:
             self.bg_dirty = True
             x, y = RX + tx * TILE + 16, RY + ty * TILE + 16
             burst(self, x, y, (150, 100, 70) if t == T_POT else self.biome['rock'], 12, 70, 0.5, 3)
-            audio.play('hit', 0.7)
+            audio.play('pot' if t == T_POT else 'rock', 0.8, x)
             if t == T_POT and self.room.kind == 'kakurenbo':
                 kakurenbo_break(self, tx, ty)
             elif t == T_POT and random.random() < 0.18 + 0.02 * self.player.s['luck']:
@@ -1010,7 +1010,7 @@ class Run:
             self.flow_src = None
 
     def explode(self, x, y, r, dmg, owner='p'):
-        audio.play('explode')
+        audio.play('explode', 1.0, x)
         self.shake(4)
         burst(self, x, y, (255, 180, 80), 22, 120, 0.5, 3)
         burst(self, x, y, (90, 80, 80), 12, 60, 0.8, 4)
@@ -1101,7 +1101,7 @@ class Run:
                     nb.hit.add(id(e))
             if b.gold:
                 e.gold_hit = True
-        audio.play('hit', 0.35)
+        audio.play('hit', 0.35, e.x)
         if e.hp <= 0:
             self.kill_enemy(e)
 
@@ -1124,7 +1124,12 @@ class Run:
             self.hitstop = max(self.hitstop, 0.05)     # schwere Gegner fallen mit Gewicht
             self.shake(2)
         self.particles.append(Particle(e.x, e.y - 4, random.uniform(-6, 6), -28, 1.1, (120, 200, 255), 2, kind='soul'))
-        audio.play('kill', 0.6)
+        if e.d.get('fly') or e.d.get('glow'):
+            audio.play('kill_ghost', 0.7, e.x)
+        elif e.champ or e.maxhp >= 60:
+            audio.play('kill_big', 0.8, e.x)
+        else:
+            audio.play('kill', 0.6, e.x)
         self.kills += 1
         self.save.stat('kills')
         base = {'gaki_small': 'gaki', 'nuppeppo_klein': 'nuppeppo', 'kappa_small': 'kappa'}.get(e.id, e.id)
@@ -1173,7 +1178,8 @@ class Run:
     # ======================================================================  Boss besiegt
     def on_boss_killed(self, b):
         self.shake(12)
-        audio.play('roar')
+        audio.play('roar', 0.7, b.x)
+        audio.play('bossdie')
         self.whiteout = 0.45
         for k, (sz, lf, c) in enumerate(((150, 0.9, (255, 220, 150)), (100, 0.7, (255, 140, 90)), (210, 1.3, (220, 200, 255)))):
             self.particles.append(Particle(b.x, b.y, 0, 0, lf, c, sz, kind='wave'))
@@ -1382,7 +1388,7 @@ class Run:
             if getattr(self, 'death_t', None) is None:
                 self.death_t = 1.6
                 self.shake(8)
-                audio.play('roar', 0.7)
+                audio.play('death')
                 audio.get().music(None)
                 burst(self, self.player.x, self.player.y, (230, 50, 60), 30, 120, 0.8, 3)
                 self.particles.append(Particle(self.player.x, self.player.y - 6, 0, -22, 1.6, (150, 210, 255), 3, kind='soul'))
@@ -1679,7 +1685,7 @@ class Run:
             elif k == 'spirit':
                 ok = p.add_spirit(2)
                 if ok:
-                    audio.play('heal', 0.7)
+                    audio.play('spirit', 0.8)
             elif k in ('coin', 'coin5'):
                 if p.coins >= 99:
                     ok = False
@@ -1702,7 +1708,7 @@ class Run:
                     ok = False
                 else:
                     p.salts += 1
-                    audio.play('pickup', 0.7)
+                    audio.play('salt', 0.8)
                     self.hint('salt', 'Reinigungssalz (Q): bannt Geschosse und sprengt rissige Wände auf.')
             elif k == 'trinket':
                 if pk.age < 0.8 or getattr(pk, 'swapcool', 0) > 0 or getattr(pk, 'need_leave', False):
@@ -1717,7 +1723,7 @@ class Run:
                 tr = TRINKETS[pk.tid]
                 self.banner(tr['name'], tr['desc'] + '  (Anhänger)', tr['col'])
                 self.hint('trinket', 'Anhänger wirken dauerhaft. Ein neuer ersetzt den alten – der bleibt liegen.')
-                audio.play('pickup')
+                audio.play('trinket')
                 if old:
                     pk.tid = old
                     pk.age = 0
@@ -1731,7 +1737,7 @@ class Run:
                 else:
                     ok = False
             elif k == 'chest':
-                audio.play('pickup')
+                audio.play('chest')
                 burst(self, pk.x, pk.y, (240, 200, 90), 16, 70)
                 if random.random() < 0.1 + 0.015 * p.s['luck']:
                     self.pedestals.append(Pedestal(self.pick_item('T'), pk.x, pk.y))

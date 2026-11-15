@@ -187,7 +187,15 @@ class Audio:
                 out.append(pygame.sndarray.make_sound(np.ascontiguousarray(arr[idx].astype(np.int16))))
             self.var[name] = out
 
-    def play(self, name, vol=1.0):
+    def _vol(self, ch, vol, x):
+        v = self.vol_sfx * vol
+        if x is None:
+            ch.set_volume(v)
+            return
+        pan = max(-1.0, min(1.0, (x - 240) / 240))          # Stereo nach Bildschirmposition (480 px breit)
+        ch.set_volume(v * (1 - max(0.0, pan) * 0.55), v * (1 + min(0.0, pan) * 0.55))
+
+    def play(self, name, vol=1.0, x=None):
         if not self.ok or name not in self.sfx:
             return
         if name in getattr(self, 'var', {}) and random.random() < 0.8:
@@ -198,8 +206,8 @@ class Audio:
             self.last_play[name] = now
             ch = pygame.mixer.find_channel(False)
             if ch:
-                ch.set_volume(self.vol_sfx * vol)
                 ch.play(s)
+                self._vol(ch, vol, x)
             return
         now = pygame.time.get_ticks()
         if now - self.last_play.get(name, -999) < 35:
@@ -208,8 +216,8 @@ class Audio:
         s = self.sfx[name]
         ch = pygame.mixer.find_channel(False)
         if ch:
-            ch.set_volume(self.vol_sfx * vol)
             ch.play(s)
+            self._vol(ch, vol, x)
 
     # ------------------------------------------------------------ Musik
     SCALES = {
@@ -484,6 +492,6 @@ def get():
     return AUDIO
 
 
-def play(name, vol=1.0):
+def play(name, vol=1.0, x=None):
     if AUDIO:
-        AUDIO.play(name, vol)
+        AUDIO.play(name, vol, x)

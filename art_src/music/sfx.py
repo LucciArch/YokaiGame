@@ -73,23 +73,6 @@ def trim(x, thresh=1e-4):
 
 
 # ------------------------------------------------------------------ Effekte
-def s_shoot(v):
-    """Ofuda wird geworfen: Papier-Fwip + heller Funke."""
-    p = 1 + (v - 1.5) * 0.06
-    fw = sweep_noise(0.09, 5200 * p, 1400 * p, 1.2, 0.6) * env(0.09, 0.004, 40)
-    sp = tone(1900 * p, 1300 * p, 0.07, 'sine', 45) * 0.35
-    return at(0.12, (0, fw, 1.0), (0.002, sp, 1.0))
-
-
-def s_hit(v):
-    """Ofuda trifft einen Yokai: Papierschlag mit hellem Knistern."""
-    p = 1 + (v - 1.5) * 0.08
-    slap = biquad(noise(int(SR * 0.05)), 'bp', 2600 * p, 0.9) * env(0.05, 0.001, 70)
-    body = tone(260 * p, 140 * p, 0.09, 'sine', 35)
-    crack = biquad(noise(int(SR * 0.02)), 'hp', 5000) * env(0.02, 0.0005, 200)
-    return at(0.12, (0, slap, 1.0), (0, body, 0.7), (0, crack, 0.5))
-
-
 def s_ehit(v):
     """Geschoss prallt ab / Gegnertreffer: dumpfer Holz-Plock."""
     p = 1 + (v - 1.5) * 0.08
@@ -291,10 +274,146 @@ def s_bow(v):
     return at(0.15, (0, tw, 1.0), (0.01, sw, 0.7))
 
 
+
+# ------------------------------------------------------------------ neu in Runde 110
+def s_shoot(v):
+    """Ofuda wird geworfen: weicher Papier-Fwip mit kurzem Körper, ohne schrille Spitze (wird ständig gehört)."""
+    p = 1 + (v - 1.5) * 0.05
+    fw = sweep_noise(0.08, 3600 * p, 1100 * p, 1.1, 0.6) * env(0.08, 0.003, 45)
+    body = tone(420 * p, 260 * p, 0.06, 'sine', 50) * 0.5
+    tick = biquad(noise(int(SR * 0.006)), 'bp', 2400 * p, 1.2) * 0.6
+    return biquad(at(0.1, (0, tick, 1.0), (0.001, fw, 0.9), (0.002, body, 1.0)), 'lp', 6500)
+
+
+def s_hit(v):
+    """Ofuda trifft: Klatsch mit Tiefe, Papier reißt, kurzes Knistern."""
+    p = 1 + (v - 1.5) * 0.07
+    click = biquad(noise(int(SR * 0.004)), 'bp', 3000 * p, 1.0)
+    slap = biquad(noise(int(SR * 0.05)), 'bp', 1700 * p, 0.8) * env(0.05, 0.001, 75)
+    body = tone(190 * p, 95 * p, 0.1, 'sine', 32)
+    tear = sweep_noise(0.05, 4200 * p, 2200 * p, 2.0, 0.8) * env(0.05, 0.004, 55)
+    return biquad(at(0.13, (0, click, 0.9), (0, slap, 1.0), (0, body, 0.9), (0.01, tear, 0.35)), 'lp', 7000)
+
+
+def s_kill_ghost(v):
+    """Geist/Irrlicht vergeht: luftiges Ausatmen nach unten, schimmerndes Glöckchen, kein Aufprall."""
+    p = 1 + (v - 1) * 0.06
+    sigh = sweep_noise(0.55, 2400 * p, 500 * p, 2.2, 0.7) * env(0.55, 0.03, 5)
+    shimmer = (tone(1760 * p, 1320 * p, 0.6, 'sine', 5) + tone(2637 * p, 1980 * p, 0.6, 'sine', 7) * 0.5) * 0.25
+    ting = Y.kane(2350 * p, 0.5, 0.8) * 0.35
+    return room(at(0.8, (0, sigh, 1.0), (0.02, shimmer, 1.0), (0.05, ting, 1.0)), 0.9, 0.35)
+
+
+def s_kill_big(v):
+    """Schwerer Yokai fällt: dumpfer Aufschlag, Bröckeln, tiefes Ausklingen."""
+    p = 1 + (v - 1) * 0.06
+    thud = tone(85 * p, 40 * p, 0.45, 'sine', 7) * 1.2
+    knock = tone(220 * p, 120 * p, 0.12, 'rich', 30) * 0.5
+    grit = biquad(noise(int(SR * 0.5)), 'bp', 900, 0.8) * env(0.5, 0.01, 8) * (np.random.rand(int(SR * 0.5)) > 0.7)
+    growl = biquad(tone(70 * p, 50 * p, 0.6, 'rich', 4), 'lp', 500) * 0.4
+    return room(at(0.9, (0, thud, 1.0), (0, knock, 1.0), (0.03, grit, 0.7), (0.02, growl, 1.0)), 0.7, 0.22)
+
+
+def s_pot(v):
+    """Tonkrug zerbricht: hohler Schlag, dann mehrere Scherben-Klicks."""
+    p = 1 + (v - 1) * 0.08
+    knock = tone(380 * p, 260 * p, 0.07, 'rich', 45)
+    parts = [(0, knock, 0.8), (0, biquad(noise(int(SR * 0.03)), 'bp', 1500 * p, 1.0) * env(0.03, 0.001, 90), 0.8)]
+    rng = np.random.RandomState(int(v * 7 + 3))
+    for k in range(7):
+        t0 = 0.02 + rng.uniform(0, 0.22) * (k / 7) ** 0.6
+        f = rng.uniform(2200, 5200) * p
+        sh_ = biquad(noise(int(SR * 0.018)), 'bp', f, 3.0) * env(0.018, 0.0005, 220)
+        parts.append((t0, sh_, rng.uniform(0.3, 0.7)))
+    return at(0.32, *parts)
+
+
+def s_rock(v):
+    """Felsen zerbröckelt."""
+    rumble = onepole_lp(noise(int(SR * 0.35)), 600) * env(0.35, 0.004, 12) * 3
+    parts = [(0, rumble, 1.0), (0, tone(120, 70, 0.15, 'sine', 18), 0.8)]
+    rng = np.random.RandomState(11)
+    for k in range(6):
+        parts.append((rng.uniform(0.01, 0.25), biquad(noise(int(SR * 0.03)), 'bp', rng.uniform(700, 1800), 1.5) * env(0.03, 0.001, 100), 0.5))
+    return at(0.4, *parts)
+
+
+def s_chest(v):
+    """Truhe: Holzdeckel knarrt, Riegel schnappt, Münzen klingen."""
+    n = int(SR * 0.22)
+    creak = biquad(tone(240, 300, 0.22, 'rich', 2) * (1 + 0.6 * np.sign(np.sin(2 * np.pi * 38 * T(0.22)))), 'bp', 900, 1.5) * np.sin(np.linspace(0, np.pi, n))
+    latch = at(0.04, (0, tone(900, 600, 0.04, 'rich', 70), 1.0), (0, biquad(noise(int(SR * 0.02)), 'hp', 3000) * env(0.02, 0.0005, 150), 1.0))
+    return room(at(0.9, (0, creak, 0.6), (0.2, latch, 0.7), (0.3, Y.kane(1850, 0.6, 0.4), 0.5), (0.36, Y.kane(2480, 0.6, 0.45), 0.5),
+                   (0.43, Y.kane(2100, 0.5, 0.4), 0.4)), 0.6, 0.2)
+
+
+def s_spirit(v):
+    """Geisterherz: kühler Sho-Akkord mit aufsteigendem Hauch."""
+    sh = Y.sho([587, 880, 1175], 0.8, 0.5)
+    rise = tone(700, 1400, 0.5, 'sine', 4) * 0.3
+    return room(at(1.0, (0, sh, 1.0), (0.02, rise, 1.0), (0.1, Y.kane(1760, 0.4, 0.8), 0.4)), 0.9, 0.35)
+
+
+def s_salt(v):
+    """Reinigungssalz aufgehoben: kristallines Rieseln."""
+    parts = []
+    rng = np.random.RandomState(5)
+    for k in range(10):
+        f = rng.uniform(3500, 7000)
+        parts.append((k * 0.022 + rng.uniform(0, 0.01), tone(f, f * 0.98, 0.05, 'sine', 60), 0.25))
+    return room(at(0.45, *parts, (0.02, Y.kane(1568, 0.5, 0.5), 0.4)), 0.5, 0.3)
+
+
+def s_trinket(v):
+    """Anhänger: zwei kleine Glöckchen am Band."""
+    return room(at(0.9, (0, Y.kane(1975, 0.6, 0.7), 0.6), (0.09, Y.kane(2637, 0.5, 0.7), 0.5), (0.18, Y.kane(1975, 0.4, 0.6), 0.35)), 0.7, 0.3)
+
+
+def s_death(v):
+    """Tod der Spielfigur: harter Taiko-Schlag, fallende Flöte, Tempelglocke klingt aus."""
+    hit = Y.odaiko(50, 1.0, 1.2)
+    t = T(1.4)
+    f = 740 * (0.5 ** (t / 1.4)) * (1 + 0.01 * np.sin(2 * np.pi * 5 * t))
+    ph = np.cumsum(2 * np.pi * f / SR)
+    flute = (np.sin(ph) + 0.2 * np.sin(2 * ph)) * np.minimum(1, t / 0.05) * np.exp(-t * 1.6) * 0.35
+    flute = flute + biquad(noise(len(t)), 'bp', 1500, 1.0) * np.exp(-t * 2.5) * 0.06
+    return room(at(3.0, (0, hit, 1.0), (0.08, flute, 1.0), (0.25, Y.bonsho(65, 0.7, 2.6), 0.8)), 1.6, 0.35)
+
+
+def s_bossdie(v):
+    """Boss besiegt: Trommelwirbel, großer Glockenschlag, aufsteigender Sho-Akkord."""
+    roll = [(i * 0.07, Y.odaiko(55 + i * 2, 0.5 + i * 0.06, 0.7), 1.0) for i in range(7)]
+    return room(at(3.4, *roll, (0.5, Y.odaiko(46, 1.0, 1.8), 1.2), (0.52, Y.bonsho(58, 0.9, 2.8), 0.9),
+                   (0.9, Y.sho([392, 523, 659, 784], 2.2, 0.6), 1.0)), 1.8, 0.35)
+
+
 SFX = {k[2:]: f for k, f in globals().items() if k.startswith('s_')}
-VARIANTS = {'slash': 3, 'eshot': 3, 'shoot': 4, 'hit': 4, 'ehit': 4, 'kill': 4, 'coin': 3}
+VARIANTS = {'slash': 3, 'eshot': 3, 'shoot': 4, 'hit': 4, 'ehit': 4, 'kill': 4, 'coin': 3, 'kill_ghost': 3, 'kill_big': 2, 'pot': 3}
 PEAK = {'slash': 0.5, 'laser': 0.4, 'bow': 0.45, 'eshot': 0.3, 'shoot': 0.35, 'hit': 0.55, 'ehit': 0.45, 'kill': 0.6, 'hurt': 0.8, 'coin': 0.45, 'move': 0.35, 'select': 0.5,
-        'boss': 0.9, 'explode': 0.85, 'roar': 0.75, 'thunder': 0.8}
+        'boss': 0.9, 'explode': 0.85, 'roar': 0.75, 'thunder': 0.8, 'kill_ghost': 0.5, 'kill_big': 0.75, 'pot': 0.5, 'rock': 0.6,
+        'chest': 0.6, 'spirit': 0.55, 'salt': 0.45, 'trinket': 0.5, 'death': 0.9, 'bossdie': 0.95}
+
+# Ziel-Lautheit (lautestes 50-ms-Fenster, dBFS): häufige Kleinklänge leise, wichtige Rückmeldungen deutlich
+LOUD = dict(shoot=-24, move=-22, select=-19, hit=-18, ehit=-20, eshot=-21, coin=-18, pot=-18, slash=-17, bow=-17, laser=-18,
+            kill=-15, kill_ghost=-16, kill_big=-12, pickup=-16, heal=-15, spirit=-15, salt=-17, key=-16, trinket=-16, chest=-15,
+            item=-14, synergy=-13, unlock=-14, hurt=-11, bell=-15, explode=-11, drum=-13, gust=-17, wave=-17, wisp=-16,
+            grab=-14, lock=-16, roar=-11, thunder=-13, blank=-13, buy=-15, door=-16, stairs=-14, splash=-16, rock=-16,
+            dash=-17, bamboo=-16, death=-9, boss=-8, bossdie=-7)
+
+
+def loudness(x):
+    w = int(SR * 0.05)
+    r = max(np.sqrt(np.mean(x[i:i + w] ** 2)) for i in range(0, max(1, len(x) - w), w // 2))
+    return 20 * np.log10(r + 1e-9)
+
+
+def level(x, name):
+    x = x / (np.abs(x).max() + 1e-9) * 0.5
+    x = x * 10 ** ((LOUD.get(name, -15) - loudness(x)) / 20)
+    pk = np.abs(x).max()
+    if pk > 0.9:                                     # weiche Begrenzung statt Übersteuern
+        x = np.tanh(x / 0.9 * 1.2) * 0.9 / np.tanh(1.2)
+    return x
 
 
 def write(path, x):
@@ -316,6 +435,6 @@ if __name__ == '__main__':
             x = fn(v)
             x = biquad(x, 'hp', 40)
             x = trim(x)
-            x = x / (np.abs(x).max() + 1e-9) * PEAK.get(name, 0.7)
+            x = level(x, name)
             write(os.path.join(OUT, '%s_%d.ogg' % (name, v)), x)
         print(name, VARIANTS.get(name, 1), round(len(x) / SR, 2), 's')

@@ -14,6 +14,9 @@
 - Lexikon-Seite **Ereignisse**, Statistik „Ereignisse erlebt“, Erfolg „Festtagsgast“
 - Hinweis unten links bei neuen Lexikon-Einträgen; Minikarte mit Rahmen und pulsierendem aktuellem Raum
 - Lesbarkeit: Titelkarte mit dunklem Band, Hinweise, Tooltips und Erfolgsmeldungen liegen über den Figuren
+- 19 Gegner komplett neu gezeichnet (u. a. Gozu und Mezu, Gyūki, Tsuchigumo, Nurikabe, Ningyo, Tennin, Bakeneko, Kawauso, Yamauba)
+- Klänge überarbeitet: weicherer Ofuda-Wurf, kräftigere Treffer, eigene Klänge für vergehende Geister, schwere Gegner, zerbrechende Krüge und Felsen, Truhen, Geisterherzen, Salz, Anhänger, Bosssieg und den eigenen Tod
+- Alle Klänge auf einheitliche Lautheit gebracht; Gegnerklänge kommen von links oder rechts, je nachdem wo der Gegner steht
 
 ## 1.4.0 – „Hyakki-Update“ (enthält 1.3 „Kapitel-Update“)
 

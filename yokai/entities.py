@@ -1196,7 +1196,7 @@ class Enemy:
                     self.state = 'up'
                     self.st = 1.6
                     self.do_attack(force=True)
-                    audio.play('splash')
+                    audio.play('splash', 1.0, self.x)
             elif self.state == 'up':
                 if self.st <= 0:
                     self.state = 'under'
@@ -1227,7 +1227,7 @@ class Enemy:
                 return
         self.acd = a['cd'] * random.uniform(0.85, 1.15) * max(0.7, 1 - 0.06 * (self.run.tier - 1))
         self.fire_t = self.t
-        audio.play('eshot', 0.45)
+        audio.play('eshot', 0.45, self.x)
         sp = a['speed'] * (1.15 if self.champ == 'blau' else 1.0)
         k = a['kind']
         ang = math.atan2(p.y - self.y, p.x - self.x)
