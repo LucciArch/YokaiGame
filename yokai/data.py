@@ -268,6 +268,11 @@ I('yomi_stein', 'Fels von Yomotsu', 'Der Stein, der die Unterwelt verschließt',
   ['O'], ['oni'], 3, hp=2, spd=-10, knock=1, dmg=0.6)
 I('mikaboshi_staub', 'Sternenstaub', 'Ein Säckchen aus dem Gewand des bösen Sterns', 'mikaboshi_staub', (120, 150, 255),
   ['B'], ['raijin'], 4, crit=0.12, rate=0.35, luck=1)
+# ---- v1.4: Geschenke aus Ereignisräumen (nur dort zu finden, Pool 'Y')
+I('brautschleier', 'Schleier der Fuchsbraut', 'Ein Dank für den ungestörten Hochzeitszug', 'brautschleier', (240, 240, 250),
+  ['Y'], ['kitsune'], 3, luck=2, homing=1, spd=8)
+I('zashiki_temari', 'Temari-Ball', 'Zashiki-warashis Spielball bringt Glück ins Haus', 'zashiki_temari', (220, 60, 70),
+  ['Y'], [], 2, luck=1, coins=6, rate=0.2)
 
 ITEM_IDS = ORDER
 

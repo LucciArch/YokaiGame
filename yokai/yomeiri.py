@@ -116,7 +116,10 @@ class Procession:
         b = self.bride
         from .data import ITEMS
         fox = [i for i in run.pool if 'kitsune' in ITEMS[i]['tags'] and ITEMS[i]['q'] <= 3]
-        if fox and random.random() < 0.7:
+        if 'brautschleier' in run.pool:
+            iid = 'brautschleier'
+            run.pool.remove(iid)
+        elif fox and random.random() < 0.7:
             iid = random.choice(fox)
             run.pool.remove(iid)
         else:
@@ -185,10 +188,14 @@ def kakurenbo_break(run, tx, ty):
         p.recalc()
         run.apparitions.append(Apparition('zashiki', x, y + 10, 2.6, frame0=4))
         burst(run, x, y, (255, 200, 230), 20, 80)
-        for i in range(4):
-            run.spawn_pickup('coin', x + random.uniform(-12, 12), y + random.uniform(-6, 10))
+        if 'zashiki_temari' in run.pool:
+            run.pool.remove('zashiki_temari')
+            run.pedestals.append(Pedestal('zashiki_temari', RX + RW / 2, RY + RH / 2))
+        else:
+            for i in range(4):
+                run.spawn_pickup('coin', x + random.uniform(-12, 12), y + random.uniform(-6, 10))
         audio.play('unlock', 0.6)
-        run.banner('Gefunden!', 'Zashiki-warashi bringt Glück ins Haus – Glück +1', (255, 220, 240))
+        run.banner('Gefunden!', 'Zashiki-warashi lässt dir ihr Spielzeug da – Glück +1', (255, 220, 240))
         run.achieve('kakurenbo')
     else:
         room.extra['kak_tries'] = room.extra.get('kak_tries', 0) + 1

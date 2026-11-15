@@ -6,8 +6,8 @@ und spielen die Nachtmarkt-Musik „Yomise“.
 
 | Raum | Kapitel | Häufigkeit | Entscheidung | Belohnung / Strafe |
 |---|---|---|---|---|
-| Kitsune no Yomeiri (Fuchshochzeit) | alle | ca. jede 7. Ebene | Nicht auf den Zug schießen | Geschenk der Braut (meist Fuchs-Item) / Fuchsfeuer greifen an |
-| Kakurenbo (Versteckspiel) | ab II | ca. jede 7. Ebene | Die richtige von vier Urnen zerschlagen, zwei Versuche | Glück +1 und Mon / nichts |
+| Kitsune no Yomeiri (Fuchshochzeit) | alle | ca. jede 7. Ebene | Nicht auf den Zug schießen | Schleier der Fuchsbraut, danach meist Fuchs-Items / Fuchsfeuer greifen an |
+| Kakurenbo (Versteckspiel) | ab II | ca. jede 7. Ebene | Die richtige von vier Urnen zerschlagen, zwei Versuche | Glück +1 und Temari-Ball (danach Mon) / nichts |
 
 Code: `yokai/yomeiri.py`, Raumverteilung in `yokai/rooms.py` (`extras`).
 
