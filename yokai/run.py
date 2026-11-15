@@ -484,7 +484,12 @@ class Run:
         luck = self.player.s['luck']
         cands = [i for i in self.pool if pool_letter in ITEMS[i]['pools']]
         if not cands:
-            cands = [i for i in self.pool if 'T' in ITEMS[i]['pools']] or ['onigiri']
+            cands = [i for i in self.pool if 'T' in ITEMS[i]['pools']]
+        if not cands:                                   # Pool leer (lange Endlos-Läufe): alles Nicht-Getragene kommt zurück
+            unlocked = set(self.save['items'])
+            have = set(self.player.items)
+            self.pool = [i for i in ITEM_IDS if (not ITEMS[i]['locked'] or i in unlocked) and i not in have]
+            cands = [i for i in self.pool if pool_letter in ITEMS[i]['pools']] or self.pool or ['onigiri']
         if self.tier >= 4:                              # tief unten kein Kleinkram mehr, solange es Besseres gibt
             good = [i for i in cands if ITEMS[i]['q'] >= 2]
             if good:
