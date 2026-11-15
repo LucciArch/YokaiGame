@@ -1104,7 +1104,7 @@ class Enemy:
             elif self.state == 'fade':
                 self.alpha = int(255 * max(0, self.st / 0.3))
                 if self.st <= 0:
-                    self.x, self.y = free_tile_pos(room, random, (p.x, p.y), 70)
+                    self.x, self.y = free_tile_pos(room, random, (p.x, p.y), 95)
                     self.state = 'appear'
                     self.st = 0.3
             elif self.state == 'appear':

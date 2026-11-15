@@ -24,3 +24,8 @@ Enma 3 → 25, Orochi 4 → 19), weil Boss-HP jetzt mit der Ebene quadratisch st
 
 ### Offen
 Kodama (1,6) bleibt oben, aber nur in 7 Räumen beobachtet – bei der nächsten Messung prüfen.
+
+### Nachmessung v1.3 (Balance-Check 5)
+Nach den neuen Raumvorlagen lagen Yamabiko (2,29) und Nopperabō (2,16) vorn. Das Echo des Yamabiko
+feuert jetzt höchstens alle 0,85 s und langsamer (105); Nopperabō taucht mindestens 95 px entfernt auf.
+Danach: Nopperabō 1,61, Yamabiko 1,33, Tsurube-otoshi 1,29 – Spitze deutlich flacher.

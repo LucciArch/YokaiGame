@@ -679,6 +679,8 @@ def _balance_13():
     fa = ENEMIES['funayurei']['attack']
     fa['n'], fa['spread'] = 3, 0.25
     ENEMIES['kappa_small']['speed'] = 62
+    ya = ENEMIES['yamabiko']['attack']               # Echo traf zu oft (Balance-Check 5)
+    ya['cd'], ya['speed'] = 0.85, 105
 
 
 _balance_13()
