@@ -100,6 +100,8 @@ LORE = {
               'Rast umher und hinterlässt Feuer.'),
     'wanyudo': ('輪入道', 'Der Kopf eines Mannes in einem brennenden Rad, der die Seelen derer stiehlt, die ihn ansehen.',
                 'Prallt durch den Raum und zieht Flammen nach.'),
+    'kawauso': ('川獺', 'Fischotter, die sich in hübsche Mädchen oder Mönche verwandeln, mit Strohhut und Laterne am Ufer warten und Wanderer ins Wasser locken.',
+                'Lockt mit seiner Laterne und wirft Flusskiesel.'),
     'zashiki': ('座敷童子', 'Ein Hausgeist in Kindergestalt mit Pagenkopf und rotem Kimono. Wo er wohnt, herrscht Wohlstand – zieht er aus, verfällt das Haus.',
                 'Spielt durch die Räume und wirft dir seinen Temari-Ball zu.'),
     'komainu': ('狛犬', 'Steinerne Löwenhunde, die paarweise vor Schreinen wachen – einer mit offenem Maul (a), einer mit geschlossenem (un). Zusammen bilden sie Anfang und Ende aller Dinge.',

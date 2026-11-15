@@ -476,6 +476,15 @@
   "w": 100,
   "walk": 4
  },
+ "kawauso": {
+  "atk": 4,
+  "h": 46,
+  "hi": true,
+  "kind": "strip",
+  "n": 7,
+  "w": 40,
+  "walk": 4
+ },
  "kenji": {
   "atk": 4,
   "h": 72,

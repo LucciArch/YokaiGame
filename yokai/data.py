@@ -718,6 +718,11 @@ ENEMIES['zashiki'] = {'name': 'Zashiki-warashi', 'sprite': 'zashiki', 'hp': 12, 
                                  'eff': None, 'r': 4}}
 for _b in ('yashiki', 'obakedera'):
     BIOMES[_b]['enemies'].append('zashiki')
+ENEMIES['kawauso'] = {'name': 'Kawauso', 'sprite': 'kawauso', 'hp': 9, 'speed': 44, 'r': 7, 'move': 'wander',
+                      'attack': {'kind': 'aimed', 'n': 2, 'spread': 0.25, 'speed': 100, 'cd': 2.4, 'col': (150, 160, 180),
+                                 'eff': None, 'r': 3}}
+for _b in ('kawabe', 'chikurin'):
+    BIOMES[_b]['enemies'].append('kawauso')
 for _b in ('takamagahara', 'tsukiyomi'):
     BIOMES[_b]['enemies'] += ['komainu', 'tennin']
 BIOMES['takamagahara']['enemies'] = [e for e in BIOMES['takamagahara']['enemies'] if e != 'ningyo']
