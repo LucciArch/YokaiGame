@@ -100,6 +100,8 @@ LORE = {
               'Rast umher und hinterlässt Feuer.'),
     'wanyudo': ('輪入道', 'Der Kopf eines Mannes in einem brennenden Rad, der die Seelen derer stiehlt, die ihn ansehen.',
                 'Prallt durch den Raum und zieht Flammen nach.'),
+    'zashiki': ('座敷童子', 'Ein Hausgeist in Kindergestalt mit Pagenkopf und rotem Kimono. Wo er wohnt, herrscht Wohlstand – zieht er aus, verfällt das Haus.',
+                'Spielt durch die Räume und wirft dir seinen Temari-Ball zu.'),
     'komainu': ('狛犬', 'Steinerne Löwenhunde, die paarweise vor Schreinen wachen – einer mit offenem Maul (a), einer mit geschlossenem (un). Zusammen bilden sie Anfang und Ende aller Dinge.',
                 'Stürmt mit gesenktem Kopf heran – beim Aufprall spritzen Steinsplitter im Ring.'),
     'tennin': ('天人', 'Himmlische Wesen in Federgewändern (hagoromo). In der Legende von Mihonomatsu findet ein Fischer ein solches Gewand und gibt es erst zurück, als die Tennin für ihn tanzt.',

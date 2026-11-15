@@ -772,5 +772,14 @@
   "n": 7,
   "w": 98,
   "walk": 4
+ },
+ "zashiki": {
+  "atk": 4,
+  "h": 49,
+  "hi": true,
+  "kind": "strip",
+  "n": 7,
+  "w": 46,
+  "walk": 4
  }
 }

@@ -713,6 +713,11 @@ ENEMIES['komainu'] = {'name': 'Komainu', 'sprite': 'komainu', 'hp': 36, 'speed':
 ENEMIES['tennin'] = {'name': 'Tennin', 'sprite': 'tennin', 'hp': 24, 'speed': 30, 'r': 9, 'move': 'float', 'fly': True,
                      'attack': {'kind': 'aimed', 'n': 5, 'spread': 0.17, 'speed': 112, 'cd': 2.5, 'col': (255, 226, 120),
                                 'eff': None, 'r': 3}}
+ENEMIES['zashiki'] = {'name': 'Zashiki-warashi', 'sprite': 'zashiki', 'hp': 12, 'speed': 42, 'r': 7, 'move': 'wander',
+                      'attack': {'kind': 'aimed', 'n': 1, 'spread': 0.0, 'speed': 95, 'cd': 2.0, 'col': (110, 140, 255),
+                                 'eff': None, 'r': 4}}
+for _b in ('yashiki', 'obakedera'):
+    BIOMES[_b]['enemies'].append('zashiki')
 for _b in ('takamagahara', 'tsukiyomi'):
     BIOMES[_b]['enemies'] += ['komainu', 'tennin']
 BIOMES['takamagahara']['enemies'] = [e for e in BIOMES['takamagahara']['enemies'] if e != 'ningyo']
