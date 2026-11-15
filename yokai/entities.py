@@ -798,7 +798,7 @@ class Hazard:
         self.dmg, self.owner, self.kind = dmg, owner, kind
         self.col = col or {'strike': (255, 240, 120), 'fire': (255, 140, 40), 'slam': (230, 220, 200),
                            'ice': (190, 240, 255), 'water': (120, 190, 255), 'meteor': (200, 140, 255),
-                           'smoke': (140, 140, 150), 'ink': (60, 20, 40)}.get(kind, (255, 255, 255))
+                           'smoke': (140, 140, 150), 'ink': (60, 20, 40), 'bamboo': (130, 200, 90), 'hands': (160, 70, 110)}.get(kind, (255, 255, 255))
         self.t = 0.0
         self.done = set()
         self.started = False
@@ -815,7 +815,7 @@ class Hazard:
                 audio.play('explode', 0.5); run.shake(4)
                 burst(run, self.x, self.y, self.col, 12, 80)
         p = run.player
-        if self.kind == 'smoke':
+        if self.kind in ('smoke', 'hands'):
             if math.hypot(p.x - self.x, p.y - self.y) < self.r + p.hitr:
                 run.slow_player = max(run.slow_player, 0.3)
             return self.t < self.warn + self.act
@@ -846,6 +846,31 @@ class Hazard:
                 pts = [(x + random.randint(-4, 4), y - 300 + i * 30) for i in range(10)] + [(x, y)]
                 pygame.draw.lines(s, (255, 255, 230), False, pts, 2)
                 gfx.draw_glow(s, x, y, r * 2, (255, 240, 120), 120)
+            elif self.kind == 'bamboo':
+                f = min(1, (self.t - self.warn) / 0.12)
+                for dx_, hh in ((-5, 16), (0, 22), (5, 13)):
+                    h_ = int(hh * f)
+                    pygame.draw.rect(s, (40, 70, 34), (x + dx_ - 2, y - h_, 5, h_ + 1))
+                    pygame.draw.rect(s, (110, 170, 70), (x + dx_ - 1, y - h_, 3, h_))
+                    pygame.draw.line(s, (170, 220, 110), (x + dx_ - 1, y - h_), (x + dx_ - 1, y), 1)
+                    for ny_ in range(y - h_ + 6, y, 7):
+                        pygame.draw.line(s, (40, 70, 34), (x + dx_ - 1, ny_), (x + dx_ + 1, ny_))
+                    if h_ > 2:
+                        pygame.draw.polygon(s, (150, 210, 90), [(x + dx_ - 1, y - h_), (x + dx_ + 1, y - h_), (x + dx_, y - h_ - 4)])
+            elif self.kind == 'hands':
+                pool = pygame.Surface((r * 2 + 4, r + 4), pygame.SRCALPHA)
+                pygame.draw.ellipse(pool, (40, 10, 30, 170), pool.get_rect())
+                pygame.draw.ellipse(pool, (150, 60, 110, 200), pool.get_rect(), 1)
+                s.blit(pool, (x - r - 2, y - r // 2 - 2))
+                for k in range(4):
+                    a_ = k / 4 * math.tau + 0.6
+                    hx, hy = x + int(math.cos(a_) * r * 0.55), y + int(math.sin(a_) * r * 0.3)
+                    lift = int(6 + 3 * math.sin(tm * 6 + k))
+                    pygame.draw.line(s, (90, 70, 80), (hx, hy), (hx, hy - lift), 3)
+                    pygame.draw.line(s, (200, 185, 190), (hx - 1, hy - lift), (hx - 1, hy), 1)
+                    for fx_ in (-2, 0, 2):
+                        s.set_at((hx + fx_, hy - lift - 2), (220, 205, 210))
+                        s.set_at((hx + fx_, hy - lift - 1), (200, 185, 190))
             elif self.kind == 'fire':
                 gfx.draw_glow(s, x, y, r + 4, (255, 120, 30), 120)
                 for i in range(3):

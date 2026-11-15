@@ -220,6 +220,7 @@ class Run:
             self.spawn_room_enemies(room)
         self.fade = 0.6
         self._quirk_t = 3.0
+        self.foxfire = None
         rh = {'shop': 'Laden: Mon gegen Items tauschen. Der Saisen-Kasten nimmt Spenden an – manchmal lohnt es sich.',
               'curse': 'Fluchraum: Betreten kostet Leben, dafür lockt ein dunkler Schatz.',
               'challenge': 'Prüfungsraum: Mehrere Wellen überstehen, dann gibt es eine Belohnung.',
@@ -463,10 +464,13 @@ class Run:
         'current': 'Meeresströmung: Unter Wasser treibt dich die Strömung langsam ab.',
         'polter': 'Poltergeist! Im Kampf fliegen dir Töpfe entgegen – zerschlag sie vorher.',
         'star': 'Im Himmel fallen nach dem Kampf manchmal Sternschnuppen voller Mon.',
+        'bamboo': 'Bambus schießt aus dem Boden – achte auf die grünen Kreise unter dir!',
+        'foxfire': 'Kitsunebi: Fange das Fuchsfeuer, um in diesem Raum stärker zuzuschlagen.',
+        'hands': 'In Yomi greifen Hände aus dem Boden und bremsen dich.',
     }
     QUIRKS = {'yukiyama': 'ice', 'kurama': 'gust', 'jigoku': 'lava', 'enma_cho': 'lava', 'hakaba': 'souls',
               'ryugu': 'current', 'shinkai': 'current', 'obakedera': 'polter', 'yashiki': 'polter',
-              'takamagahara': 'star', 'tsukiyomi': 'star'}
+              'takamagahara': 'star', 'tsukiyomi': 'star', 'chikurin': 'bamboo', 'inari': 'foxfire', 'yomi': 'hands'}
 
     def biome_quirk(self, dt):
         """Kleine Eigenheit pro Biom (nur in normalen Räumen, nicht in Schreinen)."""
@@ -497,6 +501,32 @@ class Run:
                         for i in range(5):
                             ebullet(self, x, y, i / 5 * math.tau + random.random(), 55, (255, 120, 40), r=3)
                 qt = random.uniform(2.2, 3.4)
+        elif q == 'bamboo' and fighting:
+            if qt <= 0:
+                self.hazards.append(Hazard(p.x + p.vx * 0.3, p.y + p.vy * 0.3 + 4, 9, 0.9, 0.5, 1, 'e', 'bamboo'))
+                qt = random.uniform(3.5, 5.5)
+        elif q == 'hands' and fighting:
+            if qt <= 0:
+                for i in range(2):
+                    a = random.uniform(0, math.tau)
+                    self.hazards.append(Hazard(p.x + math.cos(a) * 40, p.y + math.sin(a) * 30, 14, 0.6, 3.0, 0, 'e', 'hands'))
+                qt = random.uniform(4, 6)
+        elif q == 'foxfire' and fighting:
+            ff = getattr(self, 'foxfire', None)
+            if ff is None and qt <= 0 and p.room_dmg_buff <= 0:
+                self.foxfire = [RX + random.uniform(40, RW - 40), RY + random.uniform(30, RH - 30), 0.0]
+                qt = 9999
+            elif ff is not None:
+                ff[2] += dt
+                ff[0] += math.cos(ff[2] * 1.7) * 30 * dt
+                ff[1] += math.sin(ff[2] * 2.3) * 22 * dt
+                if math.hypot(ff[0] - p.x, ff[1] - p.y) < 12:
+                    p.room_dmg_buff = 30.0
+                    burst(self, ff[0], ff[1], (120, 200, 255), 16, 70)
+                    audio.play('item', 0.5)
+                    self.foxfire = None
+                elif ff[2] > 10:
+                    self.foxfire = None
         elif q == 'current' and fighting:
             cur = self.room.extra.setdefault('current', random.choice(((28, 0), (-28, 0), (0, 22), (0, -22))))
             if self.wind[2] <= 0:
@@ -1809,6 +1839,14 @@ class Run:
             gfx.TEXT.add(name, bx, by + 2, 8, col, 'c')
             gfx.TEXT.add(desc, bx, by + 12, 6, (230, 225, 210), 'c')
             gfx.TEXT.add(fxs, bx, by + 21, 6, (170, 220, 255), 'c')
+        ff = getattr(self, 'foxfire', None)
+        if ff:
+            fx_, fy_ = int(ff[0]), int(ff[1] + math.sin(t * 5) * 2)
+            gfx.draw_glow(s, fx_, fy_, 14, (90, 170, 255), 140)
+            pygame.draw.circle(s, (180, 230, 255), (fx_, fy_), 3)
+            pygame.draw.circle(s, (255, 255, 255), (fx_, fy_ - 1), 1)
+            if random.random() < 0.4:
+                self.particles.append(Particle(fx_, fy_, random.uniform(-8, 8), -30, 0.4, (120, 190, 255), 1))
         if self.hold:
             icon, col, ht = self.hold
             yy = p.y - 28 - (1 - min(1, (1.4 - ht) * 4)) * 6
