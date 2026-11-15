@@ -482,6 +482,13 @@ SPECIAL_LAYOUTS = {
                  , "............."
                  , "..L.......L.."
                  , "............."],
+    'kakurenbo': ["............."
+                  , "...O.....O..."
+                  , ".L.........L."
+                  , "............."
+                  , ".L.........L."
+                  , "...O.....O..."
+                  , "............."],
     'shop': ["............."
              , ".L.........L."
              , "............."
@@ -652,6 +659,8 @@ def generate_floor(rng, depth, labyrinth=False, hard=False):
         extras = ['challenge', 'curse', 'omikuji', 'onsen', 'treasure2', 'library', 'dojo', 'teahouse', 'slots']
         if rng.random() < 0.45:
             extras.append('yomeiri')
+        if depth >= 2 and rng.random() < 0.45:
+            extras.append('kakurenbo')
         rng.shuffle(extras)
         for p, k in zip(rest[2:], extras):
             if k == 'treasure2':

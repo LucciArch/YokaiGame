@@ -11,7 +11,7 @@ from .rooms import generate_floor, build_room_tiles, Room
 from .entities import (Player, Bullet, Enemy, Pickup, Pedestal, Obj, Hazard, Particle, burst, clamp, norm,
                        tile_at, free_tile_pos, ebullet)
 from .bosses import make_boss, CX, CY
-from .yomeiri import Procession
+from .yomeiri import Procession, Apparition, kakurenbo_start, kakurenbo_break
 
 ACH = {a[0]: a for a in ACHIEVEMENTS}
 TIPS = ['Esc → „Speichern & Hauptmenü“: Der Lauf geht später ab dieser Ebene weiter.',
@@ -438,11 +438,15 @@ class Run:
         self._quirk_t = 3.0
         self.foxfire = None
         self.yomeiri = None
+        self.apparitions = []
         if room.kind == 'yomeiri' and not room.extra.get('yomeiri_done'):
             self.yomeiri = Procession(self, room)
+        if room.kind == 'kakurenbo':
+            kakurenbo_start(self, room)
         rh = {'shop': 'Laden: Mon gegen Items tauschen. Der Saisen-Kasten nimmt Spenden an – manchmal lohnt es sich.',
               'curse': 'Fluchraum: Betreten kostet Leben, dafür lockt ein dunkler Schatz.',
               'yomeiri': 'Fuchshochzeit: Schieß nicht auf den Zug – dann bekommst du ein Geschenk.',
+              'kakurenbo': 'Versteckspiel: Zerschlage die richtige Urne. Du hast zwei Versuche.',
               'challenge': 'Prüfungsraum: Mehrere Wellen überstehen, dann gibt es eine Belohnung.',
               'secret': 'Geheimraum! Rissige Wände lassen sich mit Salz aufsprengen.',
               'boss': 'Der Boss dieser Ebene. Bei 25 % Leben rasen Bosse vor Wut.'}.get(room.kind)
@@ -971,7 +975,9 @@ class Run:
             x, y = RX + tx * TILE + 16, RY + ty * TILE + 16
             burst(self, x, y, (150, 100, 70) if t == T_POT else self.biome['rock'], 12, 70, 0.5, 3)
             audio.play('hit', 0.7)
-            if t == T_POT and random.random() < 0.18 + 0.02 * self.player.s['luck']:
+            if t == T_POT and self.room.kind == 'kakurenbo':
+                kakurenbo_break(self, tx, ty)
+            elif t == T_POT and random.random() < 0.18 + 0.02 * self.player.s['luck']:
                 self.random_drop(x, y)
             self.flow_src = None
 
@@ -1437,6 +1443,8 @@ class Run:
         # Geschosse
         if getattr(self, 'yomeiri', None) is not None and not self.yomeiri.update(dt):
             self.yomeiri = None
+        if getattr(self, 'apparitions', None):
+            self.apparitions = [a for a in self.apparitions if a.update(dt)]
         self.update_bullets(dt)
         # Gefahren
         self.hazards = [h for h in self.hazards if h.update(dt, self)]
@@ -2209,7 +2217,7 @@ class Run:
             rect = pygame.Rect(0, 0, w, h)
             rect.center = (x, y + (-6 if d == 'n' else 6 if d == 's' else 0)) if horiz else (x + (-6 if d == 'w' else 6), y)
             frame = {'boss': (150, 30, 40), 'treasure': (230, 190, 70), 'shop': (90, 160, 90), 'curse': (110, 40, 120),
-                     'challenge': (200, 90, 50), 'omikuji': (210, 60, 50), 'onsen': (120, 190, 220), 'yomeiri': (240, 150, 80),
+                     'challenge': (200, 90, 50), 'omikuji': (210, 60, 50), 'onsen': (120, 190, 220), 'yomeiri': (240, 150, 80), 'kakurenbo': (220, 150, 190),
                      'library': (150, 120, 200), 'dojo': (230, 140, 60), 'secret': (160, 140, 110),
                      'teahouse': (110, 170, 90), 'slots': (230, 120, 70)}.get(other.kind, (110, 70, 45))
             if self.curse == 'verirrt' and not other.visited:
@@ -2276,6 +2284,7 @@ class Run:
         ents = [e for e in self.enemies] + [p] + self.standing_tiles() + list(self.pedestals)
         if getattr(self, 'yomeiri', None) is not None:
             ents += self.yomeiri.foxes
+        ents += getattr(self, 'apparitions', [])
         ents.sort(key=lambda e: e.y)
         for e in ents:
             e.draw(s, t)
@@ -2654,7 +2663,7 @@ class Run:
         pygame.draw.rect(bg, (120, 96, 70, 170), bg.get_rect(), 1)
         s.blit(bg, (x0 - 2, y0 - 2))
         icons = {'secret': (200, 180, 140), 'boss': (230, 50, 50), 'treasure': (240, 200, 70), 'shop': (90, 200, 90), 'curse': (170, 80, 200),
-                 'challenge': (230, 120, 60), 'omikuji': (230, 80, 70), 'onsen': (120, 200, 230), 'yomeiri': (255, 170, 90),
+                 'challenge': (230, 120, 60), 'omikuji': (230, 80, 70), 'onsen': (120, 200, 230), 'yomeiri': (255, 170, 90), 'kakurenbo': (240, 170, 210),
                  'library': (170, 140, 230), 'dojo': (240, 160, 60), 'teahouse': (120, 190, 100), 'slots': (240, 140, 80)}
         for pos, r in rooms.items():
             if not (r.seen or show_all) or not r.revealed:

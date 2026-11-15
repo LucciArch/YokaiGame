@@ -574,6 +574,15 @@ dd......dd""",
 ..RWWWR...
 ..RRRRR...
 ..rrrrr...""",
+    'kakurenbo': """
+...kkkk...
+..kkkkkk..
+..kSWWSk..
+..kWkWkW..
+...WWWW...
+..RRRRRR..
+.RRrRRrRR.
+..RR..RR..""",
     'yomeiri': """
 .O......O.
 .OO....OO.

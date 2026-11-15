@@ -574,6 +574,7 @@ ACHIEVEMENTS = [
     ('floor11', 'Über den Wolken', 'Erreiche Ebene 11', None),
     ('items40', 'Schatzkammer', 'Trage 40 Items in einem Lauf', None),
     ('yomeiri', 'Hochzeitsgast', 'Lass eine Fuchshochzeit ungestört vorbeiziehen', None),
+    ('kakurenbo', 'Gefunden!', 'Finde Zashiki-warashi beim Versteckspiel', None),
     ('lexikon_half', 'Yōkai-Kundige', 'Begegne der Hälfte aller Yōkai', None),
     ('lexikon_all', 'Hyakki Yagyō', 'Begegne allen Yōkai des Lexikons', None),
     ('kenji', 'Herrenlos', 'Besiege einen Boss in Kapitel II', ('char', 'kenji')),

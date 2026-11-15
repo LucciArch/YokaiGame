@@ -132,3 +132,64 @@ class Procession:
             run.spawn_enemy('kitsunebi_e', f.x, f.y - 10)
         if run.enemies:
             self.room.cleared = False
+
+
+# ---------------------------------------------------------------- Kakurenbo (Versteckspiel)
+class Apparition:
+    """Kurz sichtbare Figur (z. B. Zashiki-warashi, die aus der Urne hüpft)."""
+
+    def __init__(self, name, x, y, life=2.4, frame0=0):
+        self.name, self.x, self.y, self.life, self.t = name, x, y, life, 0.0
+        self.frame0 = frame0
+
+    def update(self, dt):
+        self.t += dt
+        return self.t < self.life
+
+    def draw(self, s, t):
+        a = int(255 * max(0.0, min(1.0, self.t * 4, (self.life - self.t) * 2)))
+        hop = math.sin(min(1.0, self.t / 0.4) * math.pi) * 8
+        f = self.frame0 + int(self.t * 6) % 3 if self.frame0 else int(self.t * 6) % 4
+        spr = sheets.frame(self.name, sheets.LEFT, f)
+        gfx.shadow(s, (int(self.x) - 6, int(self.y) - 2, 12, 4))
+        gfx.hi_blit(spr, self.x, self.y + 1 - hop, a)
+
+
+POTS = [(3, 1), (9, 1), (3, 5), (9, 5)]
+
+
+def kakurenbo_start(run, room):
+    if room.extra.get('kak_done'):
+        return
+    if 'kak_hide' not in room.extra:
+        room.extra['kak_hide'] = random.choice(POTS)
+        room.extra['kak_tries'] = 0
+    run.banner('Kakurenbo', 'Zashiki-warashi versteckt sich in einer Urne – zwei Versuche!', (240, 200, 220))
+
+
+def kakurenbo_break(run, tx, ty):
+    room = run.room
+    if room.kind != 'kakurenbo' or room.extra.get('kak_done') or (tx, ty) not in POTS:
+        return
+    x, y = RX + tx * 32 + 16, RY + ty * 32 + 16
+    if (tx, ty) == tuple(room.extra.get('kak_hide', ())):
+        room.extra['kak_done'] = True
+        p = run.player
+        p.bonus['luck'] += 1
+        p.recalc()
+        run.apparitions.append(Apparition('zashiki', x, y + 10, 2.6, frame0=4))
+        burst(run, x, y, (255, 200, 230), 20, 80)
+        for i in range(4):
+            run.spawn_pickup('coin', x + random.uniform(-12, 12), y + random.uniform(-6, 10))
+        audio.play('unlock', 0.6)
+        run.banner('Gefunden!', 'Zashiki-warashi bringt Glück ins Haus – Glück +1', (255, 220, 240))
+        run.achieve('kakurenbo')
+    else:
+        room.extra['kak_tries'] = room.extra.get('kak_tries', 0) + 1
+        if room.extra['kak_tries'] >= 2:
+            room.extra['kak_done'] = True
+            hx, hy = room.extra['kak_hide']
+            run.apparitions.append(Apparition('zashiki', RX + hx * 32 + 16, RY + hy * 32 + 26, 1.6))
+            run.banner('Kichern…', 'Sie ist entwischt', (200, 180, 220))
+        else:
+            run.banner('Leer…', 'Noch ein Versuch', (220, 200, 210))
