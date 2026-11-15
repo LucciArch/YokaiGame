@@ -2352,6 +2352,8 @@ class Run:
         ents = [e for e in self.enemies] + [p] + self.standing_tiles() + list(self.pedestals)
         if getattr(self, 'yomeiri', None) is not None:
             ents += self.yomeiri.foxes
+            if hasattr(self.yomeiri, 'draw_under'):
+                self.yomeiri.draw_under(s)
         ents += getattr(self, 'apparitions', [])
         ents.sort(key=lambda e: e.y)
         for e in ents:

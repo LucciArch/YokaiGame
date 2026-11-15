@@ -256,6 +256,9 @@ class Parade:
         self.run, self.room = run, room
         self.fade = 1.0
         self.hits = 0
+        self.beat = 0.3
+        self.nbeat = 0
+        self.dark = 0.0
         self.marchers = []
         names = [n for n in PARADE if sheets.has(n) and sheets.is_hi(n)]
         random.shuffle(names)
@@ -273,8 +276,28 @@ class Parade:
     def foxes(self):                     # für die Zeichen-Sortierung wie beim Hochzeitszug
         return self.marchers
 
+    def draw_under(self, s):
+        """Violetter Schleier über dem Raum, solange die Parade durchzieht."""
+        if self.dark <= 0:
+            return
+        ov = getattr(Parade, '_ov', None)
+        if ov is None:
+            import pygame
+            ov = pygame.Surface((RW, RH), pygame.SRCALPHA)
+            ov.fill((40, 20, 70, 255))
+            Parade._ov = ov
+        ov.set_alpha(int(70 * self.dark))
+        s.blit(ov, (RX, RY))
+
     def update(self, dt):
         run, p = self.run, self.run.player
+        inside = any(RX < m.x < RX + RW for m in self.marchers)
+        self.dark = min(1.0, self.dark + dt) if inside else max(0.0, self.dark - dt)
+        self.beat -= dt
+        if self.beat <= 0 and inside:
+            self.beat = 0.6
+            self.nbeat += 1
+            audio.play('drum' if self.nbeat % 2 else 'wisp', 0.16 if self.nbeat % 2 else 0.08)
         for m in self.marchers:
             m.x += m.vx * dt
             m.t += dt
