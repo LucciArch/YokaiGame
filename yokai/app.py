@@ -831,8 +831,10 @@ class Game:
         gfx.TEXT.clear()
         s = self.screen
         ov = pygame.Surface((W, H), pygame.SRCALPHA)
-        ov.fill((0, 0, 0, min(190, int(self.over_t * 300))))
+        oa = min(190, int(self.over_t * 300))
+        ov.fill((0, 0, 0, oa))
         s.blit(ov, (0, 0))
+        gfx.dim_hi(1 - oa / 255)
         T = gfx.TEXT
         win = run.result == 'win'
         if win:
@@ -1270,6 +1272,7 @@ class Game:
             gfx.HI.clear()
             gfx.TEXT.clear()
             ov = pygame.Surface((W, H), pygame.SRCALPHA); ov.fill((0, 0, 0, 170)); s.blit(ov, (0, 0))
+            gfx.dim_hi(1 - 170 / 255)
         else:
             self.menu_bg(s)
         T = gfx.TEXT

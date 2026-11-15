@@ -1182,6 +1182,11 @@ def tinted(surf, mode):
     return im
 
 
+def dim_hi(f):
+    """Alle bisher gesammelten Hi-Res-Bilder abdunkeln (z. B. unter einem Menü-Schleier)."""
+    HI[:] = [(e[0], e[1], e[2], e[3], (e[4] if len(e) > 4 else 1.0) * f, True) for e in HI]
+
+
 def hi_flush(win, sc, ox, oy, dim=1.0, light=None):
     for ent in HI:
         surf, cx, by, alpha = ent[:4]
