@@ -739,11 +739,11 @@
  },
  "tennin": {
   "atk": 4,
-  "h": 87,
+  "h": 64,
   "hi": true,
   "kind": "strip",
   "n": 7,
-  "w": 82,
+  "w": 116,
   "walk": 4
  },
  "tenome": {
