@@ -485,6 +485,13 @@ class Run:
         q = self.QUIRKS.get(self.biome_id)
         p = self.player
         p.ice = q == 'ice'
+        qs = getattr(self, 'quirk_snd', None)
+        if qs:
+            if qs[0] - dt <= 0:
+                audio.play(qs[1], 0.7)
+                self.quirk_snd = None
+            else:
+                self.quirk_snd = (qs[0] - dt, qs[1])
         if not q or self.room.kind.startswith('shrine') or self.room.kind == 'boss':
             return
         self.hint('biome_' + q, self.QUIRK_TEXT[q])
@@ -500,7 +507,7 @@ class Run:
                 self.wind = (d * 75, 0, 1.3)
                 for i in range(14):
                     self.particles.append(Particle(RX + (0 if d > 0 else RW), RY + random.uniform(10, RH - 10), d * random.uniform(160, 260), random.uniform(-10, 10), 1.6, (190, 170, 110), 2, kind='petal'))
-                audio.play('dash', 0.4)
+                audio.play('gust', 0.8)
                 qt = random.uniform(6, 9)
         elif q == 'lava' and fighting:
             if qt <= 0:
@@ -516,17 +523,20 @@ class Run:
         elif q == 'bamboo' and fighting:
             if qt <= 0:
                 self.hazards.append(Hazard(p.x + p.vx * 0.3, p.y + p.vy * 0.3 + 4, 9, 0.9, 0.5, 1, 'e', 'bamboo'))
+                self.quirk_snd = (0.9, 'bamboo')
                 qt = random.uniform(3.5, 5.5)
         elif q == 'hands' and fighting:
             if qt <= 0:
                 for i in range(2):
                     a = random.uniform(0, math.tau)
                     self.hazards.append(Hazard(p.x + math.cos(a) * 40, p.y + math.sin(a) * 30, 14, 0.6, 3.0, 0, 'e', 'hands'))
+                self.quirk_snd = (0.6, 'grab')
                 qt = random.uniform(4, 6)
         elif q == 'foxfire' and fighting:
             ff = getattr(self, 'foxfire', None)
             if ff is None and qt <= 0 and p.room_dmg_buff <= 0:
                 self.foxfire = [RX + random.uniform(40, RW - 40), RY + random.uniform(30, RH - 30), 0.0]
+                audio.play('wisp', 0.7)
                 qt = 9999
             elif ff is not None:
                 ff[2] += dt
@@ -542,7 +552,7 @@ class Run:
                     self.foxfire = None
         elif q == 'drums' and fighting:
             if qt <= 0:
-                audio.play('explode', 0.35)
+                audio.play('drum', 0.8)
                 self.shake(2)
                 for e in self.enemies:
                     if e.active() and not e.is_boss:
@@ -555,6 +565,7 @@ class Run:
             if qt <= 0:
                 d = random.choice((-1, 1))
                 self.wind = (d * 60, 0, 1.0)
+                audio.play('wave', 0.8)
                 for i in range(22):
                     self.particles.append(Particle(RX + (0 if d > 0 else RW), RY + random.uniform(6, RH - 6), d * random.uniform(180, 260), random.uniform(-6, 6), 1.4, (170, 210, 230), 2))
                 qt = random.uniform(6, 8)
@@ -597,6 +608,7 @@ class Run:
             if lucky:
                 x, y = RX + random.uniform(40, RW - 40), RY + random.uniform(30, RH - 30)
                 pk = Pickup('spirit', x, y, pop=False)
+                audio.play('wisp', 0.6)
                 pk.wisp = True
                 self.pickups.append(pk)
                 burst(self, x, y, (140, 200, 255), 10, 40, 0.6, 2)

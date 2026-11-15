@@ -135,6 +135,14 @@ class Audio:
             'bell': S(T(1046, 1.2, None, 'sine', 3) + T(2093, 1.2, None, 'sine', 5) * 0.3 + T(1568, 1.2, None, 'sine', 4) * 0.2, 0.45),
             'splash': S(N(0.3, 10, 0.5), 0.3),
             'stairs': S(cat([P(f, 0.14) for f in (784, 659, 523, 392, 330)]), 0.7),
+            # Biom-Eigenheiten
+            'drum': S(self._taiko(0.6, 58) * 1.3 + cat([np.zeros(int(SR * 0.12)), self._taiko(0.48, 64)]) * 0.8, 0.5),
+            'gust': S(N(0.9, 2.5, 0.04) * np.sin(np.linspace(0, np.pi, int(SR * 0.9))) * 1.6, 0.4),
+            'wave': S(N(1.2, 1.6, 0.07) * np.sin(np.linspace(0, np.pi, int(SR * 1.2))) ** 2 * 1.4
+                      + N(1.2, 3, 0.5) * np.linspace(0, 1, int(SR * 1.2)) ** 3 * 0.35, 0.4),
+            'bamboo': S(cat([T(420, 0.05, 300, 'tri', 40), T(520, 0.12, 380, 'tri', 25)]) + N(0.17, 30, 0.3) * 0.3, 0.45),
+            'grab': S(T(140, 0.45, 70, 'buzz', 6) * 0.6 + N(0.45, 6, 0.06) * 0.6, 0.4),
+            'wisp': S(T(1200, 0.5, 1800, 'sine', 5) * 0.5 + T(1800, 0.5, 2400, 'sine', 7) * 0.25, 0.3),
         }
 
     def _variants(self):
