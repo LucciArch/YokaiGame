@@ -117,8 +117,8 @@ def geta_leg(c, knee, ank, far=False):
 
 DEF = dict(
     bob=0, lean=0, flap=0, beard=0,
-    fsh=(86, 64), felb=(70, 78), fhand=(54, 76), fanang=232,
-    nsh=(114, 63), nelb=(122, 82), nhand=(110, 92),
+    fsh=(89, 64), felb=(73, 78), fhand=(57, 76), fanang=232,
+    nsh=(111, 63), nelb=(119, 82), nhand=(108, 92),
     fknee=(86, 120), fank=(86, 131), nknee=(108, 120), nank=(110, 131),
     gust=0, arm_front=True,
 )
@@ -139,19 +139,24 @@ def sojobo(**kw):
 
     def sleeve_arm(sh_, el, ha, rp, far):
         p = C()
-        up = L(*sh_, 6.4, *el, 6.0)
-        p.form(up, rp, sd=2, hl=1)
+        up = L(*sh_, 7.0, *el, 6.2) | E(sh_[0], sh_[1] + 1, 7.5, 6.5)
+        p.form(up, rp, sd=4, hl=1)
+        q = lerp(sh_, el, 0.5)
+        p.line([(q[0] - 3, q[1] - 2), (q[0] + 2, q[1] + 3)], rp[0], only=up)          # Stoff-Falte
         c.stamp(p, 'K')
         p = C()
         d = (ha[0] - el[0], ha[1] - el[1]); n_ = math.hypot(*d) or 1
         nx, ny = -d[1] / n_, d[0] / n_
         if ny < 0:
             nx, ny = -nx, -ny
-        w = PG([(el[0] - nx * 6, el[1] - ny * 6), (ha[0] - nx * 4, ha[1] - ny * 4), (ha[0] + nx * 5, ha[1] + ny * 5),
-                (ha[0] + nx * 17 + d[0] / n_ * 2, ha[1] + ny * 17), (el[0] + nx * 14, el[1] + ny * 14), (el[0] + nx * 2 - d[0] / n_ * 5, el[1] + ny * 4)])
-        p.form(w, rp, sd=3, hl=1)
-        p.line([(ha[0] + nx * 15, ha[1] + ny * 15), (el[0] + nx * 5, el[1] + ny * 4)], rp[0], only=w)
-        p.line([(ha[0] - nx * 4, ha[1] - ny * 4), (ha[0] + nx * 16, ha[1] + ny * 16)], 'v1', only=w)   # white lining at the cuff
+        # weiter, herabhängender Ärmel: weich gerundet statt kantig
+        mid = lerp(el, ha, 0.55)
+        w = (L(*el, 6.6, *ha, 6.0) | E(mid[0] + nx * 7, mid[1] + ny * 7, 9.5, 7.5)
+             | L(mid[0] + nx * 4, mid[1] + ny * 4, 6.0, ha[0] + nx * 11, ha[1] + ny * 11, 5.0))
+        p.form(w, rp, sd=5, hl=1)
+        p.line([(el[0] + nx * 3, el[1] + ny * 6), (mid[0] + nx * 11, mid[1] + ny * 11)], rp[0], only=w)   # Faltenwurf
+        cuff = L(ha[0] - nx * 4, ha[1] - ny * 4, 1.6, ha[0] + nx * 14, ha[1] + ny * 14, 1.6)
+        p.fill(cuff & w, 'v1')                                            # weißes Futter am Ärmelsaum
         c.stamp(p, 'K')
         p = C()
         p.grid(int(ha[0]) - 4, int(ha[1]) - 3, FIST, LEG)
@@ -168,7 +173,7 @@ def sojobo(**kw):
     # hakama
     p = C()
     fk, nk = P(*S['fknee']), P(*S['nknee'])
-    hak = PG([B((81, 90)), B((119, 90)), (nk[0] + 13, nk[1] + 1), (nk[0] - 7, nk[1] + 3), B((99, 108)), (fk[0] + 8, fk[1] + 3),
+    hak = PG([B((84, 90)), B((116, 90)), (nk[0] + 13, nk[1] + 1), (nk[0] - 7, nk[1] + 3), B((99, 108)), (fk[0] + 8, fk[1] + 3),
               (fk[0] - 12, fk[1] + 1)])
     p.form(hak, HAK, sd=4, hl=1)
     for a_, b_ in ((B((88, 94)), (fk[0] - 4, fk[1])), (B((96, 94)), (fk[0] + 4, fk[1] + 1)), (B((106, 94)), (nk[0], nk[1] + 1)),
@@ -178,12 +183,17 @@ def sojobo(**kw):
 
     # ---- robe
     p = C()
-    robe = PG([B((85, 56)), B((112, 54)), B((122, 63)), B((121, 97)), B((79, 97)), B((77, 66))])
-    p.form(robe, PUR, sd=5, hl=1)
+    robe = (L(*B((89, 62)), 6.5, *B((85, 95)), 6.0) | L(*B((110, 61)), 6.5, *B((115, 95)), 6.0)
+            | PG([B((89, 56)), B((110, 55)), B((117, 98)), B((83, 98))]) | E(*B((99, 59)), 13, 5))
+    p.form(robe, PUR, sd=7, hl=1)
+    collar = PG([B((90, 55)), B((96, 55)), B((100, 70)), B((104, 55)), B((110, 55)), B((101, 76)), B((99, 76))])
+    p.form(collar & robe, WHT, sd=1, hl=1)                                   # weißer Kragen des Untergewands (V)
+    for a_, b_ in (((84, 66), (83, 92)), ((116, 66), (118, 92))):            # Faltenwurf an den Seiten
+        p.line([B(a_), B(b_)], 'p1', only=robe)
     p.line([B((92, 56)), B((98, 76)), B((97, 96))], 'p0', only=robe)
-    belt = PG([B((78, 88)), B((121, 87)), B((121, 95)), B((79, 96))])
+    belt = PG([B((82, 88)), B((118, 87)), B((118, 95)), B((82, 96))])
     p.form(belt, WHT, sd=2, hl=1)
-    p.line([B((78, 92)), B((121, 91))], 'v0', only=belt)
+    p.line([B((82, 92)), B((118, 91))], 'v0', only=belt)
     # yuigesa: sash with gold pom-poms
     for a_, b_ in (((90, 56), (104, 86)), ((108, 55), (92, 86))):
         p.line([B(a_), B(b_)], 'c1', only=robe); p.line([B((a_[0] + 1, a_[1])), B((b_[0] + 1, b_[1]))], 'c0', only=robe)
