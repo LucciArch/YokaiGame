@@ -1138,3 +1138,20 @@ def hi_flush(win, sc, ox, oy, dim=1.0, light=None):
             img.set_alpha(alpha)
         win.blit(img, (int(ox + cx * sc - tw / 2), int(oy + by * sc - th)))
     HI.clear()
+
+
+_mini_cache = {}
+
+
+def mini(surf, h):
+    """Verkleinertes Porträt eines Sprites (Ausschnitt auf Inhalt, Pixel-Look erhalten)."""
+    key = (id(surf), h)
+    im = _mini_cache.get(key)
+    if im is None:
+        bb = surf.get_bounding_rect()
+        src = surf.subsurface(bb)
+        f = h / max(1, bb.h)
+        w2 = max(1, int(bb.w * f))
+        im = pygame.transform.smoothscale(src, (w2, h)) if f < 0.75 else pygame.transform.scale(src, (w2, h))
+        _mini_cache[key] = im
+    return im

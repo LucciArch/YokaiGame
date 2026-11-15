@@ -50,7 +50,8 @@ class Game:
         self.au.music(('yo', 220, 76, 'calm', 99))
         try:
             ic = pygame.Surface((32, 32), pygame.SRCALPHA)
-            ic.blit(sheets.frame('hana', 0, 0, 2), (0, 0))
+            hm = gfx.mini(sheets.frame('hana', 0, 0, 1), 32)
+            ic.blit(hm, (16 - hm.get_width() // 2, 0))
             pygame.display.set_icon(ic)
         except Exception:
             pass
@@ -221,9 +222,9 @@ class Game:
             img = pygame.transform.scale(self.screen, (int(W * sc), int(H * sc)))
         self.window.blit(img, (ox + shake[0], oy + shake[1]))
         r = self.run
-        if r and not getattr(r, 'slide', None) and self.state in ('play', 'pause', 'items', 'over'):
-            dim = 1.0 if self.state == 'play' else 0.45
-            light = r.hi_light if hasattr(r, 'hi_light') else None
+        if r and not getattr(r, 'slide', None) and self.state in ('play', 'pause', 'over', 'options'):
+            dim = 1.0
+            light = r.hi_light if self.state == 'play' else None
             gfx.hi_flush(self.window, sc, ox + shake[0], oy + shake[1], dim, light)
         elif self.state in ('title', 'chars') and gfx.HI:
             gfx.hi_flush(self.window, sc, ox, oy, 1.0, None)
@@ -282,19 +283,16 @@ class Game:
             ti = props.torii((170, 34, 36))
             self._title_torii = pygame.transform.scale(ti, (ti.get_width() * 2, ti.get_height() * 2))
         s.blit(self._title_torii, (tx - self._title_torii.get_width() // 2, 236 - self._title_torii.get_height()))
-        # Laternen
+        # Laternen (Stein-Tōrō aus den Umgebungs-Tiles)
+        lt = gfx.env_img('_shared', 'lantern', 32)
         for i, lx in enumerate((160, 240, 320, 420)):
-            gfx.draw_glow(s, lx, 220, 18, (255, 170, 80), 80)
-            pygame.draw.rect(s, (90, 90, 100), (lx - 2, 222, 4, 12))
-            pygame.draw.rect(s, (120, 120, 130), (lx - 6, 212, 12, 10))
-            pygame.draw.rect(s, (255, 200, 120), (lx - 4, 214, 8, 5))
-        # Kirschbaum & fallende Blüten
-        pygame.draw.line(s, (50, 30, 30), (470, 240), (440, 120), 6)
-        pygame.draw.line(s, (50, 30, 30), (448, 150), (410, 120), 3)
-        for i in range(40):
-            rr = random.Random(i)
-            bx, by = 400 + rr.randint(0, 80), 95 + rr.randint(0, 60)
-            pygame.draw.circle(s, (240, 160 + rr.randint(0, 40), 190), (bx, by), rr.randint(5, 10))
+            gfx.draw_glow(s, lx, 216, 18, (255, 170, 80), 80)
+            if lt:
+                s.blit(lt[0], (lx - 16, 236 - 32))
+        # Kirschbaum (gecachte Pixel-Grafik)
+        if not hasattr(self, '_sakura'):
+            self._sakura = self.make_sakura()
+        s.blit(self._sakura, (380, 80))
         for i in range(30):
             rr = random.Random(100 + i)
             ph = (t * rr.uniform(0.05, 0.12) + rr.random()) % 1
@@ -312,6 +310,27 @@ class Game:
                 gfx.hi_blit(spr, x + spr.get_width() / 4, 252)
             else:
                 s.blit(spr, (int(x), int(250 - spr.get_height())))
+
+    def make_sakura(self):
+        from . import props
+        S = pygame.Surface((100, 165), pygame.SRCALPHA)
+        bark = (58, 36, 40)
+        pygame.draw.line(S, bark, (90, 160), (62, 40), 7)
+        pygame.draw.line(S, props.sh(bark, 1.3), (88, 160), (60, 40), 2)
+        pygame.draw.line(S, bark, (68, 70), (30, 40), 4)
+        pygame.draw.line(S, bark, (75, 95), (98, 62), 3)
+        rr = random.Random(7)
+        blobs = [(rr.randint(8, 98), rr.randint(8, 80), rr.randint(6, 11)) for _ in range(34)]
+        base = (236, 156, 186)
+        for x, y, r in blobs:
+            pygame.draw.circle(S, props.sh(base, 0.62), (x + 1, y + 2), r)
+        for x, y, r in blobs:
+            pygame.draw.circle(S, base, (x, y), r - 1)
+        for x, y, r in blobs:
+            pygame.draw.circle(S, props.sh(base, 1.35), (x - r // 3, y - r // 3), max(1, r // 3))
+        for _ in range(40):
+            S.set_at((rr.randint(4, 99), rr.randint(4, 88)), (255, 236, 244))
+        return props._outline(S)
 
     # ================================================================  Zustände
     MENU = ['Neuer Lauf', 'Tägliche Prüfung', 'Herausforderungen', 'Codex der Items', 'Erfolge', 'Statistik', 'Steuerung', 'Optionen', 'Beenden']
@@ -401,8 +420,8 @@ class Game:
             y = 32 + i * 26
             sel = i == self.ch_sel
             gfx.panel(s, (30, y, W - 60, 23), 210 if sel else 150, (255, 210, 120) if sel else (90, 80, 90))
-            spr = sheets.frame(c['char'], 0, 0, 1)
-            s.blit(spr, (38, y + 5))
+            spr = gfx.mini(sheets.frame(c['char'], 0, 0, 1), 19)
+            s.blit(spr, (46 - spr.get_width() // 2, y + 2))
             T.add(c['name'], 58, y + 2, 9, (255, 230, 150) if sel else (220, 210, 200))
             T.add(c['desc'], 58, y + 13, 6, (210, 200, 190))
             if c['id'] in done:
@@ -529,6 +548,7 @@ class Game:
         run.update(dt, inp)
         run.draw(self.screen, self.t)
         if self.show_tab:
+            gfx.HI.clear()
             self.draw_itemlist(self.screen)
         if run.result:
             self.state = 'over'
@@ -571,6 +591,7 @@ class Game:
     def st_pause(self, dt, events, nav):
         run = self.run
         run.draw(self.screen, self.t)
+        gfx.HI.clear()
         gfx.TEXT.clear()
         s = self.screen
         ov = pygame.Surface((W, H), pygame.SRCALPHA)
@@ -601,6 +622,7 @@ class Game:
                     self.confirm = None
             return
         if getattr(self, 'pause_tab', False):
+            gfx.HI.clear()
             self.draw_itemlist(s)
             if nav:
                 self.pause_tab = False
@@ -645,6 +667,7 @@ class Game:
         self.over_t += dt
         run.update_fx(dt)
         run.draw(self.screen, self.t)
+        gfx.HI.clear()
         gfx.TEXT.clear()
         s = self.screen
         ov = pygame.Surface((W, H), pygame.SRCALPHA)
@@ -847,6 +870,7 @@ class Game:
         s = self.screen
         if self.run and getattr(self, 'opt_return', None) == 'pause':
             self.run.draw(s, self.t)
+            gfx.HI.clear()
             gfx.TEXT.clear()
             ov = pygame.Surface((W, H), pygame.SRCALPHA); ov.fill((0, 0, 0, 170)); s.blit(ov, (0, 0))
         else:
