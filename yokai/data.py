@@ -650,3 +650,19 @@ def _exclusive_pools():
 
 
 _exclusive_pools()
+
+
+# Balance-Check 1.2 (design/balance/balance-check-1.md)
+def _balance_12():
+    # Laden war fast nur Qualität 1: jedes fünfte Schatzraum-Item der Qualität 2 wandert in den Laden
+    t2 = [k for k, it in ITEMS.items() if it['pools'] == ['T'] and it['q'] == 1 + 1]
+    for k in t2[::5]:
+        ITEMS[k]['pools'] = ['S']
+    # Tiefe 4 hatte die kleinste Gegnervielfalt
+    for b, extra in (('ryugu', ['kappa_small', 'onibi']), ('shinkai', ['kappa_small', 'onibi']), ('uminobe', ['kappa_small', 'yosuzume'])):
+        for e in extra:
+            if e not in BIOMES[b]['enemies']:
+                BIOMES[b]['enemies'].append(e)
+
+
+_balance_12()

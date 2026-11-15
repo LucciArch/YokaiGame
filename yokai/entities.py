@@ -905,7 +905,7 @@ class Enemy:
         elif d['sprite'] in art.ARTS:
             sp = art.make(d['sprite'])
             self.r = max(self.r, int(min(sp.get_width(), sp.get_height()) * 0.36))
-        mult = (1 + 0.3 * (run.depth - 1)) * (1.3 if run.hard else 1.0) * run.loop_mult
+        mult = (1 + 0.3 * (run.depth - 1) + (0.3 if run.depth >= 6 else 0)) * (1.3 if run.hard else 1.0) * run.loop_mult
         self.champ = champ
         cm = CHAMPIONS[champ] if champ else {}
         self.maxhp = self.hp = d['hp'] * mult * cm.get('hp', 1)
