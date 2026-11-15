@@ -512,6 +512,24 @@
   "w": 148,
   "walk": 4
  },
+ "kitsune_braut": {
+  "atk": 4,
+  "h": 47,
+  "hi": true,
+  "kind": "strip",
+  "n": 7,
+  "w": 46,
+  "walk": 4
+ },
+ "kitsune_gefolge": {
+  "atk": 4,
+  "h": 50,
+  "hi": true,
+  "kind": "strip",
+  "n": 7,
+  "w": 46,
+  "walk": 4
+ },
  "kitsunebi_e": {
   "atk": 4,
   "h": 45,

@@ -574,6 +574,15 @@ dd......dd""",
 ..RWWWR...
 ..RRRRR...
 ..rrrrr...""",
+    'yomeiri': """
+.O......O.
+.OO....OO.
+.OWWWWWWO.
+OWWRWWRWWO
+.WWWWWWWW.
+..WWWWWW..
+...WRRW...
+....WW....""",
     'onsen': """
 .B..B..B..
 B..B..B...

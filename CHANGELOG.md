@@ -19,6 +19,7 @@
 - 4 neue Items (Glocke des Komainu, Feder der Tennin, Fels von Yomotsu, Sternenstaub) und 3 neue Synergien
 - Waffen-, Figuren- und Boss-Balance gemessen und angeglichen (Berichte unter `design/balance/`)
 - Kapitelnamen, eigener Seed (E in der Figurenauswahl), Codex mit Silhouetten, Menüs mit Nachthimmel
+- Neues Ereignis **Kitsune no Yomeiri**: Eine Fuchshochzeit zieht durch einen Raum – wer sie nicht stört, bekommt ein Geschenk der Braut
 - Neue Herausforderung **„Der lange Weg“** (alle zehn Ebenen), Option **Blitzeffekte reduziert**, Erzählzeilen zu Kapitelbeginn
 - Raum-Requisiten, Torii, Steinlaternen und Todesanimation in doppelter Pixeldichte
 - Neue Gegner: **Kawauso** (Kapitel I), **Zashiki-warashi** (Kapitel II), **Yamauba** (Kapitel III), **Nure-onna** (Kapitel IV), **Gozu** und **Mezu** (Kapitel V), **Komainu** und **Tennin** (Kapitel VI)

@@ -11,6 +11,7 @@ from .rooms import generate_floor, build_room_tiles, Room
 from .entities import (Player, Bullet, Enemy, Pickup, Pedestal, Obj, Hazard, Particle, burst, clamp, norm,
                        tile_at, free_tile_pos, ebullet)
 from .bosses import make_boss, CX, CY
+from .yomeiri import Procession
 
 ACH = {a[0]: a for a in ACHIEVEMENTS}
 TIPS = ['Esc → „Speichern & Hauptmenü“: Der Lauf geht später ab dieser Ebene weiter.',
@@ -436,8 +437,12 @@ class Run:
         self.fade = 0.6
         self._quirk_t = 3.0
         self.foxfire = None
+        self.yomeiri = None
+        if room.kind == 'yomeiri' and not room.extra.get('yomeiri_done'):
+            self.yomeiri = Procession(self, room)
         rh = {'shop': 'Laden: Mon gegen Items tauschen. Der Saisen-Kasten nimmt Spenden an – manchmal lohnt es sich.',
               'curse': 'Fluchraum: Betreten kostet Leben, dafür lockt ein dunkler Schatz.',
+              'yomeiri': 'Fuchshochzeit: Schieß nicht auf den Zug – dann bekommst du ein Geschenk.',
               'challenge': 'Prüfungsraum: Mehrere Wellen überstehen, dann gibt es eine Belohnung.',
               'secret': 'Geheimraum! Rissige Wände lassen sich mit Salz aufsprengen.',
               'boss': 'Der Boss dieser Ebene. Bei 25 % Leben rasen Bosse vor Wut.'}.get(room.kind)
@@ -1425,6 +1430,8 @@ class Run:
                 e.update(dt)
         self.enemies = [e for e in self.enemies if not e.dead]
         # Geschosse
+        if getattr(self, 'yomeiri', None) is not None and not self.yomeiri.update(dt):
+            self.yomeiri = None
         self.update_bullets(dt)
         # Gefahren
         self.hazards = [h for h in self.hazards if h.update(dt, self)]
@@ -2196,7 +2203,7 @@ class Run:
             rect = pygame.Rect(0, 0, w, h)
             rect.center = (x, y + (-6 if d == 'n' else 6 if d == 's' else 0)) if horiz else (x + (-6 if d == 'w' else 6), y)
             frame = {'boss': (150, 30, 40), 'treasure': (230, 190, 70), 'shop': (90, 160, 90), 'curse': (110, 40, 120),
-                     'challenge': (200, 90, 50), 'omikuji': (210, 60, 50), 'onsen': (120, 190, 220),
+                     'challenge': (200, 90, 50), 'omikuji': (210, 60, 50), 'onsen': (120, 190, 220), 'yomeiri': (240, 150, 80),
                      'library': (150, 120, 200), 'dojo': (230, 140, 60), 'secret': (160, 140, 110),
                      'teahouse': (110, 170, 90), 'slots': (230, 120, 70)}.get(other.kind, (110, 70, 45))
             if self.curse == 'verirrt' and not other.visited:
@@ -2261,6 +2268,8 @@ class Run:
         for pk in self.pickups:
             pk.draw(s, t)
         ents = [e for e in self.enemies] + [p] + self.standing_tiles() + list(self.pedestals)
+        if getattr(self, 'yomeiri', None) is not None:
+            ents += self.yomeiri.foxes
         ents.sort(key=lambda e: e.y)
         for e in ents:
             e.draw(s, t)
@@ -2639,7 +2648,7 @@ class Run:
         pygame.draw.rect(bg, (120, 96, 70, 170), bg.get_rect(), 1)
         s.blit(bg, (x0 - 2, y0 - 2))
         icons = {'secret': (200, 180, 140), 'boss': (230, 50, 50), 'treasure': (240, 200, 70), 'shop': (90, 200, 90), 'curse': (170, 80, 200),
-                 'challenge': (230, 120, 60), 'omikuji': (230, 80, 70), 'onsen': (120, 200, 230),
+                 'challenge': (230, 120, 60), 'omikuji': (230, 80, 70), 'onsen': (120, 200, 230), 'yomeiri': (255, 170, 90),
                  'library': (170, 140, 230), 'dojo': (240, 160, 60), 'teahouse': (120, 190, 100), 'slots': (240, 140, 80)}
         for pos, r in rooms.items():
             if not (r.seen or show_all) or not r.revealed:

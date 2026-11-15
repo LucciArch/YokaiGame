@@ -650,6 +650,8 @@ def generate_floor(rng, depth, labyrinth=False, hard=False):
         rooms[rest[0]].kind = 'treasure'
         rooms[rest[1]].kind = 'shop'
         extras = ['challenge', 'curse', 'omikuji', 'onsen', 'treasure2', 'library', 'dojo', 'teahouse', 'slots']
+        if rng.random() < 0.45:
+            extras.append('yomeiri')
         rng.shuffle(extras)
         for p, k in zip(rest[2:], extras):
             if k == 'treasure2':
