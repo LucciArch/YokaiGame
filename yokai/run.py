@@ -55,6 +55,10 @@ class Run:
         self.hold = None
         self.portrait = None
         self.depth = 1
+        self.stage = 0          # 0/1: erster oder zweiter Abschnitt eines Kapitels
+        self.floor_no = 0       # fortlaufende Ebenen-Nummer
+        self._prev_biome = None
+        self._prev_boss = None
         self.time = 0.0
         self.result = None
         self.char = char_id
@@ -131,6 +135,21 @@ class Run:
         p.recalc()
 
     # ======================================================================  Ebenen
+    TWO_STAGE = (1, 2, 3, 4, 5)        # Kapitel mit zwei Ebenen
+
+    @property
+    def tier(self):
+        """Schwierigkeitsstufe: Kapitel, zweite Ebene eines Kapitels zählt halb mehr."""
+        return self.depth + 0.5 * self.stage
+
+    @property
+    def last_stage(self):
+        return self.stage == 1 or self.depth not in self.TWO_STAGE or self.challenge == 'bossrush'
+
+    def floor_label(self):
+        roman = ['', 'I', 'II', 'III', 'IV', 'V', 'VI']
+        return 'Ebene %d  ·  Kapitel %s' % (self.floor_no, roman[min(6, self.depth)])
+
     @property
     def enemy_dmg(self):
         """Ab Ebene 4 kosten Treffer ein ganzes Herz."""
@@ -138,8 +157,11 @@ class Run:
 
     def new_floor(self):
         rng = self.rng
-        self.bullet_speed_mult = (1.12 if self.hard else 1.0) + 0.07 * self.loop + 0.045 * (self.depth - 1)
-        self.biome_id = rng.choice(DEPTH_BIOMES[self.depth])
+        self.floor_no += 1
+        self.bullet_speed_mult = (1.12 if self.hard else 1.0) + 0.07 * self.loop + 0.045 * (self.tier - 1)
+        opts = [b for b in DEPTH_BIOMES[self.depth] if not (self.stage == 1 and b == self._prev_biome)] or DEPTH_BIOMES[self.depth]
+        self.biome_id = rng.choice(opts)
+        self._prev_biome = self.biome_id
         self.biome = BIOMES[self.biome_id]
         bs = self.save.data.setdefault('biomes_seen', [])
         if self.biome_id not in bs:
@@ -156,15 +178,17 @@ class Run:
             if self.challenge == 'kaufmann' and r.kind == 'treasure':
                 r.kind = 'shop'
                 r.locked = False
-        self.boss_id = rng.choice(BOSS_POOL[self.depth])
+        bopts = [b for b in BOSS_POOL[self.depth] if not (self.stage == 1 and b == self._prev_boss)] or BOSS_POOL[self.depth]
+        self.boss_id = rng.choice(bopts)
+        self._prev_boss = self.boss_id
         self.rooms[self.boss_pos].boss_id = self.boss_id
         self.room = None
         self.shrine_room = None
         self.player.hit_this_floor = False
-        if self.depth > 1:
+        if self.floor_no > 1:
             self.player.salts = min(9, self.player.salts + 1)
-        if self.depth > self.save['stats'].get('best_floor', 0):
-            self.save['stats']['best_floor'] = self.depth
+        if self.floor_no > self.save['stats'].get('best_floor', 0):
+            self.save['stats']['best_floor'] = self.floor_no
         if self.depth >= 5:
             self.achieve('floor5')
         if self.challenge == 'bossrush':
@@ -184,7 +208,11 @@ class Run:
         return ('iwato' if self.depth >= 4 else b[0], b[1], 132 + self.depth * 4, 'boss', b[4] + 100 + self.depth)
 
     def go_deeper(self, depth=None):
-        self.depth = depth or self.depth + 1
+        if depth is None and self.stage == 0 and not self.last_stage:
+            self.stage = 1
+        else:
+            self.depth = depth or self.depth + 1
+            self.stage = 0
         self.descend = 1.3
         if self.depth > 6:
             self.depth = 1
@@ -936,7 +964,7 @@ class Run:
         self.boss = None
         self.last_boss = b.id
         self.bosses_beaten = getattr(self, 'bosses_beaten', []) + [b.id]
-        self.bullet_speed_mult = (1.12 if self.hard else 1.0) + 0.07 * self.loop + 0.045 * (self.depth - 1)
+        self.bullet_speed_mult = (1.12 if self.hard else 1.0) + 0.07 * self.loop + 0.045 * (self.tier - 1)
         s = self.save
         first = s.add_to('bosses', b.id)
         self.achieve('first_boss')
@@ -967,15 +995,15 @@ class Run:
         p = self.player
         if self.challenge == 'bossrush':
             self.pedestals.append(Pedestal(self.pick_item('T'), cx + 50, cy - 30))
-        if self.challenge and self.depth >= 5:
+        if self.challenge and self.depth >= 5 and self.last_stage:
             goal = 6 if self.challenge == 'bossrush' else 5
             if self.depth >= goal:
                 self.objs.append(Obj('victory', cx, cy + 40))
             else:
                 self.objs.append(Obj('heaven', cx, cy + 40))
-        elif self.endless and self.depth in (5, 6):
+        elif self.endless and self.depth in (5, 6) and self.last_stage:
             self.objs.append(Obj('heaven' if self.depth == 5 else 'torii', cx, cy + 40))
-        elif self.depth == 5:
+        elif self.depth == 5 and self.last_stage:
             self.objs.append(Obj('victory', cx - 70, cy + 40))
             if self.save['heaven_unlocked']:
                 self.objs.append(Obj('heaven', cx + 70, cy + 40))
@@ -1799,7 +1827,7 @@ class Run:
         s.write()
 
     def score(self):
-        return int((self.depth + self.loop * 6) * 1000 + self.kills * 10 + len(self.player.items) * 50 + (5000 if self.result == 'win' else 0)
+        return int((self.floor_no + self.loop * 11) * 1000 + self.kills * 10 + len(self.player.items) * 50 + (5000 if self.result == 'win' else 0)
                    - self.time * 0.5)
 
     # ======================================================================  Zeichnen
@@ -2130,7 +2158,7 @@ class Run:
             gfx.draw_icon(s, tr['icon'], tr['col'], 271, 14)
         # Ebene
         T.add('%s – %s' % (self.biome['jp'], self.biome['name']), 300, 3, 8, (230, 220, 190))
-        info = ('Prüfung  •  ' if self.challenge else '') + ('%d:%02d  •  ' % (max(0, 900 - self.time) // 60, max(0, 900 - self.time) % 60) if self.challenge == 'zeitlauf' else '') + 'Ebene %d' % self.depth + ('  •  Schleife %d' % (self.loop + 1) if self.endless else '') + ('  •  Oni-Modus' if self.hard else '') + ('  •  ' + CURSES[self.curse] if self.curse else '')
+        info = ('Prüfung  •  ' if self.challenge else '') + ('%d:%02d  •  ' % (max(0, 900 - self.time) // 60, max(0, 900 - self.time) % 60) if self.challenge == 'zeitlauf' else '') + self.floor_label() + ('  •  Schleife %d' % (self.loop + 1) if self.endless else '') + ('  •  Oni-Modus' if self.hard else '') + ('  •  ' + CURSES[self.curse] if self.curse else '')
         T.add(info, 300, 15, 6, (190, 170, 150))
         # Werte-Leiste
         self.draw_statbar(s, t)
@@ -2151,11 +2179,11 @@ class Run:
         # Titelkarte
         if self.title_t > 0 and self.boss_intro <= 0:
             a = int(255 * min(1, self.title_t))
-            T.add('Ebene %d' % self.depth, W // 2, 92, 9, (230, 210, 170), 'c', alpha=a)
+            T.add(self.floor_label(), W // 2, 92, 9, (230, 210, 170), 'c', alpha=a)
             T.add(self.biome['name'], W // 2, 104, 18, (255, 245, 225), 'c', alpha=a)
             T.add(self.biome['jp'], W // 2, 128, 10, (210, 170, 150), 'c', alpha=a)
-            if not hasattr(self, 'tip') or self.tip[0] != self.depth:
-                self.tip = (self.depth, random.choice(TIPS))
+            if not hasattr(self, 'tip') or self.tip[0] != self.floor_no:
+                self.tip = (self.floor_no, random.choice(TIPS))
             q = self.QUIRKS.get(self.biome_id)
             if q:
                 T.add('Eigenheit: ' + self.QUIRK_SHORT[q], W // 2, 142, 8, (255, 200, 140), 'c', alpha=a)
@@ -2178,7 +2206,7 @@ class Run:
                 gfx.hi_blit(img, int(-200 + 300 * slide) + 30, 203, a)
             T.add(self.boss.name, W // 2 + 70, 122, 20, (255, 210, 190), 'c', alpha=a)
             T.add(self.boss.title, W // 2 + 70, 152, 9, (230, 190, 170), 'c', alpha=a)
-            T.add('Ebene %d' % self.depth, W // 2 + 70, 170, 7, (190, 160, 150), 'c', alpha=a)
+            T.add(self.floor_label(), W // 2 + 70, 170, 7, (190, 160, 150), 'c', alpha=a)
         # Banner
         if self.cur_banner:
             title, sub, col, big, fxs = self.cur_banner

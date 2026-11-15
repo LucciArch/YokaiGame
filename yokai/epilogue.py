@@ -63,7 +63,7 @@ class Epilogue:
             ('Yōkai no Michi', 18, (255, 230, 170)),
             ('', 6, None),
             ('%s – %s' % (CHARS[self.char]['name'], CHARS[self.char]['title']), 10, (240, 225, 200)),
-            ('Ebene %d  •  %d:%02d  •  %d Yōkai besiegt  •  %d Items' % (run.depth, run.time // 60, run.time % 60, run.kills, len(p.items)), 7, (210, 200, 185)),
+            ('Ebene %d  •  %d:%02d  •  %d Yōkai besiegt  •  %d Items' % (run.floor_no, run.time // 60, run.time % 60, run.kills, len(p.items)), 7, (210, 200, 185)),
             ('Bosse: ' + (', '.join(BOSSES[b]['name'] for b in beaten) if beaten else '–'), 7, (210, 200, 185)),
             ('', 10, None),
             ('Spielidee und Leitung', 7, (190, 170, 150)),

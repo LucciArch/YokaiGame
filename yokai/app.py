@@ -723,7 +723,7 @@ class Game:
                   W // 2, 60, 9, (240, 230, 210), 'c')
         else:
             T.add('Du bist gefallen…', W // 2, 30, 22, (230, 110, 110), 'c')
-            T.add('Ebene %d – %s' % (run.depth, run.biome['name']), W // 2, 60, 9, (230, 210, 200), 'c')
+            T.add('Ebene %d – %s' % (run.floor_no, run.biome['name']), W // 2, 60, 9, (230, 210, 200), 'c')
         p = run.player
         gfx.panel(s, (60, 80, W - 120, 150), 200)
         rows = [('Charakter', CHARS[p.char]['name']), ('Zeit', '%d:%02d' % (run.time // 60, run.time % 60)),
