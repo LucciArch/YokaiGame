@@ -330,8 +330,8 @@ class Game:
             py = ph * H
             pygame.draw.ellipse(s, (250, 190, 215), (int(px), int(py), 3, 2))
         # Hyakki Yagyō – die Parade der hundert Dämonen
-        names = ['hitodama', 'kasa_obake', 'chochin', 'kappa', 'bakeneko', 'nopperabo', 'oni', 'karasu_tengu',
-                 'onibi', 'gaki', 'ittan_momen', 'kitsunebi_e', 'heikegani', 'yamabiko', 'shikome', 'bakezori']
+        names = ['hitodama', 'kasa_obake', 'chochin', 'kappa', 'kawauso', 'bakeneko', 'zashiki', 'oni', 'karasu_tengu',
+                 'yamauba', 'nopperabo', 'ittan_momen', 'kitsunebi_e', 'heikegani', 'gozu', 'tennin', 'bakezori']
         for i in range(16):
             x = (t * 18 + i * 34) % (W + 60) - 40
             nm = names[i % len(names)]
@@ -386,7 +386,7 @@ class Game:
         T.add('Yōkai no Michi', W // 2, 30, 28, (255, 240, 220), 'c')
         T.add('– Hyakki Yagyō –', W // 2, 66, 11, (230, 140, 130), 'c')
         items = self.menu_items()
-        step = 15 if len(items) <= 10 else 13
+        step = 14 if len(items) <= 10 else 13
         for i, m in enumerate(items):
             y = 84 + i * step
             sel = i == self.sel
