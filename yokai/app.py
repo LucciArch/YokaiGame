@@ -79,9 +79,10 @@ class Game:
             except Exception:
                 pass
 
-    def toast(self, title, sub='', col=(255, 220, 120)):
+    def toast(self, title, sub='', col=(255, 220, 120), sound=True):
         self.toasts.append([title, sub, col, 3.5])
-        audio.play('unlock')
+        if sound:
+            audio.play('unlock')
 
     # ================================================================  Skalierung
     def view(self):

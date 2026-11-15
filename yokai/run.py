@@ -543,6 +543,10 @@ class Run:
             from .bestiary import LORE, SKIP
             total = [k for k in ENEMIES if k in LORE and k not in SKIP]
             n = len([k for k in total if k in self.save.data['enemies_seen']])
+            if base in total and not self.daily:
+                if not hasattr(self, 'lex_new'):
+                    self.lex_new = []
+                self.lex_new.append([ENEMIES[base]['name'], 4.0])
             if n * 2 >= len(total):
                 self.achieve('lexikon_half')
             if n >= len(total):
@@ -1461,6 +1465,10 @@ class Run:
         # Raum geschafft?
         if not self.room.cleared and not self.enemies:
             self.on_room_clear()
+        if getattr(self, 'lex_new', None):
+            self.lex_new[0][1] -= dt * (1.8 if len(self.lex_new) > 1 else 1.0)
+            if self.lex_new[0][1] <= 0:
+                self.lex_new.pop(0)
         for k in list(self.stat_delta):
             self.stat_delta[k][1] -= dt
             if self.stat_delta[k][1] <= 0:
@@ -2501,6 +2509,7 @@ class Run:
         T.add(info, 300, 15, 6, (190, 170, 150))
         # Werte-Leiste
         self.draw_statbar(s, t)
+        self.draw_lexnew(s)
         # Minikarte
         if self.curse != 'nebel' and not self.room.kind.startswith('shrine'):
             self.draw_minimap(s, W - 8, RY - 12)
@@ -2586,6 +2595,21 @@ class Run:
                 T.add('„%s“' % sub if fxs else sub, W // 2, y0 + 19, 7, (230, 225, 210), 'c', alpha=a)
             if fxs:
                 T.add(fxs, W // 2, y0 + 31, 7, (170, 220, 255), 'c', alpha=a)
+
+    def draw_lexnew(self, s):
+        """Kleiner Hinweis unten links: neuer Yōkai im Lexikon."""
+        if not getattr(self, 'lex_new', None):
+            return
+        name, tt = self.lex_new[0]
+        a = int(255 * max(0.0, min(1.0, tt * 2, (4.0 - tt) * 4)))
+        x, y = RX + 6, RY + RH - 14
+        txt = 'Neu im Lexikon: '
+        w = gfx.text_w(txt, 6) + gfx.text_w(name, 7) + 10
+        ov = pygame.Surface((w, 12), pygame.SRCALPHA)
+        ov.fill((10, 6, 16, int(a * 0.7)))
+        s.blit(ov, (x - 4, y - 1))
+        gfx.TEXT.add(txt, x, y + 1, 6, (190, 180, 220), alpha=a)
+        gfx.TEXT.add(name, x + gfx.text_w(txt, 6), y, 7, (215, 200, 255), alpha=a)
 
     def draw_statbar(self, s, t):
         p = self.player
