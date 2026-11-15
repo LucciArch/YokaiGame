@@ -9,16 +9,21 @@ FLD = ('fl0', 'fl1', 'fl2')
 CW, CH = 100, 100
 CX, BASE = 52, 94
 FACE = """
-.KK......KK.
-KqqK....KqqK
-KeqK....KqeK
-.KK......KK.
-............
-...KKKKKK...
-..KqqqqqqK..
-...KKKKKK...
+.ddddd....ddddd.
+dKKKKKd..dKKKKKd
+.KeeqK....KqeeK.
+..KKK......KKK..
+................
+.......dd.......
+......dKKd......
+................
+....dKKKKKKd....
+...KqqqqqqqqK...
+...KqWqqqqWqK...
+....KqqqqqqK....
+.....KKKKKK.....
 """
-LEGF = dict(K='K', q='q', e='e1')
+LEGF = dict(K='K', q='q', e='v3', d='fl1', W='b3')
 
 
 def draw(sq=0.0, dx=0, rise=0):
@@ -35,17 +40,22 @@ def draw(sq=0.0, dx=0, rise=0):
     body = E(cx, BASE - ht * 0.8, hw, ht * 0.8) | E(cx - 2, BASE - ht * 1.3, hw * 0.72, ht * 0.62)
     body &= (px.Y <= BASE)
     p.form(body, FL, sd=6, hl=2)
-    # Hautfalten (hängende Wülste)
-    for k, yy in enumerate((0.35, 0.62, 0.9)):
+    # Hautfalten: unregelmäßig hängende Wülste, an den Seiten tiefer
+    for k, (yy, x0, x1, sag) in enumerate(((0.42, -0.85, 0.2, 4), (0.55, 0.0, 0.8, 3), (0.72, -0.9, -0.1, 5), (0.8, 0.2, 0.9, 4))):
         y = BASE - ht * 2 * (1 - yy) * 0.82
-        p.line([(cx - hw * 0.8, y), (cx - hw * 0.3, y + 3), (cx + hw * 0.2, y + 2), (cx + hw * 0.75, y - 1)], 'fl0', only=body)
-        p.line([(cx - hw * 0.7, y - 1), (cx - hw * 0.25, y + 2)], 'fl3', only=body)
+        xa, xb = cx + hw * x0, cx + hw * x1
+        pts = [(xa, y - 2), ((xa + xb) / 2, y + sag), (xb, y - 1)]
+        p.line(pts, 'fl0', only=body)
+        p.line([(xa + 2, y - 3), ((xa + xb) / 2, y + sag - 1)], 'fl3', only=body)
+    for (ox, oy) in ((-0.5, 0.55), (0.45, 0.4), (0.15, 0.75), (-0.2, 0.3)):            # Warzen
+        x_, y_ = int(cx + hw * ox), int(BASE - ht * 2 * (1 - oy) * 0.82)
+        p.fill(E(x_, y_, 1.4, 1.2) & body, 'fl1'); p.pxs([(x_ - 1, y_ - 1)], 'fl3')
     # Bauchnabel-Falte und hängende Lappen am Boden
     p.form(E(cx - hw * 0.55, BASE - 4, 7, 4) & body, FLD, sd=1, hl=0)
     p.form(E(cx + hw * 0.5, BASE - 3, 8, 3) & body, FLD, sd=1, hl=0)
     c.stamp(p, 'K')
     # Gesicht (klein, verschwommen, oben)
-    p = C(); p.grid(int(cx - 9), int(BASE - ht * 1.6), FACE, LEGF); c.stamp(p, 'K', ring=False)
+    p = C(); p.grid(int(cx - 10), int(BASE - ht * 1.62), FACE, LEGF); c.stamp(p, 'K', ring=False)
     # Stummelarm vorn
     p = C(); p.form(L(cx - hw + 7, BASE - ht, 4.6, cx - hw - 4, BASE - ht + 9 - rise * 0.8, 3.6), FL, sd=2, hl=1)
     for d in (-1, 1):

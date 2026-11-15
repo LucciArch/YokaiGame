@@ -13,14 +13,14 @@ OBI = ('y0', 'y1', 'y2')
 SKIN = ('k1', 'k2', 'k3')
 HAIR = ('h0', 'hb', 'h2')
 FACE = """
-KK.....
-.......
-Ke.....
-.......
-.......
-.q.....
+.........
+.KK..KK..
+.Ke..Ke..
+.........
+pp.....pp
+....q....
 """
-LEG = dict(K='K', e='e1', q='m0')
+LEG = dict(K='K', e='v3', q='m0', p='p2')
 
 
 def draw(bob=0, step=0, arm=0, ball=0):
@@ -35,7 +35,7 @@ def draw(bob=0, step=0, arm=0, ball=0):
     c.stamp(p, 'K')
     # Kimono-Körper (Glocke) mit Obi
     p = C()
-    body = PG([(cx - 6, top + 8), (cx + 7, top + 8), (cx + 11, top + 26), (cx - 10, top + 26)])
+    body = PG([(cx - 6, top + 8), (cx + 7, top + 8), (cx + 11, top + 30), (cx - 10, top + 30)])
     p.form(body, KIM, sd=3, hl=1)
     for (x, y) in ((cx - 4, top + 13), (cx + 4, top + 18), (cx - 6, top + 22), (cx + 6, top + 24)):   # Blütenmuster
         p.pxs([(x, y), (x + 1, y), (x, y + 1)], 'v3')
@@ -45,7 +45,7 @@ def draw(bob=0, step=0, arm=0, ball=0):
     c.stamp(p, 'm0')
     # nahes Bein
     p = C()
-    p.form(L(cx - 3 + step, top + 24, 2.6, cx - 4 + step * 2, by - 2, 2.4), SKIN, sd=1, hl=1)
+    p.form(L(cx - 3 + step, top + 29, 2.6, cx - 4 + step * 2, by - 2, 2.4), SKIN, sd=1, hl=1)
     p.form(E(cx - 5 + step * 2, by - 1, 3.6, 1.8), ('w0', 'w1', 'w2'), sd=1, hl=1)
     c.stamp(p, 'K')
     # Kopf mit Pagenkopf (okappa)
@@ -54,21 +54,21 @@ def draw(bob=0, step=0, arm=0, ball=0):
     p.form(head, SKIN, sd=2, hl=1)
     c.stamp(p, 'k0')
     p = C()
-    hair = (E(cx + 1, top - 2, 8.4, 6.4) | R(cx - 8, top - 2, cx + 9, top + 4) | R(cx + 1, top - 2, cx + 9, top + 8)) & ~(R(cx - 8, top + 1, cx - 1, top + 9))
+    hair = (E(cx + 1, top - 2, 8.6, 6.6) | R(cx - 8, top - 3, cx + 9, top) | R(cx + 3, top - 2, cx + 9, top + 8)) & ~(R(cx - 8, top + 1, cx + 3, top + 9))
     p.form(hair, HAIR, sd=2, hl=1)
-    p.line([(cx - 8, top), (cx - 1, top)], 'h0')                                          # gerader Pony
+    p.line([(cx - 8, top), (cx + 3, top)], 'h0')                                          # gerader Pony
     c.stamp(p, 'K')
     p = C()
     p.grid(cx - 7, top + 1, FACE, LEG)
     c.stamp(p, ring=False)
     # Arm mit Temari-Ball
     p = C()
-    hx, hy = cx - 10 - arm * 2, top + 14 - arm * 6
-    p.form(L(cx - 4, top + 10, 3.0, hx + 2, hy + 1, 3.4), KIM, sd=1, hl=1)              # Ärmel
+    hx, hy = cx - 9 - arm * 2, top + 17 - arm * 7
+    p.form(L(cx - 2, top + 13, 3.0, hx + 2, hy + 1, 3.4), KIM, sd=1, hl=1)              # Ärmel
     p.form(E(hx, hy, 1.8, 1.8), SKIN, sd=0, hl=0)
     c.stamp(p, 'm0')
     p = C()
-    bx, byy = hx - 3 - ball * 4, hy - 4 - ball * 3
+    bx, byy = hx - 4 - ball * 4, hy + 1 - ball * 6
     tm = E(bx, byy, 4.4, 4.4)
     p.form(tm, ('n1', 'n2', 'n3'), sd=1, hl=1)
     p.line([(bx - 4, byy), (bx + 4, byy)], 'y2', only=tm)

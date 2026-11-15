@@ -550,7 +550,7 @@
  },
  "komainu": {
   "atk": 4,
-  "h": 70,
+  "h": 68,
   "hi": true,
   "kind": "strip",
   "n": 7,
@@ -784,11 +784,11 @@
  },
  "tsurube_otoshi": {
   "atk": 4,
-  "h": 107,
+  "h": 108,
   "hi": true,
   "kind": "strip",
   "n": 7,
-  "w": 92,
+  "w": 84,
   "walk": 4
  },
  "wanyudo": {
@@ -838,7 +838,7 @@
  },
  "zashiki": {
   "atk": 4,
-  "h": 49,
+  "h": 48,
   "hi": true,
   "kind": "strip",
   "n": 7,

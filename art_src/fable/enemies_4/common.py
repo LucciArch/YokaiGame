@@ -109,3 +109,9 @@ def export(name, fn, walk, attack, static=None):
     a = np.array(base)
     semi = int(((a[:, :, 3] > 0) & (a[:, :, 3] < 255)).sum())
     print(name, 'static', base.size, 'cell', (cw, ch), 'orphans', len(orphans(base)), 'semi', semi)
+
+
+def tri(o, ang, ln, w):
+    """Spitze/Büschel: Basis mittig auf o (Breite w), Spitze in Richtung ang (Grad)"""
+    t = pol(o, ang, ln)
+    return PG([pol(o, ang + 90, w / 2), t, pol(o, ang - 90, w / 2)])

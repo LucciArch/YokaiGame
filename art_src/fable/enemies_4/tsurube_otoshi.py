@@ -33,33 +33,40 @@ def draw(dy=0, mouth=0, sway=0):
     cx, cy = CX + sway, CY + dy
     # Haar: lange Strähnen nach oben (fällt herab) und zu den Seiten
     p = C()
-    hair = E(cx, cy - 6, 34, 30)
-    for i in range(11):
-        a = math.radians(-160 + i * 14)
-        L_ = 18 + (i * 5 % 9)
-        bx, by = cx + math.cos(a) * 24, cy - 6 + math.sin(a) * 22
-        tx = bx + math.cos(a) * L_ + sway * 0.5
-        ty = by + math.sin(a) * L_ - 6
-        hair |= L(bx, by, 6, tx, ty, 1.2)
-    for s_ in (-1, 1):
-        hair |= L(cx + s_ * 28, cy, 7, cx + s_ * 34, cy + 26, 2.0)
+    hair = E(cx, cy - 4, 31, 28)
+    for i in range(13):                                            # wirre Strähnen, vom Fall nach oben gerissen
+        a = math.radians(-170 + i * 13 + (7 if i % 2 else -4))
+        L_ = 14 + (i * 7 % 11)
+        bx, by = cx + math.cos(a) * 22, cy - 4 + math.sin(a) * 20
+        mx, my = bx + math.cos(a) * L_ * 0.5 + (3 if i % 3 == 0 else -2), by + math.sin(a) * L_ * 0.5 - 3
+        tx, ty = bx + math.cos(a) * L_ + sway * 0.6 + (4 if i % 2 else -3), by + math.sin(a) * L_ - 7
+        hair |= L(bx, by, 5.5, mx, my, 3.2) | L(mx, my, 3.2, tx, ty, 0.8)
+    for s_ in (-1, 1):                                             # lange Seitensträhnen hängen am Gesicht herab
+        hair |= L(cx + s_ * 25, cy - 2, 7, cx + s_ * 30, cy + 20, 3.4) | L(cx + s_ * 30, cy + 20, 3.4, cx + s_ * 27 + sway, cy + 36, 1.0)
     p.form(hair, ('h0', 'hb', 'h2'), sd=4, hl=1)
+    hair_p = p
     for i in range(9):
         x = cx - 26 + i * 6.5
         p.line([(x, cy - 30), (x + 2, cy - 8)], 'h0', only=hair)
     c.stamp(p, 'K')
     # Gesicht: breit, fahl, eingefallen
     p = C()
-    face = E(cx, cy + 6, 22, 24)
+    face = E(cx, cy + 7, 23, 25)
     p.form(face, SK, sd=5, hl=1)
     p.form(E(cx - 14, cy + 12, 6, 7) & face, ('k0', 'k1', 'k1'), sd=1, hl=0)      # eingefallene Wange
     p.form(E(cx + 14, cy + 12, 6, 7) & face, ('k0', 'k0', 'k1'), sd=1, hl=0)
-    # Stirnhaar (Pony) über dem Gesicht
-    p.form((E(cx, cy - 14, 24, 10) | L(cx - 20, cy - 10, 4, cx - 18, cy + 4, 2)) & ~E(cx, cy + 4, 16, 9), ('h0', 'hb', 'h2'), sd=2, hl=1)
     c.stamp(p, 'K')
     p = C()
     p.grid(int(cx - 10), int(cy - 4), FACE, LEGF)
     c.stamp(p, 'K', ring=False)
+    # zerzauste Stirnsträhnen über der Stirn (gleicher Haarblock, kein Band)
+    p = C()
+    bangs = np.zeros((px.H, px.W), bool)
+    for (ox, ln, ang) in ((-19, 13, 100), (-12, 16, 93), (-4, 12, 86), (4, 15, 96), (12, 13, 82), (19, 11, 72)):
+        bangs |= tri((cx + ox, cy - 17), ang, ln, 9)
+    bangs &= E(cx, cy + 2, 26, 30)
+    p.form(bangs, ('h0', 'hb', 'h2'), sd=2, hl=1)
+    c.stamp(p, 'K')
     c.blacken()
     return c
 

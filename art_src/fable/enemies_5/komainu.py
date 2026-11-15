@@ -62,22 +62,23 @@ def draw(bob=0, fl=0, fr=0, bl=0, br=0, lean=0, jaw=0, tail=0):
     c.stamp(p, 'K')
     # --- nahe Beine mit Lockenbüscheln
     p = C()
-    near = L(44 + fl, 48 + bob, 6.4, 42 + fl, by - 3, 5.4) | L(68 + bl, 50 + bob, 7, 70 + bl, by - 3, 5.4)
+    near = (L(44 + fl, 46 + bob, 7.0, 43 + fl, 58 + bob * 0.5, 5.0) | L(43 + fl, 58 + bob * 0.5, 5.0, 42 + fl, by - 3, 4.4)
+            | L(66 + bl, 47 + bob, 8.0, 70 + bl, 57 + bob * 0.5, 5.4) | L(70 + bl, 57 + bob * 0.5, 5.4, 70 + bl, by - 3, 4.4))
     p.form(near, ST, sd=2, hl=1)
     paws = E(41 + fl, by - 2, 7.4, 3.4) | E(70 + bl, by - 2, 7.4, 3.4)
     p.form(paws, STL, sd=1, hl=1)
     for x in (36, 40, 44):
         p.line([(x + fl, by - 4), (x + fl, by - 1)], 'z0', only=paws)
     c.stamp(p, 'K')
+    # --- Mähne: dunkle Grundmasse, darüber der Lockenkranz
     p = C()
-    curl(p, 48 + fl, 50 + bob, 4.4, STL, 'z0')
-    curl(p, 74 + bl, 52 + bob, 4.4, STL, 'z0')
+    base = E(hx + 9, hy + 3, 17, 19)
+    p.form(base, ('z0', 'z0', 'z1'), sd=2, hl=0)
     c.stamp(p, 'K')
-    # --- Mähne: Lockenkranz hinter dem Kopf und über die Brust
     p = C()
     for (dx, dy, r) in ((2, -14, 6.4), (12, -10, 6.4), (18, -1, 6.4), (18, 10, 6.4), (11, 17, 6.4),
                         (-4, -12, 5.4), (24, 16, 5.4), (2, 19, 5.4)):
-        curl(p, hx + dx, hy + dy, r, MANE, 'z0')
+        curl(p, hx + dx, hy + dy, r - 0.6, MANE, 'z0')
     c.stamp(p, 'K')
     # --- rotes Lätzchen mit Glocke
     p = C()
