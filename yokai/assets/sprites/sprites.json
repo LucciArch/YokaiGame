@@ -838,11 +838,11 @@
  },
  "zashiki": {
   "atk": 4,
-  "h": 48,
+  "h": 50,
   "hi": true,
   "kind": "strip",
   "n": 7,
-  "w": 46,
+  "w": 52,
   "walk": 4
  }
 }
