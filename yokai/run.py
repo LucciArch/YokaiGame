@@ -2635,7 +2635,8 @@ class Run:
         x0 = right - w
         y0 = 2
         bg = pygame.Surface((w + 4, h + 4), pygame.SRCALPHA)
-        bg.fill((0, 0, 0, 110))
+        bg.fill((6, 4, 10, 150))
+        pygame.draw.rect(bg, (120, 96, 70, 170), bg.get_rect(), 1)
         s.blit(bg, (x0 - 2, y0 - 2))
         icons = {'secret': (200, 180, 140), 'boss': (230, 50, 50), 'treasure': (240, 200, 70), 'shop': (90, 200, 90), 'curse': (170, 80, 200),
                  'challenge': (230, 120, 60), 'omikuji': (230, 80, 70), 'onsen': (120, 200, 230),
@@ -2645,10 +2646,16 @@ class Run:
                 continue
             rx = x0 + (pos[0] - minx) * cw
             ry = y0 + (pos[1] - miny) * ch
-            col = (200, 200, 210) if r.visited else (90, 90, 100)
-            if pos == self.room.pos:
-                col = (255, 255, 255)
+            col = (178, 166, 150) if r.visited else (78, 70, 80)
+            cur = pos == self.room.pos
+            if cur:
+                col = (250, 236, 200)
             pygame.draw.rect(s, col, (rx, ry, cw - 1, ch - 1))
+            if r.visited or cur:
+                pygame.draw.line(s, (255, 250, 235) if cur else (210, 200, 185), (rx, ry), (rx + cw - 2, ry))
+            if cur:
+                pa = 0.5 + 0.5 * math.sin(pygame.time.get_ticks() / 180.0)
+                pygame.draw.rect(s, (255, int(180 + 60 * pa), 90), (rx - 1, ry - 1, cw + 1, ch + 1), 1)
             if r.kind in icons and (r.seen or show_all):
                 img = props.map_icon(r.kind)
                 if img is not None and gfx.HI_MODE:
