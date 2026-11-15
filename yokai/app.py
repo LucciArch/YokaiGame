@@ -724,10 +724,9 @@ class Game:
                 T.add(it['desc'] + '  –  ' + ', '.join(fx_lines(it['fx'])), 140, 219, 7, (230, 225, 210))
         y = 236
         if p.synergies:
-            T.add('Synergien: ' + ', '.join(sy['name'] for sy in SYNERGIES if sy['id'] in p.synergies), 30, y, 7, (255, 220, 120))
-            y += 11
+            y = self._wrap('Synergien: ' + ', '.join(sy['name'] for sy in SYNERGIES if sy['id'] in p.synergies), 30, y, W - 70, 7, (255, 220, 120))
         if p.transforms:
-            T.add('Transformationen: ' + ', '.join(TRANSFORMS[t]['name'] for t in p.transforms), 30, y, 7, (180, 220, 255))
+            self._wrap('Transformationen: ' + ', '.join(TRANSFORMS[t]['name'] for t in p.transforms), 30, y, W - 70, 7, (180, 220, 255))
 
     def st_pause(self, dt, events, nav):
         run = self.run

@@ -356,6 +356,7 @@ class Run:
         if self.blessing:
             name, sub = BLESSINGS[self.blessing]
             self.banner(name, sub, (255, 225, 140))
+            audio.play('unlock', 0.6)
             if self.blessing == 'kami':
                 self.player.heal(2)
                 self.player.spirit += 2
