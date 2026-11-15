@@ -1124,7 +1124,8 @@ class Game:
         T.add('Erfolge  (%d / %d)' % (len(got), len(ACHIEVEMENTS)), W // 2, 6, 11, (255, 230, 170), 'c')
         per = 11
         self.scroll = max(0, min(self.scroll, len(ACHIEVEMENTS) - per))
-        for i, (aid, name, desc, reward) in enumerate(ACHIEVEMENTS[self.scroll:self.scroll + per]):
+        order = [a for a in ACHIEVEMENTS if a[0] in got] + [a for a in ACHIEVEMENTS if a[0] not in got]
+        for i, (aid, name, desc, reward) in enumerate(order[self.scroll:self.scroll + per]):
             y = 28 + i * 23
             ok = aid in got
             gfx.panel(s, (24, y, W - 48, 20), 180, (230, 190, 90) if ok else (80, 70, 80))
@@ -1132,6 +1133,14 @@ class Game:
                 star(s, 32, y + 10, (255, 220, 100))
             T.add(name, 40, y + 2, 8, (255, 230, 150) if ok else (170, 160, 170))
             T.add(desc, 40, y + 11, 6, (220, 215, 200) if ok else (140, 130, 140))
+            prog = {'ponpoko': ('coins', 300), 'benkei': ('kills', 500), 'okiku': ('deaths', 10),
+                    'donor': ('donations', 30)}.get(aid)
+            if prog and not ok:
+                cur = min(prog[1], self.save['stats'].get(prog[0], 0))
+                bx_ = W // 2 + 10
+                pygame.draw.rect(s, (40, 32, 44), (bx_, y + 8, 90, 4))
+                pygame.draw.rect(s, (200, 170, 90), (bx_, y + 8, int(90 * cur / prog[1]), 4))
+                T.add('%d / %d' % (cur, prog[1]), bx_ + 96, y + 6, 6, (190, 180, 160))
             if reward:
                 kind, val = reward
                 r = {'char': lambda v: 'Charakter: ' + CHARS[v]['name'], 'item': lambda v: 'Item: ' + ITEMS[v]['name'],
