@@ -32,6 +32,9 @@ FX_NAMES = {
     'salts_regen': ('Chance auf Salz pro Raum', '%'), 'curse_immune': ('Immun gegen Flüche', ''),
     'raijin_chance': ('Chance, dass ein Blitz einschlägt', '%'),
 }
+from .sigs import TEXT as _SIG
+for _k, _v in _SIG.items():
+    FX_NAMES['sig_' + _k] = (_v, '')
 TAG_NAMES = {'kitsune': 'Kitsune', 'raijin': 'Donner', 'oni': 'Oni', 'shikigami': 'Shikigami', 'yurei': 'Yūrei',
              'tengu': 'Tengu', 'ryu': 'Drache', 'kami': 'Kami', 'tanuki': 'Tanuki'}
 

@@ -16,6 +16,8 @@
 - Lesbarkeit: Titelkarte mit dunklem Band, Hinweise, Tooltips und Erfolgsmeldungen liegen über den Figuren
 - 19 Gegner komplett neu gezeichnet (u. a. Gozu und Mezu, Gyūki, Tsuchigumo, Nurikabe, Ningyo, Tennin, Bakeneko, Kawauso, Yamauba)
 - Klänge überarbeitet: weicherer Ofuda-Wurf, kräftigere Treffer, eigene Klänge für vergehende Geister, schwere Gegner, zerbrechende Krüge und Felsen, Truhen, Geisterherzen, Salz, Anhänger, Bosssieg und den eigenen Tod
+- **Jedes Item fühlt sich eigen an:** 94 Items haben jetzt eine eigene Fähigkeit statt geteilter Effekte – z. B. der Yata-Spiegel wirft jedes dritte Geschoss zurück, Senbazuru faltet pro Raum einen Kranich (zehn retten vor dem Tod), die Tsukuyomi-Sichel lässt Talismane in Bögen fliegen, Gashadokuros Knochen zerbricht angeschlagene Feinde, die Rauchpfeife hinterlässt Rauch, der Geschosse schluckt
+- Zielsuchend, Mehrfachwurf, Gift, Kreisschilde usw. tragen jetzt höchstens zwei Items
 - Alle Klänge auf einheitliche Lautheit gebracht; Gegnerklänge kommen von links oder rechts, je nachdem wo der Gegner steht
 
 ## 1.4.0 – „Hyakki-Update“ (enthält 1.3 „Kapitel-Update“)

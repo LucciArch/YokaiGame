@@ -4,7 +4,7 @@ import random
 import pygame
 from collections import defaultdict
 from .settings import *
-from . import gfx, audio, art, sheets, props, costume, weapons
+from . import gfx, audio, art, sheets, props, costume, weapons, sigs
 from .data import ITEMS, ENEMIES, CHAMPIONS, ACTIVES, CHARS, SYNERGIES, TRANSFORMS, TRINKETS
 
 ONE_TIME = ('hp', 'heal', 'spirit', 'coins', 'keys', 'salts', 'fullheal')
@@ -162,6 +162,9 @@ class Bullet:
             c, s = math.cos(self.curve * dt), math.sin(self.curve * dt)
             self.vx, self.vy = self.vx * c - self.vy * s, self.vx * s + self.vy * c
         if self.owner == 'p':
+            if 'sg' in fl:
+                sigs.bullet_tick(self, run, dt)
+                fl = self.fl
             if fl.get('homing'):
                 tgt = run.nearest_enemy(self.x, self.y, 140)
                 if tgt:
@@ -293,6 +296,8 @@ class Player:
         self.dash_trail = 0.0
         self.shoot_cd = 0.0
         self.shot_count = 0
+        self.sg = {}
+        self.sgs = set()
         self.facing = (0, 1)
         self.flip = False
         self.moving = False
@@ -347,7 +352,9 @@ class Player:
                     continue
                 else:
                     f[k] += v
+        sigs.stat_bonus(self, f)
         self.f = f
+        self.sgs = sigs.active(self)
         old = dict(self.s) if self.s else None
         self.s = dict(
             dmg=max(0.5, (3.5 + f['dmg']) * dm),
@@ -385,7 +392,7 @@ class Player:
             d *= 1.5
         if self.kagura > 0:
             d *= 1.3
-        return d
+        return d * sigs.dmg_mult(self)
 
     def apply_once(self, fx):
         if 'hp' in fx:
@@ -413,6 +420,7 @@ class Player:
         it = ITEMS[iid]
         self.items.append(iid)
         self.apply_once(it['fx'])
+        sigs.on_gain(self, iid)
         self.recalc()
         run = self.run
         if not silent:
@@ -458,6 +466,7 @@ class Player:
         if self.shield_ready:
             self.shield_ready = False
             self.iframes = 0.8
+            sigs.shield_break(self, run)
             audio.play('bell')
             burst(run, self.x, self.y, (140, 200, 255), 16, 90)
             return False
@@ -480,6 +489,7 @@ class Player:
                 run.fire_player_bullet(self.x, self.y, a, self.damage() * 1.2, self.s['shotspd'], self.s['size'], 0.9, {'pierce': 1})
         if self.f['hurt_dmg']:
             self.hurt_buff = 6.0
+        sigs.on_hurt(self, run)
         if self.total_hp() <= 0:
             if self.revives > 0:
                 self.revives -= 1
@@ -535,6 +545,7 @@ class Player:
             self.dash_cd = 0.55
             self.dash_hit.clear()
             audio.play('dash')
+            sigs.on_dash(self, run)
         sp = self.s['spd']
         if self.dash_t > 0:
             self.dash_t -= dt
@@ -589,10 +600,11 @@ class Player:
                 self.fire(self.facing)
                 self.recoil = 0.08
                 wk = weapons.weapon_of(self)
-                self.shoot_cd = 1.0 / (self.s['rate'] * (weapons.RATE[wk] if wk else 1.0))
+                self.shoot_cd = 1.0 / (self.s['rate'] * sigs.rate_mult(self) * (weapons.RATE[wk] if wk else 1.0))
                 run.player_fired = True
         # Begleiter
         self.update_followers(dt, inp)
+        sigs.tick(self, run, dt)
 
     def move(self, dx, dy, fly):
         run = self.run
@@ -636,6 +648,7 @@ class Player:
         self.shot_count += 1
         wk = weapons.weapon_of(self)
         if wk and weapons.fire(self, d, wk):
+            sigs.on_fire(self, run, [])
             rc = self.f['raijin_chance']
             if rc and random.random() < rc * (1 + self.s['luck'] * 0.08):
                 tgt = run.nearest_enemy(self.x, self.y, 400)
@@ -658,8 +671,10 @@ class Player:
             angs.append(base + math.pi)
         for _ in range(int(self.f['side'])):
             angs += [base + math.pi / 2, base - math.pi / 2]
+        made = []
         for a in angs:
             b = run.fire_player_bullet(self.x, self.y - 3, a, dmg, self.s['shotspd'], size, self.s['range'] / self.s['shotspd'], fl)
+            made.append(b)
             b.big = big
             if self.f['gold_shots'] and random.random() < self.f['gold_shots']:
                 b.gold = True
@@ -669,6 +684,7 @@ class Player:
             tgt = run.nearest_enemy(self.x, self.y, 400)
             if tgt:
                 run.lightning(tgt.x, tgt.y, dmg * 2 + 4)
+        sigs.on_fire(self, run, made)
         audio.play('shoot', 0.6)
 
     def update_followers(self, dt, inp):
@@ -862,6 +878,11 @@ class Hazard:
             pygame.draw.circle(s, self.col, (x, y), r, 1)
             pygame.draw.circle(s, self.col, (x, y), max(1, int(r * f)), 1)
         else:
+            if self.kind == 'silk':
+                f = 1 - (self.t - self.warn) / max(0.01, self.act)
+                if f > 0.3:
+                    s.set_at((x, y), (230, 240, 255) if f > 0.6 else (150, 170, 210))
+                return
             if self.kind == 'smoke':
                 f = 1 - (self.t - self.warn) / max(0.01, self.act)
                 gfx.draw_glow(s, x, y, int(r * 1.6), (60, 60, 70), int(90 * f))
@@ -996,7 +1017,8 @@ class Enemy:
         if self.slowed > 0:
             self.slowed -= dt
         spd = self.speed * (0.5 if self.slowed > 0 else 1)
-        self.ai(dt, spd)
+        if not sigs.enemy_tick(self, dt):
+            self.ai(dt, spd)
         # Rückstoß
         if self.d.get('heavy'):
             self.kx = self.ky = 0
@@ -1010,7 +1032,7 @@ class Enemy:
                 if p.dash_t > 0 and p.f['dash_dmg'] and id(self) not in p.dash_hit:
                     p.dash_hit.add(id(self))
                     run.damage_enemy(self, p.damage() * 2.5, None)
-                else:
+                elif not sigs.contact(p, run, self):
                     p.hurt(self.contact, self.name)
 
     # -------------------------------------------------------------- KI
@@ -1209,6 +1231,8 @@ class Enemy:
         run = self.run
         a = self.d['attack']
         p = run.player
+        if not force and sigs.no_attack(self):
+            return
         if a['kind'] == 'mirror':
             self.acd -= dt
             if run.player_fired and self.acd <= 0:

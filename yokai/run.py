@@ -4,7 +4,7 @@ import random
 import pygame
 from collections import deque, defaultdict
 from .settings import *
-from . import gfx, props, weapons, audio
+from . import gfx, props, weapons, audio, sigs
 from .data import (TRINKETS, BIOMES, DEPTH_BIOMES, BOSS_POOL, ITEMS, ITEM_IDS, ACTIVES, ENEMIES, CHAMPIONS, BOSSES,
                    BOSS_REWARD, CHARS, ACHIEVEMENTS, TRANSFORMS, SYNERGIES, CHAR_ORDER)
 from .rooms import generate_floor, build_room_tiles, Room
@@ -343,6 +343,7 @@ class Run:
         self.player.hit_this_floor = False
         if self.floor_no > 1:
             self.player.salts = min(9, self.player.salts + 1)
+        sigs.on_floor(self)
         if self.floor_no > self.save['stats'].get('best_floor', 0):
             self.save['stats']['best_floor'] = self.floor_no
         if self.depth >= 5:
@@ -442,6 +443,7 @@ class Run:
         self.yomeiri = None
         self.apparitions = []
         self.room_enter_time = self.time
+        sigs.on_room_enter(self)
         if room.kind == 'yomeiri' and not room.extra.get('yomeiri_done'):
             self.yomeiri = Procession(self, room)
         if room.kind == 'kakurenbo':
@@ -1005,7 +1007,7 @@ class Run:
             audio.play('pot' if t == T_POT else 'rock', 0.8, x)
             if t == T_POT and self.room.kind == 'kakurenbo':
                 kakurenbo_break(self, tx, ty)
-            elif t == T_POT and random.random() < 0.18 + 0.02 * self.player.s['luck']:
+            elif t == T_POT and (sigs.on_pot(self, x, y) or random.random() < 0.18 + 0.02 * self.player.s['luck']):
                 self.random_drop(x, y)
             self.flow_src = None
 
@@ -1044,6 +1046,7 @@ class Run:
         if p.f['crit'] and random.random() < p.f['crit']:
             dmg *= 2
             self.floats.append([e.x, e.y - 14, 'Kritisch!', (255, 220, 90), 0.6])
+        dmg = sigs.hit_pre(self, e, b, dmg)
         e.hp -= dmg
         e.flash = 0.07
         if b is not None:
@@ -1101,6 +1104,7 @@ class Run:
                     nb.hit.add(id(e))
             if b.gold:
                 e.gold_hit = True
+        sigs.hit_post(self, e, b, dmg)
         audio.play('hit', 0.35, e.x)
         if e.hp <= 0:
             self.kill_enemy(e)
@@ -1132,6 +1136,7 @@ class Run:
             audio.play('kill', 0.6, e.x)
         self.kills += 1
         self.save.stat('kills')
+        sigs.on_kill(self, e)
         base = {'gaki_small': 'gaki', 'nuppeppo_klein': 'nuppeppo', 'kappa_small': 'kappa'}.get(e.id, e.id)
         kc = self.save.data.setdefault('kill_counts', {})
         kc[base] = kc.get(base, 0) + 1
@@ -1363,6 +1368,7 @@ class Run:
             return
         p.salts -= 1
         audio.play('blank')
+        sigs.on_salt(p, self)
         self.reveal_near(p.x, p.y, 75)
         self.clear_ebullets()
         self.flash_white = 0.25
@@ -1561,13 +1567,16 @@ class Run:
                 ang += clamp(dd, -1.6 * dt, 1.6 * dt)
                 sp = math.hypot(b.vx, b.vy)
                 b.vx, b.vy = math.cos(ang) * sp, math.sin(ang) * sp
-            if not b.update(dt, self):
+            if b.dead or not b.update(sigs.ebullet_dt(p, b, dt), self):
                 continue
             if b.delay > 0:
                 eb.append(b)
                 continue
             dx, dy = b.x - p.x, b.y - (p.y - 3)
             if dx * dx + dy * dy < (b.r + p.hitr) ** 2:
+                if sigs.block(p, self, b):
+                    burst(self, b.x, b.y, (255, 240, 200), 5, 50)
+                    continue
                 if p.dash_t > 0 and p.f['dash_reflect']:
                     burst(self, b.x, b.y, (220, 220, 255), 4, 40)
                     continue
@@ -1644,6 +1653,7 @@ class Run:
                 self.floats.append([p.x, p.y - 16, '+1/2 Herz', (255, 120, 140), 0.8])
         if p.f['salts_regen'] and random.random() < p.f['salts_regen']:
             p.salts = min(9, p.salts + 1)
+        sigs.on_room_clear(self)
         cx, cy = RX + RW / 2, RY + RH / 2
         if room.kind == 'boss':
             self.boss_room_rewards()
@@ -1691,6 +1701,7 @@ class Run:
                     ok = False
                 else:
                     v = 1 if k == 'coin' else 5
+                    v += sigs.on_coin(p, self, v)
                     p.coins = min(99, p.coins + v)
                     self.coins_got += v
                     self.save.stat('coins', v)
@@ -1738,6 +1749,7 @@ class Run:
                     ok = False
             elif k == 'chest':
                 audio.play('chest')
+                sigs.on_chest(self, pk)
                 burst(self, pk.x, pk.y, (240, 200, 90), 16, 70)
                 if random.random() < 0.1 + 0.015 * p.s['luck']:
                     self.pedestals.append(Pedestal(self.pick_item('T'), pk.x, pk.y))
