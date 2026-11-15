@@ -707,6 +707,13 @@ class Game:
         for i, iid in enumerate(p.items[:40]):
             it = ITEMS[iid]
             gfx.draw_icon(s, it['icon'], it['col'], 225 + (i % 9) * 20, 95 + (i // 9) * 20)
+        if sheets.has(run.char) and sheets.is_hi(run.char):           # Porträt der Figur
+            won = run.result != 'dead'
+            spr = sheets.frame(run.char, sheets.LEFT, 0 if won else 6)
+            if not won:
+                spr = gfx.tinted(spr, 'frozen')
+            gfx.draw_glow(s, 392, 208, 20, (255, 220, 150) if won else (120, 150, 230), 60)
+            gfx.hi_blit(spr, 392, 224)
         if run.last_boss or getattr(run, 'bosses_beaten', None):
             bl = getattr(run, 'bosses_beaten', [])
             T.add('Besiegte Bosse: ' + (', '.join(BOSSES[b]['name'] for b in bl) if bl else '–'), W // 2, 233, 7, (240, 200, 170), 'c')
