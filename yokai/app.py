@@ -1267,7 +1267,12 @@ class Game:
                 gfx.panel(s, (W // 2 - 120, y - 2, 240, 16), 180, (200, 120, 90))
             T.add(k, W // 2 - 110, y, 9, (255, 230, 150) if i == self.sel else (220, 210, 200))
             T.add(v, W // 2 + 110, y, 9, (255, 255, 255), 'r')
-        T.add('Links/Rechts – ändern     Esc – Zurück', W // 2, 240, 7, (160, 150, 150), 'c')
+        T.add('Links/Rechts – ändern     Esc – Zurück', W // 2, 270, 7, (160, 150, 150), 'c')
+        info = {'Spielweise': 'Entspannt: +1 Herz, nur halbe Herzen Schaden, langsamere Geschosse (ab dem nächsten Lauf)',
+                'Tipps': 'Einmalige Hinweise beim ersten Betreten besonderer Räume',
+                'Spielstand löschen': 'Löscht alle Freischaltungen, Erfolge und Statistiken'}.get(opts[self.sel][0])
+        if info:
+            T.add(info, W // 2, 254, 7, (200, 210, 170), 'c')
         if self.confirm == 'reset':
             gfx.panel(s, (W // 2 - 120, 120, 240, 50), 240)
             T.add('Wirklich ALLES löschen?  Enter – Ja / Esc – Nein', W // 2, 140, 8, (255, 160, 150), 'c')
