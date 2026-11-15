@@ -6,10 +6,10 @@ import random
 import sys
 import pygame
 from .settings import *
-from . import gfx, audio, sheets
+from . import gfx, audio, sheets, art, bestiary
 from .save import Save
 from .data import (ITEMS, ITEM_IDS, CHARS, CHAR_ORDER, ACHIEVEMENTS, ACTIVES, SYNERGIES, TRANSFORMS, BOSSES,
-                   BIOMES, CHALLENGES)
+                   BIOMES, CHALLENGES, ENEMIES)
 from .run import Run
 
 from .texts import FX_NAMES, TAG_NAMES, fx_lines, star
@@ -226,7 +226,7 @@ class Game:
             dim = 1.0
             light = r.hi_light if self.state == 'play' else None
             gfx.hi_flush(self.window, sc, ox + shake[0], oy + shake[1], dim, light)
-        elif self.state in ('title', 'chars') and gfx.HI:
+        elif self.state in ('title', 'chars', 'lexicon') and gfx.HI:
             gfx.hi_flush(self.window, sc, ox, oy, 1.0, None)
         else:
             gfx.HI.clear()
@@ -347,7 +347,7 @@ class Game:
         return S
 
     # ================================================================  Zustände
-    MENU = ['Neuer Lauf', 'Tägliche Prüfung', 'Herausforderungen', 'Codex der Items', 'Erfolge', 'Statistik', 'Steuerung', 'Optionen', 'Beenden']
+    MENU = ['Neuer Lauf', 'Tägliche Prüfung', 'Herausforderungen', 'Codex der Items', 'Yōkai-Lexikon', 'Erfolge', 'Statistik', 'Steuerung', 'Optionen', 'Beenden']
 
     def st_title(self, dt, events, nav):
         s = self.screen
@@ -396,6 +396,8 @@ class Game:
             self.ch_sel = 0
         elif m == 'Codex der Items':
             self.state = 'codex'
+        elif m == 'Yōkai-Lexikon':
+            self.state = 'lexicon'; self.lex_sel = 0; self.lex_tab = 0
         elif m == 'Erfolge':
             self.state = 'achievements'; self.scroll = 0
         elif m == 'Statistik':
@@ -803,6 +805,156 @@ class Game:
                     self.codex_sel = i
             if n in ('left', 'right', 'up', 'down'):
                 audio.play('move')
+
+    # ------------------------------------------------------------ Yōkai-Lexikon
+    def _lex_entries(self):
+        if self.lex_tab == 0:
+            ids = [e for e in ENEMIES if e in bestiary.LORE and e not in bestiary.SKIP]
+            seen = set(self.save.data.get('enemies_seen', []))
+            return ids, seen
+        ids = [b for b in BOSSES if b in bestiary.BOSS_LORE]
+        seen = set(self.save.data.get('bosses_seen', [])) | set(self.save['bosses'])
+        return ids, seen
+
+    def _lex_portrait(self, bid):
+        cache = self.__dict__.setdefault('_lex_img', {})
+        if bid not in cache:
+            img = None
+            try:
+                fn = os.path.join(os.path.dirname(sheets.BASE), 'lexikon', bid + '.png')
+                if os.path.exists(fn):
+                    img = pygame.image.load(fn).convert_alpha()
+            except (OSError, pygame.error):
+                img = None
+            cache[bid] = img
+        return cache[bid]
+
+    def st_lexicon(self, dt, events, nav):
+        s = self.screen
+        gfx.HI_MODE = True
+        self.draw_night(s)
+        gfx.HI.clear()
+        ov = pygame.Surface((W, H), pygame.SRCALPHA)
+        ov.fill((6, 4, 12, 150))
+        s.blit(ov, (0, 0))
+        T = gfx.TEXT
+        ids, seen = self._lex_entries()
+        n_seen = len([i for i in ids if i in seen])
+        T.add('Yōkai-Lexikon', W // 2, 5, 13, (255, 230, 170), 'c')
+        for k, name in enumerate(('Yōkai', 'Bosse')):
+            x = W // 2 - 60 + k * 120
+            on = k == self.lex_tab
+            T.add(('‹ %s ›' if on else '%s') % name, x, 24, 9, (255, 215, 130) if on else (150, 140, 150), 'c')
+        T.add('%d / %d begegnet' % (n_seen, len(ids)), W - 16, 8, 7, (190, 180, 170), 'r')
+        self.lex_sel = max(0, min(self.lex_sel, len(ids) - 1))
+        # Liste links
+        gfx.panel(s, (10, 38, 128, 252), 200)
+        rows = 18
+        top = max(0, min(self.lex_sel - rows // 2, len(ids) - rows))
+        for r in range(rows):
+            i = top + r
+            if i >= len(ids):
+                break
+            eid = ids[i]
+            y = 44 + r * 13.5
+            sel = i == self.lex_sel
+            if sel:
+                pygame.draw.rect(s, (70, 48, 60), (13, int(y) - 1, 122, 13))
+            nm = (ENEMIES[eid]['name'] if self.lex_tab == 0 else BOSSES[eid]['name']) if eid in seen else '? ? ?'
+            T.add('%2d  %s' % (i + 1, nm), 18, y, 7, (255, 225, 160) if sel else ((225, 215, 200) if eid in seen else (110, 100, 115)))
+        # Detail rechts
+        gfx.panel(s, (146, 38, W - 156, 252), 200)
+        eid = ids[self.lex_sel]
+        cx = 146 + (W - 156) // 2
+        if eid in seen:
+            if self.lex_tab == 0:
+                d = ENEMIES[eid]
+                kanji, lore, ingame = bestiary.LORE[eid]
+                T.add(d['name'], cx, 44, 12, (255, 230, 170), 'c')
+                spr = d['sprite']
+                if sheets.has(spr):
+                    hi = sheets.is_hi(spr)
+                    fr = sheets.frame(spr, sheets.RIGHT, int(self.t * 6) % 4, 1 if hi else 2)
+                    bob = int(abs(math.sin(self.t * 3)) * 2)
+                    if hi:
+                        if fr.get_height() < 70:
+                            key = (spr, int(self.t * 6) % 4)
+                            cache = self.__dict__.setdefault('_lex_big', {})
+                            if key not in cache:
+                                cache[key] = pygame.transform.scale(fr, (fr.get_width() * 2, fr.get_height() * 2))
+                            fr = cache[key]
+                        gfx.hi_blit(fr, cx, 128 - bob)
+                    else:
+                        s.blit(fr, (cx - fr.get_width() // 2, 128 - fr.get_height() - bob))
+                elif spr in art.ARTS:
+                    im = art.make(spr)
+                    im = pygame.transform.scale(im, (im.get_width() * 3, im.get_height() * 3))
+                    s.blit(im, (cx - im.get_width() // 2, 128 - im.get_height()))
+                pygame.draw.ellipse(s, (0, 0, 0), (cx - 18, 126, 36, 6))
+                y = self._wrap(lore, 154, 136, W - 172, 8, (230, 225, 210))
+                y = self._wrap('Im Spiel: ' + ingame, 154, y + 6, W - 172, 7, (170, 205, 240))
+                biomes = [BIOMES[b]['name'] for b in BIOMES if eid in BIOMES[b]['enemies']]
+                if biomes:
+                    self._wrap('Vorkommen: ' + ', '.join(biomes), 154, y + 4, W - 172, 7, (200, 190, 160))
+            else:
+                b = BOSSES[eid]
+                kanji, lore = bestiary.BOSS_LORE[eid]
+                T.add(b['name'], cx, 44, 12, (255, 200, 170), 'c')
+                T.add(b['title'], cx, 60, 8, (220, 180, 160), 'c')
+                img = self._lex_portrait(eid)
+                if img is not None:
+                    f = min(1.0, 290 / img.get_width(), 170 / img.get_height())
+                    im = img if f >= 1 else pygame.transform.scale(img, (int(img.get_width() * f), int(img.get_height() * f)))
+                    gfx.hi_blit(im, cx, 72 + im.get_height() / 2)
+                    y0 = 74 + im.get_height() / 2
+                else:
+                    y0 = 80
+                beaten = eid in self.save['bosses']
+                T.add('Besiegt' if beaten else 'Noch nicht besiegt', cx, y0, 7, (150, 220, 150) if beaten else (220, 150, 140), 'c')
+                self._wrap(lore, 154, y0 + 14, W - 172, 8, (230, 225, 210))
+        else:
+            spr = ENEMIES[eid]['sprite'] if self.lex_tab == 0 else None
+            if spr and sheets.has(spr) and sheets.is_hi(spr):
+                fr = gfx.tinted(sheets.frame(spr, sheets.RIGHT, 0, 1), 'shadow')
+                gfx.hi_blit(fr, cx, 128)
+            else:
+                T.add('? ? ?', cx, 100, 14, (130, 120, 140), 'c')
+            T.add('? ? ?', cx, 140, 12, (150, 140, 160), 'c')
+            T.add('Noch keine Begegnung.', cx, 160, 8, (180, 170, 170), 'c')
+        T.add('Links/Rechts: Seite    Hoch/Runter: Eintrag    Esc: Zurück', W // 2, 300, 6, (150, 140, 140), 'c')
+        for nv in nav:
+            if nv == 'up': self.lex_sel = (self.lex_sel - 1) % len(ids)
+            elif nv == 'down': self.lex_sel = (self.lex_sel + 1) % len(ids)
+            elif nv in ('left', 'right'):
+                self.lex_tab = 1 - self.lex_tab; self.lex_sel = 0
+            elif nv == 'back': self.state = 'title'
+            elif isinstance(nv, tuple):
+                mx, my = nv[1]
+                if 10 <= mx <= 138 and my >= 44:
+                    i = top + int((my - 44) // 13.5)
+                    if 0 <= i < len(ids):
+                        self.lex_sel = i
+                elif my < 34:
+                    self.lex_tab = 0 if mx < W // 2 else 1; self.lex_sel = 0
+            if nv in ('left', 'right', 'up', 'down'):
+                audio.play('move')
+
+    def _wrap(self, txt, x, y, w, size, col):
+        T = gfx.TEXT
+        line = ''
+        lh = size * 1.55
+        for word in txt.split():
+            t = (line + ' ' + word).strip()
+            if gfx.text_w(t, size) > w and line:
+                T.add(line, x, y, size, col)
+                y += lh
+                line = word
+            else:
+                line = t
+        if line:
+            T.add(line, x, y, size, col)
+            y += lh
+        return y
 
     def st_achievements(self, dt, events, nav):
         s = self.screen

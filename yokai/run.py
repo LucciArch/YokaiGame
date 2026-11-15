@@ -310,6 +310,9 @@ class Run:
     def spawn_enemy(self, eid, x, y, champ=None):
         e = Enemy(self, eid, x, y, champ)
         self.enemies.append(e)
+        base = {'gaki_small': 'gaki', 'nuppeppo_klein': 'nuppeppo', 'kappa_small': 'kappa'}.get(eid, eid)
+        if base not in self.save.data.setdefault('enemies_seen', []):
+            self.save.data['enemies_seen'].append(base)
         return e
 
     def spawn_room_enemies(self, room):
@@ -2137,6 +2140,7 @@ class Run:
             a = int(255 * min(1, self.boss_intro))
             if self.portrait is None or self.portrait[0] is not self.boss:
                 self.portrait = (self.boss, self.make_portrait(self.boss))
+                self.remember_boss(self.boss, self.portrait[1])
             img = self.portrait[1]
             slide = min(1, (2.2 - self.boss_intro) * 4)
             ov = pygame.Surface((W, 110), pygame.SRCALPHA)
@@ -2184,6 +2188,15 @@ class Run:
                 T.add(('+' if d[0] > 0 else '') + ('%.2f' % d[0] if k in ('dmg', 'rate') else '%g' % round(d[0], 1)),
                       vx + gfx.text_w(val, 6) + 2, y, 6, (120, 255, 140) if d[0] > 0 else (255, 120, 110), alpha=int(255 * min(1, d[1])))
             x += 78
+
+    def remember_boss(self, b, img):
+        """Boss fürs Lexikon merken und sein Porträt einmalig speichern."""
+        bid = getattr(b, 'id', None)
+        if not bid:
+            return
+        seen = self.save.data.setdefault('bosses_seen', [])
+        if bid not in seen:
+            seen.append(bid)
 
     def make_portrait(self, b):
         """Porträt des Bosses für das Intro: rendert die Hi-Res-Teile auf eine eigene Fläche, vergrößert."""
