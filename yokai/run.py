@@ -32,6 +32,12 @@ _GRADE = {'chikurin': (40, 90, 30), 'inari': (120, 50, 20), 'kawabe': (20, 70, 8
 Q_WEIGHT = {0: 1.0, 1: 1.0, 2: 0.8, 3: 0.42, 4: 0.18}
 CHAPTER_NAMES = {1: '– Die Grenzlande der Nacht –', 2: '– Die Stätten der Toten –', 3: '– Die heiligen Berge –',
                  4: '– Das Meer der Ertrunkenen –', 5: '– Yomi, das Land der Toten –', 6: '– Die Himmelsgefilde –'}
+CHAPTER_LORE = {1: 'In dieser Nacht ziehen die hundert Dämonen durch das Land. Folge ihrer Spur bis zum Anfang.',
+                2: 'Wo die Toten keine Ruhe finden, hat sich der Zug versammelt. Laternen flüstern Namen.',
+                3: 'In den Bergen herrschen die Tengu. Der Wind trägt Gelächter und Messerklingen.',
+                4: 'Unter den Wellen liegt der Palast des Drachenkönigs. Die Ertrunkenen wachen über ihn.',
+                5: 'Hinter dem Felsen von Yomotsu beginnt das Land der Toten. Wer hier isst, kehrt nie zurück.',
+                6: 'Über den Wolken wartet der böse Stern. Hier endet die Nacht – so oder so.'}
 BLESSINGS = {'vollmond': ('Segen des Vollmonds', 'Die ganze Ebene liegt im Mondlicht – die Karte ist aufgedeckt'),
              'fuchs': ('Segen der Füchse', 'Die Tanuki-Händler geben 30 % Rabatt'),
              'reichtum': ('Segen des Reichtums', 'Auf dieser Ebene fallen doppelt so viele Mon'),
@@ -2498,11 +2504,14 @@ class Run:
             if not hasattr(self, 'tip') or self.tip[0] != self.floor_no:
                 self.tip = (self.floor_no, random.choice(TIPS))
             q = self.QUIRKS.get(self.biome_id)
+            line2 = ('„' + CHAPTER_LORE[self.depth] + '“') if (self.stage == 0 and self.depth in CHAPTER_LORE and not self.loop) \
+                else 'Tipp: ' + self.tip[1]
+            col2 = (225, 205, 235) if line2.startswith('„') else (200, 190, 170)
             if q:
                 T.add('Eigenheit: ' + self.QUIRK_SHORT[q], W // 2, 142, 8, (255, 200, 140), 'c', alpha=a)
-                T.add('Tipp: ' + self.tip[1], W // 2, 155, 7, (200, 190, 170), 'c', alpha=a)
+                T.add(line2, W // 2, 155, 7, col2, 'c', alpha=a)
             else:
-                T.add('Tipp: ' + self.tip[1], W // 2, 148, 7, (200, 190, 170), 'c', alpha=a)
+                T.add(line2, W // 2, 148, 7, col2, 'c', alpha=a)
         if self.boss_intro > 0 and self.boss:
             a = int(255 * min(1, self.boss_intro))
             if self.portrait is None or self.portrait[0] is not self.boss:
