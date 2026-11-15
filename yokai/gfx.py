@@ -1019,6 +1019,8 @@ class TextLayer:
         if f is None:
             if FONT_PATH:
                 f = pygame.font.Font(FONT_PATH, max(6, int(round(px * 0.66))))
+                if px * 0.66 <= 19:                 # kleine Schrift kräftiger, damit der Pinselstrich lesbar bleibt
+                    f.bold = True
             else:
                 f = pygame.font.Font(None, px)
             self.fonts[px] = f

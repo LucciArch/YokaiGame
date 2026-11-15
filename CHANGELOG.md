@@ -7,7 +7,12 @@
 - Anzeige „Ebene 7 · Kapitel IV“ im HUD, auf der Titelkarte und im Boss-Intro
 - Fairer: Tsurube-otoshi blitzt nach der Landung kurz auf, bevor er feuert; Nopperabō schießt nicht mehr sofort nach dem Auftauchen
 - Späte Gegner gefährlicher: Shikome schneller, Onibi legen in tiefen Kapiteln Feuerspuren, Funayūrei feuern Fächer
-- Balance-Berichte 2 und 3 unter `design/balance/`
+- Balance-Berichte 2 bis 4 unter `design/balance/`
+- Fortschrittspfad auf der Titelkarte jeder Ebene und im Pausenmenü
+- Tiefere Ebenen liefern wertvollere Items
+- Spielgefühl: kurzer Halt mit Lichtwelle beim Säubern eines Raums, schwere Gegner fallen mit Gewicht
+- Kleine Schrift wird kräftiger gezeichnet, damit sie auch in kleinen Fenstern lesbar bleibt
+- Prüfungen bleiben kurz (eine Ebene pro Kapitel)
 
 ## 1.2.0 – „Morgengrauen-Update“
 
