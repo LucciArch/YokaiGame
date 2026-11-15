@@ -771,6 +771,8 @@ class Game:
         gfx.TEXT.add('Pause', W // 2, 50, 18, (255, 240, 220), 'c')
         run.draw_path(s, W // 2, 84)
         gfx.TEXT.add(run.floor_label() + '  –  ' + run.biome['name'], W // 2, 196, 8, (220, 200, 170), 'c')
+        gfx.TEXT.add('Seed %d' % run.seed + ('   •   Entspannt' if run.relaxed else '') + ('   •   Oni-Modus' if run.hard else ''),
+                     W // 2, 208, 6, (170, 160, 150), 'c')
         for i, m in enumerate(items):
             y = 100 + i * 18
             if i == self.sel:
