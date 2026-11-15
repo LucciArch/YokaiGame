@@ -6,7 +6,7 @@ import random
 import sys
 import pygame
 from .settings import *
-from . import gfx, audio, sheets, art, bestiary
+from . import gfx, audio, sheets, art, bestiary, props
 from .save import Save
 from .data import (ITEMS, ITEM_IDS, CHARS, CHAR_ORDER, ACHIEVEMENTS, ACTIVES, SYNERGIES, TRANSFORMS, BOSSES,
                    BIOMES, CHALLENGES, ENEMIES)
@@ -1003,7 +1003,24 @@ class Game:
                 audio.play('move')
 
     # ------------------------------------------------------------ Yōkai-Lexikon
+    LEX_EVENTS = {
+        'yomeiri': dict(name='Kitsune no Yomeiri', spr='kitsune_braut',
+                        lore='Regnet es bei Sonnenschein, so sagt man, heiraten die Füchse. Ihr Hochzeitszug zieht mit '
+                             'Laternen durch die Nacht – wer ihn sieht, soll still bleiben und den Blick senken.',
+                        ingame='Schieß nicht auf den Zug. Die Braut verneigt sich und lässt ein Geschenk zurück.'),
+        'kakurenbo': dict(name='Kakurenbo', spr='zashiki',
+                          lore='Zashiki-warashi ist ein Hausgeist in Kindergestalt. Solange sie bleibt, wohnt das Glück im Haus – '
+                               'und manchmal spielt sie Verstecken mit den Bewohnern.',
+                          ingame='Zerschlage die Urne, in der sie sich versteckt. Zwei Versuche.'),
+        'ema': dict(name='Ema-Wand', spr=None,
+                    lore='Ema sind kleine Holztafeln, auf die man in Schreinen seine Wünsche schreibt. Früher opferte man '
+                         'den Göttern Pferde – heute genügt ein gemaltes.',
+                    ingame='Drei Tafeln, drei Wünsche – nur einer geht in Erfüllung.'),
+    }
+
     def _lex_entries(self):
+        if self.lex_tab == 2:
+            return list(self.LEX_EVENTS), set(self.save.data.get('events_seen', []))
         if self.lex_tab == 0:
             ids = [e for e in ENEMIES if e in bestiary.LORE and e not in bestiary.SKIP]
             seen = set(self.save.data.get('enemies_seen', []))
@@ -1037,8 +1054,8 @@ class Game:
         ids, seen = self._lex_entries()
         n_seen = len([i for i in ids if i in seen])
         T.add('Yōkai-Lexikon', W // 2, 5, 13, (255, 230, 170), 'c')
-        for k, name in enumerate(('Yōkai', 'Bosse')):
-            x = W // 2 - 60 + k * 120
+        for k, name in enumerate(('Yōkai', 'Bosse', 'Ereignisse')):
+            x = W // 2 - 110 + k * 110
             on = k == self.lex_tab
             T.add(('‹ %s ›' if on else '%s') % name, x, 24, 9, (255, 215, 130) if on else (150, 140, 150), 'c')
         T.add('%d / %d begegnet' % (n_seen, len(ids)), W - 16, 8, 7, (190, 180, 170), 'r')
@@ -1056,13 +1073,31 @@ class Game:
             sel = i == self.lex_sel
             if sel:
                 pygame.draw.rect(s, (70, 48, 60), (13, int(y) - 1, 122, 13))
-            nm = (ENEMIES[eid]['name'] if self.lex_tab == 0 else BOSSES[eid]['name']) if eid in seen else '? ? ?'
+            nm = (ENEMIES[eid]['name'] if self.lex_tab == 0 else BOSSES[eid]['name'] if self.lex_tab == 1
+                  else self.LEX_EVENTS[eid]['name']) if eid in seen else '? ? ?'
             T.add('%2d  %s' % (i + 1, nm), 18, y, 7, (255, 225, 160) if sel else ((225, 215, 200) if eid in seen else (110, 100, 115)))
         # Detail rechts
         gfx.panel(s, (146, 38, W - 156, 252), 200)
         eid = ids[self.lex_sel]
         cx = 146 + (W - 156) // 2
-        if eid in seen:
+        if eid in seen and self.lex_tab == 2:
+            ev = self.LEX_EVENTS[eid]
+            T.add(ev['name'], cx, 44, 12, (255, 220, 170), 'c')
+            if ev['spr'] and sheets.has(ev['spr']):
+                fr = sheets.frame(ev['spr'], sheets.RIGHT, int(self.t * 6) % 4, 1)
+                key = (ev['spr'], int(self.t * 6) % 4)
+                cache = self.__dict__.setdefault('_lex_big', {})
+                if key not in cache:
+                    cache[key] = pygame.transform.scale(fr, (fr.get_width() * 2, fr.get_height() * 2))
+                gfx.hi_blit(cache[key], cx, 128 - int(abs(math.sin(self.t * 3)) * 2))
+            else:
+                im = props.ema((240, 90, 80), False)
+                im = pygame.transform.scale(im, (im.get_width() * 3, im.get_height() * 3))
+                s.blit(im, (cx - im.get_width() // 2, 128 - im.get_height()))
+            pygame.draw.ellipse(s, (0, 0, 0), (cx - 18, 126, 36, 6))
+            y = self._wrap(ev['lore'], 154, 136, W - 172, 8, (230, 225, 210))
+            self._wrap('Im Spiel: ' + ev['ingame'], 154, y + 6, W - 172, 7, (170, 205, 240))
+        elif eid in seen:
             if self.lex_tab == 0:
                 d = ENEMIES[eid]
                 kanji, lore, ingame = bestiary.LORE[eid]
@@ -1125,7 +1160,7 @@ class Game:
             if nv == 'up': self.lex_sel = (self.lex_sel - 1) % len(ids)
             elif nv == 'down': self.lex_sel = (self.lex_sel + 1) % len(ids)
             elif nv in ('left', 'right'):
-                self.lex_tab = 1 - self.lex_tab; self.lex_sel = 0
+                self.lex_tab = (self.lex_tab + (1 if nv == 'right' else -1)) % 3; self.lex_sel = 0
             elif nv == 'back': self.state = 'title'
             elif isinstance(nv, tuple):
                 mx, my = nv[1]
@@ -1134,7 +1169,7 @@ class Game:
                     if 0 <= i < len(ids):
                         self.lex_sel = i
                 elif my < 34:
-                    self.lex_tab = 0 if mx < W // 2 else 1; self.lex_sel = 0
+                    self.lex_tab = min(2, max(0, int((mx - (W // 2 - 165)) // 110))); self.lex_sel = 0
             if nv in ('left', 'right', 'up', 'down'):
                 audio.play('move')
 
