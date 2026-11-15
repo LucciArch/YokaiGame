@@ -712,11 +712,11 @@
  },
  "shikome": {
   "atk": 4,
-  "h": 72,
+  "h": 77,
   "hi": true,
   "kind": "strip",
   "n": 7,
-  "w": 92,
+  "w": 94,
   "walk": 4
  },
  "shinigami": {
@@ -748,11 +748,11 @@
  },
  "tenome": {
   "atk": 4,
-  "h": 64,
+  "h": 80,
   "hi": true,
   "kind": "strip",
   "n": 7,
-  "w": 156,
+  "w": 68,
   "walk": 4
  },
  "tesso": {
@@ -811,11 +811,11 @@
  },
  "yamauba": {
   "atk": 4,
-  "h": 63,
+  "h": 83,
   "hi": true,
   "kind": "strip",
   "n": 7,
-  "w": 58,
+  "w": 98,
   "walk": 4
  },
  "yosuzume": {

@@ -8,24 +8,24 @@ SC = ('p1', 'p2', 'p3')
 FIN = ('m0', 'm1', 'm2')
 HAIR = ('h0', 'h1', 'h2')
 
-LEG = dict(zip('KmnokLjJYZWq', ['K', 'h0', 'h1', 'h2', 'k2', 'k3', 'k1', 'k0', 'y2', 'y3', 'b3', 'q']))
+LEG = dict(zip('KmnokLjJYZWq', ['K', 'h0', 'h1', 'h2', 'k2', 'k3', 'k1', 'k0', 'y2', 'a1', 'v3', 'q']))
 HEAD = """
 ....mmmmmmm....
 ..mmnnonnnnmm..
 .mnnoonnnnnnnm.
-.mnkkkknnnnnnnm
-mnkLLLkkknnnnnm
-mkLLLLkkkknnnnm
-mKKKKkkKKKkjnnm
-mkYZKkkKYZKjnnm
-mkkYKkkkKYkjnnm
-mkLkkkjkkkjjnnm
-.kLkkkkkkkjjnnm
-.kKKKKKKKKjjnnm
-.kKWqWqWqKjjnnm
-..kKqWqWKjjJnnm
-...kKKKKjjJnnm.
-....jjjjJnnnm..
+.mnmmmmnnnnnnnm
+mnmLLLmmmnnnnnm
+mmkLLLkkkmnnnnm
+mkkkkkkkkkmnnnm
+mKKKkkKKKkjmnnm
+mkWZKkkWZKjmnnm
+mkkkkkkkkkjmnnm
+.kLkkkjkkkjmnnm
+.kkkkKkkkkjmnnm
+.kkkkkkkkjjmnnm
+..kkKqqKkjjmnnm
+...kkkkkkjJmnm.
+....jjjjJmnnm..
 """
 
 

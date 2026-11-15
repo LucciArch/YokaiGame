@@ -56,9 +56,9 @@ def draw(bob=0, wave=0, arm=0, glow=0):
     cx, cy = 40, 34 + bob
     # --- Schwebeband hinten (große Schleife über Kopf nach rechts unten)
     p = C()
-    pts = [(cx + 8, cy + 10), (cx + 6, cy - 14), (cx + 20, cy - 22 + wave), (cx + 34, cy - 12 - wave),
-           (cx + 36, cy + 8 + wave), (cx + 30, cy + 26 - wave), (cx + 42, cy + 40 + wave)]
-    ribbon(p, pts, 2.2, 1.4, UNDER)
+    pts = [(cx - 10, cy + 12), (cx - 4, cy + 4), (cx + 10, cy + 2), (cx + 22, cy + 6 + wave),
+           (cx + 30, cy + 18 - wave), (cx + 28, cy + 32 + wave), (cx + 38, cy + 44)]
+    ribbon(p, pts, 3.2, 1.6, ('p1', 'p2', 'p3'))
     c.stamp(p, 'p0')
     # --- Robe: weite Glocke, unten in Wolkenfransen auslaufend (keine Füße)
     p = C()
@@ -91,13 +91,15 @@ def draw(bob=0, wave=0, arm=0, glow=0):
     bun = E(cx + 2, cy - 15, 4.4, 3.4) | E(cx + 9, cy - 13, 3.4, 3.4)
     p.form(bun, HAIR, sd=1, hl=1)
     c.stamp(p, 'K')
-    p = C()
-    crown = R(cx - 6, cy - 11, cx + 5, cy - 10)
-    for x in (cx - 5, cx - 1, cx + 3):
-        crown = crown | PG([(x - 1.5, cy - 11), (x + 0.5, cy - 15), (x + 2.5, cy - 11)])
-    p.form(crown, GOLD, sd=1, hl=1)
-    p.pxs([(cx - 1, cy - 13)], 'm2')
-    c.stamp(p, 'y0')
+    p = C()                                                                 # goldene Haarnadeln (Kanzashi) mit Blüte
+    pins = L(cx + 4, cy - 14, 0.7, cx + 13, cy - 19, 0.6) | L(cx + 6, cy - 12, 0.7, cx + 14, cy - 13, 0.6)
+    p.fill(pins, 'y2')
+    for (dx, dy) in ((14, -19), (14, -13)):
+        p.fill(E(cx + dx, cy + dy, 1.4, 1.4), 'y3')
+    flower = E(cx - 1, cy - 12, 2.6, 2.2)
+    p.form(flower, ('m1', 'm2', 'm3'), sd=0, hl=1)
+    p.pxs([(cx - 1, cy - 12)], 'y3')
+    c.stamp(p, 'K')
     p = C()
     p.grid(cx - 8, cy - 5, FACE, LEG)
     c.stamp(p, ring=False)
@@ -115,12 +117,13 @@ def draw(bob=0, wave=0, arm=0, glow=0):
     for k in range(5):
         a = math.radians(130 + k * 22 - arm * 25)
         tip = (hx + math.cos(a) * (12 + glow), hy + math.sin(a) * (12 + glow))
-        seg = L(hx, hy, 1.0, tip[0], tip[1], 2.4)
+        seg = L(hx, hy, 0.6, tip[0], tip[1], 1.4)
         fan = seg if fan is None else (fan | seg)
-    p.form(fan, ('y1', 'y2', 'y3'), sd=1, hl=1)
+    fan = fan | (E(hx - 4, hy - 4, 8 + glow * 0.5, 8 + glow * 0.5) & ~E(hx - 4, hy - 4, 6.6 + glow * 0.5, 6.6 + glow * 0.5) & E(hx - 7, hy - 7, 9, 9))
+    p.form(fan, ('y1', 'y2', 'y3'), sd=0, hl=1)
     c.stamp(p, 'y0')
     p = C()                                                                 # vorderes Bandende
-    ribbon(p, [(hx + 4, hy + 6), (hx - 6, hy + 18 + wave), (hx - 2, hy + 30 - wave), (hx - 10, hy + 40)], 1.8, 1.2, UNDER)
+    ribbon(p, [(hx + 4, hy + 6), (hx - 4, hy + 16 + wave), (hx - 1, hy + 26 - wave), (hx - 8, hy + 36)], 2.6, 1.4, ('p1', 'p2', 'p3'))
     c.stamp(p, 'p0')
     c.blacken()
     return c
