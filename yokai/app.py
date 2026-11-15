@@ -239,6 +239,10 @@ class Game:
                 self.window = pygame.display.set_mode(self.win_size, pygame.RESIZABLE)
             elif e.type in (pygame.JOYDEVICEADDED, pygame.JOYDEVICEREMOVED):
                 self.scan_pads()
+            if e.type in (pygame.JOYBUTTONDOWN, pygame.JOYHATMOTION):
+                gfx.PAD_MODE = True
+            elif e.type in (pygame.KEYDOWN, pygame.MOUSEBUTTONDOWN):
+                gfx.PAD_MODE = False
         nav = self.menu_keys(events)
         getattr(self, 'st_' + self.state)(dt, events, nav)
         for tt in self.toasts:

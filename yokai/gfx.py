@@ -1024,6 +1024,17 @@ if not _os.path.exists(FONT_PATH):
     FONT_PATH = None
 
 
+PAD_MODE = False          # zuletzt mit Controller gespielt → Tastenhinweise als Controller-Knöpfe
+_PAD_SUB = (('Enter – ', 'A – '), ('Enter: ', 'A: '), ('Esc – ', 'B – '), ('Esc: ', 'B: '),
+            ('/ Esc –', '/ B –'), ('Beliebige Taste', 'Beliebiger Knopf'))
+
+
+def pad_labels(s):
+    for a, b in _PAD_SUB:
+        s = s.replace(a, b)
+    return s
+
+
 class TextLayer:
     """Texte werden in Spielkoordinaten gesammelt und scharf in Fensterauflösung gezeichnet."""
 
@@ -1032,7 +1043,10 @@ class TextLayer:
         self.fonts = {}
 
     def add(self, s, x, y, size=10, color=(240, 236, 226), align='l', shadow=True, alpha=255):
-        self.items.append((str(s), x, y, size, color, align, shadow, alpha))
+        s = str(s)
+        if PAD_MODE and ('Enter' in s or 'Esc' in s or 'Beliebige Taste' in s):
+            s = pad_labels(s)
+        self.items.append((s, x, y, size, color, align, shadow, alpha))
 
     def clear(self):
         self.items.clear()
