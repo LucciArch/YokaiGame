@@ -44,7 +44,7 @@ class Boss(Enemy):
         self.idle = 1.0
         self.phase = 1
         self.last = None
-        self.contact = 1 if run.depth <= 3 else 2
+        self.contact = 1 if run.depth <= 3 or run.relaxed else 2
         self.invuln = False
         self.attacks = ['ring']
         self.attacks2 = None

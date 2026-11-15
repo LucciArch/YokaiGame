@@ -761,7 +761,7 @@ class Game:
                   W // 2, 60, 9, (240, 230, 210), 'c')
         else:
             T.add('Du bist gefallen…', W // 2, 30, 22, (230, 110, 110), 'c')
-            T.add('Ebene %d – %s' % (run.floor_no, run.biome['name']), W // 2, 60, 9, (230, 210, 200), 'c')
+            T.add('Ebene %d – %s' % (run.floor_no, run.biome['name']) + ('  (Entspannt)' if run.relaxed else ''), W // 2, 60, 9, (230, 210, 200), 'c')
         p = run.player
         gfx.panel(s, (60, 80, W - 120, 150), 200)
         rows = [('Charakter', CHARS[p.char]['name']), ('Zeit', '%d:%02d' % (run.time // 60, run.time % 60)),
@@ -1138,6 +1138,7 @@ class Game:
         opts = [('Musik', '%d%%' % round(st['music'] * 100)), ('Effekte', '%d%%' % round(st['sfx'] * 100)),
                 ('Vollbild', 'An' if self.fullscreen else 'Aus'), ('Bildschirmwackeln', 'An' if st.get('shake', True) else 'Aus'),
                 ('Schadenszahlen', 'An' if st.get('dmgnums', True) else 'Aus'), ('Tipps', 'An' if st.get('hints', True) else 'Aus'),
+                ('Spielweise', 'Entspannt' if st.get('relaxed') else 'Normal'),
                 ('Spielstand löschen', ''), ('Zurück', '')]
         T.add('Optionen', W // 2, 30, 14, (255, 230, 170), 'c')
         for i, (k, v) in enumerate(opts):
@@ -1185,6 +1186,11 @@ class Game:
                     st['dmgnums'] = not st.get('dmgnums', True)
                 elif k == 'Tipps':
                     st['hints'] = not st.get('hints', True)
+                elif k == 'Spielweise':
+                    st['relaxed'] = not st.get('relaxed', False)
+                    if st['relaxed']:
+                        self.toast('Entspannt', 'Ab dem nächsten Lauf: +1 Herz, nur halbe Herzen Schaden, langsamere Geschosse',
+                                   (170, 220, 170))
                 elif k == 'Spielstand löschen' and n == 'ok':
                     self.confirm = 'reset'
                 elif k == 'Zurück' and n == 'ok':

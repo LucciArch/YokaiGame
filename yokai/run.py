@@ -73,7 +73,8 @@ class Run:
         self.seed = seed if seed is not None else random.randrange(1, 10 ** 8)
         self.rng = random.Random(self.seed)
         random.seed(self.seed * 7 + 3)
-        self.hard = hard
+        self.relaxed = bool(game.save['settings'].get('relaxed')) and not challenge and not daily
+        self.hard = hard and not self.relaxed
         self.daily = daily
         self.endless = endless
         self.challenge = challenge
@@ -138,13 +139,16 @@ class Run:
         else:
             self.save.stat('runs')
             self.apply_challenge()
+            if self.relaxed:
+                self.player.maxhp += 2
+                self.player.hp += 2
             if not (self.challenge or self.daily):     # Prüfungen überschreiben keinen gespeicherten Lauf
                 clear_run_file()
                 self.save_run_file()
         self.new_floor()
 
     # ---------------------------------------------------------------- Lauf speichern / fortsetzen
-    RUN_KEYS = ('depth', 'stage', 'floor_no', 'loop', 'loop_mult', 'time', 'kills', 'rooms_cleared', 'coins_got',
+    RUN_KEYS = ('relaxed', 'depth', 'stage', 'floor_no', 'loop', 'loop_mult', 'time', 'kills', 'rooms_cleared', 'coins_got',
                 'pool', 'active_pool', '_prev_biome', '_prev_boss')
     PLAYER_SKIP = {'run', 'x', 'y', 'iframes', 'dash_t', 'dash_cd', 'dash_dir', 'dash_hit', 'dash_trail', 'shoot_cd',
                    'facing', 'flip', 'moving', 'anim', 'familiars', 'orb_angle', 'orb_hit_cd', 'aura_cd', 'knock',
@@ -281,12 +285,12 @@ class Run:
     @property
     def enemy_dmg(self):
         """Ab Kapitel IV kosten Treffer ein ganzes Herz."""
-        return 2 if self.depth >= 4 or self.loop else 1
+        return 2 if (self.depth >= 4 or self.loop) and not self.relaxed else 1
 
     def new_floor(self):
         rng = self.rng
         self.floor_no += 1
-        self.bullet_speed_mult = (1.12 if self.hard else 1.0) + 0.07 * self.loop + 0.045 * (self.tier - 1)
+        self.bullet_speed_mult = ((1.12 if self.hard else 1.0) + 0.07 * self.loop + 0.045 * (self.tier - 1)) * (0.88 if self.relaxed else 1)
         opts = [b for b in DEPTH_BIOMES[self.depth] if not (self.stage == 1 and b == self._prev_biome)] or DEPTH_BIOMES[self.depth]
         self.biome_id = rng.choice(opts)
         self._prev_biome = self.biome_id
@@ -1105,7 +1109,7 @@ class Run:
         self.boss = None
         self.last_boss = b.id
         self.bosses_beaten = getattr(self, 'bosses_beaten', []) + [b.id]
-        self.bullet_speed_mult = (1.12 if self.hard else 1.0) + 0.07 * self.loop + 0.045 * (self.tier - 1)
+        self.bullet_speed_mult = ((1.12 if self.hard else 1.0) + 0.07 * self.loop + 0.045 * (self.tier - 1)) * (0.88 if self.relaxed else 1)
         s = self.save
         first = s.add_to('bosses', b.id)
         self.achieve('first_boss')

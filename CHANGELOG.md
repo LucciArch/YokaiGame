@@ -13,6 +13,10 @@
 - Spielgefühl: kurzer Halt mit Lichtwelle beim Säubern eines Raums, schwere Gegner fallen mit Gewicht
 - Kleine Schrift wird kräftiger gezeichnet, damit sie auch in kleinen Fenstern lesbar bleibt
 - Prüfungen bleiben kurz (eine Ebene pro Kapitel)
+- Läufe speichern und fortsetzen („Speichern & Hauptmenü“, im Titel „Fortsetzen“)
+- Neue Spielweise „Entspannt“ in den Optionen: +1 Herz, nur halbe Herzen Schaden, langsamere Geschosse
+- Türen, Item-Altäre, Felsen, Urnen und Laternen in doppelter Pixeldichte; Gruben mit Abbruchkante
+- 16 neue Raumvorlagen für tiefere Kapitel, 4 neue Erfolge, Lauf-Pfad auf dem Endbildschirm
 
 ## 1.2.0 – „Morgengrauen-Update“
 
