@@ -82,7 +82,7 @@ def bird(**kw):
     p.grid(bx - 16 + hdx, by_ - 9 + hdy, HEAD, LEG)
     c.stamp(p, 'K')
     # near wing
-    p = C(); wing(p, shd, S['wt'], WING); c.stamp(p, 'K')
+    p = C(); wing(p, (shd[0] + 2, shd[1] - 3), S['wt'], WING); c.stamp(p, 'K')
     c.blacken()
     if S['streak']:
         for (x, y, n) in ((14, -14, 7), (20, -8, 9), (8, -18, 5)):
