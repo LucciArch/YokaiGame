@@ -264,6 +264,7 @@ class Parade:
         random.shuffle(names)
         cy = RY + RH / 2
         lanes = [(cy - 44, 1, 0), (cy + 40, -1, 3.0), (cy - 4, 1, 7.5)]           # (y, Richtung, Verzögerung in s)
+        self.lanes = [ly for ly, _, _ in lanes]
         k = 0
         for ly, d, delay in lanes:
             for i in range(5):
@@ -288,6 +289,20 @@ class Parade:
             Parade._ov = ov
         ov.set_alpha(int(70 * self.dark))
         s.blit(ov, (RX, RY))
+
+    def draw_lanes(self, s, t):
+        """Vorwarnung: Eine Reihe kündigt sich als violette Spur am Boden an, bevor sie den Raum betritt."""
+        import pygame
+        for ly in self.lanes:
+            ms = [m for m in self.marchers if m.y == ly]
+            near = [m for m in ms if (m.vx > 0 and RX - 140 < m.x < RX + RW + 20) or (m.vx < 0 and RX - 20 < m.x < RX + RW + 140)]
+            if not near:
+                continue
+            a = 0.5 + 0.5 * math.sin(t * 6)
+            col = (int(110 + 60 * a), int(70 + 30 * a), int(170 + 60 * a))
+            off = int(t * 40 * (1 if ms[0].vx > 0 else -1)) % 12
+            for x in range(RX + off, RX + RW, 12):
+                pygame.draw.line(s, col, (x, int(ly) - 2), (x + 5, int(ly) - 2), 1)
 
     def update(self, dt):
         run, p = self.run, self.run.player

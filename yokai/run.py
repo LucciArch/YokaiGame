@@ -2354,6 +2354,7 @@ class Run:
             ents += self.yomeiri.foxes
             if hasattr(self.yomeiri, 'draw_under'):
                 self.yomeiri.draw_under(s)
+                self.yomeiri.draw_lanes(s, t)
         ents += getattr(self, 'apparitions', [])
         ents.sort(key=lambda e: e.y)
         for e in ents:
