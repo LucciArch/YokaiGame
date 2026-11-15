@@ -31,4 +31,4 @@ Prototyp im Browser (`/prototype`, `engines/web`) werden nicht benutzt.
 - `design/game-concept.md` – Spielidee, Säulen, Kernschleife
 - `design/art/art-bible.md` – visuelle Identität (nach `/art-bible`)
 - `design/balance/` – Balance-Berichte (nach `/balance-check`)
-- `design/ereignisse.md` – Ereignisräume (Fuchshochzeit, Versteckspiel)
+- `design/ereignisse.md` – Ereignisräume (Fuchshochzeit, Versteckspiel, Ema-Wand)

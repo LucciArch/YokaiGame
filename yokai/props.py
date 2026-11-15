@@ -391,6 +391,28 @@ def omikuji():
     return _get(('omikuji',), mk)
 
 
+def ema(col, used):
+    """Ema: hölzerne Votivtafel (Fünfeck) an roter Kordel, mit gemaltem Zeichen."""
+    def mk():
+        s = pygame.Surface((22, 26), pygame.SRCALPHA)
+        wood = (172, 130, 82) if not used else (110, 90, 70)
+        s.fill((150, 30, 36), (10, 0, 2, 5))                      # Kordel
+        pts = [(1, 9), (11, 3), (21, 9), (21, 23), (1, 23)]
+        pygame.draw.polygon(s, sh(wood, 0.55), pts)
+        pygame.draw.polygon(s, wood, [(2, 9), (11, 4), (20, 9), (20, 22), (2, 22)])
+        s.fill(sh(wood, 1.2), (3, 10, 16, 1))
+        for yy in (14, 18):                                      # Holzmaserung
+            s.fill(sh(wood, 0.85), (4, yy, 6, 1)); s.fill(sh(wood, 0.85), (12, yy + 1, 5, 1))
+        if not used:
+            c = col
+            pygame.draw.circle(s, sh(c, 0.6), (11, 15), 5)
+            pygame.draw.circle(s, c, (11, 15), 4)
+            s.fill(sh(c, 1.4), (9, 13, 2, 1))
+        s.fill(sh(wood, 0.45), (1, 23, 21, 2))
+        return s
+    return _get(('ema', tuple(col), used), mk)
+
+
 def onsen(used):
     def mk():
         s = pygame.Surface((58, 32), pygame.SRCALPHA)
@@ -574,6 +596,15 @@ dd......dd""",
 ..RWWWR...
 ..RRRRR...
 ..rrrrr...""",
+    'ema': """
+....RR....
+....RR....
+...dDDd...
+..dDDDDd..
+.dDDYYDDd.
+.dDYYYYDd.
+.dDDYYDDd.
+.dddddddd.""",
     'kakurenbo': """
 ...kkkk...
 ..kkkkkk..

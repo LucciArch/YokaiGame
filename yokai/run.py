@@ -15,7 +15,7 @@ from .yomeiri import Procession, Apparition, kakurenbo_start, kakurenbo_break
 
 ACH = {a[0]: a for a in ACHIEVEMENTS}
 MATSURI = ('yo', 60, 96, 'matsuri', 55)          # Nachtmarkt-Musik für Laden und Ereignisräume
-MATSURI_ROOMS = ('shop', 'yomeiri', 'kakurenbo', 'teahouse', 'slots')
+MATSURI_ROOMS = ('shop', 'yomeiri', 'kakurenbo', 'teahouse', 'slots', 'ema')
 TIPS = ['Esc → „Speichern & Hauptmenü“: Der Lauf geht später ab dieser Ebene weiter.',
         'Gesegnete Ebenen erkennst du am goldenen Banner – nutze den Segen, solange er gilt.',
         'Im Item-Tooltip steht, ob ein Fund eine Synergie vervollständigt.',
@@ -450,6 +450,7 @@ class Run:
               'curse': 'Fluchraum: Betreten kostet Leben, dafür lockt ein dunkler Schatz.',
               'yomeiri': 'Fuchshochzeit: Schieß nicht auf den Zug – dann bekommst du ein Geschenk.',
               'kakurenbo': 'Versteckspiel: Zerschlage die richtige Urne. Du hast zwei Versuche.',
+              'ema': 'Ema-Wand: Berühre eine Tafel – nur ein Wunsch geht in Erfüllung.',
               'challenge': 'Prüfungsraum: Mehrere Wellen überstehen, dann gibt es eine Belohnung.',
               'secret': 'Geheimraum! Rissige Wände lassen sich mit Salz aufsprengen.',
               'boss': 'Der Boss dieser Ebene. Bei 25 % Leben rasen Bosse vor Wut.'}.get(room.kind)
@@ -666,6 +667,17 @@ class Run:
             random.shuffle(opts)
             for i, (nm, fx, col) in enumerate(opts[:3]):
                 self.objs.append(Obj('tea', cx - 80 + i * 80, cy, name=nm, fx=fx, col=col, price=random.randint(6, 10)))
+        elif k == 'ema':
+            wishes = [('Stärke', 'Schaden +0,4', {'dmg': 0.4}, (240, 90, 80)),
+                      ('Gesundheit', '+1 Herz', {'hp': 1, 'heal': 1}, (230, 70, 90)),
+                      ('Wohlstand', '+15 Mon', {'coins': 15}, (240, 200, 80)),
+                      ('Weitblick', 'Karte + Schlüssel', {'map': 1, 'keys': 1}, (130, 190, 250)),
+                      ('Schutz', '+2 Seelenherzen', {'spirit': 2}, (150, 170, 255)),
+                      ('Schnelligkeit', 'Feuerrate +0,3', {'rate': 0.3}, (250, 200, 90))]
+            random.shuffle(wishes)
+            for i, (nm, desc, fx, col) in enumerate(wishes[:3]):
+                self.objs.append(Obj('ema', cx - 90 + i * 90, cy - 4, name=nm, desc=desc, fx=fx, col=col))
+            self.banner('Ema-Wand', 'Schreib einen Wunsch auf – nur einer geht in Erfüllung', (230, 190, 140))
         elif k == 'slots':
             self.objs.append(Obj('slots', cx, cy))
             self.banner('Tanuki-Spielhalle', 'Wage dein Glück!', (230, 150, 90))
@@ -1858,6 +1870,28 @@ class Run:
             p.recalc()
             audio.play('heal')
             self.banner(o.data['name'], ', '.join('%s +%g' % (kk, vv) for kk, vv in fx.items()).replace('rate', 'Feuerrate').replace('hp', 'Herz').replace('dmg', 'Schaden').replace('spd', 'Tempo').replace('shotspd', 'Schussgeschw.').replace('luck', 'Glück').replace('heal', 'Heilung').replace('range', 'Reichweite').replace('size', 'Größe'), o.data['col'])
+        elif k == 'ema':
+            if o.used:
+                return
+            for oo in self.objs:
+                if oo.kind == 'ema':
+                    oo.used = True
+            self.room.extra['ema_done'] = True
+            fx = o.data['fx']
+            if 'map' in fx:
+                for r in self.rooms.values():
+                    r.revealed = r.seen = True
+            once = {kk: vv for kk, vv in fx.items() if kk in ('hp', 'heal', 'coins', 'keys', 'spirit', 'salts')}
+            if once:
+                p.apply_once(once)
+            for kk, vv in fx.items():
+                if kk not in once and kk != 'map':
+                    p.bonus[kk] += vv
+            p.recalc()
+            audio.play('bell', 0.6)
+            burst(self, o.x, o.y - 8, tuple(o.data['col']), 18, 60)
+            self.banner('Dein Wunsch wurde erhört', o.data['name'] + ': ' + o.data['desc'], tuple(o.data['col']))
+            self.achieve('ema_wunsch')
         elif k == 'slots':
             self.achieve('slots')
             if p.coins < 3:
@@ -2234,7 +2268,7 @@ class Run:
             rect = pygame.Rect(0, 0, w, h)
             rect.center = (x, y + (-6 if d == 'n' else 6 if d == 's' else 0)) if horiz else (x + (-6 if d == 'w' else 6), y)
             frame = {'boss': (150, 30, 40), 'treasure': (230, 190, 70), 'shop': (90, 160, 90), 'curse': (110, 40, 120),
-                     'challenge': (200, 90, 50), 'omikuji': (210, 60, 50), 'onsen': (120, 190, 220), 'yomeiri': (240, 150, 80), 'kakurenbo': (220, 150, 190),
+                     'challenge': (200, 90, 50), 'omikuji': (210, 60, 50), 'onsen': (120, 190, 220), 'yomeiri': (240, 150, 80), 'kakurenbo': (220, 150, 190), 'ema': (200, 150, 100),
                      'library': (150, 120, 200), 'dojo': (230, 140, 60), 'secret': (160, 140, 110),
                      'teahouse': (110, 170, 90), 'slots': (230, 120, 70)}.get(other.kind, (110, 70, 45))
             if self.curse == 'verirrt' and not other.visited:
@@ -2698,7 +2732,7 @@ class Run:
         pygame.draw.rect(bg, (120, 96, 70, 170), bg.get_rect(), 1)
         s.blit(bg, (x0 - 2, y0 - 2))
         icons = {'secret': (200, 180, 140), 'boss': (230, 50, 50), 'treasure': (240, 200, 70), 'shop': (90, 200, 90), 'curse': (170, 80, 200),
-                 'challenge': (230, 120, 60), 'omikuji': (230, 80, 70), 'onsen': (120, 200, 230), 'yomeiri': (255, 170, 90), 'kakurenbo': (240, 170, 210),
+                 'challenge': (230, 120, 60), 'omikuji': (230, 80, 70), 'onsen': (120, 200, 230), 'yomeiri': (255, 170, 90), 'kakurenbo': (240, 170, 210), 'ema': (220, 170, 110),
                  'library': (170, 140, 230), 'dojo': (240, 160, 60), 'teahouse': (120, 190, 100), 'slots': (240, 140, 80)}
         for pos, r in rooms.items():
             if not (r.seen or show_all) or not r.revealed:

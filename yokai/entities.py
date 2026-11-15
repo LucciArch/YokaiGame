@@ -1580,6 +1580,14 @@ class Obj:
             gfx.draw_glow(s, x, y - 6, 22, col, 90)
             put(props.hokora(bool(oni)), y + 6)
             gfx.TEXT.add('Oni-Schrein' if oni else 'Kami-Schrein', x, y + 8, 6, col, 'c')
+        elif k == 'ema':
+            col = tuple(self.data['col'])
+            if not self.used:
+                gfx.draw_glow(s, x, y - 8, 16, col, 50)
+            put(props.ema(col, self.used), y + 4 + (int(math.sin(t * 2 + x) * 1.2) if not self.used else 0))
+            if not self.used:
+                gfx.TEXT.add(self.data['name'], x, y + 7, 6, (240, 225, 190), 'c')
+                gfx.TEXT.add(self.data['desc'], x, y + 15, 6, col, 'c')
         elif k == 'tea':
             nm, price, col = self.data['name'], self.data['price'], self.data['col']
             put(props.tea_bench(), y + 8)

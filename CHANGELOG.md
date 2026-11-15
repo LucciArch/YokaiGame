@@ -21,6 +21,7 @@
 - Kapitelnamen, eigener Seed (E in der Figurenauswahl), Codex mit Silhouetten, Menüs mit Nachthimmel
 - Neues Ereignis **Kitsune no Yomeiri**: Eine Fuchshochzeit zieht durch einen Raum – wer sie nicht stört, bekommt ein Geschenk der Braut
 - Neues Ereignis **Kakurenbo**: Zashiki-warashi versteckt sich in einer von vier Urnen – zwei Versuche
+- Neues Ereignis **Ema-Wand**: Drei Votivtafeln, nur ein Wunsch geht in Erfüllung
 - 2 neue Items nur aus Ereignisräumen: **Schleier der Fuchsbraut** und **Temari-Ball**
 - Controller vibrieren bei Treffern und Explosionen (an „Bildschirmwackeln“ gekoppelt)
 - Neues Musikstück **„Yomise“** (Nachtmarkt) für Laden, Teehaus, Spielhalle und Ereignisräume
