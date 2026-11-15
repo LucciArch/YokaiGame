@@ -57,6 +57,8 @@ class Run:
         self.banner_t = 0.0
         self.cur_banner = None
         self.shake_amt = 0.0
+        self.whiteout = 0.0
+        self.hint_txt, self.hint_t = '', 0.0
         self.hurt_flash = 0.0
         self.flash_white = 0.0
         self.timestop = 0.0
@@ -217,6 +219,13 @@ class Run:
         elif not room.cleared:
             self.spawn_room_enemies(room)
         self.fade = 0.6
+        rh = {'shop': 'Laden: Mon gegen Items tauschen. Der Saisen-Kasten nimmt Spenden an – manchmal lohnt es sich.',
+              'curse': 'Fluchraum: Betreten kostet Leben, dafür lockt ein dunkler Schatz.',
+              'challenge': 'Prüfungsraum: Mehrere Wellen überstehen, dann gibt es eine Belohnung.',
+              'secret': 'Geheimraum! Rissige Wände lassen sich mit Salz aufsprengen.',
+              'boss': 'Der Boss dieser Ebene. Bei 25 % Leben rasen Bosse vor Wut.'}.get(room.kind)
+        if rh and room_obj is None:
+            self.hint('room_' + room.kind, rh)
         self.boss_intro = 0
         if room.kind == 'boss' and not room.cleared:
             self.boss_intro = 2.2
@@ -368,6 +377,10 @@ class Run:
                         continue
                     self.pickups.append(Pickup(kind, cx + dx, cy - 6, price=max(1, int(price * disc)), pop=False))
             self.objs.append(Obj('saisen', cx, cy + 60))
+            if True:
+                tk = Obj('tanuki', cx, cy - 46, run=self)
+                tk.r = -100
+                self.objs.append(tk)
         elif k == 'curse':
             if random.random() < 0.5:
                 self.pedestals.append(Pedestal(self.pick_item('O'), cx, cy))
@@ -439,6 +452,18 @@ class Run:
             self.player.hurt(1)
 
     # ======================================================================  Hilfen
+    HINTS_OFF = False
+
+    def hint(self, hid, text):
+        """Einmaliger Kontext-Tipp (pro Spielstand), unten im Raum eingeblendet."""
+        if self.HINTS_OFF or not self.save['settings'].get('hints', True):
+            return
+        seen = self.save.data.setdefault('hints', [])
+        if hid in seen:
+            return
+        seen.append(hid)
+        self.hint_txt, self.hint_t = text, 6.0
+
     def banner(self, title, sub='', col=(255, 240, 200), big=False, fx=''):
         self.banners.append((title, sub, col, big, fx))
 
@@ -705,8 +730,15 @@ class Run:
 
     # ======================================================================  Boss besiegt
     def on_boss_killed(self, b):
-        self.shake(10)
+        self.shake(12)
         audio.play('roar')
+        self.whiteout = 0.45
+        for k, (sz, lf, c) in enumerate(((150, 0.9, (255, 220, 150)), (100, 0.7, (255, 140, 90)), (210, 1.3, (220, 200, 255)))):
+            self.particles.append(Particle(b.x, b.y, 0, 0, lf, c, sz, kind='wave'))
+        for i in range(36):
+            a = i / 36 * math.tau
+            v = random.uniform(120, 260)
+            self.particles.append(Particle(b.x, b.y, math.cos(a) * v, math.sin(a) * v, random.uniform(0.4, 0.9), (255, 230, 170), 2, kind='spark'))
         for i in range(5):
             burst(self, b.x + random.uniform(-15, 15), b.y + random.uniform(-15, 15), (255, 230, 160), 20, 140, 1.0, 3)
         for e in self.enemies:
@@ -930,6 +962,10 @@ class Run:
         self.hurt_flash = max(0, self.hurt_flash - dt)
         self.flash_white = max(0, self.flash_white - dt)
         self.shake_amt = max(0, self.shake_amt - dt * 30)
+        self.whiteout = max(0.0, self.whiteout - dt)
+        self.hint_t = max(0.0, self.hint_t - dt)
+        if self.player.hp <= 2 and not self.player.spirit_only:
+            self.hint('lowhp', 'Wenig Leben: Leertaste = Ausweichrolle (kurz unverwundbar). Herzen gibt es im Laden.')
         self.timestop = max(0, self.timestop - dt)
         self.slow_player = max(0, self.slow_player - dt)
         self.flow_t -= dt
@@ -1186,12 +1222,14 @@ class Run:
             elif k == 'key':
                 p.keys = min(99, p.keys + 1)
                 audio.play('key', 0.7)
+                self.hint('key', 'Schlüssel öffnen Türen mit Schloss und goldene Truhen.')
             elif k == 'salt':
                 if p.salts >= 9:
                     ok = False
                 else:
                     p.salts += 1
                     audio.play('pickup', 0.7)
+                    self.hint('salt', 'Reinigungssalz (Q): bannt Geschosse und sprengt rissige Wände auf.')
             elif k == 'trinket':
                 if pk.age < 0.8 or getattr(pk, 'swapcool', 0) > 0:
                     continue
@@ -1204,6 +1242,7 @@ class Run:
                 p.recalc()
                 tr = TRINKETS[pk.tid]
                 self.banner(tr['name'], tr['desc'] + '  (Anhänger)', tr['col'])
+                self.hint('trinket', 'Anhänger wirken dauerhaft. Ein neuer ersetzt den alten – der bleibt liegen.')
                 audio.play('pickup')
                 if old:
                     pk.tid = old
@@ -1264,6 +1303,7 @@ class Run:
                 new = pd.item[7:]
                 old = p.active
                 p.active = new
+                self.hint('active', 'Aktives Item: mit E einsetzen. Es lädt sich mit jedem geräumten Raum auf.')
                 p.charge = ACTIVES[new]['charge']
                 self.banner(ACTIVES[new]['name'], ACTIVES[new]['desc'] + '  [E]', ACTIVES[new]['col'])
                 audio.play('item')
@@ -1727,6 +1767,20 @@ class Run:
             s.blit(cur, (area.x + dx * ow * (1 - f), area.y + dy * oh * (1 - f)))
             s.blit(img, (area.x + ox, area.y + oy))
             s.set_clip(None)
+        if self.whiteout > 0:
+            fl = pygame.Surface((RW, RH)); fl.fill((255, 246, 230))
+            fl.set_alpha(int(min(1, self.whiteout / 0.45) * 170 * (0.5 if self.save['settings'].get('flash', True) is False else 1)))
+            s.blit(fl, (RX, RY))
+        if self.hint_t > 0 and self.hint_txt:
+            a = min(1.0, self.hint_t, (6.0 - self.hint_t) * 3)
+            hw = min(RW - 20, 8 + len(self.hint_txt) * 4)
+            bx = RX + RW // 2 - hw // 2
+            by = RY + 6
+            bg = pygame.Surface((hw, 14), pygame.SRCALPHA)
+            bg.fill((12, 8, 18, int(190 * a)))
+            pygame.draw.rect(bg, (200, 170, 110, int(220 * a)), bg.get_rect(), 1)
+            s.blit(bg, (bx, by))
+            gfx.TEXT.add(self.hint_txt, RX + RW // 2, by + 3, 6, (250, 236, 200), 'c', alpha=int(255 * a))
         self.draw_hud(s, t)
         if getattr(self, 'descend', 0) > 0:
             f = 1 - self.descend / 1.3

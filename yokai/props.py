@@ -177,3 +177,189 @@ def ofuda(col, r, ang):
     im = pygame.transform.rotate(im, -step * 15)
     _cache[key] = im
     return im
+
+
+# ---------------------------------------------------------------- Ladentheke des Tanuki-Händlers (2x für Hi-Res-Ebene)
+def counter():
+    key = ('counter',)
+    if key in _cache:
+        return _cache[key]
+    s = pygame.Surface((48, 16), pygame.SRCALPHA)
+    wd = (118, 76, 48)
+    _box(s, 1, 4, 46, 11, sh(wd, 0.85))                         # Front
+    for x in range(6, 46, 8):
+        s.fill(sh(wd, 0.62), (x, 6, 1, 8))
+    _box(s, 0, 1, 48, 4, wd)                                    # Platte
+    s.fill(sh(wd, 1.4), (1, 1, 46, 1))
+    s.fill((40, 52, 104), (3, 6, 42, 4))                        # Noren-Tuch mit Wappen
+    s.fill((60, 76, 140), (3, 6, 42, 1))
+    for x in (12, 24, 36):
+        pygame.draw.circle(s, (232, 222, 196), (x, 8), 1)
+    s.fill((30, 26, 32), (38, 0, 3, 1)); s.fill((226, 214, 186), (37, -1 + 1, 5, 1))
+    _box(s, 38, -1 + 1, 3, 1, (226, 214, 186), hl=False)
+    s = _outline(s)
+    s = pygame.transform.scale(s, (s.get_width() * 2, s.get_height() * 2))
+    _cache[key] = s
+    return s
+
+
+# ---------------------------------------------------------------- Schrein- und Raumobjekte
+STONE = (112, 108, 126)
+
+
+def _get(key, fn):
+    s = _cache.get(key)
+    if s is None:
+        s = _outline(fn())
+        _cache[key] = s
+    return s
+
+
+def saisen():
+    def mk():
+        s = pygame.Surface((28, 18), pygame.SRCALPHA)
+        wd = (104, 64, 40)
+        _box(s, 1, 6, 26, 11, sh(wd, 0.9))
+        _box(s, 0, 3, 28, 4, wd)
+        for i in range(6):                                       # Schräg-Latten im Deckel
+            s.fill(sh(wd, 0.5), (3 + i * 4, 3, 2, 3))
+            s.fill(sh(wd, 1.35), (3 + i * 4, 3, 1, 1))
+        s.fill((226, 186, 74), (11, 9, 6, 5))                    # Messingplakette
+        s.fill((255, 228, 140), (11, 9, 6, 1))
+        s.fill((150, 104, 34), (12, 11, 4, 1))
+        for x in (3, 24):
+            s.fill(sh(wd, 0.55), (x, 16, 2, 2))
+        rope = (214, 190, 130)                                   # Glockenseil
+        s.fill(rope, (13, 0, 2, 3)); s.fill((200, 40, 44), (13, 0, 1, 2))
+        return s
+    return _get(('saisen',), mk)
+
+
+def omikuji():
+    def mk():
+        s = pygame.Surface((20, 28), pygame.SRCALPHA)
+        red = (186, 44, 40)
+        _box(s, 3, 2, 14, 18, red)
+        s.fill(sh(red, 1.35), (4, 2, 12, 1))
+        s.fill((236, 226, 200), (6, 5, 8, 11))                   # Papierfeld
+        s.fill((40, 24, 24), (9, 6, 2, 1)); s.fill((40, 24, 24), (8, 8, 4, 1))
+        s.fill((40, 24, 24), (9, 10, 2, 4)); s.fill((40, 24, 24), (7, 12, 6, 1))
+        s.fill((30, 18, 20), (9, 0, 2, 2))                       # Losstab
+        _box(s, 5, 20, 10, 2, (80, 52, 34))
+        _box(s, 2, 22, 16, 5, (96, 62, 40))
+        for x in (1, 17):                                        # gebundene Zettel
+            s.fill((246, 244, 236), (x, 14, 2, 4)); s.set_at((x, 18), (190, 186, 200))
+        return s
+    return _get(('omikuji',), mk)
+
+
+def onsen(used):
+    def mk():
+        s = pygame.Surface((58, 32), pygame.SRCALPHA)
+        pygame.draw.ellipse(s, sh(STONE, 0.7), (0, 2, 58, 29))
+        water = (70, 140, 168) if not used else (64, 96, 108)
+        pygame.draw.ellipse(s, sh(water, 0.7), (5, 6, 48, 21))
+        pygame.draw.ellipse(s, water, (6, 8, 46, 18))
+        pygame.draw.ellipse(s, sh(water, 1.3), (14, 11, 22, 6), 1)
+        import random as _r
+        rng = _r.Random(4)
+        for i in range(16):                                      # Randsteine
+            a = i / 16 * math.tau
+            x = 29 + math.cos(a) * 26 - 3
+            y = 16 + math.sin(a) * 12 - 3
+            w = rng.randint(6, 9)
+            _box(s, int(x), int(y), w, 5, sh(STONE, rng.uniform(0.8, 1.05)))
+        return s
+    return _get(('onsen', used), mk)
+
+
+def torii(col):
+    def mk():
+        s = pygame.Surface((44, 36), pygame.SRCALPHA)
+        blk = (30, 22, 30)
+        _box(s, 8, 6, 4, 29, col)                                # Pfeiler
+        _box(s, 32, 6, 4, 29, col)
+        s.fill(blk, (7, 31, 6, 4)); s.fill(blk, (31, 31, 6, 4))   # Kamaki-Sockel
+        _box(s, 4, 11, 36, 3, col)                               # Nuki
+        _box(s, 20, 6, 4, 6, sh(col, 0.85))                      # Gakuzuka
+        _box(s, 2, 4, 40, 3, col)                                # Shimaki
+        for x in range(0, 44):                                   # Kasagi, Enden geschwungen
+            lift = 2 if x < 3 or x > 40 else (1 if x < 6 or x > 37 else 0)
+            s.fill(blk, (x, 1 - lift + 2, 1, 2))
+            s.set_at((x, 1 - lift + 2), (70, 56, 70))
+        return s
+    return _get(('torii', col), mk)
+
+
+def hokora(oni):
+    def mk():
+        s = pygame.Surface((32, 32), pygame.SRCALPHA)
+        wd = (96, 60, 40) if not oni else (70, 26, 30)
+        acc = (230, 196, 90) if not oni else (200, 40, 50)
+        _box(s, 5, 26, 22, 5, sh(STONE, 0.9))                    # Steinsockel
+        _box(s, 8, 13, 16, 13, wd)                               # Schrein-Körper
+        s.fill(sh(wd, 0.45), (12, 16, 8, 10))                    # Öffnung
+        s.fill(acc, (15, 18, 2, 4))                              # Spiegel / Flamme
+        s.fill(sh(acc, 1.4), (15, 18, 1, 1))
+        for i in range(8):                                       # Satteldach
+            s.fill(sh((60, 54, 72), 1.1 - i * 0.04), (3 + i, 12 - i, 26 - 2 * i, 1))
+        s.fill((40, 36, 52), (2, 12, 28, 2))
+        s.fill(acc, (15, 3, 2, 2))
+        s.fill((246, 244, 236), (10, 15, 1, 3)); s.fill((246, 244, 236), (21, 15, 1, 3))
+        return s
+    return _get(('hokora', oni), mk)
+
+
+def tea_bench():
+    def mk():
+        s = pygame.Surface((28, 12), pygame.SRCALPHA)
+        red = (170, 40, 40)
+        _box(s, 0, 2, 28, 4, red)                                # Bank mit rotem Tuch (Hiraki-mōsen)
+        s.fill(sh(red, 1.35), (1, 2, 26, 1))
+        wd = (90, 58, 38)
+        for x in (2, 23):
+            _box(s, x, 6, 3, 6, wd)
+        _box(s, 9, 0, 10, 3, (60, 44, 34))                       # Tablett
+        return s
+    return _get(('tea_bench',), mk)
+
+
+def tea_cup(col):
+    def mk():
+        s = pygame.Surface((10, 8), pygame.SRCALPHA)
+        clay = (200, 190, 170)
+        _box(s, 1, 2, 8, 6, clay)
+        s.fill(col, (2, 2, 6, 2))
+        s.fill(sh(col, 1.4), (2, 2, 3, 1))
+        return s
+    return _get(('tea_cup', col), mk)
+
+
+def slots_cab():
+    def mk():
+        s = pygame.Surface((32, 40), pygame.SRCALPHA)
+        fur = (138, 96, 60)
+        pygame.draw.circle(s, fur, (16, 8), 7)                   # Tanuki-Kopf oben
+        pygame.draw.circle(s, sh(fur, 0.7), (10, 3), 2); pygame.draw.circle(s, sh(fur, 0.7), (22, 3), 2)
+        s.fill((40, 30, 30), (10, 7, 12, 3))                     # Maske
+        s.fill((250, 240, 220), (12, 8, 2, 1)); s.fill((250, 240, 220), (18, 8, 2, 1))
+        s.fill((230, 214, 186), (13, 11, 6, 3))
+        red = (176, 46, 44)
+        _box(s, 3, 15, 26, 22, red)
+        s.fill(sh(red, 1.4), (4, 15, 24, 1))
+        s.fill((20, 14, 20), (6, 18, 20, 9))                     # Fenster
+        _box(s, 26, 18, 4, 3, (210, 180, 80))                    # Hebel
+        s.fill((230, 190, 70), (8, 30, 16, 2))                   # Münzschlitz-Leiste
+        s.fill((40, 26, 18), (14, 30, 4, 1))
+        _box(s, 2, 36, 28, 3, (70, 46, 34))
+        return s
+    return _get(('slots',), mk)
+
+
+def stairs_up():
+    def mk():
+        s = pygame.Surface((24, 22), pygame.SRCALPHA)
+        for i in range(5):
+            _box(s, 2 + i * 2, 17 - i * 4, 20 - i * 4, 5, sh(STONE, 0.7 + i * 0.08))
+        return s
+    return _get(('stairs',), mk)

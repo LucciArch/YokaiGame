@@ -846,7 +846,8 @@ class Game:
         st = self.save['settings']
         opts = [('Musik', '%d%%' % round(st['music'] * 100)), ('Effekte', '%d%%' % round(st['sfx'] * 100)),
                 ('Vollbild', 'An' if self.fullscreen else 'Aus'), ('Bildschirmwackeln', 'An' if st.get('shake', True) else 'Aus'),
-                ('Schadenszahlen', 'An' if st.get('dmgnums', True) else 'Aus'), ('Spielstand löschen', ''), ('Zurück', '')]
+                ('Schadenszahlen', 'An' if st.get('dmgnums', True) else 'Aus'), ('Tipps', 'An' if st.get('hints', True) else 'Aus'),
+                ('Spielstand löschen', ''), ('Zurück', '')]
         T.add('Optionen', W // 2, 30, 14, (255, 230, 170), 'c')
         for i, (k, v) in enumerate(opts):
             y = 70 + i * 20
@@ -891,6 +892,8 @@ class Game:
                     st['shake'] = not st.get('shake', True)
                 elif k == 'Schadenszahlen':
                     st['dmgnums'] = not st.get('dmgnums', True)
+                elif k == 'Tipps':
+                    st['hints'] = not st.get('hints', True)
                 elif k == 'Spielstand löschen' and n == 'ok':
                     self.confirm = 'reset'
                 elif k == 'Zurück' and n == 'ok':

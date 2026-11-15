@@ -93,6 +93,13 @@ class Particle:
         elif self.kind == 'ring':
             r = int(self.size * (1 - f) + 2)
             pygame.draw.circle(s, self.col, (int(self.x), int(self.y)), r, 1)
+        elif self.kind == 'wave':
+            r = int(self.size * (1 - f * f) + 3)
+            w = max(1, int(4 * f + 1))
+            gfx.draw_glow(s, int(self.x), int(self.y), r + 6, self.col, int(60 * f))
+            pygame.draw.circle(s, self.col, (int(self.x), int(self.y)), r, w)
+            if r > 4:
+                pygame.draw.circle(s, (255, 255, 240), (int(self.x), int(self.y)), r - w, 1)
         elif self.kind == 'petal':
             pygame.draw.ellipse(s, self.col, (int(self.x), int(self.y), 3, 2))
         elif self.kind == 'rain':
@@ -1441,64 +1448,80 @@ class Obj:
         x, y = int(self.x), int(self.y)
         D = pygame.draw
         k = self.kind
+        if k == 'tanuki':
+            run = self.data.get('run')
+            pl = run.player if run else None
+            last = self.data.get('coins')
+            if pl is not None:
+                if last is not None and pl.coins < last:
+                    self.data['say'] = (random.choice(['Maido ari!', 'Danke sehr!', 'Gute Wahl!']), self.t + 1.6)
+                self.data['coins'] = pl.coins
+            bob = 1 if int(self.t * 2) % 2 else 0
+            if sheets.has('ponpoko'):
+                spr = sheets.frame('ponpoko', sheets.RIGHT if pl is not None and pl.x > x else sheets.LEFT, 0)
+                gfx.hi_blit(spr, x, y + 9 - bob)
+            gfx.hi_blit(props.counter(), x, y + 14)
+            say = self.data.get('say')
+            if say and self.t < say[1]:
+                txt = say[0]
+            elif pl is not None and math.hypot(pl.x - x, pl.y - y) < 80:
+                txt = 'Irasshai!'
+            else:
+                txt = None
+            if txt:
+                gfx.TEXT.add(txt, x, y - 40 - bob, 7, (255, 240, 200), 'c')
+            return
+        def put(img, bottom):
+            s.blit(img, (x - img.get_width() // 2, bottom - img.get_height()))
         if k == 'saisen':
-            D.rect(s, (60, 36, 24), (x - 12, y - 6, 24, 14))
-            D.rect(s, (130, 84, 50), (x - 12, y - 8, 24, 4))
-            for i in range(5):
-                D.line(s, (50, 30, 20), (x - 10 + i * 5, y - 7), (x - 10 + i * 5, y - 5))
+            put(props.saisen(), y + 8)
             gfx.TEXT.add('Saisen', x, y + 9, 6, (230, 210, 170), 'c')
         elif k == 'omikuji':
-            D.rect(s, (200, 50, 40), (x - 8, y - 14, 16, 22))
-            D.rect(s, (250, 240, 220), (x - 5, y - 10, 10, 12))
-            D.line(s, (30, 20, 20), (x, y - 9), (x, y), 1)
+            put(props.omikuji(), y + 9)
             gfx.TEXT.add('Omikuji 5 Mon', x, y + 10, 6, (230, 210, 170), 'c')
         elif k == 'onsen':
-            D.ellipse(s, (90, 80, 80), (x - 26, y - 14, 52, 28))
-            D.ellipse(s, (120, 200, 220) if not self.used else (80, 120, 130), (x - 22, y - 11, 44, 22))
+            put(props.onsen(self.used), y + 16)
             if not self.used:
                 for i in range(3):
-                    yy = y - 14 - ((t * 20 + i * 9) % 26)
-                    D.circle(s, (240, 240, 250), (x - 10 + i * 10 + int(math.sin(t * 2 + i) * 3), int(yy)), 2)
+                    yy = y - 8 - ((t * 20 + i * 9) % 26)
+                    a_ = 1 - ((t * 20 + i * 9) % 26) / 26
+                    c_ = int(170 + 70 * a_)
+                    D.circle(s, (c_, c_, min(255, c_ + 8)), (x - 10 + i * 10 + int(math.sin(t * 2 + i) * 3), int(yy)), 2 if a_ > 0.4 else 1)
         elif k in ('torii', 'heaven', 'victory'):
-            col = {'torii': (210, 50, 40), 'heaven': (240, 210, 120), 'victory': (250, 250, 250)}[k]
-            gfx.draw_glow(s, x, y, 26, col, 70)
-            D.rect(s, col, (x - 14, y - 22, 4, 26))
-            D.rect(s, col, (x + 10, y - 22, 4, 26))
-            D.rect(s, col, (x - 18, y - 24, 36, 4))
-            D.rect(s, col, (x - 15, y - 17, 30, 3))
-            D.rect(s, (20, 10, 10), (x - 10, y - 14, 20, 18))
+            col = {'torii': (196, 46, 38), 'heaven': (226, 190, 96), 'victory': (236, 234, 228)}[k]
+            gfx.draw_glow(s, x, y - 8, 26, col, 70)
+            pr = pygame.Surface((22, 20), pygame.SRCALPHA)       # schimmerndes Portal zwischen den Pfeilern
+            for i in range(20):
+                f_ = 0.5 + 0.5 * math.sin(t * 3 + i * 0.5)
+                pr.fill((int(20 + 40 * f_ * (col[0] / 255)), int(10 + 30 * f_ * (col[1] / 255)), int(24 + 40 * f_ * (col[2] / 255))), (0, i, 22, 1))
+            s.blit(pr, (x - 11, y - 16))
+            put(props.torii(col), y + 5)
             txt = {'torii': 'Tiefer hinab', 'heaven': 'Aufstieg nach Takamagahara', 'victory': 'Die Reise beenden'}[k]
             gfx.TEXT.add(txt, x, y + 8, 6, (255, 240, 200), 'c')
         elif k == 'shrine':
             oni = self.data.get('oni')
             col = (200, 40, 50) if oni else (250, 230, 150)
-            gfx.draw_glow(s, x, y, 22, col, 90)
-            D.polygon(s, col, [(x - 14, y - 10), (x, y - 22), (x + 14, y - 10)])
-            D.rect(s, (60, 40, 30), (x - 10, y - 10, 20, 14))
-            D.rect(s, col, (x - 4, y - 6, 8, 10))
+            gfx.draw_glow(s, x, y - 6, 22, col, 90)
+            put(props.hokora(bool(oni)), y + 6)
             gfx.TEXT.add('Oni-Schrein' if oni else 'Kami-Schrein', x, y + 8, 6, col, 'c')
         elif k == 'tea':
             nm, price, col = self.data['name'], self.data['price'], self.data['col']
-            D.rect(s, (90, 60, 40), (x - 12, y - 2, 24, 10))
-            D.rect(s, (130, 90, 60), (x - 12, y - 4, 24, 3))
+            put(props.tea_bench(), y + 8)
             if not self.used:
-                D.ellipse(s, col, (x - 5, y - 12, 10, 8))
-                D.ellipse(s, (250, 250, 250), (x - 5, y - 12, 10, 8), 1)
+                put(props.tea_cup(tuple(col)), y - 1)
+                for i in range(2):
+                    yy = y - 6 - ((t * 12 + i * 6) % 12)
+                    s.set_at((x - 1 + i * 2 + int(math.sin(t * 3 + i)), int(yy)), (220, 220, 230))
                 gfx.TEXT.add(nm, x, y + 10, 6, (240, 225, 190), 'c')
                 gfx.TEXT.add('%d Mon' % price, x, y + 18, 6, (255, 230, 120), 'c')
         elif k == 'slots':
-            D.rect(s, (40, 20, 20), (x - 14, y - 22, 28, 32))
-            D.rect(s, (200, 60, 50), (x - 13, y - 21, 26, 30))
-            D.rect(s, (250, 240, 220), (x - 10, y - 16, 20, 9))
-            sy = self.data.get('spin', 0)
+            put(props.slots_cab(), y + 11)
             icons = ['coin', 'leaf', 'heart', 'flame', 'star']
             for i in range(3):
                 ic = icons[int((t * 12 if self.cool > 0.3 else 0) + i * 2 + self.data.get('res', 0)) % len(icons)]
                 D.circle(s, {'coin': (230, 190, 70), 'leaf': (90, 170, 80), 'heart': (220, 50, 60), 'flame': (255, 140, 40), 'star': (250, 230, 120)}[ic],
-                         (x - 6 + i * 6, y - 11), 2)
-            D.circle(s, (160, 110, 70), (x, y - 26), 5)
-            D.circle(s, (20, 10, 10), (x - 2, y - 27), 1); D.circle(s, (20, 10, 10), (x + 2, y - 27), 1)
+                         (x - 6 + i * 6, y - 8), 2)
             gfx.TEXT.add('Tanuki-Automat 3 Mon', x, y + 12, 6, (240, 225, 190), 'c')
         elif k == 'back':
-            D.rect(s, (20, 14, 20), (x - 10, y - 10, 20, 20))
+            put(props.stairs_up(), y + 10)
             gfx.TEXT.add('Zurück', x, y + 12, 6, (230, 210, 170), 'c')
