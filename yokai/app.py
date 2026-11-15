@@ -913,7 +913,7 @@ class Game:
         T.add('Ebene %d von %d' % (run.floor_no, len(run.path_nodes())), W // 2, 282, 7, (190, 170, 150), 'c')
         if self.over_t > 0.8:
             for n in nav:
-                if n == 'retry':
+                if n in ('retry', 'hard'):                 # R bzw. Y am Controller
                     audio.play('select')
                     self.start_run(p.char)
                     return

@@ -1026,7 +1026,7 @@ if not _os.path.exists(FONT_PATH):
 
 PAD_MODE = False          # zuletzt mit Controller gespielt → Tastenhinweise als Controller-Knöpfe
 _PAD_SUB = (('Enter – ', 'A – '), ('Enter: ', 'A: '), ('Esc – ', 'B – '), ('Esc: ', 'B: '),
-            ('/ Esc –', '/ B –'), ('Beliebige Taste', 'Beliebiger Knopf'))
+            ('/ Esc –', '/ B –'), ('Beliebige Taste', 'Beliebiger Knopf'), ('R – Nochmal', 'Y – Nochmal'))
 
 
 def pad_labels(s):
@@ -1044,7 +1044,7 @@ class TextLayer:
 
     def add(self, s, x, y, size=10, color=(240, 236, 226), align='l', shadow=True, alpha=255):
         s = str(s)
-        if PAD_MODE and ('Enter' in s or 'Esc' in s or 'Beliebige Taste' in s):
+        if PAD_MODE and ('Enter' in s or 'Esc' in s or 'Beliebige Taste' in s or 'R – ' in s):
             s = pad_labels(s)
         self.items.append((s, x, y, size, color, align, shadow, alpha))
 
