@@ -38,6 +38,7 @@ Jeder Push auf `main` baut über GitHub Actions automatisch eine neue `.exe`.
 - Spezialräume: Schatzraum (verschlossen ab Kapitel II), Laden, Fluchraum, Kampfraum, Geheimräume (mit Reinigungssalz an rissigen Wänden aufdecken), Omikuji-Schrein, heiße Quelle (Onsen), Schriftrollenarchiv (1 von 3 Items), Dōjō (Champion-Kampf), Teehaus (dauerhafte Werte-Upgrades), Tanuki-Spielautomat, Kami- und Oni-Schreine nach Bossen
 - Flüche (Dunkelheit, Nebel, Labyrinth, Verirrte), Oni-Modus (schwer), **Endlose Nacht** (endlose Schleifen mit steigender Schwierigkeit), tägliche Prüfung mit festem Seed, **9 Herausforderungen** mit Sonderregeln (Glaskanone, Boss-Ansturm, Wettlauf gegen den Morgen, Papiermeister …)
 - **Biom-Eigenheiten**: jedes Biom hat eine eigene Mechanik – Eisboden, Tengu-Windböen, speiende Lavagruben, Irrlichter, Meeresströmung, Poltergeist-Töpfe, Sternschnuppen, Bambus-Fallen, Fuchsfeuer, greifende Hände, Kappa-Dank, Oni-Kriegstrommeln, Brandung
+- **Ereignisräume**: Fuchshochzeit (Kitsune no Yomeiri), Versteckspiel mit Zashiki-warashi (Kakurenbo), Ema-Wand der Wünsche – mit eigener Nachtmarkt-Musik
 - Tanuki-Händler im Laden, einmalige Kontext-Tipps (abschaltbar)
 - Mini-Bosse in normalen Räumen, Wutphase der Bosse bei 25 % Leben, Wetter (Regen, Schneesturm, Asche)
 - **Yōkai-Lexikon** mit Folklore, Verhalten, Fundorten und Zähler, **Codex** aller Items, Erfolge, Statistik (Biome, letzte Läufe)
