@@ -1498,6 +1498,9 @@ class Pedestal:
             gfx.TEXT.add('-%d Herz' % self.hearts if self.hearts < 99 else '-3 Geist', x, y + 13, 7, (255, 110, 110), 'c')
 
 
+_OBJ_HI = {}
+
+
 class Obj:
     """Interaktive Objekte: Saisen-Kasten, Omikuji, Onsen, Torii-Ausgang, Schrein-Portal."""
 
@@ -1538,7 +1541,10 @@ class Obj:
                 gfx.TEXT.add(txt, x, y - 40 - bob, 7, (255, 240, 200), 'c')
             return
         def put(img, bottom):
-            s.blit(img, (x - img.get_width() // 2, bottom - img.get_height()))
+            hi = _OBJ_HI.get(id(img))                  # Requisiten auf der Hi-Res-Ebene (Scale2x, geglättete Kanten)
+            if hi is None or hi[0] is not img:
+                hi = _OBJ_HI[id(img)] = (img, gfx.scale2x(img))
+            gfx.hi_blit(hi[1], x, bottom)
         if k == 'saisen':
             put(props.saisen(), y + 8)
             gfx.TEXT.add('Saisen', x, y + 9, 6, (230, 210, 170), 'c')
