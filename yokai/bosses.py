@@ -628,44 +628,81 @@ class Jorogumo(Boss):
 
 
 # =====================================================================  EBENE 2
+GASHA_PAL = ((10, 8, 20), (95, 66, 80), (168, 134, 106), (220, 203, 156), (255, 246, 216))
+_GASHA_HAND = {}
+
+
+def gasha_hand(spread, wig):
+    """Aus dem Boden ragender Skelettarm mit Hand – Pixelgrafik in Hi-Res (1 Pixel = ½ Weltpixel),
+    gleiche Farben wie das Gashadokuro-Sprite. spread 0 = geschlossen, 0.5 = gespreizt zum Zupacken."""
+    key = (spread, wig)
+    if key in _GASHA_HAND:
+        return _GASHA_HAND[key]
+    K, D_, M, L, H = GASHA_PAL
+    S = 1.9
+    w, h = 96, 124
+    surf = pygame.Surface((w, h), pygame.SRCALPHA)
+    dr = pygame.draw
+
+    def bone(p0, p1, wd):
+        p0 = (round(p0[0]), round(p0[1])); p1 = (round(p1[0]), round(p1[1]))
+        dr.line(surf, K, p0, p1, wd + 3)
+        dr.line(surf, D_, p0, p1, wd)
+        dr.line(surf, M, (p0[0] - 1, p0[1]), (p1[0] - 1, p1[1]), max(1, wd - 2))
+        if wd >= 5:
+            dr.line(surf, L, (p0[0] - 2, p0[1]), (p1[0] - 2, p1[1]), max(1, wd - 5))
+
+    def knob(p, r):
+        p = (round(p[0]), round(p[1]))
+        dr.circle(surf, K, p, r + 2)
+        dr.circle(surf, D_, p, r)
+        dr.circle(surf, M, (p[0] - 1, p[1] - 1), max(1, r - 1))
+        dr.circle(surf, L, (p[0] - 2, p[1] - 2), max(1, r - 3))
+
+    cx = w // 2
+    base = h - 3
+    wy = 66                                                        # Handgelenk
+    bone((cx - 7, base), (cx - 5, wy + 6), 7)                      # Elle
+    bone((cx + 7, base), (cx + 5, wy + 6), 6)                      # Speiche
+    for (dx, dy, r) in ((-7, 3, 5), (0, 0, 5), (7, 3, 5), (-4, -6, 5), (5, -6, 5)):   # Handwurzel
+        knob((cx + dx, wy + dy), r)
+    for f in range(5):
+        ang = -math.pi / 2 + (f - 2) * (0.24 + spread * 0.45) + (0.05 * wig if f == 4 else 0)
+        if f == 0:
+            ang = -math.pi / 2 - 1.0 - spread * 0.35                # Daumen seitlich
+        x, y = cx + (f - 2) * 5, wy - 10
+        lens = [l * S for l in ((8, 7, 6, 4) if f not in (0, 4) else (6, 6, 5, 3))]
+        for k, ln in enumerate(lens):
+            nx, ny = x + math.cos(ang) * ln, y + math.sin(ang) * ln
+            bone((x, y), (nx, ny), 5 if k < 2 else 4)
+            if k < 3:
+                knob((nx, ny), 2)
+            x, y = nx, ny
+            ang += 0.2 if f < 2 else (-0.2 if f > 2 else 0.1 * (1 - 2 * wig))
+        tip = (x + math.cos(ang) * 6, y + math.sin(ang) * 6)
+        dr.polygon(surf, K, [(round(x - 2), round(y)), (round(x + 2), round(y)), (round(tip[0]), round(tip[1]))])
+    _GASHA_HAND[key] = surf
+    return surf
+
+
 class Gashadokuro(Boss):
     sheet = ('boss_gashadokuro', 1, None)
 
     def render_extra(self, s, t):
-        x, y = self.x, self.y
+        """Die Riesenhände wühlen sich durch den Boden: Erdloch, herausragender Unterarm (Elle und Speiche), Knochenhand.
+        Keine Verbindung zum Körper – das Skelett hat seine eigenen Arme im Sprite."""
         for i, h in enumerate(self.hands):
-            sx = -1 if i == 0 else 1
-            sh_ = (x + sx * 18, y + 14)
             hx, hy = h[0], h[1]
-            mx, my = (sh_[0] + hx) / 2 + sx * 14, (sh_[1] + hy) / 2 - 10    # Ellbogen nach außen-oben
-            # Oberarm (ein Knochen), Unterarm (zwei parallele Knochen)
-            hi_tube([sh_, (mx, my)], [3.4, 3.0], BONE)
-            dx, dy = hx - mx, hy - my
-            dl = math.hypot(dx, dy) or 1
-            nx, ny = -dy / dl * 2.2, dx / dl * 2.2
-            hi_tube([(mx + nx, my + ny), (hx + nx * 0.6, hy + ny * 0.6)], [2.0, 1.8], BONE)
-            hi_tube([(mx - nx, my - ny), (hx - nx * 0.6, hy - ny * 0.6)], [2.0, 1.8], BONE)
-            # Gelenkknubbel
-            hi_tube([(mx - 0.5, my), (mx + 0.5, my)], [3.8, 3.8], BONE)
-
-            def hand(surf, P, hx=hx, hy=hy, sx=sx):
-                D = pygame.draw
-                cx, cy = P(hx, hy)
-                D.ellipse(surf, BONE[0], (cx - 13, cy - 11, 26, 22))
-                D.ellipse(surf, BONE[2], (cx - 11, cy - 9, 22, 18))
-                D.ellipse(surf, BONE[3], (cx - 8, cy - 7, 8, 6))
-                for f in range(4):
-                    a = math.pi / 2 + (f - 1.5) * 0.42
-                    px_, py_ = cx + math.cos(a) * 9, cy + math.sin(a) * 7
-                    for seg in range(3):
-                        qx, qy = px_ + math.cos(a) * 7, py_ + math.sin(a) * 7
-                        D.line(surf, BONE[0], (px_, py_), (qx, qy), 7)
-                        D.line(surf, BONE[2], (px_, py_), (qx, qy), 4)
-                        D.circle(surf, BONE[3], (int(px_), int(py_)), 2)
-                        px_, py_ = qx, qy
-                        a += 0.18
-                    D.polygon(surf, BONE[1], [(px_ - 2, py_), (px_ + 2, py_), (px_ + math.cos(a) * 5, py_ + math.sin(a) * 5)])
-            hi_tube([(hx, hy - 0.5), (hx, hy + 0.5)], [0.5, 0.5], BONE, extra=hand)
+            gy = hy + 26 - (6 if self.busy[i] else 0)          # Bodenhöhe des Lochs
+            # Erdloch mit aufgeworfener Erde (niedrige Ebene, unter allem)
+            pygame.draw.ellipse(s, (14, 10, 12), (int(hx - 17), int(gy - 5), 34, 10))
+            pygame.draw.ellipse(s, (6, 4, 6), (int(hx - 12), int(gy - 3), 24, 6))
+            for k in range(7):
+                a = k / 7 * math.tau + i
+                pygame.draw.circle(s, (95, 66, 80) if k % 2 else (70, 52, 46), (int(hx + math.cos(a) * 17), int(gy + math.sin(a) * 5)), 2)
+            # Unterarm (Elle und Speiche) und Knochenhand als Pixelgrafik in Sprite-Farben
+            img = gasha_hand(0.5 if self.busy[i] else 0.0, int(t * 4 + i) % 2)
+            gfx.hi_blit(img, hx, gy + 2)
 
     r = 20
 
