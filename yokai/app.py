@@ -225,6 +225,8 @@ class Game:
             dim = 1.0 if self.state == 'play' else 0.45
             light = r.hi_light if hasattr(r, 'hi_light') else None
             gfx.hi_flush(self.window, sc, ox + shake[0], oy + shake[1], dim, light)
+        elif self.state in ('title', 'chars') and gfx.HI:
+            gfx.hi_flush(self.window, sc, ox, oy, 1.0, None)
         else:
             gfx.HI.clear()
         gfx.TEXT.flush(self.window, sc, ox + shake[0], oy + shake[1])
@@ -275,11 +277,11 @@ class Game:
         pygame.draw.rect(s, (18, 12, 26), (0, 232, W, H))
         # Torii
         tx = 90
-        col = (170, 30, 36)
-        pygame.draw.rect(s, col, (tx - 30, 150, 7, 85))
-        pygame.draw.rect(s, col, (tx + 23, 150, 7, 85))
-        pygame.draw.rect(s, (30, 16, 20), (tx - 42, 142, 84, 8))
-        pygame.draw.rect(s, col, (tx - 38, 160, 76, 5))
+        if not hasattr(self, '_title_torii'):
+            from . import props
+            ti = props.torii((170, 34, 36))
+            self._title_torii = pygame.transform.scale(ti, (ti.get_width() * 2, ti.get_height() * 2))
+        s.blit(self._title_torii, (tx - self._title_torii.get_width() // 2, 236 - self._title_torii.get_height()))
         # Laternen
         for i, lx in enumerate((160, 240, 320, 420)):
             gfx.draw_glow(s, lx, 220, 18, (255, 170, 80), 80)
@@ -306,8 +308,10 @@ class Game:
             x = (t * 18 + i * 34) % (W + 60) - 40
             nm = names[i % len(names)]
             spr = sheets.frame(nm, sheets.RIGHT, int(t * 6 + i), 2 if sheets.scale_of(nm) >= 2 else 1) if sheets.has(nm) else gfx.sprite(nm, False)
-            bob = 0
-            s.blit(spr, (int(x), int(250 - spr.get_height() - bob)))
+            if sheets.has(nm) and sheets.is_hi(nm):
+                gfx.hi_blit(spr, x + spr.get_width() / 4, 252)
+            else:
+                s.blit(spr, (int(x), int(250 - spr.get_height())))
 
     # ================================================================  Zustände
     MENU = ['Neuer Lauf', 'Tägliche Prüfung', 'Herausforderungen', 'Codex der Items', 'Erfolge', 'Statistik', 'Steuerung', 'Optionen', 'Beenden']
@@ -419,7 +423,9 @@ class Game:
     # ---------------------------------------------------------------- Charakterwahl
     def st_chars(self, dt, events, nav):
         s = self.screen
+        gfx.HI_MODE = True
         self.draw_night(s)
+        gfx.HI.clear()
         ov = pygame.Surface((W, H), pygame.SRCALPHA)
         ov.fill((0, 0, 0, 120))
         s.blit(ov, (0, 0))
@@ -433,12 +439,15 @@ class Game:
             y = 42 + row_i * 62
             sel = i == self.char_sel
             gfx.panel(s, (x - 30, y, 60, 54), 200 if sel else 140, (255, 210, 120) if sel else (110, 90, 80))
-            spr = sheets.frame(cid, 0, int(self.t * 6) if sel else 0, 2)
+            hi = sheets.is_hi(cid)
+            spr = sheets.frame(cid, sheets.RIGHT, (int(self.t * 8) % 4) if sel else 0, 1 if hi else 2)
             if cid not in unlocked:
-                spr = spr.copy()
-                spr.fill((0, 0, 0), special_flags=pygame.BLEND_RGB_MULT)
+                spr = gfx.tinted(spr, 'shadow')
             bob = int(abs(math.sin(self.t * 5)) * 2) if sel else 0
-            s.blit(spr, (x - spr.get_width() // 2, y + 7 - bob))
+            if hi:
+                gfx.hi_blit(spr, x, y + 41 - bob)
+            else:
+                s.blit(spr, (x - spr.get_width() // 2, y + 7 - bob))
             T.add(CHARS[cid]['name'] if cid in unlocked else '???', x, y + 44, 7, (240, 230, 210) if cid in unlocked else (130, 120, 120), 'c')
             wins = self.save['char_wins'].get(cid, 0)
             if wins:

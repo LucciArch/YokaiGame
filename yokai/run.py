@@ -1662,7 +1662,7 @@ class Run:
                 frame = (110, 70, 45)
             state = 'open' if (open_ and not other.locked) else ('locked' if other.locked else 'closed')
             img = props.door(frame, state, d, other.kind == 'boss')
-            off = {'n': (0, -2), 's': (0, 2), 'w': (-2, 0), 'e': (2, 0)}[d]
+            off = {'n': (0, 0), 's': (0, 2), 'w': (-2, 0), 'e': (2, 0)}[d]
             if other.kind == 'boss':
                 gfx.draw_glow(s, x, y, 18, (255, 50, 50), 50 + int(20 * math.sin(t * 3)))
             s.blit(img, img.get_rect(center=(rect.centerx + off[0], rect.centery + off[1])))
