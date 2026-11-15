@@ -2251,7 +2251,7 @@ class Run:
         self.draw_doors(s, t)
         p = self.player
         # Tutorial-Hinweise
-        if self.room.extra.get('tutorial') and (self.cur_banner or self.banners):
+        if self.room.extra.get('tutorial') and (self.cur_banner or self.banners or self.title_t > 0):
             self._tut_a = 0.0
         elif self.room.extra.get('tutorial'):
             self._tut_a = min(1.0, getattr(self, '_tut_a', 0.0) + 1 / 40)
