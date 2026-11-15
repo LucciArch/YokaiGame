@@ -605,3 +605,16 @@ ACHIEVEMENTS = [
 
 for _k, _b in BIOMES.items():
     _b['_id'] = _k
+
+
+# Jedes Item bekommt sein eigenes Symbol (assets/items/icons/<id>.png), falls vorhanden
+def _own_icons():
+    import os
+    d = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets', 'items', 'icons')
+    for table in (ITEMS, ACTIVES, TRINKETS):
+        for k, v in table.items():
+            if os.path.exists(os.path.join(d, k + '.png')):
+                v['icon'] = k
+
+
+_own_icons()
