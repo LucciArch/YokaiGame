@@ -748,11 +748,11 @@
  },
  "tenome": {
   "atk": 4,
-  "h": 80,
+  "h": 81,
   "hi": true,
   "kind": "strip",
   "n": 7,
-  "w": 68,
+  "w": 70,
   "walk": 4
  },
  "tesso": {

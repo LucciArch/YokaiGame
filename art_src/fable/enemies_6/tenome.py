@@ -17,43 +17,50 @@ SKINF = ('l0', 'l1', 'l2')
 ROBE = ('j1', 'j2', 'j3')
 ROBEF = ('j0', 'j1', 'j2')
 
-LEG = dict(zip('abcdKqWh', ['l0', 'l1', 'l2', 'l3', 'K', 'q', 'b3', 'v2']))
+LEG = dict(zip('abcdKqWhg', ['l0', 'l1', 'l2', 'l3', 'K', 'q', 'b3', 'v2', 'v1']))
 # kahler Schädel, eingefallene Wangen, zugenähte/geschlossene Lider, schütterer weißer Bart
 HEAD = """
-......bcccccb.....
-....bcddccccccb...
-...cddddccccccbb..
-..cdddcccccccccbb.
-..cddccccccccccbb.
-.ccdcccccccccccbbb
-.cdaaacccaaaabcbbb
-.cKKKKcccKKKKbcbbb
-.dcacacccacaabcbbb
-ddcccccdcbbbbbcbba
-dccccccbbbbbccbba.
-.ccccbbbbbbcbbba..
-..ccaaaaabbbbbaa..
-..cKKKKKbbbbaa....
-..chhhhhhbbaa.....
-...hhhhhhhaa......
-....hhhhh.........
-.....hhh..........
+.......bbbbbb.......
+.....bcddddccbb.....
+....bcddddcccccb....
+...bcdddccccccccb...
+...cddcccccccccccb..
+..bcdccccccccccccbh.
+..cccbbbcccccccccbhh
+.bcbaaaabccccbabcbhh
+.bcKcKcKbcccbcbabbbh
+..cbaaabcccccbcbbbbh
+.ddcbbbcccccccbbbbh.
+dddccccbbbcccbbbbbh.
+.cccbccbbaabccccbb..
+..bbcccbaabcccccbb..
+..aKKKbcbbbccccbb...
+..hbbbbbbbbbbcbb....
+..hhhbbbbbbbbbb.....
+..hhhhhgbbbb........
+...hhhhgg...........
+....hhgg............
+.....hg.............
 """
-# Handfläche nach vorn, gespreizte Finger, großes Auge mitten in der Hand
+# Handfläche nach vorn: vier knochige Finger mit Knöcheln, Daumen seitlich, mandelförmiges Auge mit Lidern
 PALM = """
-.c..c..c....
-.cd.cd.cd.c.
-.cd.cd.cd.cd
-.cd.cd.cd.cd
-.cdccdccdccd
-ccKKKKKKKKcb
-cKWWWWWWWWKb
-cKWWeEEeWWKb
-cKWWEZYEWWKb
-cKWWeEEeWWKb
-cbKKKKKKKKbb
-.cbbbbbbbbb.
-..cbbbbbba..
+..c..c..c.......
+.cd.cd.cd.......
+.cd.cd.cd..c....
+.cb.cb.cb.cd....
+.cd.cd.cd.cd....
+.cd.cd.cd.cb....
+.cdccdccdccd....
+cddddddddddddc..
+cdaKKKKKKKadcc..
+cdKWWWeeWWWKdcd.
+cKWWWeEEeWWWKcd.
+cKWWeEZYEeWWKcb.
+cKWWWeEEeWWWKb..
+cdKWWWeeWWWKdb..
+cddaKKKKKKaddb..
+.cddddddddddb...
+..cbbbbbbbbb....
 """
 
 
@@ -83,7 +90,7 @@ def arm(c, sh_, hd, ramp, robe, glow, far=False):
     p.form(L(*el, 2.2, *hd, 1.8), ramp, sd=1, hl=1)                        # dürrer Unterarm
     c.stamp(p, 'K')
     lg = dict(LEG, c=ramp[1], d=ramp[2], b=ramp[0], a=ramp[0], e='e0', E='e1' if glow else 'e0', Z='y3', Y='K')
-    p = C(); p.grid(int(hd[0]) - 6, int(hd[1]) - 8, PALM, lg); c.stamp(p, 'K')
+    p = C(); p.grid(int(hd[0]) - 7, int(hd[1]) - 11, PALM, lg); c.stamp(p, 'K')
 
 
 def draw(**kw):
@@ -117,6 +124,11 @@ def draw(**kw):
     p.line([B((24, 24)), B((31, 38))], 'j0', only=robe)                   # Kragen
     neck = PG([B((24, 24)), B((30, 23)), B((29, 30))]) & robe
     p.form(neck, SKIN, sd=1, hl=0)
+    for k in range(9):                                                     # Gebetskette
+        t = k / 8
+        q = B((24 + t * 8 + math.sin(t * 3.1) * -3, 25 + t * 14))
+        p.form(E(q[0], q[1], 1.3, 1.3), ('w0', 'w1', 'w2'), sd=0, hl=1)
+    p.form(E(*B((30, 41)), 1.6, 2.2), ('m1', 'm2', 'm3'), sd=0, hl=1)       # Quaste
     c.stamp(p, 'K')
     # ---- Hals (sehnig), dann Kopf leicht vorgereckt
     p = C()
@@ -124,7 +136,7 @@ def draw(**kw):
     p.line([B((24, 22)), B((22, 17))], 'l1')
     c.stamp(p, 'K')
     p = C()
-    p.grid(*B((10, 4)), HEAD, LEG)
+    p.grid(*B((9, 3)), HEAD, LEG)
     c.stamp(p, 'K')
     # ---- naher Arm
     arm(c, B((28, 30)), B(S['nhd']), SKIN, ROBE, S['glow'])
