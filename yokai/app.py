@@ -887,11 +887,11 @@ class Game:
     # ---------------------------------------------------------------- Codex
     def menu_bg(self, s, a=185):
         """Hintergrund für Menüseiten: Nachthimmel mit Torii, abgedunkelt."""
-        gfx.HI_MODE = True
+        # Hintergrund bewusst auf der niedrigen Ebene: Die Menütafeln liegen darüber.
+        gfx.HI_MODE = False
         n0 = len(gfx.HI)
         self.draw_night(s, parade=False)
-        f = max(0.0, 1.0 - a / 255.0)
-        gfx.HI[n0:] = [(e[0], e[1], e[2], e[3], f, True) for e in gfx.HI[n0:]]
+        del gfx.HI[n0:]
         ov = self.__dict__.get('_menu_ov')
         if ov is None or ov.get_alpha() != a:
             ov = pygame.Surface((W, H))
