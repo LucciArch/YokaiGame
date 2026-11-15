@@ -487,11 +487,11 @@
  },
  "kawauso": {
   "atk": 4,
-  "h": 46,
+  "h": 73,
   "hi": true,
   "kind": "strip",
   "n": 7,
-  "w": 40,
+  "w": 98,
   "walk": 4
  },
  "kenji": {
