@@ -1217,16 +1217,28 @@ def tinted(surf, mode):
     return im
 
 
+def bake_low(surf):
+    """Ebenen in einfacher Pixeldichte (Geschosse, HUD) zurück auf die Grundfläche legen – für Menüs über dem Spiel."""
+    keep = []
+    for e in HI:
+        if len(e) > 6 and e[6] == 'low':
+            surf.blit(e[0], (0, 0))
+        else:
+            keep.append(e)
+    HI[:] = keep
+
+
 def dim_hi(f):
     """Alle bisher gesammelten Hi-Res-Bilder abdunkeln (z. B. unter einem Menü-Schleier)."""
-    HI[:] = [(e[0], e[1], e[2], e[3], (e[4] if len(e) > 4 else 1.0) * f, True) for e in HI]
+    HI[:] = [(e[0], e[1], e[2], e[3], (e[4] if len(e) > 4 else 1.0) * f, True) + tuple(e[6:]) for e in HI]
 
 
 def hi_flush(win, sc, ox, oy, dim=1.0, light=None):
     for ent in HI:
         surf, cx, by, alpha = ent[:4]
         w, h = surf.get_size()
-        tw, th = max(1, int(w * sc / 2)), max(1, int(h * sc / 2))
+        k = sc if len(ent) > 6 and ent[6] == 'low' else sc / 2      # 'low': Ebene in einfacher Pixeldichte (Geschosse, Partikel)
+        tw, th = max(1, int(w * k)), max(1, int(h * k))
         f = dim * (ent[4] if len(ent) > 4 else 1.0)
         if light is not None and not (len(ent) > 5 and ent[5]):
             f *= light(cx, by)

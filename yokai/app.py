@@ -804,7 +804,8 @@ class Game:
     def st_pause(self, dt, events, nav):
         run = self.run
         run.draw(self.screen, self.t)
-        gfx.HI[:] = [(e[0], e[1], e[2], e[3], 0.4) for e in gfx.HI]   # Figuren gedimmt unter dem Pause-Schleier
+        gfx.bake_low(self.screen)
+        gfx.HI[:] = [(e[0], e[1], e[2], e[3], 0.4) + tuple(e[5:]) for e in gfx.HI]   # Figuren gedimmt unter dem Pause-Schleier
         gfx.TEXT.clear()
         s = self.screen
         ov = pygame.Surface((W, H), pygame.SRCALPHA)
@@ -891,6 +892,7 @@ class Game:
         self.over_t += dt
         run.update_fx(dt)
         run.draw(self.screen, self.t)
+        gfx.bake_low(self.screen)
         gfx.HI.clear()
         gfx.TEXT.clear()
         s = self.screen
@@ -1388,6 +1390,7 @@ class Game:
         s = self.screen
         if self.run and getattr(self, 'opt_return', None) == 'pause':
             self.run.draw(s, self.t)
+            gfx.bake_low(s)
             gfx.HI.clear()
             gfx.TEXT.clear()
             ov = pygame.Surface((W, H), pygame.SRCALPHA); ov.fill((0, 0, 0, 170)); s.blit(ov, (0, 0))

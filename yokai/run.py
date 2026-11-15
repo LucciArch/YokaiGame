@@ -2411,15 +2411,21 @@ class Run:
             yy = p.y - 28 - (1 - min(1, (1.4 - ht) * 4)) * 6
             gfx.draw_glow(s, int(p.x), int(yy), 16, col, 110)
             gfx.draw_icon(s, icon, col, p.x, yy)
+        # Geschosse, Hiebe und Partikel liegen über den Figuren (die in doppelter Dichte darüber gezeichnet werden):
+        # eigene durchsichtige Ebene, die als letzter Eintrag in die Hi-Res-Warteschlange kommt
+        ov = getattr(self, '_over', None)
+        if ov is None:
+            ov = self._over = pygame.Surface((W, H), pygame.SRCALPHA)
+        ov.fill((0, 0, 0, 0))
         for b in self.pbullets:
-            b.draw(s, t)
-        weapons.draw(self, s)
+            b.draw(ov, t)
+        weapons.draw(self, ov)
         for b in self.ebullets:
-            b.draw(s, t)
+            b.draw(ov, t)
         for pt in self.particles:
-            pt.draw(s)
+            pt.draw(ov)
         for pt in self.ambient:
-            pt.draw(s)
+            pt.draw(ov)
         for f in self.floats:
             gfx.TEXT.add(f[2], f[0], f[1], 6 if f[2] != 'Kritisch!' else 7, f[3], 'c', alpha=int(255 * min(1, f[4] * 3)))
         # Dunkelheit
@@ -2460,8 +2466,8 @@ class Run:
             nx, ny = dx * ow * (1 - f), dy * oh * (1 - f)
             def inside(e, sx, sy):
                 return area.x - 20 < e[1] + sx < area.right + 20 and area.y - 10 < e[2] + sy < area.bottom + 30
-            new = [(e[0], e[1] + nx, e[2] + ny, e[3]) for e in gfx.HI]
-            old = [(e[0], e[1] + ox, e[2] + oy, e[3]) for e in old_hi]
+            new = [(e[0], e[1] + nx, e[2] + ny) + tuple(e[3:]) for e in gfx.HI if e[6:7] != ('low',)]
+            old = [(e[0], e[1] + ox, e[2] + oy) + tuple(e[3:]) for e in old_hi if e[6:7] != ('low',)]
             gfx.HI[:] = [e for e in old if inside(e, 0, 0)] + [e for e in new if inside(e, 0, 0)]
         if self.whiteout > 0:
             fl = pygame.Surface((RW, RH)); fl.fill((255, 246, 230))
@@ -2479,6 +2485,8 @@ class Run:
                 self._hint_bg = (key, bg)
             gfx.HI.append((self._hint_bg[1], RX + RW / 2, by + 14, int(255 * a), 1.0, True))   # über den Figuren
             gfx.TEXT.add(self.hint_txt, RX + RW // 2, by + 3, 6, (250, 236, 200), 'c', alpha=int(255 * a))
+        # HUD, Abstiegs- und Überblendungs-Schleier liegen über allem (auch über den Hi-Res-Figuren)
+        top = s = self._over              # dieselbe Ebene wie Geschosse/Partikel (ein Skalieren pro Bild)
         self.draw_hud(s, t)
         if getattr(self, 'descend', 0) > 0:
             f = 1 - self.descend / 1.3
@@ -2502,6 +2510,8 @@ class Run:
             ov = pygame.Surface((W, H), pygame.SRCALPHA)
             ov.fill((0, 0, 0, int(min(1, self.fade) * 255)))
             s.blit(ov, (0, 0))
+        gfx.NOCACHE.add(id(top))
+        gfx.HI.append((top, W / 2, H, 255, 1.0, True, 'low'))
 
     _light = {}
 
