@@ -690,6 +690,8 @@ _balance_13()
 CHARS['susanoo']['fx']['dmgm'] = 0.65
 CHARS['akago']['fx']['dmgm'] = 0.95
 CHARS['kuzunoha']['fx']['dmgm'] = 1.0
+BOSSES['izanami']['hp'] = 1250        # Boss-Test: brauchte fast doppelt so lange wie die anderen Endbosse
+BOSSES['shuten_doji']['hp'] = 740
 
 
 # Neue Gegner der Himmelsgefilde (v1.3)

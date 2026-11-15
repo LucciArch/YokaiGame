@@ -2179,7 +2179,7 @@ class Izanami(Boss):
         yield 0.6
 
     def a_hags(self):
-        self.summon('shikome', 3, 50)
+        self.summon('shikome', 2, 50)
         yield 0.8
 
     def a_rot(self):

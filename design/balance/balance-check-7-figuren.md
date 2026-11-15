@@ -19,3 +19,8 @@
 - Susanoo (Schwert + Schwertwelle + Blitze) lag beim Fünffachen von Hana. Als letzte Freischaltung
   darf er stark sein, aber nicht alles überstrahlen: Schaden ×1,0 → ×0,65, Schwertwelle ×1,2 → ×0,9.
 - Akago (Keule + Wut) leicht gesenkt: ×1,1 → ×0,95.
+
+## Boss-Zeiten (Boss-Test, gleicher Schaden je Kapitel)
+Izanami brauchte 232 s, die anderen Endbosse ≈ 135 s (Schleier macht sie kurz unverwundbar, beschworene
+Shikome fangen Schüsse ab). Jetzt: 2 statt 3 Shikome pro Beschwörung, HP 1450 → 1250 → 123 s.
+Shuten-dōji leicht gesenkt (820 → 740); seine Dauer kommt vor allem von den beschworenen Oni.
