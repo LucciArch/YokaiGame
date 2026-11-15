@@ -4,3 +4,4 @@ build/
 dist/
 *.spec
 spielstand.json
+release_notes.md

@@ -54,12 +54,15 @@ jobs:
           name: YokaiNoMichi-Windows
           path: dist/YokaiNoMichi.exe
 
+      - name: Release-Text erzeugen
+        env:
+          PYTHONIOENCODING: utf-8
+        run: python tools/release_notes.py
+
       - name: Release veröffentlichen
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ steps.ver.outputs.v }}-build${{ github.run_number }}
           name: Yōkai no Michi ${{ steps.ver.outputs.v }} – Build ${{ github.run_number }}
           files: dist/YokaiNoMichi.exe
-          body: |
-            **Herunterladen:** `YokaiNoMichi.exe` unten anklicken, speichern, doppelklicken – fertig.
-            Windows SmartScreen kann beim ersten Start warnen („Unbekannter Herausgeber“): *Weitere Informationen → Trotzdem ausführen*.
+          body_path: release_notes.md
