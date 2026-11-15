@@ -711,10 +711,23 @@ class Player:
         dt_ = getattr(run, 'death_t', None)
         if self.dead and dt_ is not None:
             f = 1 - dt_ / 1.6
-            spr = gfx.sprite(self.char, self.flip)
-            rot = pygame.transform.rotate(spr, -90 * min(1, f * 2))
-            rot.set_alpha(int(255 * max(0, 1 - f)))
-            s.blit(rot, (int(self.x) - rot.get_width() // 2, int(self.y) - rot.get_height() + 5))
+            if sheets.has(self.char) and sheets.is_hi(self.char):
+                key = (self.char, int(min(1, f * 2) * 12))
+                cache = Player.__dict__.get('_death_cache')
+                if cache is None:
+                    cache = {}
+                    Player._death_cache = cache
+                rot = cache.get(key)
+                if rot is None:
+                    fr = sheets.frame(self.char, getattr(self, '_last_dir', sheets.RIGHT), 0)
+                    rot = pygame.transform.rotate(fr, -90 * key[1] / 12 * (1 if getattr(self, '_last_dir', sheets.RIGHT) == sheets.RIGHT else -1))
+                    cache[key] = rot
+                gfx.hi_blit(rot, self.x, self.y + 5, int(255 * max(0, 1 - f)))
+            else:
+                spr = gfx.sprite(self.char, self.flip)
+                rot = pygame.transform.rotate(spr, -90 * min(1, f * 2))
+                rot.set_alpha(int(255 * max(0, 1 - f)))
+                s.blit(rot, (int(self.x) - rot.get_width() // 2, int(self.y) - rot.get_height() + 5))
             gfx.draw_glow(s, int(self.x), int(self.y - 20 * f), 12, (150, 210, 255), int(150 * (1 - f)))
             return
         if self.iframes > 0 and int(t * 20) % 2 == 0 and self.dash_t <= 0:
