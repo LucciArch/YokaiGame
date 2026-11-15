@@ -28,22 +28,24 @@ Jeder Push auf `main` baut über GitHub Actions automatisch eine neue `.exe`.
 
 - **6 Kapitel mit 11 Ebenen, 17 Biome** (Kapitel I–V je zwei Ebenen mit anderer Gegend und anderem Boss): Bambuswald, Inari-Torii-Pfad, Kappa-Flussufer, Geistertempel, Alter Friedhof, Spukvilla, Kurama-Berg, Schneeberg, Ōe-Berg, Drachenpalast, Geisterküste, Tiefsee, Yomi, Höllenfeuer, Hof des Enma, Takamagahara und Mondpalast
 - **23 Bosse** mit je eigenen Angriffsmustern und zweiter Phase: Ōmukade, Kappa-Ō, Jorōgumo, Gashadokuro, Rokurokubi, Nue, Sōjōbō, Raijū, Yuki-onna, Umibōzu, Ryūjin, Bake-kujira, Yamata no Orochi, Shuten-dōji, Tamamo-no-Mae Ōnyūdō, Nurarihyon, die drei Kamaitachi, Akkorokamui, Enma-Daiō sowie in Takamagahara Amatsu-Mikaboshi, Izanami und Kagutsuchi
-- **51 Yokai-Gegnertypen** plus 8 Champion-Varianten (rot, blau, gold, violett, grün, weiß, geisterhaft, teilend)
+- **53 Yokai-Gegnertypen** (neu in Kapitel VI: Komainu und Tennin) plus 8 Champion-Varianten (rot, blau, gold, violett, grün, weiß, geisterhaft, teilend)
 - **146 passive Items** und **15 aktive Items**, **14 Omamori-Anhänger** (ein tauschbarer Slot), Itempools für Schatzraum, Laden, Boss, Kami-Schrein und Oni-Schrein
 - **81 Synergien** (z. B. die drei Throninsignien *Kusanagi + Yata no Kagami + Yasakani no Magatama*)
 - **9 Transformationen**: 3 Items eines Themas verwandeln dich (Kitsune, Donnergott, Oni, Onmyōji, Yūrei, Tengu, Drache, Kami, Tanuki)
 - **10 Charaktere** zum Freischalten, jeweils mit eigener Fähigkeit, eigenen Werten und Startitems
-- **47 Erfolge**, die Charaktere, Items, den Oni-Modus und Takamagahara freischalten
+- **51 Erfolge**, die Charaktere, Items, den Oni-Modus und Takamagahara freischalten
 - Prozedurale Ebenen mit 92 Raumvorlagen + zufällig generierten Räumen (gespiegelt → hunderte Varianten)
-- Spezialräume: Schatzraum (verschlossen ab Ebene 2), Laden, Fluchraum, Kampfraum, Geheimräume (mit Reinigungssalz an rissigen Wänden aufdecken), Omikuji-Schrein, heiße Quelle (Onsen), Schriftrollenarchiv (1 von 3 Items), Dōjō (Champion-Kampf), Teehaus (dauerhafte Werte-Upgrades), Tanuki-Spielautomat, Kami- und Oni-Schreine nach Bossen
+- Spezialräume: Schatzraum (verschlossen ab Kapitel II), Laden, Fluchraum, Kampfraum, Geheimräume (mit Reinigungssalz an rissigen Wänden aufdecken), Omikuji-Schrein, heiße Quelle (Onsen), Schriftrollenarchiv (1 von 3 Items), Dōjō (Champion-Kampf), Teehaus (dauerhafte Werte-Upgrades), Tanuki-Spielautomat, Kami- und Oni-Schreine nach Bossen
 - Flüche (Dunkelheit, Nebel, Labyrinth, Verirrte), Oni-Modus (schwer), **Endlose Nacht** (endlose Schleifen mit steigender Schwierigkeit), tägliche Prüfung mit festem Seed, **8 Herausforderungen** mit Sonderregeln (Glaskanone, Boss-Ansturm, Wettlauf gegen den Morgen, Papiermeister …)
 - **Biom-Eigenheiten**: jedes Biom hat eine eigene Mechanik – Eisboden, Tengu-Windböen, speiende Lavagruben, Irrlichter, Meeresströmung, Poltergeist-Töpfe, Sternschnuppen, Bambus-Fallen, Fuchsfeuer, greifende Hände, Kappa-Dank, Oni-Kriegstrommeln, Brandung
 - Tanuki-Händler im Laden, einmalige Kontext-Tipps (abschaltbar)
 - Mini-Bosse in normalen Räumen, Wutphase der Bosse bei 25 % Leben, Wetter (Regen, Schneesturm, Asche)
-- Codex aller Items, Erfolge, Statistik (mit Übersicht der besuchten Biome)
+- **Yōkai-Lexikon** mit Folklore, Verhalten, Fundorten und Zähler, **Codex** aller Items, Erfolge, Statistik (Biome, letzte Läufe)
+- **Läufe speichern und fortsetzen**, eigener Seed (Figurenauswahl: E), Spielweise **Entspannt**, Segen und Flüche pro Ebene
+- **Epilog** mit eigenem Ende für jede Figur und Abspann; eigene Pinsel-Schrift „Yōkai Fude“
 - Düstere 16-Bit-Pixel-Art in doppelter Pixeldichte (selbst gezeichnet, siehe unten); Musik und Sounds werden im Code erzeugt (Koto, Taiko, Shakuhachi in japanischen Tonleitern)
 
-Der Spielstand liegt unter `%APPDATA%\YokaiNoMichi\spielstand.json`.
+Der Spielstand liegt unter `%APPDATA%\YokaiNoMichi\spielstand.json`, ein laufender Lauf unter `lauf.json`, Fehlerberichte unter `fehler.log`.
 
 ## Aus dem Quellcode starten
 
