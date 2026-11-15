@@ -114,7 +114,13 @@ class Procession:
         self.gifted = True
         self.room.extra['yomeiri_done'] = True
         b = self.bride
-        iid = run.pick_item('T', 0.12)
+        from .data import ITEMS
+        fox = [i for i in run.pool if 'kitsune' in ITEMS[i]['tags'] and ITEMS[i]['q'] <= 3]
+        if fox and random.random() < 0.7:
+            iid = random.choice(fox)
+            run.pool.remove(iid)
+        else:
+            iid = run.pick_item('T', 0.12)
         run.pedestals.append(Pedestal(iid, b.x, b.y + 22))
         burst(run, b.x, b.y + 10, (255, 220, 150), 18, 70)
         audio.play('unlock', 0.6)
