@@ -1095,6 +1095,24 @@ def panel(surf, rect, alpha=210, border=(200, 170, 110)):
     pygame.draw.rect(surf, _c(border, 0.5), r.inflate(-4, -4), 1)
 
 
+_panel_cache = {}
+
+
+def hi_panel(rect, alpha=210, border=(200, 170, 110)):
+    """Wie panel(), aber auf der Hi-Res-Ebene – liegt damit über Figuren und Requisiten."""
+    r = pygame.Rect(rect)
+    key = (r.w, r.h, alpha, tuple(border))
+    img = _panel_cache.get(key)
+    if img is None:
+        tmp = pygame.Surface(r.size, pygame.SRCALPHA)
+        panel(tmp, (0, 0, r.w, r.h), alpha, border)
+        img = pygame.transform.scale(tmp, (r.w * 2, r.h * 2))
+        if len(_panel_cache) > 60:
+            _panel_cache.clear()
+        _panel_cache[key] = img
+    HI.append((img, r.x + r.w / 2, r.bottom, 255, 1.0, True))
+
+
 _hud_crop = {}
 
 

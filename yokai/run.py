@@ -2364,7 +2364,7 @@ class Run:
             bx = clamp(near.x, RX + w / 2 + 2, RX + RW - w / 2 - 2)
             hh = 31 + (9 if extra else 0)
             by = near.y - 52 - (9 if extra else 0)
-            gfx.panel(s, (int(bx - w / 2), int(by), int(w), hh), 215, col)
+            gfx.hi_panel((int(bx - w / 2), int(by), int(w), hh), 215, col)
             gfx.TEXT.add(name, bx, by + 2, 8, col, 'c')
             if not near.item.startswith('active:') and near.item not in self.save['seen']:
                 gfx.TEXT.add('Neu!', bx + w / 2 - 4, by + 2, 6, (255, 230, 120), 'r')
