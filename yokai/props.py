@@ -195,8 +195,6 @@ def counter():
     s.fill((60, 76, 140), (3, 6, 42, 1))
     for x in (12, 24, 36):
         pygame.draw.circle(s, (232, 222, 196), (x, 8), 1)
-    s.fill((30, 26, 32), (38, 0, 3, 1)); s.fill((226, 214, 186), (37, -1 + 1, 5, 1))
-    _box(s, 38, -1 + 1, 3, 1, (226, 214, 186), hl=False)
     s = _outline(s)
     s = pygame.transform.scale(s, (s.get_width() * 2, s.get_height() * 2))
     _cache[key] = s

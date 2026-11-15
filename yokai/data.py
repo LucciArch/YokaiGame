@@ -414,7 +414,7 @@ CHARS = {
                   hp=8, spirit=0, fx=dict(rage=1, dmgm=1.1), items=['oni_sake'], active=None,
                   coins=0, keys=0, salts=1, unlock='Schließe 3 Oni-Pakte'),
     'susanoo': dict(name='Susanoo', title='Der Sturmgott', desc='Ein Gott unter Sterblichen. Seine Schüsse rufen Blitze.',
-                    hp=8, spirit=0, fx=dict(dmgm=1.2, rate=0.3, raijin_chance=0.08), items=['kusanagi'], active='raijin_taiko',
+                    hp=6, spirit=0, fx=dict(dmgm=1.0, rate=0.15, raijin_chance=0.08), items=['kusanagi'], active='raijin_taiko',
                     coins=0, keys=0, salts=3, unlock='Besiege einen Boss in Takamagahara'),
 }
 CHAR_ORDER = ['hana', 'kenji', 'kuzunoha', 'ponpoko', 'benkei', 'okiku', 'kotaro', 'seimei', 'akago', 'susanoo']
