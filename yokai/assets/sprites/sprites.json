@@ -334,11 +334,11 @@
  },
  "gyuki": {
   "atk": 4,
-  "h": 96,
+  "h": 86,
   "hi": true,
   "kind": "strip",
   "n": 7,
-  "w": 166,
+  "w": 124,
   "walk": 4
  },
  "hana": {
@@ -766,11 +766,11 @@
  },
  "tsuchigumo": {
   "atk": 4,
-  "h": 96,
+  "h": 86,
   "hi": true,
   "kind": "strip",
   "n": 7,
-  "w": 166,
+  "w": 124,
   "walk": 4
  },
  "tsuchinoko": {
