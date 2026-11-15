@@ -2394,13 +2394,15 @@ class Run:
             s.blit(fl, (RX, RY))
         if self.hint_t > 0 and self.hint_txt and self.game.state == 'play':
             a = min(1.0, self.hint_t, (6.0 - self.hint_t) * 3)
-            hw = min(RW - 20, 8 + len(self.hint_txt) * 4)
-            bx = RX + RW // 2 - hw // 2
+            hw = min(RW - 20, gfx.text_w(self.hint_txt, 6) + 16)
             by = RY + 6
-            bg = pygame.Surface((hw, 14), pygame.SRCALPHA)
-            bg.fill((12, 8, 18, int(190 * a)))
-            pygame.draw.rect(bg, (200, 170, 110, int(220 * a)), bg.get_rect(), 1)
-            s.blit(bg, (bx, by))
+            key = (self.hint_txt, hw)
+            if getattr(self, '_hint_bg', (None,))[0] != key:
+                bg = pygame.Surface((hw * 2, 28), pygame.SRCALPHA)
+                bg.fill((12, 8, 18, 200))
+                pygame.draw.rect(bg, (200, 170, 110, 230), bg.get_rect(), 2)
+                self._hint_bg = (key, bg)
+            gfx.HI.append((self._hint_bg[1], RX + RW / 2, by + 14, int(255 * a), 1.0, True))   # über den Figuren
             gfx.TEXT.add(self.hint_txt, RX + RW // 2, by + 3, 6, (250, 236, 200), 'c', alpha=int(255 * a))
         self.draw_hud(s, t)
         if getattr(self, 'descend', 0) > 0:
