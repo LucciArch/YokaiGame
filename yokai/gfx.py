@@ -994,6 +994,13 @@ def color_grade_edge(surf, col, alpha):
 
 
 # ---------------------------------------------------------------- Text
+FONT_PATH = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), 'assets', 'fonts', 'YokaiFude.ttf')
+if not _os.path.exists(FONT_PATH) and hasattr(_sys, '_MEIPASS'):
+    FONT_PATH = _os.path.join(_sys._MEIPASS, 'yokai', 'assets', 'fonts', 'YokaiFude.ttf')
+if not _os.path.exists(FONT_PATH):
+    FONT_PATH = None
+
+
 class TextLayer:
     """Texte werden in Spielkoordinaten gesammelt und scharf in Fensterauflösung gezeichnet."""
 
@@ -1010,7 +1017,10 @@ class TextLayer:
     def font(self, px):
         f = self.fonts.get(px)
         if f is None:
-            f = pygame.font.Font(None, px)
+            if FONT_PATH:
+                f = pygame.font.Font(FONT_PATH, max(6, int(round(px * 0.66))))
+            else:
+                f = pygame.font.Font(None, px)
             self.fonts[px] = f
         return f
 
@@ -1025,7 +1035,7 @@ class TextLayer:
                 img.set_alpha(alpha)
             w, h = img.get_size()
             px = ox + x * scale
-            py = oy + y * scale - h * 0.15
+            py = oy + y * scale - h * (0.21 if FONT_PATH else 0.15)
             if align == 'c':
                 px -= w / 2
             elif align == 'r':

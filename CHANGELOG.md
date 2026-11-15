@@ -10,6 +10,7 @@
 - Waffenarten: Schwert, Speer, Keule, Bogen, Fächer, Sense und Laser für Figuren und Items
 
 ### Grafik
+- Eigene Schrift „Yōkai Fude“: lateinische Buchstaben im Stil eines japanischen Pinsels (selbst erzeugt, `art_src/font/fude.py`)
 - Felsen, Urnen und Steinlaternen in doppelter Pixeldichte, nach Tiefe mit den Figuren sortiert
 - Art Bible als verbindliche Stilvorgabe (`design/art/art-bible.md`)
 
