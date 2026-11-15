@@ -566,6 +566,15 @@
   "w": 98,
   "walk": 4
  },
+ "mezu": {
+  "atk": 4,
+  "h": 105,
+  "hi": true,
+  "kind": "strip",
+  "n": 7,
+  "w": 50,
+  "walk": 4
+ },
  "mokumokuren": {
   "atk": 4,
   "h": 62,
