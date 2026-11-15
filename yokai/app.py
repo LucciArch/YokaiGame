@@ -178,7 +178,7 @@ class Game:
                 if e.button == 0: out.append('ok')
                 elif e.button == 1: out.append('back')
                 elif e.button in (6, 7): out += ['back', 'pause']
-                elif e.button == 3: out.append('hard')
+                elif e.button == 3: out += ['hard', 'pad_y']
             elif e.type == pygame.JOYHATMOTION:
                 hx, hy = e.value
                 if hy == 1: out.append('up')
@@ -913,7 +913,7 @@ class Game:
         T.add('Ebene %d von %d' % (run.floor_no, len(run.path_nodes())), W // 2, 282, 7, (190, 170, 150), 'c')
         if self.over_t > 0.8:
             for n in nav:
-                if n in ('retry', 'hard'):                 # R bzw. Y am Controller
+                if n in ('retry', 'pad_y'):                # R bzw. Y am Controller
                     audio.play('select')
                     self.start_run(p.char)
                     return
@@ -1332,7 +1332,7 @@ class Game:
         T.add('Steuerung', W // 2, 8, 14, (255, 230, 170), 'c')
         rows = [('Bewegen', 'W A S D', 'Linker Stick'), ('Ofuda werfen', 'Pfeiltasten / linke Maustaste', 'Rechter Stick'),
                 ('Ausweichrolle', 'Leertaste / Shift / rechte Maustaste', 'A / RB'), ('Aktives Item', 'E', 'Y / LB'),
-                ('Reinigungssalz', 'Q', 'X'), ('Items & Werte', 'Tab (halten)', '–'), ('Pause', 'Esc / P', 'Start'),
+                ('Reinigungssalz', 'Q', 'X'), ('Items & Werte', 'Tab (halten)', '–'), ('Pause', 'Esc / P', 'Start'), ('Nochmal (nach dem Tod)', 'R', 'Y'),
                 ('Vollbild', 'F11', '–'), ('Seed (Figurenwahl)', 'E', '–'),
                 ('Oni / Endlos (Figurenwahl)', 'H / N', '–')]
         T.add('Aktion', 40, 34, 8, (200, 180, 150)); T.add('Tastatur / Maus', 150, 34, 8, (200, 180, 150)); T.add('Controller', 360, 34, 8, (200, 180, 150))
@@ -1343,7 +1343,7 @@ class Game:
         tips = ['Die Rolle macht dich kurz unverwundbar.', 'Salz löscht alle Geschosse und öffnet Geheimräume an rissigen Wänden.',
                 'Rot aufleuchtende Yokai greifen gleich an.']
         for i, t_ in enumerate(tips):
-            T.add(t_, W // 2, 222 + i * 12, 7, (200, 190, 170), 'c')
+            T.add(t_, W // 2, 232 + i * 12, 7, (200, 190, 170), 'c')
         T.add('Esc – Zurück', W // 2, 285, 6, (150, 140, 140), 'c')
         for n in nav:
             if n in ('back', 'ok'):
