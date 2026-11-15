@@ -591,7 +591,35 @@ class Game:
             en = getattr(self, 'endless', False)
             T.add('[N] Endlose Nacht: ' + ('AN' if en else 'aus'), W - 32, 244, 8,
                   (200, 140, 255) if en else (190, 180, 170), 'r')
-        T.add('Enter – Start     Esc – Zurück', 32, 258, 7, (170, 160, 150))
+        seed_txt = getattr(self, 'seed_input', None)
+        if seed_txt is not None:
+            gfx.panel(s, (W // 2 - 90, 132, 180, 30), 235, (200, 200, 140))
+            T.add('Seed eingeben:  ' + seed_txt + ('_' if int(self.t * 2) % 2 else ' '), W // 2, 137, 9, (255, 240, 200), 'c')
+            T.add('Ziffern  •  Enter – mit Seed starten  •  Esc – abbrechen', W // 2, 151, 6, (200, 190, 170), 'c')
+            for e in events:
+                if e.type == pygame.KEYDOWN:
+                    if e.unicode and e.unicode.isdigit() and len(seed_txt) < 9:
+                        self.seed_input = seed_txt + e.unicode; audio.play('move')
+                    elif e.key == pygame.K_BACKSPACE:
+                        self.seed_input = seed_txt[:-1]
+            for nv in nav:
+                if nv == 'ok':
+                    sd = int(self.seed_input) if self.seed_input else None
+                    self.seed_input = None
+                    if cid in unlocked:
+                        audio.play('select')
+                        self.start_run(cid, sd)
+                    return
+                if nv == 'back':
+                    self.seed_input = None
+                    return
+            return
+        T.add('Enter – Start     E – mit Seed     Esc – Zurück', 32, 258, 7, (170, 160, 150))
+        for e in events:
+            if e.type == pygame.KEYDOWN and e.key == pygame.K_e and cid in unlocked:
+                self.seed_input = ''
+                audio.play('select')
+                return
         for nv in nav:
             if nv == 'left':
                 self.char_sel = (self.char_sel - 1) % n; audio.play('move')
