@@ -512,6 +512,15 @@
   "w": 44,
   "walk": 4
  },
+ "komainu": {
+  "atk": 4,
+  "h": 70,
+  "hi": true,
+  "kind": "strip",
+  "n": 7,
+  "w": 90,
+  "walk": 4
+ },
  "kotaro": {
   "atk": 4,
   "h": 83,
@@ -672,6 +681,15 @@
   "kind": "strip",
   "n": 7,
   "w": 130,
+  "walk": 4
+ },
+ "tennin": {
+  "atk": 4,
+  "h": 87,
+  "hi": true,
+  "kind": "strip",
+  "n": 7,
+  "w": 82,
   "walk": 4
  },
  "tenome": {

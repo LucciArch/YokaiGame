@@ -16,6 +16,8 @@
 - Läufe speichern und fortsetzen („Speichern & Hauptmenü“, im Titel „Fortsetzen“)
 - Neue Spielweise „Entspannt“ in den Optionen: +1 Herz, nur halbe Herzen Schaden, langsamere Geschosse
 - Türen, Item-Altäre, Felsen, Urnen und Laternen in doppelter Pixeldichte; Gruben mit Abbruchkante
+- Zwei neue Gegner in den Himmelsgefilden: **Komainu** (steinerner Wächterlöwe) und **Tennin** (Himmelsmädchen mit Lichtfächer)
+- Statistik „Letzte Läufe“, Infos zum gespeicherten Lauf im Titelmenü
 - Segen: Manche Ebenen sind gesegnet (Vollmond: Karte aufgedeckt, Füchse: Rabatt, Reichtum: doppelt Mon, Kami: Heilung)
 - Item-Tooltips zeigen „Neu!“, vervollständigte Synergien und Transformations-Fortschritt
 - Boss-Lebensbalken mit Schadensspur und Wut-Markierung; Steinlaternen werfen Licht

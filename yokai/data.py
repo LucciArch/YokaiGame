@@ -684,3 +684,15 @@ def _balance_13():
 
 
 _balance_13()
+
+
+# Neue Gegner der Himmelsgefilde (v1.3)
+ENEMIES['komainu'] = {'name': 'Komainu', 'sprite': 'komainu', 'hp': 36, 'speed': 64, 'r': 10, 'move': 'charge', 'attack': None,
+                      'charge_ring': 8}
+ENEMIES['tennin'] = {'name': 'Tennin', 'sprite': 'tennin', 'hp': 24, 'speed': 30, 'r': 9, 'move': 'float', 'fly': True,
+                     'attack': {'kind': 'aimed', 'n': 5, 'spread': 0.17, 'speed': 112, 'cd': 2.5, 'col': (255, 226, 120),
+                                'eff': None, 'r': 3}}
+for _b in ('takamagahara', 'tsukiyomi'):
+    BIOMES[_b]['enemies'] += ['komainu', 'tennin']
+BIOMES['takamagahara']['enemies'] = [e for e in BIOMES['takamagahara']['enemies'] if e != 'ningyo']
+

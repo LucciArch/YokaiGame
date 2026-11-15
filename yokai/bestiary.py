@@ -100,6 +100,10 @@ LORE = {
               'Rast umher und hinterlässt Feuer.'),
     'wanyudo': ('輪入道', 'Der Kopf eines Mannes in einem brennenden Rad, der die Seelen derer stiehlt, die ihn ansehen.',
                 'Prallt durch den Raum und zieht Flammen nach.'),
+    'komainu': ('狛犬', 'Steinerne Löwenhunde, die paarweise vor Schreinen wachen – einer mit offenem Maul (a), einer mit geschlossenem (un). Zusammen bilden sie Anfang und Ende aller Dinge.',
+                'Stürmt mit gesenktem Kopf heran – beim Aufprall spritzen Steinsplitter im Ring.'),
+    'tennin': ('天人', 'Himmlische Wesen in Federgewändern (hagoromo). In der Legende von Mihonomatsu findet ein Fischer ein solches Gewand und gibt es erst zurück, als die Tennin für ihn tanzt.',
+               'Schwebt über den Wolken und fächert goldene Lichtfedern auf dich.'),
     'karasu': ('烏', 'Gewöhnliche Krähen – Boten der Tengu.', 'Flattert im Schwarm.'),
 }
 
