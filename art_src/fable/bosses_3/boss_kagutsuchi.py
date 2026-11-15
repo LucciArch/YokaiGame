@@ -2,8 +2,8 @@
 from lib3 import *
 
 NAME = 'boss_kagutsuchi'
-CW, CH = 240, 150
-OX, OY = 110, 14            # local baseline y=130
+CW, CH = 240, 176
+OX, OY = 110, 40            # local baseline y=130
 col('f0', '#7a1220'); col('f1', '#d83a1c'); col('f2', '#ff8a24'); col('f3', '#ffd23c'); col('f4', '#fff4b0')   # living fire
 col('u0', '#1c0c1c'); col('u1', '#3a1420'); col('u2', '#6a2420')                                                # charred skin
 px.add_rim('f0', 'f2'); px.add_rim('f1', 'f3'); px.add_rim('f2', 'f4'); px.add_rim('u0 u1 u2', 'f2')

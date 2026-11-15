@@ -2,7 +2,7 @@
 from bl import *
 
 NAME = 'boss_sojobo'
-CW, CH = 272, 208
+CW, CH = 292, 208
 OX, OY = 70, 50          # local baseline y=150
 BLKF = ('h0', 'h1', 'h2')
 PUR = ('p1', 'p2', 'p3')

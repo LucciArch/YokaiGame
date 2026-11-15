@@ -53,6 +53,7 @@ class Boss(Enemy):
         if self.sheet:
             try:
                 ww, hh = sheets.size_of(self.sheet[0])
+                ww, hh = ww * self.sheet[1], hh * self.sheet[1]
                 self.r = max(self.r, int(min(ww, hh) * 0.36))
             except Exception:
                 pass
@@ -705,15 +706,24 @@ class Rokurokubi(Boss):
     def render(self, s, t):
         D = pygame.draw
         bx, by = self.body
-        D.ellipse(s, (180, 50, 70), (bx - 18, by - 2, 36, 26))
-        D.ellipse(s, (240, 180, 190), (bx - 10, by + 2, 20, 10))
-        # Hals
-        n = 18
+        if sheets.has('boss_rokuro_body'):
+            sheets.blit_center(s, 'boss_rokuro_body', bx, by + 6, sheets.hdir(self.p.x - bx), self.af('boss_rokuro_body', t, 4, 0))
+        else:
+            D.ellipse(s, (180, 50, 70), (bx - 18, by - 2, 36, 26))
+        # Hals (blass, mit dunklem Umriss, schlängelt sich)
+        n = 22
+        pts = []
         for i in range(n + 1):
             f = i / n
             cx = bx + (self.x - bx) * f + math.sin(f * math.pi * 3 + t * 3) * 10 * (1 - abs(f - 0.5) * 2)
-            cy = by + (self.y - by) * f
-            D.circle(s, (240, 210, 190), (int(cx), int(cy)), 4)
+            cy = by - 6 + (self.y - by + 6) * f
+            pts.append((int(cx), int(cy)))
+        for (cx, cy) in pts:
+            D.circle(s, (20, 10, 22), (cx, cy), 4)
+        for (cx, cy) in pts:
+            D.circle(s, (201, 128, 108), (cx, cy), 3)
+        for (cx, cy) in pts:
+            D.circle(s, (240, 188, 152), (cx - 1, cy - 1), 1)
         x, y = int(self.x), int(self.y)
         sheets.blit_center(s, 'boss_rokuro_head', x, y, sheets.hdir(self.p.x - x), self.af('boss_rokuro_head', t, 4, 0))
         return
@@ -1128,13 +1138,12 @@ class Ryujin(Omukade):
         segs = self.seg_pos()
         for i, (x, y) in enumerate(reversed(segs)):
             j = len(segs) - i
-            r = 9 if j < 6 else 7 if j < 12 else 5
-            D.circle(s, (10, 40, 40), (int(x), int(y)), r + 1)
-            D.circle(s, (60, 170, 140), (int(x), int(y)), r)
-            D.circle(s, (240, 210, 90), (int(x), int(y) - r + 2), 2)
-            if j % 4 == 0:
-                for side in (-1, 1):
-                    D.line(s, (240, 210, 90), (x, y), (x + side * 9, y + 6), 2)
+            if sheets.has('boss_ryujin_seg') and j % 2 == 0:
+                sheets.blit_center(s, 'boss_ryujin_seg', x, y, sheets.hdir(math.cos(self.heading)), self.af('boss_ryujin_seg', t, 6, j), 2 if False else None)
+            elif not sheets.has('boss_ryujin_seg'):
+                r = 9 if j < 6 else 7 if j < 12 else 5
+                D.circle(s, (10, 40, 40), (int(x), int(y)), r + 1)
+                D.circle(s, (60, 170, 140), (int(x), int(y)), r)
         hx, hy = int(self.x), int(self.y)
         sheets.blit_center(s, 'boss_ryujin_head', hx, hy, sheets.hdir(math.cos(self.heading)), self.af('boss_ryujin_head', t, 8, 0))
         return
@@ -1393,7 +1402,7 @@ class ShutenDoji(Boss):
 
 
 class Tamamo(Boss):
-    sheet = ('boss_tamamo', 1, None)
+    sheet = ('boss_tamamo', 2, None)
 
     def render_sheet(self, s, t):
         for i in range(9):
@@ -1406,7 +1415,7 @@ class Tamamo(Boss):
         if self.phase == 2:
             sheets.blit_center(s, 'kitsunebi_e', self.x, self.y - 4, self.face_dir(), self.af('kitsunebi_e', t, 8, 0), 1)
         else:
-            sheets.blit_center(s, 'boss_tamamo', self.x, self.y - 6, self.face_dir(), self.af('boss_tamamo', t, 7, 0))
+            sheets.blit_center(s, 'boss_tamamo', self.x, self.y - 6, self.face_dir(), self.af('boss_tamamo', t, 7, 0), 2)
 
     r = 11
 
@@ -1500,6 +1509,7 @@ class Tamamo(Boss):
 # =====================================================================  EBENE 6
 class Mikaboshi(Boss):
     r = 17
+    sheet = ('boss_mikaboshi', 2, None)
 
     def setup(self):
         self.attacks = ['starburst', 'lasers', 'meteor', 'constellation']
@@ -1583,11 +1593,11 @@ class Mikaboshi(Boss):
 
 # =====================================================================  RUNDE 1: NEUE BOSSE
 class Oonyudo(Boss):
-    sheet = ('boss_oonyudo', 1, None)
+    sheet = ('boss_oonyudo', 2, None)
 
     def render_sheet(self, s, t):
         gfx.draw_glow(s, int(self.x), int(self.y), int(40 * self.size), (80, 60, 120), 70)
-        sheets.blit_center(s, 'boss_oonyudo', self.x, self.y - 8, self.face_dir(), self.af('boss_oonyudo', t, 6, 0))
+        sheets.blit_center(s, 'boss_oonyudo', self.x, self.y - 8, self.face_dir(), self.af('boss_oonyudo', t, 6, 0), 2 if self.phase == 1 else 3)
 
     """Ein riesiger Mönch, der immer größer wird."""
     r = 16
