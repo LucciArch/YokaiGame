@@ -97,7 +97,7 @@ def fire(p, d, wk):
     if wk == 'w_sword':
         melee(run, x + d[0] * 6, y + d[1] * 6, ang, 30 + 4 * p.s['size'], math.radians(130), dmg * 2.2, kind=wk)
         if p.f['sword_wave']:
-            b = run.fire_player_bullet(x, y, ang, dmg * 1.2, p.s['shotspd'] * 1.1, p.s['size'] * 1.6, 0.6, {'pierce': 1})
+            b = run.fire_player_bullet(x, y, ang, dmg * 0.9, p.s['shotspd'] * 1.1, p.s['size'] * 1.6, 0.6, {'pierce': 1})
             b.crescent = True
         audio.play('slash', 0.8)
     elif wk == 'w_club':

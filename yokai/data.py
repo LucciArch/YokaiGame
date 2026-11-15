@@ -686,6 +686,12 @@ def _balance_13():
 _balance_13()
 
 
+# Balance-Check 7: Figuren (design/balance/balance-check-7-figuren.md)
+CHARS['susanoo']['fx']['dmgm'] = 0.65
+CHARS['akago']['fx']['dmgm'] = 0.95
+CHARS['kuzunoha']['fx']['dmgm'] = 1.0
+
+
 # Neue Gegner der Himmelsgefilde (v1.3)
 ENEMIES['komainu'] = {'name': 'Komainu', 'sprite': 'komainu', 'hp': 36, 'speed': 64, 'r': 10, 'move': 'charge', 'attack': None,
                       'charge_ring': 8}
