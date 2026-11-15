@@ -694,6 +694,8 @@ def _balance_13():
     ENEMIES['kappa_small']['speed'] = 62
     ya = ENEMIES['yamabiko']['attack']               # Echo traf zu oft (Balance-Check 5)
     ya['cd'], ya['speed'] = 0.85, 105
+    na = ENEMIES['nopperabo']['attack']               # Balance-Check 8: weiterhin Spitzenreiter
+    na['n'], na['speed'] = 2, 105
 
 
 _balance_13()
