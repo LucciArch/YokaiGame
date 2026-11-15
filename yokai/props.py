@@ -115,6 +115,109 @@ def door(accent, state, d, boss=False):
     return s
 
 
+
+# ---------------------------------------------------------------- Türen in Hi-Res (doppelte Pixeldichte)
+def _grain(s, x, y, w, h, base, seed):
+    """Holzmaserung: feine, unterbrochene Längslinien."""
+    import random as _r
+    rr = _r.Random(seed)
+    vertical = h > w
+    n = (w if vertical else h) // 3
+    for i in range(n):
+        if vertical:
+            gx = x + 1 + i * 3 + rr.randint(0, 1)
+            y0 = y + rr.randint(0, h // 3)
+            s.fill(sh(base, 0.8), (gx, y0, 1, rr.randint(h // 3, h - (y0 - y))))
+        else:
+            gy = y + 1 + i * 3 + rr.randint(0, 1)
+            x0 = x + rr.randint(0, w // 3)
+            s.fill(sh(base, 0.8), (x0, gy, rr.randint(w // 3, w - (x0 - x)), 1))
+
+
+def door_hi(accent, state, d, boss=False):
+    """Wie door(), aber in Hi-Res (92x52) mit feinem Shōji-Gitter, Maserung und Schloss."""
+    key = ('door_hi', accent, state, d, boss)
+    if key in _cache:
+        return _cache[key]
+    W, H = 92, 52
+    s = pygame.Surface((W, H), pygame.SRCALPHA)
+    wood = (74, 24, 30) if boss else WOOD
+    ox, oy, ow, oh = 12, 12, 68, 36
+    if state == 'open':
+        glow = sh(accent, 0.45)
+        for i in range(oh):
+            f = i / oh
+            c = (int(4 + glow[0] * 0.35 * f), int(3 + glow[1] * 0.3 * f), int(8 + glow[2] * 0.35 * f))
+            s.fill(c, (ox, oy + i, ow, 1))
+        s.fill((1, 0, 3), (ox, oy, ow, 5))
+        s.fill((1, 0, 3), (ox, oy, 3, oh)); s.fill((1, 0, 3), (ox + ow - 3, oy, 3, oh))
+        s.fill(sh(wood, 0.5), (ox, oy + oh - 4, ow, 4))                 # Schwelle
+        s.fill(sh(wood, 0.8), (ox, oy + oh - 4, ow, 1))
+    else:
+        paper = (226, 214, 186)
+        for i in range(oh):
+            f = max(0.0, (i - oh * 0.5) / oh)
+            s.fill(sh(paper, 1 - f * 0.55), (ox, oy + i, ow, 1))
+        s.fill(sh(paper, 1.1), (ox, oy, ow, 1))
+        lat = sh(wood, 1.2)
+        mid = ox + ow // 2
+        for half in (0, 1):
+            x0 = ox + half * (ow // 2)
+            for gx in range(x0 + 6, x0 + ow // 2 - 2, 7):
+                s.fill(lat, (gx, oy, 1, oh))
+                s.fill(sh(lat, 0.7), (gx + 1, oy, 1, oh))
+            for gy in (oy + 9, oy + 19, oy + 28):
+                s.fill(lat, (x0, gy, ow // 2, 1))
+                s.fill(sh(lat, 0.7), (x0, gy + 1, ow // 2, 1))
+        s.fill(sh(wood, 0.75), (mid - 2, oy, 4, oh))                     # Rahmen der Schiebetüren
+        s.fill(sh(wood, 1.3), (mid - 2, oy, 1, oh))
+        for hx in (mid - 8, mid + 6):                                    # runde Griffmulden (hikite)
+            pygame.draw.circle(s, sh(wood, 0.5), (hx, oy + 18), 2)
+            s.set_at((hx - 1, oy + 17), sh(wood, 1.2))
+    # Pfosten, Sturz, Schwelle
+    for px_ in (2, W - 12):
+        _box(s, px_, 2, 10, H - 2, wood)
+        _grain(s, px_ + 2, 4, 6, H - 8, wood, px_)
+    _box(s, 0, 0, W, 12, wood)
+    _grain(s, 2, 6, W - 4, 5, wood, 7)
+    s.fill(accent, (4, 4, W - 8, 4))                                     # farbiges Band = Raumtyp
+    s.fill(sh(accent, 1.4), (4, 4, W - 8, 1))
+    s.fill(sh(accent, 0.55), (4, 7, W - 8, 1))
+    for nx in (6, W - 8):                                                # Nagelköpfe
+        s.fill((150, 120, 60), (nx, 4, 3, 3)); s.set_at((nx, 4), (250, 226, 150))
+    s.fill(sh(wood, 0.5), (12, H - 3, W - 24, 3))
+    if state == 'locked':
+        cx, cy = W // 2, oy + 17
+        gd, g, gl, gh = (120, 78, 22), (210, 160, 52), (246, 210, 110), (255, 246, 200)
+        pygame.draw.arc(s, (90, 90, 110), (cx - 5, cy - 12, 10, 14), 0, math.pi, 2)   # Bügel
+        s.fill(gd, (cx - 8, cy - 4, 16, 13))
+        s.fill(g, (cx - 7, cy - 3, 14, 11))
+        s.fill(gl, (cx - 7, cy - 3, 14, 2)); s.fill(gh, (cx - 6, cy - 3, 4, 1))
+        s.fill(sh(g, 0.75), (cx + 4, cy - 1, 3, 9))
+        pygame.draw.circle(s, (40, 24, 10), (cx, cy + 1), 2)
+        s.fill((40, 24, 10), (cx, cy + 2, 1, 4))
+    if boss:                                                             # Shimenawa mit Shide
+        rope, rd, rl = (214, 190, 130), (140, 110, 64), (246, 230, 176)
+        for x in range(2, W - 2):
+            y = 12 + int(5 * math.sin(math.pi * (x - 2) / (W - 4)))
+            ph = (x // 3) % 2
+            s.fill(rd, (x, y, 1, 5))
+            s.fill(rope, (x, y + (0 if ph else 1), 1, 3))
+            s.set_at((x, y + (0 if ph else 1)), rl)
+        for x in (22, 46, 70):
+            y = 12 + int(5 * math.sin(math.pi * (x - 2) / (W - 4))) + 4
+            for k in range(4):                                           # Zickzack-Papier
+                dx = 0 if k % 2 == 0 else 3
+                s.fill((248, 246, 238), (x + dx, y + k * 4, 4, 4))
+                s.fill((196, 192, 206), (x + dx, y + k * 4 + 3, 4, 1))
+    s = _outline(s)
+    rot = {'n': 0, 's': 180, 'w': 90, 'e': -90}[d]
+    if rot:
+        s = pygame.transform.rotate(s, rot)
+    _cache[key] = s
+    return s
+
+
 # ---------------------------------------------------------------- Item-Sockel (Steinaltar mit Opferpapier)
 def pedestal(taken=False):
     key = ('ped', taken)

@@ -29,6 +29,9 @@ CURSES = {'dunkel': 'Fluch der Dunkelheit', 'nebel': 'Fluch des Nebels', 'labyri
           'verirrt': 'Fluch der Verirrten'}
 
 
+_CROP = {}
+
+
 class _TileSpr:
     __slots__ = ('img', 'x', 'top', 'y')
 
@@ -374,6 +377,10 @@ class Run:
         cands = [i for i in self.pool if pool_letter in ITEMS[i]['pools']]
         if not cands:
             cands = [i for i in self.pool if 'T' in ITEMS[i]['pools']] or ['onigiri']
+        if self.tier >= 4:                              # tief unten kein Kleinkram mehr, solange es Besseres gibt
+            good = [i for i in cands if ITEMS[i]['q'] >= 2]
+            if good:
+                cands = good
         deep = 1 + 0.15 * (self.tier - 1)            # tiefer = wertvollere Funde
         ws = [Q_WEIGHT[ITEMS[i]['q']] * (1 + 0.06 * luck * ITEMS[i]['q']) * deep ** (ITEMS[i]['q'] - 2) for i in cands]
         iid = random.choices(cands, ws)[0]
@@ -1967,11 +1974,23 @@ class Run:
             if self.curse == 'verirrt' and not other.visited:
                 frame = (110, 70, 45)
             state = 'open' if (open_ and not other.locked) else ('locked' if other.locked else 'closed')
-            img = props.door(frame, state, d, other.kind == 'boss')
+            img = props.door_hi(frame, state, d, other.kind == 'boss')
             off = {'n': (0, 0), 's': (0, 2), 'w': (-2, 0), 'e': (2, 0)}[d]
             if other.kind == 'boss':
                 gfx.draw_glow(s, x, y, 18, (255, 50, 50), 50 + int(20 * math.sin(t * 3)))
-            s.blit(img, img.get_rect(center=(rect.centerx + off[0], rect.centery + off[1])))
+            cxd, cyd = rect.centerx + off[0], rect.centery + off[1]
+            if d == 's':                                # nicht über die Werteleiste ragen
+                top = cyd - img.get_height() / 4
+                keep = int((RY + RH + 16 - top) * 2)
+                if 0 < keep < img.get_height():
+                    ck = ('crop', id(img), keep)
+                    c = _CROP.get(ck)
+                    if c is None:
+                        c = _CROP[ck] = img.subsurface((0, 0, img.get_width(), keep)).copy()
+                    img = c
+                gfx.hi_blit(img, cxd, top + img.get_height() / 2)
+            else:
+                gfx.hi_blit(img, cxd, cyd + img.get_height() / 4)
 
     def hi_light(self, x, y):
         """Helligkeit für Hi-Res-Sprites (gleiche Logik wie draw_dark: Lichtkreis um den Spieler)."""

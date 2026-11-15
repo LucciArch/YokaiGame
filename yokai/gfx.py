@@ -1057,7 +1057,10 @@ TEXT = TextLayer()
 def text_w(s, size):
     """Breite in Spielpixeln."""
     f = TEXT.font(max(8, int(size * 1.45 * 4)))
-    return f.size(s)[0] / 4
+    w = f.size(s)[0] / 4
+    if FONT_PATH and size <= 7.5:          # kleine Schrift wird fett gezeichnet und läuft etwas breiter
+        w = w * 1.07 + 1.5
+    return w
 
 
 def panel(surf, rect, alpha=210, border=(200, 170, 110)):
