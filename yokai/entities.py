@@ -4,7 +4,7 @@ import random
 import pygame
 from collections import defaultdict
 from .settings import *
-from . import gfx, audio, art, sheets, props, costume
+from . import gfx, audio, art, sheets, props, costume, weapons
 from .data import ITEMS, ENEMIES, CHAMPIONS, ACTIVES, CHARS, SYNERGIES, TRANSFORMS, TRINKETS
 
 ONE_TIME = ('hp', 'heal', 'spirit', 'coins', 'keys', 'salts', 'fullheal')
@@ -126,7 +126,7 @@ def burst(run, x, y, col, n=8, spd=60, life=0.4, size=2, grav=0):
 # =========================================================================  Geschosse
 class Bullet:
     __slots__ = ('x', 'y', 'vx', 'vy', 'dmg', 'r', 'life', 'maxlife', 'owner', 'fl', 'col', 'bounces', 'hit',
-                 't', 'eff', 'acc', 'ay', 'curve', 'returned', 'big', 'gold', 'delay', 'dead', 'kind')
+                 't', 'eff', 'acc', 'ay', 'curve', 'returned', 'big', 'gold', 'delay', 'dead', 'kind', 'arrow', 'crescent', 'wind')
 
     def __init__(self, x, y, vx, vy, dmg, r, life, owner, col, fl=None, eff=None, acc=0.0, ay=0.0, curve=0.0,
                  delay=0.0, kind='orb'):
@@ -143,6 +143,7 @@ class Bullet:
         self.delay = delay
         self.dead = False
         self.kind = kind
+        self.arrow = self.crescent = self.wind = False
 
     def update(self, dt, run):
         if self.delay > 0:
@@ -223,6 +224,10 @@ class Bullet:
             if self.big:
                 gfx.draw_glow(s, x, y, int(r * 3), (255, 120, 120), 70)
             col = self.col
+            if gfx.HI_MODE and self.delay <= 0 and (getattr(self, 'arrow', False) or getattr(self, 'crescent', False)):
+                img = props.arrow(ang) if getattr(self, 'arrow', False) else props.crescent(ang)
+                gfx.hi_blit(img, x, y + img.get_height() / 4)
+                return
             if gfx.HI_MODE and self.delay <= 0:
                 img = props.ofuda(tuple(col), r, ang)
                 if img is not None:
@@ -579,7 +584,8 @@ class Player:
             if self.shoot_cd <= 0 and run.challenge != 'papiermeister':
                 self.fire(self.facing)
                 self.recoil = 0.08
-                self.shoot_cd = 1.0 / self.s['rate']
+                wk = weapons.weapon_of(self)
+                self.shoot_cd = 1.0 / (self.s['rate'] * (weapons.RATE[wk] if wk else 1.0))
                 run.player_fired = True
         # Begleiter
         self.update_followers(dt, inp)
@@ -624,6 +630,14 @@ class Player:
     def fire(self, d):
         run = self.run
         self.shot_count += 1
+        wk = weapons.weapon_of(self)
+        if wk and weapons.fire(self, d, wk):
+            rc = self.f['raijin_chance']
+            if rc and random.random() < rc * (1 + self.s['luck'] * 0.08):
+                tgt = run.nearest_enemy(self.x, self.y, 400)
+                if tgt:
+                    run.lightning(tgt.x, tgt.y, self.damage() * 2 + 4)
+            return
         n = 1 + int(self.f['multishot'])
         base = math.atan2(d[1], d[0])
         spread = 0.16 if n <= 3 else 0.5 / (n - 1) * 1.6

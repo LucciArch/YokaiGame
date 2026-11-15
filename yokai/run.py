@@ -4,7 +4,7 @@ import random
 import pygame
 from collections import deque, defaultdict
 from .settings import *
-from . import gfx, props, audio
+from . import gfx, props, weapons, audio
 from .data import (TRINKETS, BIOMES, DEPTH_BIOMES, BOSS_POOL, ITEMS, ITEM_IDS, ACTIVES, ENEMIES, CHAMPIONS, BOSSES,
                    BOSS_REWARD, CHARS, ACHIEVEMENTS, TRANSFORMS, SYNERGIES, CHAR_ORDER)
 from .rooms import generate_floor, build_room_tiles, Room
@@ -51,6 +51,7 @@ class Run:
         self.pool = [i for i in ITEM_IDS if (not ITEMS[i]['locked'] or i in unlocked)]
         self.active_pool = list(ACTIVES.keys())
         self.particles, self.ambient, self.floats = [], [], []
+        self.slashes = []
         self.pbullets, self.ebullets, self.enemies = [], [], []
         self.pickups, self.pedestals, self.objs, self.hazards = [], [], [], []
         self.banners = deque()
@@ -204,6 +205,7 @@ class Run:
         self.objs = [o for o in room.objects if isinstance(o, Obj)]
         self.enemies, self.pbullets, self.ebullets, self.hazards = [], [], [], []
         self.particles = []
+        self.slashes = []
         self.bg_dirty = True
         p = self.player
         p.room_dmg_buff = 0
@@ -1094,6 +1096,7 @@ class Run:
 
     # ======================================================================  Update
     def update(self, dt, inp):
+        weapons.update(self, dt)
         if getattr(self, 'descend', 0) > 0:
             self.descend -= dt
         if self.player.dead and self.result is None:
@@ -1928,6 +1931,7 @@ class Run:
             gfx.draw_icon(s, icon, col, p.x, yy)
         for b in self.pbullets:
             b.draw(s, t)
+        weapons.draw(self, s)
         for b in self.ebullets:
             b.draw(s, t)
         for pt in self.particles:

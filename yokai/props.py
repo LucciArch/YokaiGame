@@ -499,3 +499,37 @@ def map_icon(kind):
     s = _outline(s)
     _cache[key] = s
     return s
+
+
+# ---------------------------------------------------------------- Pfeil und Schwertwelle (Hi-Res, gedreht)
+def arrow(ang):
+    step = int(round(math.degrees(ang) / 10)) % 36
+    key = ('arrow', step)
+    if key in _cache:
+        return _cache[key]
+    s = pygame.Surface((30, 9), pygame.SRCALPHA)
+    pygame.draw.line(s, (14, 9, 16), (1, 4), (24, 4), 3)
+    pygame.draw.line(s, (196, 150, 96), (2, 4), (23, 4), 1)
+    pygame.draw.polygon(s, (14, 9, 16), [(22, 0), (29, 4), (22, 8)])
+    pygame.draw.polygon(s, (200, 206, 220), [(23, 2), (28, 4), (23, 6)])
+    for dx in (1, 4):
+        pygame.draw.line(s, (240, 236, 226), (dx, 1), (dx + 3, 4), 1)
+        pygame.draw.line(s, (240, 236, 226), (dx, 7), (dx + 3, 4), 1)
+    s = pygame.transform.rotate(s, -step * 10)
+    _cache[key] = s
+    return s
+
+
+def crescent(ang):
+    step = int(round(math.degrees(ang) / 10)) % 36
+    key = ('cres', step)
+    if key in _cache:
+        return _cache[key]
+    s = pygame.Surface((22, 30), pygame.SRCALPHA)
+    pygame.draw.ellipse(s, (14, 9, 16), (2, 0, 18, 30))
+    pygame.draw.ellipse(s, (200, 230, 255), (3, 1, 16, 28))
+    pygame.draw.ellipse(s, (0, 0, 0, 0), (0, 2, 14, 26))
+    pygame.draw.ellipse(s, (255, 255, 255), (13, 6, 4, 18), 1)
+    s = pygame.transform.rotate(s, -step * 10)
+    _cache[key] = s
+    return s

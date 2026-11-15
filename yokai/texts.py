@@ -5,6 +5,9 @@ import pygame
 FX_NAMES = {
     'dmg': ('Schaden', '+'), 'dmgm': ('Schaden', '×'), 'rate': ('Feuerrate', '+'), 'ratem': ('Feuerrate', '×'),
     'spd': ('Lauftempo', '+'), 'shotspd': ('Schussgeschwindigkeit', '+'), 'range': ('Reichweite', '+'), 'luck': ('Glück', '+'),
+    'w_sword': ('Angriff: Schwerthieb', ''), 'w_spear': ('Angriff: Speerstoß', ''), 'w_scythe': ('Angriff: Sensenwirbel', ''),
+    'w_laser': ('Angriff: Lichtstrahl', ''), 'w_bow': ('Angriff: Pfeile', ''), 'w_club': ('Angriff: Keulenschlag', ''),
+    'w_fan': ('Angriff: Windfächer', ''), 'sword_wave': ('Hiebe senden eine Schwertwelle', ''),
     'size': ('Talismangröße', '+'), 'hp': ('Herzcontainer', '+'), 'heal': ('Heilt ½ Herzen', 'n'),
     'spirit': ('Geisterherzen (½)', '+'), 'coins': ('Mon', '+'), 'keys': ('Schlüssel', '+'), 'salts': ('Reinigungssalz', '+'),
     'fullheal': ('Heilt alle Herzen', ''), 'homing': ('Talismane suchen ihr Ziel', ''),

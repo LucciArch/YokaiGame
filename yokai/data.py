@@ -401,8 +401,8 @@ CHARS = {
     'hana': dict(name='Hana', title='Die Schreinmaid', desc='Ausgeglichen. Findet öfter Reinigungssalz.',
                  hp=6, spirit=0, fx=dict(salts_regen=0.15), items=[], active='ofuda_sturm', coins=0, keys=0, salts=2,
                  unlock='Von Beginn an verfügbar'),
-    'kenji': dict(name='Kenji', title='Der Rōnin', desc='Iaijutsu: Die Ausweichrolle schneidet Feinde. Hoher Schaden, kurze Reichweite.',
-                  hp=6, spirit=0, fx=dict(dmgm=1.35, rate=-0.5, range=-50, pierce=1, knock=1, dash_dmg=1), items=[], active=None,
+    'kenji': dict(name='Kenji', title='Der Rōnin', desc='Kämpft mit dem Katana: Schwerthiebe zerschlagen auch Geschosse. Die Ausweichrolle schneidet.',
+                  hp=6, spirit=0, fx=dict(dmgm=1.0, knock=1, dash_dmg=1), items=[], active=None,
                   coins=0, keys=0, salts=2, unlock='Besiege einen Boss auf Ebene 2'),
     'kuzunoha': dict(name='Kuzunoha', title='Die Fuchsfrau', desc='Schnell und zerbrechlich. Ihre Rolle löscht Geschosse.',
                      hp=4, spirit=0, fx=dict(spd=20, dmgm=0.85, dash_reflect=1), items=['kitsunebi'], active=None,
@@ -410,22 +410,22 @@ CHARS = {
     'ponpoko': dict(name='Ponpoko', title='Der Tanuki', desc='Goldene Talismane und Münzmagnet. Viel Leben, viel Glück.',
                     hp=8, spirit=0, fx=dict(spd=-12, luck=2, gold_shots=0.1, magnet=1), items=[], active='tanuki_blatt',
                     coins=25, keys=1, salts=1, unlock='Sammle insgesamt 300 Mon'),
-    'benkei': dict(name='Benkei', title='Der Kriegermönch', desc='Ein Bollwerk: blockt in jedem Raum einen Treffer.',
+    'benkei': dict(name='Benkei', title='Der Kriegermönch', desc='Stößt mit der Naginata weit voraus und blockt in jedem Raum einen Treffer.',
                    hp=10, spirit=0, fx=dict(spd=-8, dmgm=1.25, rate=-0.6, size=1.5, knock=1, shield=1), items=[],
                    active='kagura_suzu', coins=0, keys=0, salts=2, unlock='Besiege insgesamt 500 Yokai'),
     'okiku': dict(name='Okiku', title='Der Brunnengeist', desc='Nur Geisterherzen. Fliegt, Schüsse durch Wände.',
                   hp=0, spirit=6, fx=dict(fly=1, spectral=1, dmgm=0.95), items=[], active='onryo_kerze',
                   coins=0, keys=0, salts=2, unlock='Stirb 10-mal', spirit_only=True),
-    'kotaro': dict(name='Kotarō', title='Das Tengu-Kind', desc='Fliegt von Anfang an, schnelle Federn.',
+    'kotaro': dict(name='Kotarō', title='Das Tengu-Kind', desc='Fliegt von Anfang an und fächert Windstöße, die Feinde zurückwerfen.',
                    hp=6, spirit=0, fx=dict(fly=1, shotspd=40, spd=10), items=['karasu_feder'], active='tengu_uchiwa',
                    coins=0, keys=0, salts=2, unlock='Besiege Sōjōbō, den Tengu-König'),
     'seimei': dict(name='Seimei', title='Der Onmyōji', desc='Schwacher Schuss, aber Shikigami-Diener.',
                    hp=6, spirit=0, fx=dict(dmgm=0.85), items=['shikigami_papier', 'hitogata'], active='shikigami_ruf',
                    coins=0, keys=0, salts=2, unlock='Gewinne einen Lauf'),
-    'akago': dict(name='Akago', title='Das Oni-Kind', desc='Wird stärker, je verletzter es ist.',
+    'akago': dict(name='Akago', title='Das Oni-Kind', desc='Schlägt mit der Keule zu und wird stärker, je verletzter es ist.',
                   hp=8, spirit=0, fx=dict(rage=1, dmgm=1.1), items=['oni_sake'], active=None,
                   coins=0, keys=0, salts=1, unlock='Schließe 3 Oni-Pakte'),
-    'susanoo': dict(name='Susanoo', title='Der Sturmgott', desc='Ein Gott unter Sterblichen. Seine Schüsse rufen Blitze.',
+    'susanoo': dict(name='Susanoo', title='Der Sturmgott', desc='Ein Gott unter Sterblichen. Sein Schwert sendet Wellen, Blitze folgen ihm.',
                     hp=6, spirit=0, fx=dict(dmgm=1.0, rate=0.15, raijin_chance=0.08), items=['kusanagi'], active='raijin_taiko',
                     coins=0, keys=0, salts=3, unlock='Besiege einen Boss in Takamagahara'),
 }
@@ -618,3 +618,14 @@ def _own_icons():
 
 
 _own_icons()
+
+
+# Waffen: Items und Figuren mit eigener Angriffsart (siehe weapons.py)
+for _iid, _w in (('tamahagane', 'w_sword'), ('ronin_schwur', 'w_sword'), ('kusanagi', 'w_sword'), ('ame_nuboko', 'w_spear'),
+                 ('shinigami_sense', 'w_scythe'), ('amaterasu', 'w_laser'), ('hachiman_bogen', 'w_bow'), ('yumi', 'w_bow'),
+                 ('hamaya', 'w_bow'), ('kanabo', 'w_club'), ('tengu_faecher', 'w_fan')):
+    ITEMS[_iid]['fx'][_w] = 1
+ITEMS['kusanagi']['fx']['sword_wave'] = 1
+for _c, _w in (('kenji', 'w_sword'), ('benkei', 'w_spear'), ('kotaro', 'w_fan'), ('susanoo', 'w_sword'), ('akago', 'w_club')):
+    CHARS[_c]['fx'][_w] = 1
+CHARS['susanoo']['fx']['sword_wave'] = 1

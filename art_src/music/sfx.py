@@ -269,9 +269,31 @@ def s_eshot(v):
     return at(0.22, (0, w, 1.0), (0, t_, 1.0))
 
 
+def s_slash(v):
+    """Schwerthieb: scharfes Zischen mit metallischem Nachklang."""
+    p = 1 + (v - 1) * 0.06
+    w = sweep_noise(0.16, 2500 * p, 6500 * p, 1.4, 0.7) * np.sin(np.linspace(0, np.pi, int(SR * 0.16))) ** 0.6
+    ring = Y.kane(3100 * p, 0.4, 0.25) * 0.25
+    return at(0.3, (0, w, 1.0), (0.04, ring, 1.0))
+
+
+def s_laser(v):
+    t = T(0.25)
+    f = 900 + 600 * np.exp(-t * 12)
+    ph = np.cumsum(2 * np.pi * f / SR)
+    w = (np.sin(ph) + 0.4 * np.sin(2.01 * ph) + 0.2 * np.sin(3.02 * ph)) * np.exp(-t * 7)
+    return w * 0.6 + biquad(noise(len(t)), 'hp', 4000) * np.exp(-t * 20) * 0.3
+
+
+def s_bow(v):
+    tw = tone(180, 140, 0.12, 'rich', 25) * 0.6
+    sw = sweep_noise(0.12, 3000, 1200, 1.2, 0.8) * env(0.12, 0.004, 25)
+    return at(0.15, (0, tw, 1.0), (0.01, sw, 0.7))
+
+
 SFX = {k[2:]: f for k, f in globals().items() if k.startswith('s_')}
-VARIANTS = {'eshot': 3, 'shoot': 4, 'hit': 4, 'ehit': 4, 'kill': 4, 'coin': 3}
-PEAK = {'eshot': 0.3, 'shoot': 0.35, 'hit': 0.55, 'ehit': 0.45, 'kill': 0.6, 'hurt': 0.8, 'coin': 0.45, 'move': 0.35, 'select': 0.5,
+VARIANTS = {'slash': 3, 'eshot': 3, 'shoot': 4, 'hit': 4, 'ehit': 4, 'kill': 4, 'coin': 3}
+PEAK = {'slash': 0.5, 'laser': 0.4, 'bow': 0.45, 'eshot': 0.3, 'shoot': 0.35, 'hit': 0.55, 'ehit': 0.45, 'kill': 0.6, 'hurt': 0.8, 'coin': 0.45, 'move': 0.35, 'select': 0.5,
         'boss': 0.9, 'explode': 0.85, 'roar': 0.75, 'thunder': 0.8}
 
 
