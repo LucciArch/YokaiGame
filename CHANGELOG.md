@@ -19,6 +19,8 @@
 - 4 neue Items (Glocke des Komainu, Feder der Tennin, Fels von Yomotsu, Sternenstaub) und 3 neue Synergien
 - Waffen-, Figuren- und Boss-Balance gemessen und angeglichen (Berichte unter `design/balance/`)
 - Kapitelnamen, eigener Seed (E in der Figurenauswahl), Codex mit Silhouetten, Menüs mit Nachthimmel
+- Neue Herausforderung **„Der lange Weg“** (alle zehn Ebenen), Option **Blitzeffekte reduziert**, Erzählzeilen zu Kapitelbeginn
+- Raum-Requisiten, Torii, Steinlaternen und Todesanimation in doppelter Pixeldichte
 - Neue Gegner: **Kawauso** (Kapitel I), **Zashiki-warashi** (Kapitel II), **Yamauba** (Kapitel III), **Nure-onna** (Kapitel IV), **Gozu** und **Mezu** (Kapitel V), **Komainu** und **Tennin** (Kapitel VI)
 - Wände in doppelter Pixeldichte; nach dem zweiten Boss eines Kapitels immer ein Schrein
 - Statistik „Letzte Läufe“, Infos zum gespeicherten Lauf im Titelmenü
