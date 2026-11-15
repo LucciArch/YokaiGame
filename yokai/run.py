@@ -441,6 +441,7 @@ class Run:
         self.foxfire = None
         self.yomeiri = None
         self.apparitions = []
+        self.room_enter_time = self.time
         if room.kind == 'yomeiri' and not room.extra.get('yomeiri_done'):
             self.yomeiri = Procession(self, room)
         if room.kind == 'kakurenbo':
@@ -979,6 +980,8 @@ class Run:
 
     def break_tile(self, tx, ty, rocks=False):
         t = self.room.tiles[ty][tx]
+        if t == T_POT and self.room.kind == 'kakurenbo' and self.time - getattr(self, 'room_enter_time', -9) < 1.2:
+            return                                    # Schonfrist: Schüsse aus dem Flur zählen nicht als Versuch
         if t == T_POT or (rocks and t == T_ROCK):
             self.room.tiles[ty][tx] = T_FLOOR
             self.bg_dirty = True
