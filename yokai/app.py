@@ -499,7 +499,7 @@ class Game:
     # ---------------------------------------------------------------- Herausforderungen
     def st_challenges(self, dt, events, nav):
         s = self.screen
-        s.fill((18, 12, 24))
+        self.menu_bg(s)
         T = gfx.TEXT
         done = set(self.save['challenges_done'])
         T.add('Herausforderungen  (%d / %d bestanden)' % (len(done), len(CHALLENGES)), W // 2, 8, 12, (255, 230, 170), 'c')
@@ -869,6 +869,18 @@ class Game:
                     return
 
     # ---------------------------------------------------------------- Codex
+    def menu_bg(self, s, a=185):
+        """Hintergrund für Menüseiten: Nachthimmel mit Torii, abgedunkelt."""
+        self.draw_night(s)
+        gfx.HI.clear()
+        ov = self.__dict__.get('_menu_ov')
+        if ov is None or ov.get_alpha() != a:
+            ov = pygame.Surface((W, H))
+            ov.fill((8, 5, 14))
+            ov.set_alpha(a)
+            self._menu_ov = ov
+        s.blit(ov, (0, 0))
+
     def st_codex(self, dt, events, nav):
         s = self.screen
         gfx.HI_MODE = True
@@ -1106,7 +1118,7 @@ class Game:
 
     def st_achievements(self, dt, events, nav):
         s = self.screen
-        s.fill((18, 12, 24))
+        self.menu_bg(s)
         T = gfx.TEXT
         got = set(self.save['achievements'])
         T.add('Erfolge  (%d / %d)' % (len(got), len(ACHIEVEMENTS)), W // 2, 6, 11, (255, 230, 170), 'c')
@@ -1133,7 +1145,7 @@ class Game:
 
     def st_stats(self, dt, events, nav):
         s = self.screen
-        s.fill((18, 12, 24))
+        self.menu_bg(s)
         T = gfx.TEXT
         st = self.save['stats']
         T.add('Statistik', W // 2, 6, 12, (255, 230, 170), 'c')
@@ -1199,7 +1211,7 @@ class Game:
 
     def st_controls(self, dt, events, nav):
         s = self.screen
-        s.fill((18, 12, 24))
+        self.menu_bg(s)
         T = gfx.TEXT
         T.add('Steuerung', W // 2, 8, 14, (255, 230, 170), 'c')
         rows = [('Bewegen', 'W A S D', 'Linker Stick'), ('Ofuda werfen', 'Pfeiltasten / linke Maustaste', 'Rechter Stick'),
@@ -1228,7 +1240,7 @@ class Game:
             gfx.TEXT.clear()
             ov = pygame.Surface((W, H), pygame.SRCALPHA); ov.fill((0, 0, 0, 170)); s.blit(ov, (0, 0))
         else:
-            s.fill((18, 12, 24))
+            self.menu_bg(s)
         T = gfx.TEXT
         st = self.save['settings']
         opts = [('Musik', '%d%%' % round(st['music'] * 100)), ('Effekte', '%d%%' % round(st['sfx'] * 100)),
