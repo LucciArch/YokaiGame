@@ -29,6 +29,17 @@ CURSES = {'dunkel': 'Fluch der Dunkelheit', 'nebel': 'Fluch des Nebels', 'labyri
           'verirrt': 'Fluch der Verirrten'}
 
 
+class _TileSpr:
+    __slots__ = ('img', 'x', 'top', 'y')
+
+    def __init__(self, img, x, top, kind):
+        self.img, self.x, self.top = img, x, top
+        self.y = top + TILE * 0.62
+
+    def draw(self, s, t):
+        gfx.hi_blit(self.img, self.x, self.top + TILE)
+
+
 class Run:
     def __init__(self, game, char_id, seed=None, hard=False, daily=False, endless=False, challenge=None):
         self.game = game
@@ -1792,6 +1803,21 @@ class Run:
                    - self.time * 0.5)
 
     # ======================================================================  Zeichnen
+    def standing_tiles(self):
+        """Felsen, Urnen und Laternen als Hi-Res-Requisiten, nach Tiefe sortierbar."""
+        out = []
+        tiles = self.room.tiles
+        for ty in range(ROWS):
+            row = tiles[ty]
+            for tx in range(COLS):
+                t = row[tx]
+                if t:
+                    x, y = RX + tx * TILE, RY + ty * TILE
+                    img = gfx.hi_tile(t, x, y, self.biome)
+                    if img is not None:
+                        out.append(_TileSpr(img, x + TILE / 2, y, 0 if t != T_LANTERN else 1))
+        return out
+
     def render_bg(self):
         room = self.room
         if getattr(room, '_bgcache', None) is None or room._bgcache[0] != self.biome_id:
@@ -1906,7 +1932,7 @@ class Run:
             pd.draw(s, t)
         for pk in self.pickups:
             pk.draw(s, t)
-        ents = [e for e in self.enemies] + [p]
+        ents = [e for e in self.enemies] + [p] + self.standing_tiles()
         ents.sort(key=lambda e: e.y)
         for e in ents:
             e.draw(s, t)

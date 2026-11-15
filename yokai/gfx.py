@@ -659,9 +659,26 @@ def env_walls(biome, rng):
     return s
 
 
+def hi_tile(t, x, y, biome):
+    """Hi-Res-Bild für stehende Requisiten (Fels, Urne, Laterne) oder None."""
+    bid = biome.get('_id', '')
+    if t == T_ROCK:
+        r = env_img(bid, 'rock_hi', 64)
+        return r[(x * 7 + y * 13) // 32 % len(r)] if r else None
+    if t == T_POT:
+        r = env_img('_shared', 'pot_hi', 64)
+        return r[0] if r else None
+    if t == T_LANTERN:
+        r = env_img('_shared', 'lantern_hi', 64)
+        return r[0] if r else None
+    return None
+
+
 def env_tile(surf, t, x, y, biome):
     """Gibt True zurück, wenn ein handgesetztes Tile gezeichnet wurde."""
     bid = biome.get('_id', '')
+    if hi_tile(t, x, y, biome) is not None:
+        return True                     # wird stehend auf der Hi-Res-Ebene gezeichnet
     if t == T_ROCK:
         r = env_img(bid, 'rock', 32)
         if r:

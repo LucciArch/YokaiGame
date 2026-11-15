@@ -30,20 +30,34 @@ def dil(m):
     return m | sh(m, 1, 0) | sh(m, -1, 0) | sh(m, 0, 1) | sh(m, 0, -1)
 
 
+SS = 1   # Supersampling: 2 = Hi-Res-Ebene (doppelte Pixeldichte, Koordinaten bleiben logisch)
+
+
 class Cv:
-    def __init__(s, w, h, bg=None, wrap=False):
+    def __init__(s, w, h, bg=None, wrap=False, ss=None):
+        s.ss = SS if ss is None else ss
         s.w, s.h, s.wrap = w, h, wrap
-        s.a = np.zeros((h, w, 4), np.uint8)
-        s.Y, s.X = np.mgrid[0:h, 0:w]
+        q = s.ss
+        s.a = np.zeros((h * q, w * q, 4), np.uint8)
+        Y, X = np.mgrid[0:h * q, 0:w * q]
+        if q == 1:
+            s.Y, s.X = Y, X
+        else:
+            s.Y, s.X = (Y - (q - 1) / 2) / q, (X - (q - 1) / 2) / q
         if bg:
             s.a[:] = hx(bg)
+
+    def nz(s, m):
+        """Koordinaten gesetzter Pixel in logischen Einheiten"""
+        ys, xs = np.nonzero(m)
+        return (ys / s.ss).round().astype(int), (xs / s.ss).round().astype(int)
 
     @property
     def m(s):
         return s.a[:, :, 3] > 0
 
     def copy(s):
-        o = Cv(s.w, s.h, wrap=s.wrap)
+        o = Cv(s.w, s.h, wrap=s.wrap, ss=s.ss)
         o.a = s.a.copy()
         return o
 
@@ -54,10 +68,19 @@ class Cv:
             x %= s.w
             y %= s.h
         if 0 <= x < s.w and 0 <= y < s.h:
-            s.a[y, x] = hx(c)
+            q = s.ss
+            s.a[y * q:(y + 1) * q, x * q:(x + 1) * q] = hx(c)
+
+    def hpx(s, x, y, c):
+        """ein einzelnes Hi-Res-Pixel (halbe logische Koordinaten erlaubt)"""
+        q = s.ss
+        X, Y = int(round(x * q)), int(round(y * q))
+        if 0 <= X < s.w * q and 0 <= Y < s.h * q:
+            s.a[Y, X] = hx(c)
 
     def get(s, x, y):
-        return tuple(s.a[int(y) % s.h, int(x) % s.w])
+        q = s.ss
+        return tuple(s.a[(int(y) % s.h) * q, (int(x) % s.w) * q])
 
     def rect(s, x0, y0, x1, y1, c):
         for y in range(int(y0), int(y1) + 1):
@@ -103,13 +126,25 @@ class Cv:
         return ((s.X - cx) / rx) ** 2 + ((s.Y - cy) / ry) ** 2 <= 1.0
 
     def R(s, x0, y0, x1, y1):
-        return (s.X >= x0) & (s.X <= x1) & (s.Y >= y0) & (s.Y <= y1)
+        e = 0.5 - 0.5 / s.ss
+        return (s.X >= x0 - e) & (s.X <= x1 + e) & (s.Y >= y0 - e) & (s.Y <= y1 + e)
 
     def PG(s, pts):
         from PIL import ImageDraw
-        im = Image.new('1', (s.w, s.h), 0)
-        ImageDraw.Draw(im).polygon([(int(round(x)), int(round(y))) for x, y in pts], fill=1, outline=1)
+        q = s.ss
+        im = Image.new('1', (s.w * q, s.h * q), 0)
+        o = (q - 1) / 2
+        ImageDraw.Draw(im).polygon([(int(round(x * q + o)), int(round(y * q + o))) for x, y in pts], fill=1, outline=1)
         return np.array(im, dtype=bool)
+
+    def hline(s, pts, c):
+        """dünne Linie in Hi-Res-Pixeln (logische Koordinaten)"""
+        q = s.ss
+        for (x0, y0), (x1, y1) in zip(pts, pts[1:]):
+            n = int(max(abs(x1 - x0), abs(y1 - y0)) * q * 1.5) + 1
+            for i in range(n + 1):
+                t = i / n
+                s.hpx(x0 + (x1 - x0) * t, y0 + (y1 - y0) * t, c)
 
     def fill(s, m, c, only=None):
         if only is not None:
@@ -124,7 +159,8 @@ class Cv:
         s.a[m] = hx(ramp[1])
         shad = np.zeros_like(m)
         if sd:
-            shad = m & ~sh(m, -sd * sdir[0], -sd * sdir[1])
+            k = int(round(sd * s.ss))
+            shad = m & ~sh(m, -k * sdir[0], -k * sdir[1])
             s.a[shad] = hx(ramp[0])
         if hl:
             lit = m & ~sh(m, hl, hl) & ~shad
@@ -142,6 +178,7 @@ class Cv:
 
     def blit(s, o, x, y, flipx=False, flipy=False):
         src = o.a if isinstance(o, Cv) else np.array(o.convert('RGBA'))
+        x, y = x * s.ss, y * s.ss
         if flipx:
             src = src[:, ::-1]
         if flipy:
@@ -151,7 +188,7 @@ class Cv:
             for i in range(w):
                 if src[j, i, 3]:
                     yy, xx = y + j, x + i
-                    if 0 <= yy < s.h and 0 <= xx < s.w:
+                    if 0 <= yy < s.a.shape[0] and 0 <= xx < s.a.shape[1]:
                         s.a[yy, xx] = src[j, i]
 
     def img(s):
@@ -160,7 +197,9 @@ class Cv:
 
 def strip(cvs, path=None):
     w, h = cvs[0].w, cvs[0].h
-    out = Cv(w * len(cvs), h)
+    q = cvs[0].ss
+    out = Cv(w * len(cvs), h, ss=q)
+    w *= q
     for i, c in enumerate(cvs):
         out.a[:, i * w:(i + 1) * w] = c.a
     if path:

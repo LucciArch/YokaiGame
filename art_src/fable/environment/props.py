@@ -28,7 +28,7 @@ def fin(cv, P, shadow=True):
     m = cv.m.copy()
     cv.outline(K)
     if shadow:
-        ys, xs = np.nonzero(m)
+        ys, xs = cv.nz(m)
         y1 = ys.max()
         sel = xs[ys >= y1 - 2]
         x0, x1 = sel.min(), sel.max()
@@ -57,12 +57,14 @@ def boulder(cv, rng, ramp, cx=16, by=28, rx=11, ry=9):
 
 def cover(cv, m, ramp, depth, rng):
     """moss / snow blanket on the upper part of mask m"""
-    ys, xs = np.nonzero(m)
+    ys, xs = cv.nz(m)
     top = ys.min()
-    lim = np.zeros(cv.w)
-    for x in range(cv.w):
-        lim[x] = top + depth + math.sin(x * .9 + rng.uniform(0, .5)) * 1.3 + (x - xs.mean()) * .12
-    c = m & (cv.Y <= lim[cv.X])
+    q = cv.ss
+    lim = np.zeros(cv.w * q)
+    for i in range(cv.w * q):
+        x = i / q
+        lim[i] = top + depth + math.sin(x * .9 + rng.uniform(0, .5)) * 1.3 + (x - xs.mean()) * .12
+    c = m & (cv.Y <= lim[np.arange(cv.w * q)][None, :])
     cv.fill(c, ramp[1])
     cv.fill(c & ~sh(c, 1, 1), ramp[2])
     cv.fill(c & ~sh(c, 0, -1) & sh(m, 0, -1), ramp[0])
@@ -209,7 +211,7 @@ def rocks(name):
         cv.vl(15, 19, 23, k[0])
         out.append(fin(cv, P))
         cv, rng, m = plain_boulder(1)                        # sacred rock with shimenawa
-        ys, xs = np.nonzero(m & (cv.Y == 20))
+        ys, xs = cv.nz(m & (np.abs(cv.Y - 20) < .3))
         rope(cv, xs.min(), xs.max(), 19, 1.5, shide=(11, 16, 21))
         out.append(fin(cv, P))
         cv, rng = new(2)                                     # hokora mini shrine
@@ -328,7 +330,7 @@ def rocks(name):
 
     elif name == 'ryugu':
         cv, rng = new(0)                                     # branching coral
-        m = np.zeros((32, 32), bool)
+        m = np.zeros(cv.a.shape[:2], bool)
         for (a, b, r0, r1) in (((16, 28), (16, 18), 2.6, 2.2), ((16, 19), (9, 10), 2.2, 1.6), ((16, 19), (22, 9), 2.2, 1.6),
                                ((11, 13), (6, 14), 1.6, 1.4), ((13, 14), (14, 6), 1.7, 1.4), ((20, 12), (26, 13), 1.6, 1.4),
                                ((20, 13), (19, 5), 1.5, 1.4)):
