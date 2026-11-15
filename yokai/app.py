@@ -21,8 +21,8 @@ class Game:
         self.headless = headless
         self.save = Save()
         st = self.save['settings']
-        info = pygame.display.Info()
-        sc = max(1, min((info.current_w - 80) // W, (info.current_h - 120) // H)) if info.current_w > 0 else 3
+        dw, dh = self.desktop_size()
+        sc = max(1, min((dw - 80) // W, (dh - 120) // H)) if dw > 0 else 3
         self.fullscreen = st.get('fullscreen', False) and not headless
         self.win_size = (W * sc, H * sc)
         self.set_mode()
@@ -56,11 +56,29 @@ class Game:
         except Exception:
             pass
 
+    def desktop_size(self):
+        try:
+            sizes = pygame.display.get_desktop_sizes()
+            if sizes and sizes[0][0] > 0:
+                return sizes[0]
+        except Exception:
+            pass
+        info = pygame.display.Info()
+        return (info.current_w, info.current_h) if info.current_w > 0 else (W * 3, H * 3)
+
     def set_mode(self):
+        """Vollbild = randloses Fenster in Desktop-Größe (kein Wechsel der Bildschirmauflösung)."""
         if self.fullscreen:
-            self.window = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-        else:
-            self.window = pygame.display.set_mode(self.win_size, pygame.RESIZABLE)
+            try:
+                self.window = pygame.display.set_mode(self.desktop_size(), pygame.FULLSCREEN)
+                return
+            except pygame.error:
+                try:
+                    self.window = pygame.display.set_mode(self.desktop_size(), pygame.NOFRAME)
+                    return
+                except pygame.error:
+                    self.fullscreen = False
+        self.window = pygame.display.set_mode(self.win_size, pygame.RESIZABLE)
 
     def scan_pads(self):
         try:
@@ -229,11 +247,15 @@ class Game:
 
     def frame(self, dt, events):
         self.t += dt
+        if any(e.type == pygame.KEYDOWN and e.key == pygame.K_RETURN and e.mod & pygame.KMOD_ALT for e in events):
+            self.toggle_fullscreen()                                  # Alt+Enter: nur Vollbild, nicht „Bestätigen“
+            events = [e for e in events if not (e.type == pygame.KEYDOWN and e.key == pygame.K_RETURN)]
         for e in events:
             if e.type == pygame.QUIT:
                 self.quit()
             elif e.type == pygame.KEYDOWN and e.key == pygame.K_F11:
                 self.toggle_fullscreen()
+                continue
             elif e.type == pygame.VIDEORESIZE and not self.fullscreen:
                 self.win_size = (max(W, e.w), max(H, e.h))
                 self.window = pygame.display.set_mode(self.win_size, pygame.RESIZABLE)
@@ -278,8 +300,10 @@ class Game:
 
     def toggle_fullscreen(self):
         self.fullscreen = not self.fullscreen
+        self.set_mode()                                  # kann bei Fehlern auf Fenster zurückfallen
         self.save['settings']['fullscreen'] = self.fullscreen
-        self.set_mode()
+        self.save.write()
+        pygame.event.clear(pygame.VIDEORESIZE)           # alte Größenänderungen nicht aufs neue Fenster anwenden
 
     def quit(self):
         self.save.write()
@@ -428,7 +452,7 @@ class Game:
             if sel:
                 gfx.panel(s, (W // 2 - 70, y - 2, 140, min(15, step + 1)), 170, (200, 120, 90))
             T.add(m, W // 2, y, 10, col, 'c')
-        T.add('v' + VERSION + '   •   F11 Vollbild', W - 6, H - 12, 6, (140, 130, 150), 'r')
+        T.add('v' + VERSION + '   •   F11 / Alt+Enter Vollbild', W - 6, H - 12, 6, (140, 130, 150), 'r')
         if items and items[self.sel % len(items)] == 'Fortsetzen' and not show_news:
             info = getattr(self, '_cont_info', None)
             if info is None:
@@ -1344,7 +1368,7 @@ class Game:
         rows = [('Bewegen', 'W A S D', 'Linker Stick'), ('Ofuda werfen', 'Pfeiltasten / linke Maustaste', 'Rechter Stick'),
                 ('Ausweichrolle', 'Leertaste / Shift / rechte Maustaste', 'A / RB'), ('Aktives Item', 'E', 'Y / LB'),
                 ('Reinigungssalz', 'Q', 'X'), ('Items & Werte', 'Tab (halten)', '–'), ('Pause', 'Esc / P', 'Start'), ('Nochmal (nach dem Tod)', 'R', 'Y'),
-                ('Vollbild', 'F11', '–'), ('Seed (Figurenwahl)', 'E', '–'),
+                ('Vollbild', 'F11 / Alt+Enter', '–'), ('Seed (Figurenwahl)', 'E', '–'),
                 ('Oni / Endlos (Figurenwahl)', 'H / N', '–')]
         T.add('Aktion', 40, 34, 8, (200, 180, 150)); T.add('Tastatur / Maus', 150, 34, 8, (200, 180, 150)); T.add('Controller', 360, 34, 8, (200, 180, 150))
         for i, (a, k, c) in enumerate(rows):
