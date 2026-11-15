@@ -5,7 +5,7 @@ NAME = 'kumo'
 CW, CH = 96, 64
 BASE = 57
 NEAR = ('u1', 'u2', 'u3')
-FAR = ('u0', 'u1', 'u2')
+FAR = ('K', 'u0', 'u1')
 
 LEG = dict(zip('KeEZwWbmno', ['K', 'e0', 'e1', 'y3', 'b2', 'b3', 'b0', 'u0', 'u1', 'u2']))
 FACE = """
@@ -50,12 +50,12 @@ def leg(c, hip, foot, kh, ramp, bend):
     mid = lerp(hip, foot, 0.45)
     knee = (mid[0] + bend, min(hip[1], foot[1]) - kh)
     p = C()
-    p.form(L(knee[0], knee[1], 1.3, foot[0], foot[1], 0.7), ramp, sd=1, hl=0)
-    c.stamp(p, 'u0')
+    p.form(L(knee[0], knee[1], 1.8, foot[0], foot[1], 0.9), ramp, sd=1, hl=1)
+    c.stamp(p, 'K')
     p = C()
-    p.form(L(hip[0], hip[1], 1.6, knee[0], knee[1], 1.3), ramp, sd=1, hl=0)
-    p.form(E(knee[0], knee[1], 1.7, 1.7), ramp, sd=0, hl=1)
-    c.stamp(p, 'u0')
+    p.form(L(hip[0], hip[1], 2.3, knee[0], knee[1], 1.8), ramp, sd=1, hl=1)
+    p.form(E(knee[0], knee[1], 2.2, 2.2), ('u1', 'u2', 'u3'), sd=0, hl=1)       # helles Kniegelenk
+    c.stamp(p, 'K')
 
 
 def draw(**kw):
@@ -91,6 +91,9 @@ def draw(**kw):
         p.fill(L(ab[0] + ox, ab[1] + oy, 1.2, ab[0] + ex, ab[1] + ey, 0.5), 'u1')
     c.stamp(p, 'K')
 
+    for i in (1, 0):                                   # vordere Beine hinter den Kopf – Gesicht bleibt frei
+        f = S['nf'][i]
+        leg(c, hip(i), (cx + f[0], BASE + f[1]), S['kh'][i], NEAR, bends[i])
     # cephalothorax + head
     p = C()
     ct = E(hc[0], hc[1], 8.4, 7.0) | E(hc[0] + 6, hc[1], 6, 5.4)
@@ -103,10 +106,6 @@ def draw(**kw):
     else:
         p.grid(hc[0] - 8, hc[1] + 4, FANGS, LEG)
     c.stamp(p, 'u0')
-
-    for i in (1, 0):
-        f = S['nf'][i]
-        leg(c, hip(i), (cx + f[0], BASE + f[1]), S['kh'][i], NEAR, bends[i])
     c.blacken()
     return c
 

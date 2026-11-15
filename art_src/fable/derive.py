@@ -10,7 +10,8 @@ JOBS = {
                                          'a0': '#3a2016', 'a1': '#64402a', 'a2': '#946a44', 'xg': '#d8b890'}),
     'bake_danuki': ('heroes', 'ponpoko', 'ponpoko', {'s0': '#120c16', 's1': '#2e2228', 's2': '#54423e', 's3': '#86705a',
                                                    'c0': '#3a1420', 'c1': '#6a2430', 'c2': '#a84a3a'}),
-    'gyuki': ('enemies_3', 'tsuchigumo', 'spider', {'s0': '#0a0610', 's1': '#1e1420', 's2': '#3a2632', 's3': '#5e4048',
+    # 'gyuki' hat jetzt eine eigene Datei (enemies_3/gyuki.py, Ochsenkopf)
+    '_gyuki_alt': ('enemies_3', 'tsuchigumo', 'spider', {'s0': '#0a0610', 's1': '#1e1420', 's2': '#3a2632', 's3': '#5e4048',
                                                      't0': '#3a0c12', 't1': '#7a1a1e', 't2': '#b83a2a'}),
     'boss_raiju': ('enemies_4', 'kasha', 'draw', {'h0': '#0e1a4a', 'h1': '#2a54b0', 'h2': '#8ac8ff',
                                                   'f0': '#1a3ab0', 'f1': '#7ac8ff', 'f2': '#fff6a0'}),

@@ -1,12 +1,12 @@
 """Shared helpers for enemy batch 3 (palette additions, curve masks, IK, export)."""
-import sys, math
+import sys, math, os
 sys.path.insert(0, '/home/claude/fable_art')
 import numpy as np
 from PIL import Image
 from px import *
 import px
 
-D = '/home/claude/fable_art/enemies_3/'
+D = os.path.dirname(os.path.abspath(__file__)) + '/'
 BG = (0x16, 0x28, 0x5c, 255)
 FLOOR = (0x24, 0x20, 0x2c, 255)
 

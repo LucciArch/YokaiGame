@@ -31,11 +31,11 @@ bccKKccKKccccbbba
 """
 
 HIPS = [(-3, 3), (1, 5), (6, 5), (10, 3)]
-KN = [(-30, -34), (-9, -30), (15, -31), (36, -40)]          # near knees, relative to the cephalothorax
-KF = [(-20, -25), (-3, -25), (23, -25), (41, -31)]          # far knees
+KN = [(-28, -24), (-9, -22), (15, -22), (34, -28)]          # near knees, relative to the cephalothorax
+KF = [(-20, -18), (-3, -18), (23, -18), (39, -22)]          # far knees
 NEAR0 = [(0, 80), (45, 80), (73, 80), (110, 80)]
 FAR0 = [(13, 80), (53, 80), (85, 80), (101, 80)]
-DEF = dict(cth=(50, 53), abd=(83, 46), tilt=0, near=NEAR0, far=FAR0, nk=[0, 0, 0, 0], fk=[0, 0, 0, 0])
+DEF = dict(ox=False, cth=(50, 53), abd=(83, 46), tilt=0, near=NEAR0, far=FAR0, nk=[0, 0, 0, 0], fk=[0, 0, 0, 0])
 
 
 def P(x, y):
@@ -48,8 +48,8 @@ def leg(c, hip, foot, ramp, knee):
     ank = (knee[0] + dx * 0.72, knee[1] + dy * 0.72)
     # tibia + tarsus (in front of nothing: drawn first), then femur over the knee
     p = C()
-    tb = L(knee[0], knee[1], 2.3, ank[0], ank[1], 1.7)
-    ts = L(ank[0], ank[1], 1.5, foot[0], foot[1] - 1, 1.0)
+    tb = L(knee[0], knee[1], 3.1, ank[0], ank[1], 2.3)
+    ts = L(ank[0], ank[1], 2.0, foot[0], foot[1] - 1, 1.2)
     p.form(tb | ts, ramp, sd=1, hl=1)
     # dark bands on the shin
     for t in (0.3, 0.55):
@@ -63,13 +63,38 @@ def leg(c, hip, foot, ramp, knee):
     p.fill(L(foot[0], foot[1] - 2, 1.0, foot[0] + (-1 if ox_ < 0 else 1), foot[1], 0.7), 'b2')   # claw
     c.stamp(p, 'K')
     p = C()
-    fm = L(hip[0], hip[1], 3.3, knee[0], knee[1], 2.5)
+    fm = L(hip[0], hip[1], 4.4, knee[0], knee[1], 3.3)
     p.form(fm, ramp, sd=1, hl=1)
     fx, fy = knee[0] - hip[0], knee[1] - hip[1]
     for t in (0.55,):
         q = (hip[0] + fx * t, hip[1] + fy * t)
         p.line([q, (q[0] + ox_ * 3.6, q[1] - 2.0)], ramp[0])
-    p.form(E(knee[0], knee[1], 3.2, 3.0), ramp, sd=1, hl=1)       # knee joint
+    p.form(E(knee[0], knee[1], 3.9, 3.6), ramp, sd=1, hl=1)       # knee joint
+    c.stamp(p, 'K')
+
+
+def ox_head(c, hx, hy):
+    """Gyūki: Ochsen-/Oni-Kopf mit geschwungenen Hörnern, glühenden Augen und Hauern."""
+    p = C()
+    for sd_ in (-1, 1):                                            # Hörner: nach außen, dann nach vorn gebogen
+        b0 = (hx + 2 + sd_ * 6, hy - 9)
+        b1 = (hx + 6 + sd_ * 14, hy - 17)
+        b2 = (hx - 4 + sd_ * 15, hy - 27)
+        p.form(L(*b0, 3.4, *b1, 2.6) | L(*b1, 2.6, *b2, 0.9), ('b0', 'b1', 'b2'), sd=1, hl=1)
+    c.stamp(p, 'K')
+    p = C()
+    head = E(hx, hy - 1, 13, 11.5) | E(hx - 10, hy + 4, 8, 6.5)
+    p.form(head, BRN, sd=4, hl=1)
+    p.form(E(hx - 13, hy + 5, 5.4, 4.4) & head, ('s1', 's2', 's3'), sd=1, hl=1)   # helle Schnauze
+    p.pxs([(hx - 17, hy + 4), (hx - 13, hy + 3)], 'K')                          # Nüstern
+    p.pxs([(hx - 17, hy + 5), (hx - 13, hy + 4)], 'K')
+    for ex in (-7, 1):                                                          # glühende Augen unter schwerer Braue
+        p.fill(E(hx + ex, hy - 3, 2.2, 1.6), 'e1'); p.pxs([(hx + ex, hy - 4)], 'y3')
+        p.line([(hx + ex - 3, hy - 6), (hx + ex + 3, hy - 7)], 'K')
+    p.line([(hx - 19, hy + 9), (hx - 5, hy + 10)], 'K')                         # Maul
+    for fx_ in (-16, -8):                                                       # Hauer
+        p.fill(L(hx + fx_, hy + 9, 1.1, hx + fx_ - 1, hy + 14, 0.6), 'b3')
+    p.form(E(hx + 9, hy - 7, 3.2, 4.2), BRN, sd=1, hl=0)                        # Ohr
     c.stamp(p, 'K')
 
 
@@ -119,6 +144,9 @@ def spider(**kw):
     p.form(L(cx + 10, cy - 1, 5, ax - 18, ay + 3, 6), BRNF, sd=2, hl=0)
     c.stamp(p, 'K')
 
+    for i in (1, 0):                                   # vordere nahe Beine hinter den Kopf, damit das Gesicht frei bleibt
+        h = HIPS[i]
+        leg(c, (cx + h[0], cy + h[1]), P(*S['near'][i]), BRN, knee_of(S, 'near', i, cx, cy))
     # ---- cephalothorax: hairy brown carapace with a spiky mane
     p = C()
     ct = E(cx, cy, 15.4, 11.4)
@@ -131,12 +159,12 @@ def spider(**kw):
     c.stamp(p, 'K')
 
     # ---- head
-    p = C()
-    p.grid(cx - 28, cy - 5 + S['tilt'], HEAD, LEG)
-    c.stamp(p, 'K')
-    for i in (1, 0):
-        h = HIPS[i]
-        leg(c, (cx + h[0], cy + h[1]), P(*S['near'][i]), BRN, knee_of(S, 'near', i, cx, cy))
+    if S['ox']:
+        ox_head(c, cx - 17, cy + 1 + S['tilt'])
+    else:
+        p = C()
+        p.grid(cx - 28, cy - 5 + S['tilt'], HEAD, LEG)
+        c.stamp(p, 'K')
     c.blacken()
     return c
 
