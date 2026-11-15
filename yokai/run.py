@@ -15,7 +15,7 @@ from .bosses import make_boss, CX, CY
 ACH = {a[0]: a for a in ACHIEVEMENTS}
 TIPS = ['Reinigungssalz an rissigen Wänden öffnet Geheimräume.', 'Die Ausweichrolle macht dich kurz unverwundbar.',
         'Drei Items eines Themas lösen eine Transformation aus.', 'Ohne Treffer gegen den Boss erscheint öfter ein Schrein.',
-        'Oni-Schreine kosten Herzen – Kami-Schreine sind kostenlos.', 'Ab Ebene 2 brauchen Schatzräume einen Schlüssel.',
+        'Oni-Schreine kosten Herzen – Kami-Schreine sind kostenlos.', 'Ab Kapitel II brauchen Schatzräume einen Schlüssel.',
         'Im Codex siehst du, welche Synergien du schon kennst.', 'Rot aufleuchtende Yokai schießen gleich.',
         'Das Teehaus verbessert deine Werte dauerhaft.', 'Champions mit farbigem Punkt sind stärker – und lohnender.',
         'In der Tab-Ansicht siehst du alle Werte und Items.', 'Bosse rasen bei 25 % Leben vor Wut.',
@@ -144,7 +144,47 @@ class Run:
 
     @property
     def last_stage(self):
-        return self.stage == 1 or self.depth not in self.TWO_STAGE or self.challenge == 'bossrush'
+        return self.stage == 1 or self.depth not in self.TWO_STAGE or bool(self.challenge)   # Prüfungen bleiben kurz
+
+    def path_nodes(self):
+        """Alle Ebenen des Laufs als (Kapitel, Abschnitt)."""
+        out = []
+        last = 6 if (self.save['heaven_unlocked'] or self.depth >= 6) else 5
+        for d in range(1, last + 1):
+            two = d in self.TWO_STAGE and not self.challenge
+            out += [(d, 0), (d, 1)] if two else [(d, 0)]
+        return out
+
+    def draw_path(self, s, cx, y, a=255):
+        """Fortschrittspfad: ein Punkt je Ebene, Kapitel mit Lücke getrennt, Boss-Ebenen als Raute."""
+        nodes = self.path_nodes()
+        gaps = len(set(d for d, _ in nodes)) - 1
+        wdt = (len(nodes) - 1) * 9 + gaps * 6
+        x = cx - wdt / 2
+        cur = (self.depth, self.stage)
+        surf = pygame.Surface((wdt + 12, 12), pygame.SRCALPHA)
+        ox = x - 6
+        prev_d = None
+        for i, (d, st) in enumerate(nodes):
+            if prev_d is not None and d != prev_d:
+                x += 6
+            prev_d = d
+            done = (d, st) < cur
+            now = (d, st) == cur
+            col = (255, 220, 130) if now else (190, 150, 90) if done else (90, 80, 100)
+            px_ = int(x - ox)
+            if i + 1 < len(nodes):
+                nxt = 9 + (6 if nodes[i + 1][0] != d else 0)
+                pygame.draw.line(surf, (70, 60, 80) if not done else (150, 120, 80), (px_ + 3, 6), (px_ + nxt - 3, 6), 1)
+            if d == 6:
+                pygame.draw.polygon(surf, col, [(px_, 1), (px_ + 4, 6), (px_, 11), (px_ - 4, 6)])
+            else:
+                pygame.draw.circle(surf, col, (px_, 6), 3 if now else 2)
+            if now:
+                pygame.draw.circle(surf, (255, 250, 220), (px_, 6), 1)
+            x += 9
+        surf.set_alpha(a)
+        s.blit(surf, (int(ox), y - 6))
 
     def floor_label(self):
         roman = ['', 'I', 'II', 'III', 'IV', 'V', 'VI']
@@ -152,7 +192,7 @@ class Run:
 
     @property
     def enemy_dmg(self):
-        """Ab Ebene 4 kosten Treffer ein ganzes Herz."""
+        """Ab Kapitel IV kosten Treffer ein ganzes Herz."""
         return 2 if self.depth >= 4 or self.loop else 1
 
     def new_floor(self):
@@ -2045,7 +2085,7 @@ class Run:
             fl = pygame.Surface((RW, RH)); fl.fill((255, 246, 230))
             fl.set_alpha(int(min(1, self.whiteout / 0.45) * 170 * (0.5 if self.save['settings'].get('flash', True) is False else 1)))
             s.blit(fl, (RX, RY))
-        if self.hint_t > 0 and self.hint_txt:
+        if self.hint_t > 0 and self.hint_txt and self.game.state == 'play':
             a = min(1.0, self.hint_t, (6.0 - self.hint_t) * 3)
             hw = min(RW - 20, 8 + len(self.hint_txt) * 4)
             bx = RX + RW // 2 - hw // 2
@@ -2180,6 +2220,7 @@ class Run:
         if self.title_t > 0 and self.boss_intro <= 0:
             a = int(255 * min(1, self.title_t))
             T.add(self.floor_label(), W // 2, 92, 9, (230, 210, 170), 'c', alpha=a)
+            self.draw_path(s, W // 2, 84, a)
             T.add(self.biome['name'], W // 2, 104, 18, (255, 245, 225), 'c', alpha=a)
             T.add(self.biome['jp'], W // 2, 128, 10, (210, 170, 150), 'c', alpha=a)
             if not hasattr(self, 'tip') or self.tip[0] != self.floor_no:

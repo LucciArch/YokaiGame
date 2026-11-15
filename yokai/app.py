@@ -669,7 +669,9 @@ class Game:
             if nav:
                 self.pause_tab = False
             return
-        gfx.TEXT.add('Pause', W // 2, 60, 18, (255, 240, 220), 'c')
+        gfx.TEXT.add('Pause', W // 2, 50, 18, (255, 240, 220), 'c')
+        run.draw_path(s, W // 2, 84)
+        gfx.TEXT.add(run.floor_label() + '  –  ' + run.biome['name'], W // 2, 196, 8, (220, 200, 170), 'c')
         for i, m in enumerate(items):
             y = 100 + i * 18
             if i == self.sel:
