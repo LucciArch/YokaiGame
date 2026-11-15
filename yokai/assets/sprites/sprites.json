@@ -782,6 +782,15 @@
   "w": 82,
   "walk": 4
  },
+ "yamauba": {
+  "atk": 4,
+  "h": 63,
+  "hi": true,
+  "kind": "strip",
+  "n": 7,
+  "w": 58,
+  "walk": 4
+ },
  "yosuzume": {
   "atk": 4,
   "h": 48,
