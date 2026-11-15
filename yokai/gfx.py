@@ -1118,10 +1118,11 @@ def tinted(surf, mode):
 
 
 def hi_flush(win, sc, ox, oy, dim=1.0, light=None):
-    for surf, cx, by, alpha in HI:
+    for ent in HI:
+        surf, cx, by, alpha = ent[:4]
         w, h = surf.get_size()
         tw, th = max(1, int(w * sc / 2)), max(1, int(h * sc / 2))
-        f = dim
+        f = dim * (ent[4] if len(ent) > 4 else 1.0)
         if light is not None:
             f *= light(cx, by)
         fq = round(f * 8) / 8

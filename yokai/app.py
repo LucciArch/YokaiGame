@@ -605,7 +605,7 @@ class Game:
     def st_pause(self, dt, events, nav):
         run = self.run
         run.draw(self.screen, self.t)
-        gfx.HI.clear()
+        gfx.HI[:] = [(e[0], e[1], e[2], e[3], 0.4) for e in gfx.HI]   # Figuren gedimmt unter dem Pause-Schleier
         gfx.TEXT.clear()
         s = self.screen
         ov = pygame.Surface((W, H), pygame.SRCALPHA)
@@ -636,7 +636,7 @@ class Game:
                     self.confirm = None
             return
         if getattr(self, 'pause_tab', False):
-            gfx.HI.clear()
+            gfx.HI.clear()   # Item-Liste deckt alles ab
             self.draw_itemlist(s)
             if nav:
                 self.pause_tab = False
