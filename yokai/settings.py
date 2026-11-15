@@ -2,7 +2,7 @@
 import os
 
 TITLE = "Yōkai no Michi – Hyakki Yagyō"
-VERSION = "1.0.0"
+VERSION = "1.1.0"
 
 W, H = 480, 320          # interne Auflösung (Pixel-Art), wird hochskaliert
 TILE = 32
