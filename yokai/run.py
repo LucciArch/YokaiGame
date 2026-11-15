@@ -467,10 +467,14 @@ class Run:
         'bamboo': 'Bambus schießt aus dem Boden – achte auf die grünen Kreise unter dir!',
         'foxfire': 'Kitsunebi: Fange das Fuchsfeuer, um in diesem Raum stärker zuzuschlagen.',
         'hands': 'In Yomi greifen Hände aus dem Boden und bremsen dich.',
+        'cucumber': 'Kappa-Dank: Am Flussufer bleibt nach dem Kampf manchmal ein halbes Herz liegen.',
+        'drums': 'Oni-Kriegstrommeln! Bei jedem Schlag stürmen die Yokai auf dich zu.',
+        'tide': 'Brandung: Wellen rollen über den Strand und schieben dich mit.',
     }
     QUIRKS = {'yukiyama': 'ice', 'kurama': 'gust', 'jigoku': 'lava', 'enma_cho': 'lava', 'hakaba': 'souls',
               'ryugu': 'current', 'shinkai': 'current', 'obakedera': 'polter', 'yashiki': 'polter',
-              'takamagahara': 'star', 'tsukiyomi': 'star', 'chikurin': 'bamboo', 'inari': 'foxfire', 'yomi': 'hands'}
+              'takamagahara': 'star', 'tsukiyomi': 'star', 'chikurin': 'bamboo', 'inari': 'foxfire', 'yomi': 'hands',
+              'kawabe': 'cucumber', 'oeyama': 'drums', 'uminobe': 'tide'}
 
     def biome_quirk(self, dt):
         """Kleine Eigenheit pro Biom (nur in normalen Räumen, nicht in Schreinen)."""
@@ -527,6 +531,29 @@ class Run:
                     self.foxfire = None
                 elif ff[2] > 10:
                     self.foxfire = None
+        elif q == 'drums' and fighting:
+            if qt <= 0:
+                audio.play('explode', 0.35)
+                self.shake(2)
+                for e in self.enemies:
+                    if e.active() and not e.is_boss:
+                        d = norm(p.x - e.x, p.y - e.y)
+                        e.kx += d[0] * 190
+                        e.ky += d[1] * 190
+                        burst(self, e.x, e.y + 4, (200, 80, 60), 4, 40, 0.3)
+                qt = random.uniform(5, 7)
+        elif q == 'tide' and fighting:
+            if qt <= 0:
+                d = random.choice((-1, 1))
+                self.wind = (d * 60, 0, 1.0)
+                for i in range(22):
+                    self.particles.append(Particle(RX + (0 if d > 0 else RW), RY + random.uniform(6, RH - 6), d * random.uniform(180, 260), random.uniform(-6, 6), 1.4, (170, 210, 230), 2))
+                qt = random.uniform(6, 8)
+        elif q == 'cucumber' and self.room.cleared and not self.room.extra.get('cuc_rolled'):
+            self.room.extra['cuc_rolled'] = True
+            if random.random() < 0.25:
+                x, y = RX + random.uniform(50, RW - 50), RY + random.uniform(40, RH - 40)
+                self.spawn_pickup('half', x, y)
         elif q == 'current' and fighting:
             cur = self.room.extra.setdefault('current', random.choice(((28, 0), (-28, 0), (0, 22), (0, -22))))
             if self.wind[2] <= 0:
