@@ -1,19 +1,20 @@
 # Nächster Schritt
 
-**Synergien Teil 3** – noch ~20 Synergien geben nur Werte oder alte Flags (orbital, familiar, aura, explode …).
-Nach dem Muster in `yokai/sigs.py` (Abschnitt Synergie-Fähigkeiten, `TEXT` + Haken) je eine eigene
-Fähigkeit, die die Signaturen ihrer Items verstärkt. Erledigt: Runde 3 (Feuer/Blitz) und Runde 4 (Oni/Masken/Klingen). Als Nächstes (je Runde ~9):
+**Synergie-Fähigkeiten sichtbar machen** – seit Runde 6 haben alle 86 Synergien eine eigene Fähigkeit
+(`sig_*` in `yokai/data.py`, Text in `yokai/sigs.py` → `TEXT`). Der Spieler sieht sie aber nur einmal im
+Banner beim Aufheben. Darum:
 
-1. schreinwaechter, unbeweglich, drachenschuppen, daruma_geist, yomotsu, riesenmoench, totenfaehre, hyakki_herr, kaufmann
-2. Rest: gluecksheim, winkekatze, fuchsgeld, wunsch, tennyo, kappa_fest, hanami_picknick, shogatsu, pilger, sommerwind, fest_der_laternen
+1. Pausebildschirm (`app.py`, Synergie-Zeile in der Item-Übersicht): beim Überfahren/Auswählen einer
+   Synergie ihren Fähigkeitstext zeigen (wie bei Items per Maus-Hover).
+2. Lexikon: eigene Seite „Synergien“ (entdeckte mit Namen, Items und Fähigkeitstext, unentdeckte als ???).
 
-Warum: Synergien sind der Kern des Wiederspielwerts; reine Werte-Synergien fühlen sich nach dem
-Item-Umbau (eigene Signaturen) blass an. `tools/sigtest.py` testet neue `sig_*` automatisch.
+Warum: Synergien sind der Kern des Wiederspielwerts – wer nicht nachlesen kann, was eine Kombination tut,
+plant keine Builds. Danach Balance (siehe unten), weil viele neue Fähigkeiten sich stapeln.
 
 ## Weitere Ideen
-- Bot-Läufe mit erzwungenen Feuer-Synergien (Feuerwerk + Ölfeuer stapeln sich womöglich stark)
-- Balance-Check der neuen Synergie-Fähigkeiten (`/balance-check`, Bot-Läufe mit erzwungenen Synergien)
+- Balance-Check der Synergie-Fähigkeiten: Bot-Läufe mit erzwungenen Synergien (z. B. Feuerwerk + Ölfeuer + Obon-Fest,
+  Unbeweglich-Schild, Totenfähre-Münzen) und `/balance-check`
 - Sichtbare Effekte für Synergie-Fähigkeiten (eigene Partikel/Farben statt Standard-Ring)
 - Neuer Boss für Kapitel V/VI mit eigener Hi-Res-Figur
-- Lexikon-Seite „Synergien“ mit Fähigkeitstext (TEXT aus sigs.py) statt nur Namen
 - Weitere Ereignisräume (z. B. Tanuki-Bauchtrommel-Wettstreit)
+- Neue Synergien für Items, die noch an keiner beteiligt sind
