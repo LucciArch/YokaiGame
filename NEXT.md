@@ -42,13 +42,23 @@ für Talismane greifen (z. B. `bullet_tick`) – sollen sie auch für Strahl/Hie
   `gfx.PROP_LIGHT` angepasst. Damit hat kein Biom mehr Grundformen-Requisiten.
 - Hinweis für parallele Läufe: Rundennummer erst direkt vor dem Push aus `origin/main` bestimmen (mehrere Sitzungen pushen gleichzeitig).
 
-# Nächster Schritt: weiter mit Lucas Synergie-Wunsch (siehe oben, „Nächste Kandidaten“)
-Warum: dauerhafter Wunsch von Luca, Grafik-Rückstand ist abgearbeitet.
+# Erledigt: Item-Synergien (Runden 70–72)
+- Runde 70: Aktive Salven (Ofuda-Sturm, Shikigami-Ruf, Hyōtan-Sauger) erben `weapons.shot_flags` ohne chain/split/explode;
+  Mehrfachwurf = mehr Wellen bzw. Shikigami.
+- Runde 71: `damage_enemy` – Folgeschaden der Spielerin (`run._echo`: Explosion, Hazards 'p') trägt burn/poison/slow der Items.
+- Runde 72: `weapons._path_sigs` – Bahn-Sigs (`gross`, `stromauf`, `seidenfaden`, `windstoss`, `kammzinken`) wirken für
+  Strahl, `gross`/`seidenfaden` für Hiebe. `sichel`, `schweben`, `koi_drache` bleiben bewusst Talisman-only.
+- Alle Fälle in `tools/waffentest.py`. Alle 98 Synergien haben schon eigene sig_-Fähigkeiten.
+
+# Nächster Schritt: Item-Synergien weiter – Hit-/Kill-Sigs mit Waffen prüfen
+Warum: Lucas Dauerwunsch. Offen ist, ob `hit_pre`/`hit_post`/`on_kill`-Sigs, die `b.fl` oder `b.big`/`b.gold` lesen,
+mit dem unsichtbaren Träger-Geschoss (`weapons._carrier`) richtig greifen (z. B. Goldwürfe, großer Wurf bei Hieben,
+`on_fire`-Sigs wie `sonne_mond`/`rausch`, die nur Talismane verändern – für Strahl/Hieb Farbe/Element wechseln?).
+Ein Test pro Fund in `tools/waffentest.py`.
 
 # Weitere Ideen
-- Licht: Spielerin-Items mit Feuer/Licht (z. B. Kitsunebi-Familiar, Laternen-Items) als eigene Lichtquelle
-- Wanddekos Yashiki/Kawabe/Ōeyama/Shinkai/Enma-chō/Tsukiyomi ebenfalls in Hi-Res überarbeiten (`wall_decos`)
-- Mondpalast-Ambiente: fallende Katsura-Blätter als Partikel, Mondhase als seltener Ereignis-NPC (Mochi-Tausch)
-- Totenpalast-Ambiente: eigene Partikel (Maden-Glühwürmchen, Izanamis acht Donnergötter als Blitze im Hintergrund)
-- Kawabe-/Shinkai-Ambiente: Glühwürmchen über Wasser, aufsteigende Leuchtpartikel in der Tiefsee
-- Shinkirō als Ereignis: eine Hamaguri spiegelt einen Trugladen vor, dessen Items nach dem Kauf verschwinden können
+- Licht: Spielerin-Items mit Feuer/Licht (Kitsunebi-Familiar, Laternen-Items) als eigene Lichtquelle
+- Wanddekos Yashiki/Kawabe/Ōeyama/Shinkai/Enma-chō/Tsukiyomi in Hi-Res überarbeiten (`wall_decos`)
+- Amaterasu-Bossmusik und Titelbild-Stimmung nach dem Iwato-Sieg
+- Mondpalast-Ambiente: fallende Katsura-Blätter, Mondhase als seltener Ereignis-NPC (Mochi-Tausch)
+- Shinkirō als Ereignis: eine Hamaguri spiegelt einen Trugladen vor
