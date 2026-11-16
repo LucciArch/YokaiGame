@@ -120,5 +120,10 @@ check(e.gold_hit, 'Goldwurf-Item wirkt nicht beim Schwerthieb')
 r, p = setup(w_bow=1, gold_shots=1)
 p.fire((1, 0))
 check(r.pbullets and all(b.gold for b in r.pbullets), 'Goldwurf-Item wirkt nicht beim Bogen')
+# Laternen-Items vergrößern und färben das Licht der Spielerin
+r, p = setup()
+p.gain_item('chochin_feuer', silent=True)
+lx, ly, lr, lc = r.collect_lights()[0]
+check(lr > 90 and lc == (230, 70, 50), 'Chōchin-Feuer leuchtet nicht um die Spielerin')
 print('Waffen-Synergien geprüft, Fehler:', bad)
 sys.exit(1 if bad else 0)

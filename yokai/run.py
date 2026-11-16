@@ -2343,10 +2343,15 @@ class Run:
     _HAZ_LIGHT = {'strike': (255, 240, 140), 'fire': (255, 130, 40), 'meteor': (200, 140, 255)}
     _PART_LIGHT = {'wave': 2.0, 'soul': 0, 'ring': 2.5}
 
+    LAMP_ITEMS = ('kitsunebi', 'yurei_laterne', 'onibi_ring', 'yomi_feuer', 'chochin_feuer', 'hozuki', 'kasha_rad',
+                  'kagutsuchi_glut')
+
     def collect_lights(self):
         """Alle Lichtquellen dieses Bildes als (x, y, Radius, Farbe oder None). Das Licht der Spielerin steht vorn."""
         p = self.player
-        out = [(p.x, p.y, 90, None)]
+        lamps = [ITEMS[i]['col'] for i in p.items if i in self.LAMP_ITEMS]
+        # Laternen und Feuer-Items: größeres Licht in der Farbe der zuletzt aufgenommenen Flamme
+        out = [(p.x, p.y, 90 + 16 * min(3, len(lamps)), lamps[-1] if lamps else None)]
         tiles, bid = self.room.tiles, self.biome_id
         for ty in range(ROWS):
             for tx in range(COLS):
