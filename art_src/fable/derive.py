@@ -20,7 +20,8 @@ JOBS = {
 
 def run(name):
     folder, mod, fn, cols = JOBS[name]
-    d = os.path.join(BASE, folder) if folder else BASE
+    repo = os.path.join(os.path.dirname(os.path.abspath(__file__)), folder)
+    d = repo if folder and os.path.isdir(repo) else (os.path.join(BASE, folder) if folder else BASE)   # Repo-Quellen zuerst
     os.chdir(d)
     sys.path.insert(0, d)
     m = importlib.import_module(mod)

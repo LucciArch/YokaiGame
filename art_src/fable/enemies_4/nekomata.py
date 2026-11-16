@@ -2,7 +2,7 @@
 Angriff: Sprung mit gespreizten Krallen, Schwänze lodern."""
 from common import *
 import cat as catlib
-import bakeneko as bk
+import cat_bakeneko_alt as bk  # Gerüst der alten Bakeneko (die neue liegt in enemies_6)
 
 NAME = 'nekomata'
 CELL = bk.CELL

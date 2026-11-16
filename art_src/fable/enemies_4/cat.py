@@ -114,9 +114,13 @@ def cat(S, NEAR, FAR, ln, LEG, cell, org, fire=None, bristle=True):
     p.form(L(pts[0][0], pts[0][1], 6.2, pts[1][0], pts[1][1], 3.6), NEAR, sd=3, hl=1)
     c.stamp(p, ln)
     paw(c, pts[-1], S['nhd'], NEAR, ln, S['claws'])
-    # head
-    p = C()
+    # head – mit Hals, damit der Kopf nicht vor dem Körper schwebt
     hx, hy = B(S['head'])
+    hw, hh = max(len(r) for r in HEAD.strip().split('\n')), len(HEAD.strip().split('\n'))
+    p = C()
+    p.form(L(hx + hw * 0.55, hy + hh * 0.7, 4.0, *B((ch[0] - ch[2] * 0.4, ch[1] - ch[3] * 0.5)), 5.6), NEAR, sd=2, hl=1)
+    c.stamp(p, ln)
+    p = C()
     p.grid(int(hx), int(hy), HEAD, LEG)
     c.stamp(p, 'K', ring=False)
     # near front leg
