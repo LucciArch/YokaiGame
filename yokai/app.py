@@ -579,64 +579,93 @@ class Game:
         gfx.HI_MODE = True
         self.draw_night(s)
         gfx.HI.clear()
-        ov = pygame.Surface((W, H), pygame.SRCALPHA)
-        ov.fill((0, 0, 0, 120))
-        s.blit(ov, (0, 0))
         T = gfx.TEXT
-        T.add('Wähle deinen Charakter', W // 2, 8, 14, (255, 240, 220), 'c')
+        img = lambda n: gfx.env_img('_title', n)[0]
+        sc_ = self.__dict__.get('_cscrim')
+        if sc_ is None:                                  # Schleier hinter der Schrift rechts, nach links auslaufend
+            sc_ = self._cscrim = pygame.Surface((290, 230), pygame.SRCALPHA)
+            for x in range(290):
+                sc_.fill((8, 6, 18, int(150 * min(1, x / 70))), (x, 0, 1, 230))
+            sc_.fill((8, 6, 18, 150), (0, 0, 0, 0))
+        s.blit(sc_, (W - 290, 26))
+        strip = pygame.Surface((W, 62), pygame.SRCALPHA)
+        strip.fill((8, 6, 18, 150))
+        s.blit(strip, (0, 240))
+        T.add('Wähle deinen Charakter', W // 2, 6, 12, (255, 236, 200), 'c')
         unlocked = self.save['chars']
         n = len(CHAR_ORDER)
-        for i, cid in enumerate(CHAR_ORDER):
-            col_i, row_i = i % 5, i // 5
-            x = 70 + col_i * 85
-            y = 42 + row_i * 62
-            sel = i == self.char_sel
-            gfx.panel(s, (x - 30, y, 60, 54), 200 if sel else 140, (255, 210, 120) if sel else (110, 90, 80))
-            hi = sheets.is_hi(cid)
-            spr = sheets.frame(cid, sheets.RIGHT, (int(self.t * 8) % 4) if sel else 0, 1 if hi else 2)
-            if cid not in unlocked:
-                spr = gfx.tinted(spr, 'shadow')
-            bob = int(abs(math.sin(self.t * 5)) * 2) if sel else 0
-            if hi:
-                gfx.hi_blit(spr, x, y + 41 - bob)
-            else:
-                s.blit(spr, (x - spr.get_width() // 2, y + 7 - bob))
-            T.add(CHARS[cid]['name'] if cid in unlocked else '???', x, y + 44, 7, (240, 230, 210) if cid in unlocked else (130, 120, 120), 'c')
-            wins = self.save['char_wins'].get(cid, 0)
-            if wins:
-                for k in range(min(wins, 3)):
-                    star(s, x + 24 - k * 7, y + 6, (255, 220, 100))
-        c = CHARS[CHAR_ORDER[self.char_sel]]
         cid = CHAR_ORDER[self.char_sel]
-        gfx.panel(s, (20, 172, W - 40, 100), 210)
+        c = CHARS[cid]
+        if self.__dict__.get('_csel') != self.char_sel:      # Wechsel: Figur steigt kurz aufs Podest, Pinsel zieht neu
+            self._csel, self._ct = self.char_sel, 0.0
+        self._ct += dt
+        # ---- große Figur auf dem Steinpodest am Ufer, Mondlicht dahinter
+        px, pby = 112, 236
+        gfx.draw_glow(s, px, 168, 58 + 3 * math.sin(self.t * 1.5), (120, 130, 220), 46)
+        gfx.hi_blit(img('pedestal'), px, pby)
+        lift = int(8 * max(0.0, 1 - self._ct / 0.18) ** 2)
         if cid in unlocked:
-            T.add('%s – %s' % (c['name'], c['title']), 32, 178, 12, (255, 230, 170))
-            T.add(c['desc'], 32, 196, 8, (230, 225, 210))
-            hx = 34
+            spr = sheets.frame(cid, sheets.RIGHT, int(self.t * 8) % 4, 2)
+            gfx.hi_blit(spr, px, pby - 22 - lift)
+        else:
+            spr = gfx.tinted(sheets.frame(cid, sheets.RIGHT, 0, 2), 'shadow')
+            gfx.hi_blit(spr, px, pby - 22 - lift, 200)
+            gfx.hi_blit(img('lock'), px, pby - 48 + int(2 * math.sin(self.t * 2)))
+        # ---- Name als Pinselschrift-Banner, darunter Titel, Beschreibung und Werte als Tuschebalken
+        x0, iw = 214, W - 214 - 36                   # text_w schätzt kleine Schrift etwas zu schmal
+        br = img('brush')
+        bw = max(2, int(br.get_width() * min(1.0, self._ct / 0.16)))
+        gfx.hi_blit(br.subsurface((0, 0, bw, br.get_height())), x0 - 6 + bw // 4, 52, transient=True)
+        if cid in unlocked:
+            T.add(c['name'], x0 + 6, 33, 15, (255, 240, 214))
+            T.add(c['title'], x0 + 2, 58, 8, (240, 196, 120))
+            y = self._wrap(c['desc'], x0 + 2, 74, iw, 7, (230, 225, 210)) + 4
+            ink = img('ink')
+            for lab, v in (('Leben', (c['hp'] + c['spirit']) / 10), ('Kraft', (c['fx'].get('dmgm', 1) - 0.7) / 0.6),
+                           ('Tempo', (c['fx'].get('spd', 0) + 16) / 38), ('Wurfrate', (c['fx'].get('rate', 0) + 0.8) / 1.1)):
+                v = max(0.12, min(1.0, v)) * min(1.0, self._ct / 0.3)
+                T.add(lab, x0 + 2, y, 7, (200, 192, 178))
+                gfx.hi_blit(pygame.transform.scale(ink, (max(4, int(ink.get_width() * v)), 14)), x0 + 60 + ink.get_width() * v / 4, y + 9, transient=True)
+                y += 12
+            hx_ = x0 + 60
             for k in range(c['hp'] // 2):
-                gfx.heart(s, hx, 212, 'red', 2); hx += 10
+                gfx.heart(s, hx_, y + 1, 'red', 2); hx_ += 10
             for k in range(c['spirit'] // 2):
-                gfx.heart(s, hx, 212, 'spirit', 2); hx += 10
-            extra = []
-            if c['active']:
-                extra.append('Aktiv: ' + ACTIVES[c['active']]['name'])
-            for it in c['items']:
-                extra.append(ITEMS[it]['name'])
-            if c['coins']:
-                extra.append('%d Mon' % c['coins'])
-            T.add('  •  '.join(extra) if extra else 'Keine Startitems', 32, 226, 7, (200, 190, 170))
+                gfx.heart(s, hx_, y + 1, 'spirit', 2); hx_ += 10
+            y += 14
+            extra = (['Aktiv: ' + ACTIVES[c['active']]['name']] if c['active'] else []) + [ITEMS[it]['name'] for it in c['items']] \
+                + (['%d Mon' % c['coins']] if c['coins'] else [])
+            y = self._wrap('  •  '.join(extra) if extra else 'Keine Startitems', x0 + 2, y, iw, 7, (210, 196, 160))
             fx = fx_lines(c['fx'])
             if fx:
-                T.add('  •  '.join(fx), 32, 240, 7, (180, 200, 230))
+                self._wrap('  •  '.join(fx), x0 + 2, y, iw, 6, (170, 195, 230))
         else:
-            T.add('Gesperrt', 32, 178, 12, (200, 150, 150))
-            T.add('Freischalten: ' + c['unlock'], 32, 198, 8, (230, 210, 190))
+            T.add('Versiegelt', x0 + 6, 33, 15, (220, 160, 150))
+            T.add('Freischalten:', x0 + 2, 64, 8, (240, 196, 120))
+            self._wrap(c['unlock'], x0 + 2, 78, iw, 8, (230, 215, 195))
+        # ---- Leiste mit allen Figuren am unteren Rand
+        mbr = self.__dict__.get('_mbrush')
+        if mbr is None:
+            mbr = self._mbrush = pygame.transform.scale(br, (84, 16))
+        for i, ci in enumerate(CHAR_ORDER):
+            x = 48 + i * 43
+            sel = i == self.char_sel
+            if sel:
+                gfx.hi_blit(mbr, x, 292)
+            m = gfx.mini(sheets.frame(ci, sheets.RIGHT, 0, 1), 60 if sel else 50)
+            if ci not in unlocked:
+                m = gfx.tinted(m, 'ghost')                # Schattenriss, der sich noch von der Nacht abhebt
+            gfx.hi_blit(m, x, 288 - (2 if sel else 0), 255 if sel or ci in unlocked else 190)
+            if ci not in unlocked:
+                gfx.hi_blit(gfx.mini(img('lock'), 18), x + 11, 288)
+            for k in range(min(self.save['char_wins'].get(ci, 0), 3)):
+                star(s, x - 6 + k * 6, 248, (255, 220, 100))
         if self.save['hard_unlocked']:
-            T.add('[H] Oni-Modus: ' + ('AN' if self.hard else 'aus'), W - 32, 258, 8,
+            T.add('[H] Oni-Modus: ' + ('AN' if self.hard else 'aus'), W - 14, 226, 7,
                   (255, 110, 100) if self.hard else (190, 180, 170), 'r')
         if self.save.data.get('endless_unlocked'):
             en = getattr(self, 'endless', False)
-            T.add('[N] Endlose Nacht: ' + ('AN' if en else 'aus'), W - 32, 244, 8,
+            T.add('[N] Endlose Nacht: ' + ('AN' if en else 'aus'), W - 14, 214, 7,
                   (200, 140, 255) if en else (190, 180, 170), 'r')
         seed_txt = getattr(self, 'seed_input', None)
         if seed_txt is not None:
@@ -661,7 +690,7 @@ class Game:
                     self.seed_input = None
                     return
             return
-        T.add('Enter – Start     E – mit Seed     Esc – Zurück', 32, 258, 7, (170, 160, 150))
+        T.add('Enter – Start     E – mit Seed     Esc – Zurück', W // 2, 305, 6, (170, 160, 150), 'c')
         for e in events:
             if e.type == pygame.KEYDOWN and e.key == pygame.K_e and cid in unlocked:
                 self.seed_input = ''
@@ -672,8 +701,6 @@ class Game:
                 self.char_sel = (self.char_sel - 1) % n; audio.play('move')
             elif nv == 'right':
                 self.char_sel = (self.char_sel + 1) % n; audio.play('move')
-            elif nv in ('up', 'down'):
-                self.char_sel = (self.char_sel + 5) % n; audio.play('move')
             elif nv == 'hard' and self.save['hard_unlocked']:
                 self.hard = not self.hard; audio.play('select')
             elif nv == 'endless' and self.save.data.get('endless_unlocked'):
@@ -683,9 +710,7 @@ class Game:
             elif isinstance(nv, tuple) and nv[0] == 'click':
                 mx, my = nv[1]
                 for i in range(n):
-                    x = 70 + (i % 5) * 85
-                    y = 42 + (i // 5) * 62
-                    if x - 30 < mx < x + 30 and y < my < y + 54:
+                    if abs(mx - (48 + i * 43)) < 21 and 244 < my < 300:
                         if self.char_sel == i and CHAR_ORDER[i] in unlocked:
                             audio.play('select'); self.start_run(CHAR_ORDER[i]); return
                         self.char_sel = i; audio.play('move')

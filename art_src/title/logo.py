@@ -123,14 +123,14 @@ if __name__ == '__main__':
     build()
 
 
-def brush():
+def brush(name='brush', cols=None):
     """Pinselstrich hinter dem gewählten Menüpunkt: Zinnober-Tusche, spitz auslaufend, trockene Borstenspuren."""
     import math
     import random
     rr = random.Random(8)
     W, H = 168, 24
     a = np.zeros((H, W, 4), np.uint8)
-    cols = [hx('#3e0c30'), hx('#801634'), hx('#a81f2a'), hx('#c02634')]
+    cols = cols or [hx('#3e0c30'), hx('#801634'), hx('#a81f2a'), hx('#c02634')]
     for x in range(W):
         f = x / (W - 1)
         half = 9 * math.sqrt(min(1, f * 10)) * min(1, (1 - f) * 3.2) ** 0.7 + 1      # dicker Ansatz links, langes Auslaufen rechts
@@ -147,7 +147,7 @@ def brush():
         y = rr.randrange(5, 19)
         x0 = rr.randrange(60, 130)
         a[y, x0:W][a[y, x0:W, 3] > 0] = 0
-    Image.fromarray(a, 'RGBA').save(os.path.join(DST, 'brush.png'))
+    Image.fromarray(a, 'RGBA').save(os.path.join(DST, name + '.png'))
 
 
 if __name__ == '__main__':
