@@ -282,6 +282,53 @@ class Familiar:
         self.cd = random.uniform(0, 0.5)
 
 
+# =========================================================================  Ausweich-Rolle
+ROLL_T = 0.24
+_roll_cache = {}
+
+
+def roll_pose(q, dx, right):
+    """Rollfortschritt q (0..1) -> (Winkel, sx, sy, vflip, mittig). Gequantelt, damit die Bilder gecacht bleiben."""
+    if q < 0.12:                                     # Absprung: kurz geduckt
+        return 0, 1.2, 0.8, False, False
+    r = round((q - 0.12) / 0.88 * 8) / 8
+    if abs(dx) >= 0.4:                               # seitlich: um sich selbst drehen
+        return int(-360 * r if dx > 0 else 360 * r) % 360, 1.0, 1.0, False, True
+    c = math.cos(r * math.tau)                       # hoch/runter: Purzelbaum als Stauchen + Kopfstand
+    return 0, 1 + 0.25 * (1 - abs(c)), max(0.35, abs(c)), c < 0, True
+
+
+def roll_img(spr, pose):
+    key = (id(spr), pose[:4])
+    im = _roll_cache.get(key)
+    if im is None:
+        ang, sx, sy, vf, _ = pose
+        im = pygame.transform.flip(spr, False, True) if vf else spr
+        w, h = im.get_size()
+        if (sx, sy) != (1.0, 1.0):
+            im = pygame.transform.scale(im, (max(1, int(w * sx)), max(1, int(h * sy))))
+        if ang:
+            im = pygame.transform.rotate(im, ang)
+        if len(_roll_cache) > 800:
+            _roll_cache.clear()
+        _roll_cache[key] = im
+    return im
+
+
+def roll_ghost(spr, im):
+    """Verblassende Silhouette in der Grundfarbe der Figur."""
+    key = ('g', id(spr), id(im))
+    g = _roll_cache.get(key)
+    if g is None:
+        c = pygame.transform.average_color(spr, consider_alpha=True)[:3]
+        col = tuple(min(255, int(v * 1.5) + 40) for v in c)
+        g = im.copy()
+        g.fill((0, 0, 0, 0), special_flags=pygame.BLEND_RGB_MULT)
+        g.fill(col + (0,), special_flags=pygame.BLEND_RGB_ADD)
+        _roll_cache[key] = g
+    return g
+
+
 class Player:
     def __init__(self, run, char_id):
         self.run = run
@@ -306,6 +353,8 @@ class Player:
         self.dash_dir = (0, 1)
         self.dash_hit = set()
         self.dash_trail = 0.0
+        self.roll_land = 0.0
+        self.roll_ghosts = []
         self.shoot_cd = 0.0
         self.shot_count = 0
         self.sg = {}
@@ -553,19 +602,27 @@ class Player:
         if inp['dash'] and self.dash_cd <= 0 and self.dash_t <= 0:
             d = norm(mvx, mvy) if self.moving else self.facing
             self.dash_dir = d
-            self.dash_t = 0.24
+            self.dash_t = ROLL_T
             self.dash_cd = 0.55
             self.dash_hit.clear()
+            self.roll_dust(6)
             audio.play('dash')
             sigs.on_dash(self, run)
         sp = self.s['spd']
+        self.roll_land = max(0.0, self.roll_land - dt)
+        for g in self.roll_ghosts:
+            g[3] -= dt
+        self.roll_ghosts = [g for g in self.roll_ghosts if g[3] > 0]
         if self.dash_t > 0:
             self.dash_t -= dt
+            if self.dash_t <= 0:
+                self.roll_land = 0.09
+                self.roll_dust(4)
             vx, vy = self.dash_dir[0] * sp * 2.9, self.dash_dir[1] * sp * 2.9
             self.dash_trail -= dt
             if self.dash_trail <= 0:
                 self.dash_trail = 0.03
-                run.particles.append(Particle(self.x, self.y + 4, 0, 0, 0.3, (200, 200, 220), 3))
+                self.roll_ghosts.append([self.x, self.y, 1 - max(0.0, self.dash_t) / ROLL_T, 0.1])
                 if self.f['dash_fire']:
                     run.hazards.append(Hazard(self.x, self.y, 10, 0.0, 1.2, self.damage() * 0.6, 'p', 'fire'))
         else:
@@ -733,6 +790,15 @@ class Player:
                 if e.active() and math.hypot(e.x - self.x, e.y - self.y) < rad + e.r:
                     run.damage_enemy(e, 0.8 * self.f['aura'] + 0.25 * self.damage(), None)
 
+    def roll_dust(self, n):
+        if self.f['fly']:
+            return
+        col = gfx._c(self.run.biome['floor'], 1.4)
+        for _ in range(n):
+            a = random.uniform(0, math.tau)
+            self.run.particles.append(Particle(self.x + math.cos(a) * 4, self.y + 6, math.cos(a) * 30 - self.dash_dir[0] * 15,
+                                               -abs(math.sin(a)) * 18, 0.35, col, 3, 40))
+
     def orbitals(self):
         n = int(self.f['orbital'])
         out = []
@@ -811,11 +877,22 @@ class Player:
             if 'yurei' in self.transforms or self.char == 'okiku':
                 alpha_s = spr.copy()
                 alpha_s.set_alpha(190)
-            if self.dash_t > 0:
-                alpha_s = spr.copy(); alpha_s.set_alpha(150)
             rx = int(-self.facing[0] * 1.5) if self.recoil > 0 else 0
             ry = int(-self.facing[1] * 1.5) if self.recoil > 0 else 0
-            if sheets.has(self.char) and sheets.is_hi(self.char):
+            hi = sheets.has(self.char) and sheets.is_hi(self.char)
+            if hi and (self.dash_t > 0 or self.roll_land > 0):
+                al = alpha_s.get_alpha() if alpha_s is not spr and alpha_s.get_alpha() is not None else 255
+                right = getattr(self, '_last_dir', None) == sheets.RIGHT
+                by0 = self.y + 9
+                h = spr.get_height()
+                for gx, gy, gq, gl in self.roll_ghosts:
+                    im = roll_img(spr, roll_pose(gq, self.dash_dir[0], right))
+                    gfx.hi_blit(roll_ghost(spr, im), gx, gy + 9 - h / 4 + im.get_height() / 4, int(110 * gl / 0.1))
+                pose = roll_pose(1 - self.dash_t / ROLL_T if self.dash_t > 0 else 0, self.dash_dir[0], right)
+                im = roll_img(spr, pose)
+                # gedreht um die Körpermitte, geduckt mit den Füßen am Boden; Kostüm bleibt während der Rolle aus
+                gfx.hi_blit(im, self.x, by0 - h / 4 + im.get_height() / 4 if pose[4] else by0, al)
+            elif hi:
                 al = alpha_s.get_alpha() if alpha_s is not spr and alpha_s.get_alpha() is not None else 255
                 fr_right = getattr(self, '_last_dir', None) == sheets.RIGHT
                 costume.draw(self, spr, self.x + rx, self.y + 9 - bob + ry, fr_right, t, 'back', al)
