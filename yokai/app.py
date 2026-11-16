@@ -333,105 +333,33 @@ class Game:
             y += 32
 
     # ================================================================  Hintergrund (Titel)
-    def draw_night(self, s, parade=True):
+    def draw_night(self, s):
+        """Titel-Panorama aus art_src/title/panorama.py: Ebenen mit sanfter Parallaxe, Glitzern und Blüten."""
         t = self.t
-        for y in range(H):
-            f = y / H
-            c = (int(14 + 30 * f), int(10 + 14 * f), int(36 + 30 * f))
-            pygame.draw.line(s, c, (0, y), (W, y))
-        rng = random.Random(5)
-        for i in range(90):
-            x, y = rng.randrange(W), rng.randrange(150)
-            if (t * 2 + i) % 7 > 0.4:
-                s.set_at((x, y), (220, 220, 255))
-        gfx.draw_glow(s, 418, 52, 60, (255, 230, 190), 70)
-        pygame.draw.circle(s, (250, 240, 215), (418, 52), 20)
-        pygame.draw.circle(s, (230, 220, 195), (411, 47), 4)
-        pygame.draw.circle(s, (230, 220, 195), (425, 58), 3)
-        # Berge
-        pts = [(0, 210)]
-        for x in range(0, W + 20, 20):
-            pts.append((x, 190 - 40 * math.sin(x * 0.013) - 18 * math.sin(x * 0.041)))
-        pts += [(W, H), (0, H)]
-        pygame.draw.polygon(s, (26, 20, 44), pts)
-        pygame.draw.rect(s, (18, 12, 26), (0, 232, W, H))
-        # Torii
-        tx = 90
-        if not hasattr(self, '_title_torii'):
-            from . import props
-            ti = props.torii((170, 34, 36))
-            self._title_torii = pygame.transform.scale(ti, (ti.get_width() * 2, ti.get_height() * 2))
-        if gfx.HI_MODE:
-            if not hasattr(self, '_title_torii_hi'):
-                self._title_torii_hi = gfx.scale2x(self._title_torii)
-            gfx.hi_blit(self._title_torii_hi, tx, 236)
-        else:
-            s.blit(self._title_torii, (tx - self._title_torii.get_width() // 2, 236 - self._title_torii.get_height()))
-        # Laternen (Stein-Tōrō aus den Umgebungs-Tiles)
-        lt = gfx.env_img('_shared', 'lantern', 32)
-        lth = gfx.env_img('_shared', 'lantern_hi', 64)
-        for i, lx in enumerate((160, 240, 320, 420)):
-            gfx.draw_glow(s, lx, 216, 18, (255, 170, 80), 80)
-            if lth and gfx.HI_MODE:
-                gfx.hi_blit(lth[0], lx, 236)
-            elif lt:
-                s.blit(lt[0], (lx - 16, 236 - 32))
-        # Kirschbaum (gecachte Pixel-Grafik)
-        if not hasattr(self, '_sakura'):
-            self._sakura = self.make_sakura()
-        s.blit(self._sakura, (372, 72))
-        for i in range(30):
+        sway = math.sin(t * 0.11)
+        for name, par in (('sky', 0), ('far', 8), ('mid', 16), ('fog', 24), ('near', 32)):
+            im = gfx.env_img('_title', name)
+            drift = math.sin(t * 0.07) if name == 'fog' else sway    # Nebel zieht gegen die Berge
+            s.blit(im[0], (-par + int(round(drift * par)), 0))
+            if name == 'sky':
+                rng = random.Random(5)
+                for i in range(24):                      # einige Sterne funkeln
+                    x, y = rng.randrange(W), rng.randrange(150)
+                    if math.hypot(x - 388, y - 64) > 55 and math.sin(t * rng.uniform(1.5, 3) + i) > 0.85:
+                        s.set_at((x, y), (255, 255, 255))
+                for k in range(0, 72, 3):                # Mondspiegelung: flimmernde Striche unter dem Mond
+                    y = 216 + k
+                    w_ = max(2, int(14 - k * 0.12 + 5 * math.sin(t * 2.3 + k * 0.7)))
+                    x = 388 + int(3 * math.sin(t * 1.7 + k * 0.4) + sway * 8) - w_ // 2
+                    s.fill((236, 222, 176) if k < 24 else (150, 140, 150), (x, y, w_, 1))
+        lx = 480 - 70 + 32 + int(round(sway * 32))       # Tōrō aus der Vordergrund-Ebene (dort bei Breite-70)
+        gfx.draw_glow(s, lx, 273, 22 + 2 * math.sin(t * 5), (255, 170, 80), 60)
+        for i in range(22):                              # fallende Kirschblüten vom Zweig oben links
             rr = random.Random(100 + i)
-            ph = (t * rr.uniform(0.05, 0.12) + rr.random()) % 1
-            px = (rr.uniform(0, W) - ph * 140 + math.sin(t + i) * 10) % W
-            py = ph * H
-            pygame.draw.ellipse(s, (250, 190, 215), (int(px), int(py), 3, 2))
-        # Hyakki Yagyō – die Parade der hundert Dämonen
-        names = ['hitodama', 'kasa_obake', 'chochin', 'kappa', 'kawauso', 'bakeneko', 'zashiki', 'oni', 'karasu_tengu',
-                 'yamauba', 'nopperabo', 'ittan_momen', 'kitsunebi_e', 'heikegani', 'gozu', 'tennin', 'kitsune_gefolge', 'bakezori']
-        for i in range(16 if parade else 0):
-            x = (t * 18 + i * 34) % (W + 60) - 40
-            nm = names[i % len(names)]
-            spr = sheets.frame(nm, sheets.RIGHT, int(t * 6 + i), 2 if sheets.scale_of(nm) >= 2 else 1) if sheets.has(nm) else gfx.sprite(nm, False)
-            if sheets.has(nm) and sheets.is_hi(nm):
-                gfx.hi_blit(spr, x + spr.get_width() / 4, 252)
-            else:
-                s.blit(spr, (int(x), int(250 - spr.get_height())))
-
-    def make_sakura(self):
-        from . import props
-        S = pygame.Surface((110, 170), pygame.SRCALPHA)
-        bark, barkl = (46, 30, 38), (84, 58, 62)
-        rr = random.Random(11)
-        tips = []
-
-        def branch(x, y, ang, ln, w, depth):
-            x2, y2 = x + math.cos(ang) * ln, y + math.sin(ang) * ln
-            pygame.draw.line(S, bark, (x, y), (x2, y2), max(1, int(w)))
-            if w >= 2:
-                pygame.draw.line(S, barkl, (x - 1, y), (x2 - 1, y2), 1)
-            if depth == 0:
-                tips.append((x2, y2))
-                return
-            for da in (-0.5, 0.45) if depth > 1 else (-0.6, 0.0, 0.55):
-                branch(x2, y2, ang + da + rr.uniform(-0.15, 0.15), ln * rr.uniform(0.62, 0.78), w * 0.62, depth - 1)
-
-        branch(96, 170, -1.95, 52, 7, 4)
-        pal = [(150, 74, 108), (204, 112, 150), (238, 162, 192), (255, 214, 230)]
-        for (tx, ty) in tips:                                    # Blütenbüschel an den Zweigspitzen
-            for _ in range(90):
-                a_ = rr.uniform(0, math.tau)
-                d_ = rr.uniform(0, 1) ** 0.7 * 12
-                x, y = int(tx + math.cos(a_) * d_), int(ty + math.sin(a_) * d_ * 0.75)
-                if not (0 <= x < 110 and 0 <= y < 170):
-                    continue
-                lvl = 3 - min(3, int((y - ty + 10) / 6 + rr.random() * 0.9))   # oben hell, unten dunkel
-                S.fill(pal[max(0, lvl)], (x, y, 2, 2))
-                if rr.random() < 0.35:
-                    S.set_at((x, y), pal[min(3, lvl + 1)])
-        for _ in range(26):                                      # einzelne fallende Blüten nah am Baum
-            S.set_at((rr.randint(10, 105), rr.randint(60, 168)), pal[2])
-        return S
+            ph = (t * rr.uniform(0.04, 0.09) + rr.random()) % 1
+            px = (rr.uniform(0, 160) + ph * 200 + math.sin(t * 1.3 + i) * 8) % W
+            py = 20 + ph * (H - 20)
+            s.fill((250, 190, 215), (int(px), int(py), 2, 1 + (i % 2)))
 
     # ================================================================  Zustände
     MENU = ['Neuer Lauf', 'Tägliche Prüfung', 'Herausforderungen', 'Codex der Items', 'Yōkai-Lexikon', 'Erfolge', 'Statistik', 'Steuerung', 'Optionen', 'Beenden']
@@ -971,7 +899,7 @@ class Game:
         # Hintergrund bewusst auf der niedrigen Ebene: Die Menütafeln liegen darüber.
         gfx.HI_MODE = False
         n0 = len(gfx.HI)
-        self.draw_night(s, parade=False)
+        self.draw_night(s)
         del gfx.HI[n0:]
         ov = self.__dict__.get('_menu_ov')
         if ov is None or ov.get_alpha() != a:
