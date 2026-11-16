@@ -98,6 +98,7 @@ TEXT = {
     'schweiss': 'Nach einer Rolle: der nächste Wurf +40 %',
     'schweben': 'Talismane bleiben am Ende ihrer Bahn schweben',
     'windsack': 'Alle 4 s öffnet sich der Windsack: ein Sturm in Wurfrichtung fegt Geschosse fort und schneidet Feinde',
+    'fujin_raijin': 'Der Windsack öffnet sich jede Sekunde, und Raijin schlägt in jeden getroffenen Feind ein',
     'erstes_feuer': 'Brennende Feinde explodieren beim Tod',
     'fuchsregen': 'Ein Sonnenregen fällt auf deine Feinde',
     'hausglueck': 'Der erste Krug in jedem Raum gibt immer etwas her',
@@ -414,7 +415,7 @@ def on_fire(p, run, bullets):
         h = Hazard(tx, ty, 16, 0.45, 0.12, dmg * 2.2, 'p', 'meteor')
         h.sg_conf = 'verfluchte_sterne' in S
         run.hazards.append(h)
-    if 'windsack' in S and run.time - g.get('windsack', -9) >= 4.0:
+    if 'windsack' in S and run.time - g.get('windsack', -9) >= (1.0 if 'fujin_raijin' in S else 4.0):
         g['windsack'] = run.time
         from .entities import Particle
         from . import audio
@@ -432,6 +433,9 @@ def on_fire(p, run, bullets):
             d = math.hypot(dx, dy)
             if e.active() and d < 130 + e.r and abs((math.atan2(dy, dx) - base + math.pi) % math.tau - math.pi) < 0.6:
                 run.damage_enemy(e, dmg * 1.5, None)
+                if 'fujin_raijin' in S:
+                    _syn(run, 'fujin_raijin', e.x, e.y, (200, 240, 160))
+                    run.lightning(e.x, e.y, dmg * 2.5 + 4)
                 if not e.is_boss:
                     e.kx += dx / max(d, 1) * 380; e.ky += dy / max(d, 1) * 380
 

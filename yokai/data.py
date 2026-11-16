@@ -376,6 +376,7 @@ SYNERGIES = [
     dict(id='sturmgott', name='Zorn des Sturmgottes', desc='Susanoo schleudert Blitze', items=['susanoo_zorn', 'raijin_magatama'], fx=dict(dmg=0.5, sig_sturmgott=1)),
     dict(id='oeyama_bande', name='Ōeyama-Bande', desc='Trinkfest und hart wie Horn', items=['shuten_schale', 'gyuki_horn'], fx=dict(hp=1, sig_oeyama_bande=1)),
     dict(id='maskenzug', name='Maskenzug', desc='Die Parade der hundert Gesichter', items=['hyakki_rolle', 'noh_maske'], fx=dict(crit=0.05, sig_maskenzug=1)),
+    dict(id='fujin_raijin', name='Fūjin-Raijin-zu', desc='Wind und Donner wie auf dem Wandschirm', items=['kaze_bukuro', 'raijin_trommel'], fx=dict(sig_fujin_raijin=1)),
     dict(id='verfluchte_sterne', name='Verfluchte Sterne', desc='Fuchs und Stern leuchten gemeinsam', items=['hoshi_splitter', 'kyubi_juwel'], fx=dict(crit=0.1, sig_verfluchte_sterne=1)),
     dict(id='sommerwind', name='Sommerwind', desc='Windglocke und Spatzenfeder', items=['furin', 'suzume_feder'], fx=dict(salts_regen=0.15, sig_sommerwind=1)),
 ]
