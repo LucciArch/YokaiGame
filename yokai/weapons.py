@@ -91,6 +91,12 @@ def _hitboxes(e):
 
 def melee(run, x, y, ang, radius, arc, dmg, knock=180, kind='w_sword', col=(230, 240, 255), fl=None):
     """Trifft alle Gegner in einem Kreissektor und zerschlägt feindliche Geschosse darin."""
+    S = run.player.sgs
+    if 'gross' in S:
+        radius *= 1.25
+    if 'seidenfaden' in S:                                  # der Hieb lässt einen Faden in Schlagrichtung zurück
+        _path_sigs(run, ('seidenfaden',) + (('drachenkoenig',) if 'drachenkoenig' in S else ()),
+                   x, y, math.cos(ang), math.sin(ang), radius, 0, dmg / 2)
     hit = False
     for e in list(run.enemies):
         if not e.active():
@@ -123,13 +129,33 @@ def melee(run, x, y, ang, radius, arc, dmg, knock=180, kind='w_sword', col=(230,
     return hit
 
 
+def _path_sigs(run, S, x, y, dx, dy, L, width, dmg):
+    """Seidenfaden und Windstoß der Talismane entlang eines Strahls oder Hiebs."""
+    if 'seidenfaden' in S:
+        from .entities import Hazard
+        k = 2 if 'drachenkoenig' in S else 1
+        for i in range(int(L // 20)):
+            run.hazards.append(Hazard(x + dx * (i * 20 + 10), y + dy * (i * 20 + 10), 4, 0.0, 0.5,
+                                      max(0.5, dmg * 0.18 * k), 'p', 'silk'))
+    if 'windstoss' in S:
+        rr = width + (14 if 'taifun' in S else 5)
+        for eb in run.ebullets:
+            px_, py_ = eb.x - x, eb.y - y
+            along = px_ * dx + py_ * dy
+            if 0 <= along <= L and abs(px_ * dy - py_ * dx) <= rr:
+                eb.dead = True
+
+
 def beam(run, x, y, ang, dmg, width=4, col=(255, 236, 150), fl=None, bounces=None):
     """Lichtstrahl bis zur nächsten Wand; trifft alles auf der Linie. Geisterhaft: durch Felsen,
     Abprall: wird an Wand und Fels gespiegelt."""
     from .entities import solid_hit
     fl = fl or {}
+    S = run.player.sgs
     if bounces is None:
         bounces = int(fl.get('bounce', 0))
+        if 'gross' in S:                                    # Bahn-Fähigkeiten der Talismane gelten auch für den Strahl
+            width *= 1.6
     dx, dy = math.cos(ang), math.sin(ang)
     L = 0
     wall = None
@@ -153,8 +179,13 @@ def beam(run, x, y, ang, dmg, width=4, col=(255, 236, 150), fl=None, bounces=Non
                 continue
             perp = abs(px_ * dy - py_ * dx)
             if perp <= hr + width:
-                _hit(run, e, hx, hy, dmg, ang, fl)
+                _hit(run, e, hx, hy, dmg * (1 + 0.6 * along / 460 if 'stromauf' in S else 1), ang, fl)
                 break
+    _path_sigs(run, S, x, y, dx, dy, L, width, dmg)
+    if 'kammzinken' in S and not fl.get('_kz') and L > 60:   # der Strahl spaltet sich wie Kammzinken
+        kf = dict(fl, _kz=1)
+        for da in (-0.32, 0.32):
+            beam(run, x + dx * L * 0.5, y + dy * L * 0.5, ang + da, dmg * 0.6, max(2, width * 0.7), col, kf, 0)
     run.slashes.append(dict(kind='w_laser', x=x, y=y, ang=ang, r=L, arc=0, t=0.0, life=0.12, col=col, w=width))
     if wall and bounces > 0:                                # Spiegelung: Einfallswinkel = Ausfallswinkel
         ex, ey = x + dx * (L - 4), y + dy * (L - 4)
