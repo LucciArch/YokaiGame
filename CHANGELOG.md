@@ -37,6 +37,7 @@
 - Runde 13 – Wer Fūjin zum ersten Mal besiegt, schaltet **Kaze-bukuro** (Fūjins Windsack) frei: alle 4 s öffnet sich der Sack beim Wurf – ein Sturm in Wurfrichtung fegt feindliche Geschosse fort, schneidet Feinde (150 % Schaden) und stößt sie zurück; dazu +Tempo und +Feuerrate
 - Runde 14 – Neue Synergie **Fūjin-Raijin-zu** (Kaze-bukuro + Raijins Trommelstock), nach dem berühmten Wandschirm von Tawaraya Sōtatsu: Der Windsack öffnet sich jede Sekunde, und Raijin schlägt in jeden Feind ein, den der Sturm erfasst (gemessen: Shuten-dōji in 60 s)
 - Runde 15 – Schutz- und Glücks-Synergien sichtbar: A und Un, Omamori-Sammler, Totenfähre, Todesbote, Leben und Tod, Aus der Tiefsee, Glücksgötter, Fuchshochzeit, Glückliches Haus, Fuchsgeld und Wunsch erfüllt zeigen beim ersten Auslösen pro Raum ihren Namen mit Welle. Neuer Messmodus `tools/synbalance.py --tod` (Überlebenszeit ohne Gott-Modus), Bericht unter `design/balance/balance-check-15-ueberleben.md`
+- Runde 16 – 22 weitere Synergien zeigen beim ersten Auslösen pro Raum ihren Namen mit Welle, u. a. Teezeremonie, Sushi-Platte, Fuchsfeuer-Tanz, Papiersturm, Shinobi, Ninja-Flug, Katzenreich, Oni-Krieger, Geisterlicht, Großer Wind, Sturmgötter, Kranichschwarm, Hundert Augen, Himmelsbote, Herr der Tiefe, Drachenkönig und Sommerwind – jetzt sind alle Synergien mit auslösbarer Fähigkeit erkennbar; nur reine Dauer-Boni (z. B. Hanami, Bushi-Seele, Reisender Pilger) bleiben still
 
 ## 1.4.0 – „Hyakki-Update“ (enthält 1.3 „Kapitel-Update“)
 
