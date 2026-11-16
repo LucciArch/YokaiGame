@@ -39,6 +39,7 @@ def fin(cv, P, shadow=True):
 
 # ------------------------------------------------------------------ shared motifs
 def boulder(cv, rng, ramp, cx=16, by=28, rx=11, ry=9):
+    """Felsbrocken mit drei Facetten (Licht oben links), Rissen, Körnung und Kieseln am Fuß."""
     pts = []
     n = 9
     for i in range(n):
@@ -46,12 +47,42 @@ def boulder(cv, rng, ramp, cx=16, by=28, rx=11, ry=9):
         r = rng.uniform(.82, 1.05)
         pts.append((cx + math.cos(a) * rx * r, by - ry + math.sin(a) * ry * r))
     m = cv.PG(pts) & (cv.Y <= by)
-    cv.form(m, (ramp[0], ramp[1], ramp[2]), max(2, int(rx / 3)), 1)
-    # lit top facet
-    top = cv.PG([(cx + (x - cx) * .62 - rx * .16, by - ry + (y - by + ry) * .5 - ry * .34) for x, y in pts]) & m
+    mid0 = mix(ramp[0], ramp[1], .5)
+    cv.fill(m, ramp[1])
+    # Schattenflanke rechts: Grat vom Scheitel schräg nach unten
+    gx = cx + rng.uniform(-1, 1.5)
+    cv.fill(cv.PG([(gx + 1, by - ry * 2.2), (cx + rx * 1.4, by - ry * 2.2), (cx + rx * 1.4, by + 1),
+                   (gx + rx * .45, by + 1), (gx + rx * .2, by - ry * .55)]) & m, mid0)
+    # Lichtfläche oben
+    top = cv.PG([(cx + (x - cx) * .66 - rx * .16, by - ry + (y - by + ry) * .52 - ry * .36) for x, y in pts]) & m
     cv.form(top, (ramp[1], ramp[2], ramp[3]), 1, 1)
-    cv.line([(cx + rx * .1, by - ry * .9), (cx + rx * .3, by - ry * .3), (cx + rx * .15, by - 2)], ramp[0])
-    cv.fill(~m & cv.m & False, ramp[0])
+    # Bodenkontakt und Schattensichel
+    k = max(2, int(rx / 3)) * cv.ss
+    cv.fill(m & ~sh(m, -k, -k) & ~top, ramp[0])
+    cv.fill(m & (cv.Y > by - 1.6), ramp[0])
+    # Risse: dunkle Kerbe mit Lichtkante darunter
+    for _ in range(2):
+        x0, y0 = cx + rng.uniform(-rx * .55, rx * .35), by - ry * rng.uniform(1.1, 1.5)
+        path = [(x0, y0)]
+        for _ in range(3):
+            x0 += rng.uniform(-1.5, 2.5); y0 += rng.uniform(1.5, 2.6)
+            path.append((x0, y0))
+        cv.hline(path, mix(K, ramp[0], .35))
+        cv.hline([(x + .5, y + .5) for x, y in path], ramp[2])
+        cv.a[~m] = 0
+    # Körnung
+    ys, xs = np.nonzero(m)
+    for i in rng.sample(range(len(ys)), min(len(ys), 22)):
+        y, x = ys[i], xs[i]
+        dark = top[y, x] or rng.random() < .5
+        cv.a[y, x] = hx(ramp[0] if dark else ramp[2])
+    # Kiesel am Fuß
+    for sx in (-1, 1):
+        if rng.random() < .75:
+            px_, pr = cx + sx * (rx + rng.uniform(.5, 2)), rng.uniform(1.4, 2.2)
+            pm = cv.E(px_, by - pr * .6, pr, pr * .7) & ~m
+            cv.form(pm, (ramp[0], ramp[1], ramp[2]), .5, 1)
+            m = m | pm
     return m
 
 
@@ -172,13 +203,29 @@ def rocks(name):
         return cv
 
     if name == 'chikurin':
-        cv, rng = new(0)                                     # cut bamboo stumps
+        cv, rng = new(0)                                     # cut bamboo stumps: slanted cut, hollow, nodes
         g = (P['w0'], P['w1'], P['w2'], P['w3'])
-        for (x, h, r) in ((10, 13, 3.2), (21, 9, 3.4), (15.5, 19, 3.6)):
-            m, t = cyl(cv, g, x, 28, r, h, top=(g[1], g[2], g[3]))
-            cv.fill(cv.E(x, 28 - h, r - 1.6, 1), K)
-            for y in range(28 - h + 6, 27, 6):
-                cv.fill(m & (cv.Y == y) & ~t, g[0])
+        inner = mix(g[0], K, .45)
+        for (x, h, r, tilt) in ((10, 13, 3.2, 2.2), (21.5, 9, 3.4, -1.8), (15.5, 19, 3.7, 2.6)):
+            yb = 28
+            body = cv.R(x - r, yb - h - abs(tilt), x + r, yb) | cv.E(x, yb, r, r * .45)
+            cut = cv.PG([(x - r - 1, yb - h - tilt), (x + r + 1, yb - h + tilt), (x + r + 1, 0), (x - r - 1, 0)])
+            body &= ~cut
+            cv.form(body, (g[0], g[1], g[2]), max(2, int(r * .55)), 1)
+            cv.fill(body & (cv.X < x - r * .35) & (cv.X > x - r * .75), g[3])   # Glanzstreifen
+            # schräge Schnittfläche: helle Wandung, dunkles hohles Inneres
+            rim = cv.PG([(x - r, yb - h - tilt), (x + r, yb - h + tilt), (x + r, yb - h + tilt + 1.6), (x - r, yb - h - tilt + 1.6)])
+            ring = (cv.E(x, yb - h, r, r * .5 + abs(tilt) * .5) & (rim | dil(rim)))
+            cv.fill(ring, g[3])
+            cv.fill(cv.E(x, yb - h + .2, r - 1.7, max(.6, r * .3)) & body, inner)
+            # Knoten: helle Wulst über dunkler Kerbe
+            for y in range(yb - h + 6, yb - 2, 7):
+                nm = body & (cv.Y >= y) & (cv.Y < y + .6)
+                cv.fill(nm, g[0])
+                cv.fill(sh(nm, 0, -1) & body, g[2])
+        for sx, ang in ((5, -1), (26, 1)):                    # kleine Blattzweige am Fuß
+            leaf = capsule(cv, sx, 27.5, .4, sx + ang * 4, 25.5, 1.1)
+            cv.fill(leaf, g[2]); cv.fill(leaf & sh(leaf, 1, 0) & ~sh(leaf, 0, 1), g[1])
         out.append(fin(cv, P))
         cv, rng, m = plain_boulder(1)
         cover(cv, m, MOSS, 5, rng)
