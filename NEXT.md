@@ -1,17 +1,21 @@
-# Erledigt (Runden 50–51)
-- Runde 50: Gesten beim Laufstart. Code aus `app.py` nach `yokai/pose.py` verschoben; `pose_fx(..., k=0.5, fade)`
-  skaliert Versätze/Bilder um die Fußlinie. `Player.pose_t` (Run setzt 0 bei neuem Lauf), endet nach `POSE_T` = 2.4 s
-  oder bei Laufen/Rolle/Wurf. Hinweis: Das Startblinken (iframes) verdeckt die Geste teilweise.
-- Runde 51: Omikuji in `LEX_EVENTS` (+ `event_done('omikuji')`), Erfolg `musubi`, Musubi-Gestell im Kami-Schrein.
-  „Festtagsgast“ zählt weiter nur `Run.EVENT_KINDS`.
+# Erledigt (Runden 52–54)
+- Runde 52: Requisiten Kawabe (Flussfels mit Kappa-Gurke + Wellenringe, Rohrkolben im Seichtwasser mit Hotaru,
+  Suijin-Stein mit 水神 `SUIJIN`-Glyphen) und Yashiki (Tansu mit Augen in offener Lade, Andon mit Onibi-Licht,
+  goldener Byōbu mit Fingern) in `art_src/fable/environment/props.py`. Neu bauen: `build.py kawabe yashiki`, `hi.py`,
+  dann `rock.png` nach `yokai/assets/env/<biom>/` kopieren; floor/wall-PNGs danach per `git checkout` zurücksetzen
+  (nur Metadaten-Änderungen).
+- Runde 53: Kein Startblinken während der Geste (`pose_t`), `hurt()` beendet die Geste.
+- Runde 54: Erfolg `alle_lose`, Spielstand-Liste `kuji_seen`; Test am Ende von `tools/sigtest.py`.
 
-# Nächster Schritt: Requisiten Teil 4 – Yashiki und Kawabe
-Die Requisiten dieser Biome sind noch einfache Grundformen; in `props.py` neu als Hi-Res-Pixelart (dicke Umrisse,
-satte Nachtfarben) zeichnen, wie bei Totenpalast (Runde 46) und Hakaba (Runde 47). Warum: Diese beiden Biome sieht
-man in fast jedem Lauf früh – dort fällt der Stilbruch am meisten auf.
+# Nächster Schritt: Requisiten Teil 5 – Ōeyama und Shinkai
+Gleiches Vorgehen wie Runde 52. Ōeyama (Kapitel nach dem Yashiki) und Shinkai haben noch Grundformen-Requisiten
+(Felsen, Spitzen). Ideen: Ōeyama – Sake-Fass der Oni, Kanabō im Fels, Knochenhaufen mit Oni-Maske; Shinkai –
+Riesenmuschel mit Perle, Korallen mit Leuchtfischen, versunkene Steinlaterne. Warum: Stilbruch fällt neben den
+neuen Hi-Res-Figuren auf; die Biome davor sind jetzt fertig.
 
 # Weitere Ideen
-- Startblinken zu Laufbeginn weglassen, solange die Geste läuft (iframes ohne Blinken), damit sie ganz zu sehen ist
 - Zweiter Weg: Pforte nach **Takamagahara no Oku** mit Amaterasu (Ama-no-Iwato) als Endbossin
 - Totenpalast-Ambiente: eigene Partikel (Maden-Glühwürmchen, Izanamis acht Donnergötter als Blitze im Hintergrund)
-- Erfolg „Alle Lose“: Daikichi, Kichi, Chūkichi, Shōkichi und Kyō je einmal gezogen
+- Lexikon-Ereignisseite zeigt bei Omikuji, welche der fünf Lose schon gezogen sind (`kuji_seen`)
+- Kawabe-Ambiente: Glühwürmchen-Partikel über Wasserflächen
+- Wanddekos Yashiki/Kawabe ebenfalls in Hi-Res überarbeiten (`wall_decos`)
