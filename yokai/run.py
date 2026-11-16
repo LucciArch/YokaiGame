@@ -2009,6 +2009,8 @@ class Run:
         if self.cur_banner is None and self.banners:
             self.cur_banner = self.banners.popleft()
             self.banner_t = 3.4 if (self.cur_banner[3] or self.cur_banner[4]) else 2.2
+            if self.cur_banner[5]:      # Fanfare: Zeitlupe erst, wenn ihr Banner wirklich erscheint
+                self.slowmo = 0.7
         if self.cur_banner:
             self.banner_t -= dt
             if self.banner_t <= 0:

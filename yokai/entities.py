@@ -509,7 +509,6 @@ class Player:
                 run.banner('Synergie: ' + s['name'], s['desc'], (255, 220, 120), big=True, fx=', '.join(fx_lines(s['fx'])),
                            icons=[(ITEMS[i]['icon'], ITEMS[i]['col']) for i in s['items']])
                 audio.play('synergy')
-                run.slowmo = 0.7
                 run.on_synergy(s['id'])
         # Transformationen (3 Items gleichen Themas)
         counts = defaultdict(int)
@@ -523,7 +522,8 @@ class Player:
                 self.recalc()
                 from .texts import fx_lines
                 run.banner('Transformation: ' + TRANSFORMS[t]['name'], TRANSFORMS[t]['desc'], TRANSFORMS[t]['col'], big=True,
-                           fx=', '.join(fx_lines(TRANSFORMS[t]['fx'])))
+                           fx=', '.join(fx_lines(TRANSFORMS[t]['fx'])),
+                           icons=[(ITEMS[i]['icon'], ITEMS[i]['col']) for i in self.items if t in ITEMS[i]['tags']][:3])
                 audio.play('unlock')
                 run.on_transform(t)
 
