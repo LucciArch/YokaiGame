@@ -539,6 +539,7 @@ class Player:
         if self.dead or self.iframes > 0 or self.dash_t > 0 or self.kagura > 0:
             return False
         run = self.run
+        self.pose_t = None                   # ein Treffer beendet die Geste, damit das Schadensblinken sichtbar ist
         if self.shield_ready:
             self.shield_ready = False
             self.iframes = 0.8
@@ -866,7 +867,7 @@ class Player:
                 s.blit(rot, (int(self.x) - rot.get_width() // 2, int(self.y) - rot.get_height() + 5))
             gfx.draw_glow(s, int(self.x), int(self.y - 20 * f), 12, (150, 210, 255), int(150 * (1 - f)))
             return
-        if self.iframes > 0 and int(t * 20) % 2 == 0 and self.dash_t <= 0:
+        if self.iframes > 0 and int(t * 20) % 2 == 0 and self.dash_t <= 0 and self.pose_t is None:
             vis = False
         else:
             vis = True
