@@ -1665,6 +1665,7 @@ class Pedestal:
 
 
 _OBJ_HI = {}
+_HI_W = dict(saisen=56, omikuji=40, musubi=76, onsen=116, teabench=56, teacup=20, stairs=48, ema=44)
 
 
 class Obj:
@@ -1695,7 +1696,8 @@ class Obj:
             if sheets.has('ponpoko'):
                 spr = sheets.frame('ponpoko', sheets.RIGHT if pl is not None and pl.x > x else sheets.LEFT, 0)
                 gfx.hi_blit(spr, x, y + 9 - bob)
-            gfx.hi_blit(props.counter(), x, y + 14)
+            c = gfx.env_img('_shared', 'counter_hi', 96)
+            gfx.hi_blit(c[0] if c else props.counter(), x, y + 14)
             say = self.data.get('say')
             if say and self.t < say[1]:
                 txt = say[0]
@@ -1706,16 +1708,21 @@ class Obj:
             if txt:
                 gfx.TEXT.add(txt, x, y - 40 - bob, 7, (255, 240, 200), 'c')
             return
+        def hi(name, i=0):
+            r = gfx.env_img('_shared', name + '_hi', _HI_W[name])
+            return r[min(i, len(r) - 1)] if r else None
         def put(img, bottom):
             hi = _OBJ_HI.get(id(img))                  # Requisiten auf der Hi-Res-Ebene (Scale2x, geglättete Kanten)
             if hi is None or hi[0] is not img:
                 hi = _OBJ_HI[id(img)] = (img, gfx.scale2x(img))
             gfx.hi_blit(hi[1], x, bottom)
         if k == 'saisen':
-            put(props.saisen(), y + 8)
+            im = hi('saisen', 0)
+            gfx.hi_blit(im, x, y + 9) if im else put(props.saisen(), y + 8)
             gfx.TEXT.add('Saisen', x, y + 9, 6, (230, 210, 170), 'c')
         elif k == 'omikuji':
-            put(props.omikuji(), y + 9)
+            im = hi('omikuji', 0)
+            gfx.hi_blit(im, x, y + 9) if im else put(props.omikuji(), y + 9)
             kuji = self.data.get('kuji')
             if kuji:                                   # gezogenes Los schwebt mit 吉/凶-Siegel über dem Kasten
                 seal = gfx.env_img('_title', 'seal_' + kuji)
@@ -1724,9 +1731,11 @@ class Obj:
             else:
                 gfx.TEXT.add('Omikuji 5 Mon', x, y + 10, 6, (230, 210, 170), 'c')
         elif k == 'musubi':
-            put(props.musubi(self.data.get('n', 0)), y + 14)
+            im = hi('musubi', self.data.get('n', 0))
+            gfx.hi_blit(im, x, y + 14) if im else put(props.musubi(self.data.get('n', 0)), y + 14)
         elif k == 'onsen':
-            put(props.onsen(self.used), y + 16)
+            im = hi('onsen', int(self.used))
+            gfx.hi_blit(im, x, y + 16) if im else put(props.onsen(self.used), y + 16)
             if not self.used:
                 for i in range(3):
                     yy = y - 8 - ((t * 20 + i * 9) % 26)
@@ -1762,15 +1771,39 @@ class Obj:
             col = tuple(self.data['col'])
             if not self.used:
                 gfx.draw_glow(s, x, y - 8, 16, col, 50)
-            put(props.ema(col, self.used), y + 4 + (int(math.sin(t * 2 + x) * 1.2) if not self.used else 0))
+            by = y + 4 + (int(math.sin(t * 2 + x) * 1.2) if not self.used else 0)
+            im = hi('ema', int(self.used))
+            if im:
+                key = ('ema', col, self.used)
+                if key not in _OBJ_HI:
+                    im = im.copy()
+                    if not self.used:                  # gemaltes Wunschzeichen in der Farbe des Wunsches
+                        pygame.draw.circle(im, tuple(max(0, v - 90) for v in col), (22, 31), 9)
+                        pygame.draw.circle(im, col, (22, 31), 7)
+                        pygame.draw.circle(im, tuple(min(255, v + 70) for v in col), (19, 28), 2)
+                    _OBJ_HI[key] = im
+                gfx.hi_blit(_OBJ_HI[key], x, by)
+            else:
+                put(props.ema(col, self.used), by)
             if not self.used:
                 gfx.TEXT.add(self.data['name'], x, y + 7, 6, (240, 225, 190), 'c')
                 gfx.TEXT.add(self.data['desc'], x, y + 15, 6, col, 'c')
         elif k == 'tea':
             nm, price, col = self.data['name'], self.data['price'], self.data['col']
-            put(props.tea_bench(), y + 8)
+            im = hi('teabench', 0)
+            gfx.hi_blit(im, x, y + 8) if im else put(props.tea_bench(), y + 8)
             if not self.used:
-                put(props.tea_cup(tuple(col)), y - 1)
+                im = hi('teacup')
+                if im:
+                    key = ('cup', tuple(col))
+                    if key not in _OBJ_HI:
+                        im = _OBJ_HI[key] = im.copy()
+                        pa = pygame.PixelArray(im)
+                        pa.replace((255, 0, 255), tuple(col))      # Platzhalter-Fläche bekommt die Teefarbe
+                        del pa
+                    gfx.hi_blit(_OBJ_HI[key], x, y - 1)
+                else:
+                    put(props.tea_cup(tuple(col)), y - 1)
                 for i in range(2):
                     yy = y - 6 - ((t * 12 + i * 6) % 12)
                     s.set_at((x - 1 + i * 2 + int(math.sin(t * 3 + i)), int(yy)), (220, 220, 230))
@@ -1791,5 +1824,6 @@ class Obj:
                          (x - 6 + i * 6, y - 7 if hi else y - 8), 2)
             gfx.TEXT.add('Tanuki-Automat 3 Mon', x, y + 12, 6, (240, 225, 190), 'c')
         elif k == 'back':
-            put(props.stairs_up(), y + 10)
+            im = hi('stairs', 0)
+            gfx.hi_blit(im, x, y + 11) if im else put(props.stairs_up(), y + 10)
             gfx.TEXT.add('Zurück', x, y + 12, 6, (230, 210, 170), 'c')

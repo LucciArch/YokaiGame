@@ -1286,8 +1286,12 @@ class Game:
                     cache[key] = pygame.transform.scale(fr, (fr.get_width() * 2, fr.get_height() * 2))
                 gfx.hi_blit(cache[key], cx, 128 - int(abs(math.sin(self.t * 3)) * 2))
             else:
-                im = props.omikuji() if eid == 'omikuji' else props.ema((240, 90, 80), False)
-                im = pygame.transform.scale_by(im, 2 if eid == 'omikuji' else 3)
+                hi = gfx.env_img('_shared', eid + '_hi', 40 if eid == 'omikuji' else 44)
+                if hi:
+                    im = hi[0]
+                else:
+                    im = props.omikuji() if eid == 'omikuji' else props.ema((240, 90, 80), False)
+                    im = pygame.transform.scale_by(im, 2 if eid == 'omikuji' else 3)
                 s.blit(im, (cx - im.get_width() // 2, 128 - im.get_height()))
             pygame.draw.ellipse(s, (0, 0, 0), (cx - 18, 126, 36, 6))
             y = self._wrap(ev['lore'], 154, 136, W - 172, 8, (230, 225, 210))

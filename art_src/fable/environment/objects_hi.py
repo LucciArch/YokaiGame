@@ -230,10 +230,212 @@ def slots():
     return cv
 
 
+def counter():
+    """Ladentheke des Tanuki-Händlers: Holzplatte mit Maserung, Lattenfront, indigofarbene Noren mit Mon,
+    Soroban und Münzstapel."""
+    cv = Cv(96, 36, ss=1)
+    W_ = ('#2a1810', '#5a3820', '#8a5a34', '#b88a50')
+    cv.form(cv.R(3, 10, 92, 32), (W_[0], W_[1], W_[2]), 3, 1)
+    for x in range(10, 90, 10):
+        cv.vl(x, 13, 31, W_[0]); cv.vl(x + 1, 13, 31, W_[2])
+    cv.form(cv.R(0, 5, 95, 10), (W_[1], W_[2], W_[3]), 1, 1)
+    for x0, x1 in ((6, 30), (44, 70), (78, 90)):           # Maserung
+        cv.hl(x0, x1, 7, W_[2])
+    cv.hl(0, 95, 5, '#d8b070')
+    ind = ('#101838', '#1e2c5a', '#34488a', '#5a72b0')
+    for i in range(4):                                      # vier Noren-Bahnen mit Schlitzen
+        x0 = 5 + i * 22
+        nm = cv.R(x0, 11, x0 + 20, 26)
+        cv.form(nm, (ind[0], ind[1], ind[2]), 2, 1)
+        cv.hl(x0, x0 + 20, 11, ind[3])
+        cx = x0 + 10
+        ring = cv.E(cx, 19, 5, 5) & ~cv.E(cx, 19, 3.6, 3.6)
+        cv.fill(ring, '#e8e0cc')
+        cv.fill(cv.E(cx, 19, 1.5, 1.5), '#e8e0cc')          # Mon: Ring mit Punkt (Tanuki-Bauch)
+    cv.form(cv.R(8, 0, 30, 4), ('#1a1010', '#3a2418', '#5a3a22'), 1, 1)   # Soroban
+    for x in range(10, 29, 3):
+        cv.px(x, 1, '#c8b890'); cv.px(x, 3, '#c8b890')
+    cv.hl(8, 30, 2, '#1a1010')
+    for i, x in enumerate((72, 76, 80, 74, 78)):            # Münzen
+        y = 3 - (1 if i > 2 else 0) * 2
+        cv.fill(cv.E(x, y + 1, 2.4, 1.2), '#96661c'); cv.fill(cv.E(x, y + .5, 2, .8), '#e0b040')
+    return finish(cv, 48, 33, 46)
+
+
+def saisen():
+    """Saisen-bako mit Lattendeckel, Messingbeschlägen, Plakette und rot-weißem Glockenseil."""
+    cv = Cv(56, 40, ss=1)
+    W_ = ('#1e1216', '#3e2620', '#62402c', '#8a6040')
+    cv.form(cv.R(4, 18, 51, 36), (W_[0], W_[1], W_[2]), 3, 1)
+    cv.form(cv.PG([(2, 18), (6, 12), (49, 12), (53, 18)]), (W_[1], W_[2], W_[3]), 1, 1)
+    for x in range(9, 48, 5):                               # schräge Latten, darunter Dunkel
+        cv.line([(x, 13), (x - 2, 17)], W_[0])
+        cv.line([(x + 1, 13), (x - 1, 17)], W_[3])
+    cv.hl(2, 53, 18, '#c89a30')
+    for (x, y) in ((4, 19), (47, 19), (4, 32), (47, 32)):  # Eckbeschläge
+        cv.form(cv.R(x, y, x + 4, y + 4), ('#5a3414', '#c89a30', '#f0d070'), 1, 1)
+    pl = cv.R(20, 22, 35, 31)                               # Plakette 賽銭 angedeutet
+    cv.form(pl, ('#5a3414', '#c89a30', '#f0d070'), 1, 1)
+    for x in (24, 31):
+        cv.vl(x, 24, 29, '#3a2010'); cv.hl(x - 1, x + 1, 25, '#3a2010'); cv.hl(x - 1, x + 1, 28, '#3a2010')
+    for x in range(26, 30):                                 # Glockenseil (suzu no o), gedreht rot-weiß
+        for y in range(0, 12):
+            cv.px(x, y, '#e8e0d0' if (x + y) % 4 < 2 else '#b02028')
+    cv.fill(cv.E(28, 11, 2.5, 1.5), '#b02028')
+    return finish(cv, 28, 37, 25)
+
+
+def omikuji():
+    """Omikuji-Stand: rot lackiertes Kästchen mit Dach, Papierfeld 御神籤, Losbüchse oben."""
+    cv = Cv(40, 56, ss=1)
+    red = ('#3a0c14', '#8e1a1e', '#c8382a', '#ec7050')
+    cv.form(cv.R(6, 14, 33, 44), red[:3], 3, 1)
+    cv.form(cv.PG([(3, 15), (10, 9), (29, 9), (36, 15)]), BLACK[:3], 1, 1)
+    cv.hl(3, 36, 15, BLACK[3])
+    cv.form(cv.R(11, 18, 28, 39), ('#a8a090', '#e8e0cc', '#fff8e8'), 1, 1)
+    for y in (21, 26, 31, 35):                              # Schrift 御神籤, senkrecht
+        cv.hl(17, 22, y, '#2a1818'); cv.vl(19, y - 1, y + 2, '#2a1818')
+    cv.fill(cv.R(12, 18, 13, 39), red[1])
+    cv.form(cv.R(15, 2, 24, 9), ('#3a2418', '#7a5434', '#a8804c'), 1, 1)   # sechseckige Losbüchse
+    cv.vl(19, 0, 2, '#d8c8a0'); cv.px(19, 0, '#b02028')
+    cv.form(cv.R(9, 45, 30, 48), ('#2a1810', '#5a3820', '#8a5a34'), 1, 1)
+    cv.form(cv.R(4, 49, 35, 53), ('#2a1810', '#5a3820', '#8a5a34'), 1, 1)
+    for x in (2, 36):                                       # gebundene Zettel an den Seiten
+        cv.form(cv.R(x, 26, x + 2, 33), ('#a8a090', '#e8e0cc', '#fff8e8'), 0, 1)
+        cv.px(x + 1, 27, '#b02028')
+    return finish(cv, 20, 54, 17)
+
+
+MUSUBI_SPOTS = [(16, 22), (34, 24), (52, 24), (24, 40), (44, 40), (58, 38), (14, 52), (32, 54), (50, 54)]
+
+
+def musubi(n):
+    """Musubi-dokoro: Holzgestell mit drei Strohseilen, n Unglückslose verknotet."""
+    cv = Cv(76, 64, ss=1)
+    W_ = ('#1e1216', '#3e2620', '#62402c', '#8a6040')
+    for x in (4, 66):
+        cv.form(cv.R(x, 6, x + 5, 60), (W_[0], W_[1], W_[2]), 2, 1)
+        cv.form(cv.R(x - 2, 2, x + 7, 6), BLACK[:3], 1, 1)
+    cv.form(cv.R(2, 8, 73, 11), (W_[1], W_[2], W_[3]), 1, 1)
+    for ry in (21, 37, 51):
+        for x in range(10, 66):
+            y = int(round(ry + 2.2 * np.sin(np.pi * (x - 10) / 56)))
+            cv.px(x, y, ROPE[2] if x % 3 else ROPE[1]); cv.px(x, y + 1, ROPE[1] if x % 3 else ROPE[0])
+    for i, (x, y) in enumerate(MUSUBI_SPOTS[:n]):
+        p = ('#a8a090', '#e8e0cc', '#fff8e8')
+        cv.form(cv.E(x, y, 2.6, 2), p, 0, 1)                # Knoten
+        cv.form(cv.PG([(x - 2, y + 1), (x - 1, y + 1), (x - 3, y + 9), (x - 4, y + 9)]), p, 0, 1)
+        cv.form(cv.PG([(x + 1, y + 1), (x + 2, y + 1), (x + 3, y + 7), (x + 2, y + 7)]), p, 0, 1)
+        cv.px(x, y, '#b02028')
+    for x in (3, 65):
+        cv.form(cv.R(x, 60, x + 8, 62), (STONE[1], STONE[2], STONE[3]), 1, 1)
+    return finish(cv, 38, 62, 34)
+
+
+def ema(used):
+    """Ema-Votivtafel (Fünfeck) an roter Kordel; das farbige Wunschzeichen malt das Spiel darauf."""
+    cv = Cv(44, 52, ss=1)
+    wd = ('#5a3a22', '#a07848', '#c8a070', '#e8c898') if not used else ('#3a2a20', '#6a5440', '#8a7058', '#9a8068')
+    cv.form(cv.R(20, 0, 23, 9), ('#5a0c14', '#b02028', '#e04a3a'), 0, 1)
+    pent = cv.PG([(2, 18), (21.5, 6), (41, 18), (41, 46), (2, 46)])
+    cv.form(pent, (wd[0], wd[1], wd[2]), 3, 1)
+    cv.line([(3, 18), (21, 7), (40, 18)], wd[3])
+    cv.fill(cv.R(4, 19, 39, 20), wd[0])                     # Dachkante
+    for y, (x0, x1) in ((26, (6, 16)), (34, (26, 37)), (40, (7, 20))):
+        cv.hl(x0, x1, y, wd[0])
+    if used:                                                # beschrieben: Tuschezeilen
+        for x in (14, 21, 28):
+            cv.vl(x, 24, 40, '#2a1a14')
+    return finish(cv, 22, 47, 20)
+
+
+def onsen(used):
+    """Felsen-Onsen: Randsteine, dampfendes Wasser mit Lichtringen, Bambusrinne (kakehi)."""
+    cv = Cv(116, 64, ss=1)
+    S = STONE
+    import random as _r
+    rng = _r.Random(7)
+    pool = cv.E(58, 34, 50, 22)
+    water = ('#14304a', '#2a6a8a', '#4aa0b8', '#a8e0e8') if not used else ('#18242c', '#2a4048', '#3e5a62', '#6a8088')
+    cv.fill(pool, water[1])
+    cv.fill(pool & ~sh(pool, 0, 4), water[0])
+    for (rx, ry) in ((30, 10), (18, 6)):
+        ring = cv.E(54, 36, rx, ry) & ~cv.E(54, 36, rx - 1.5, ry - 1)
+        cv.fill(ring & pool, water[2])
+    cv.fill(cv.E(40, 30, 6, 1.5) & pool, water[3])
+    for i in range(22):                                     # Randsteine
+        a = i / 22 * 2 * np.pi
+        x, y = 58 + np.cos(a) * 52, 34 + np.sin(a) * 25
+        rx, ry = rng.uniform(6, 9), rng.uniform(4, 6)
+        m = cv.E(x, y, rx, ry)
+        cv.fill(dil(m), K)
+        cv.form(m, (S[1], S[2], S[3]) if np.sin(a) > -.2 else (S[0], S[1], S[2]), 2, 1)
+        cv.px(int(x - rx * .4), int(y - ry * .5), S[4])
+    for (x, y) in ((10, 24), (100, 46), (30, 56)):
+        m = cv.E(x, y, 4, 2) & cv.m
+        cv.fill(m, MOSS[1]); cv.fill(m & ~sh(m, 1, 1), MOSS[2])
+    bam = ('#2a4a1c', '#4a7a2c', '#8ab84a')                 # Kakehi: Bambusrinne mit Wasserstrahl
+    cv.form(cv.R(84, 4, 87, 14), bam, 1, 1)
+    cv.form(cv.PG([(70, 7), (88, 4), (88, 7), (70, 10)]), bam, 1, 1)
+    if not used:
+        cv.vl(70, 10, 22, '#a8e0e8'); cv.vl(71, 11, 22, '#4aa0b8')
+    cv.outline(K)
+    return cv
+
+
+def tea_bench():
+    """Teehaus-Bank mit rotem Mōsen-Tuch, Holzbeinen und Lacktablett."""
+    cv = Cv(56, 28, ss=1)
+    red = ('#4a0c14', '#a01c22', '#d03a30', '#f07050')
+    for x in (5, 46):
+        cv.form(cv.R(x, 12, x + 4, 26), ('#1e1216', '#3e2620', '#62402c'), 1, 1)
+    cv.form(cv.R(0, 6, 55, 12), red[:3], 2, 1)
+    cv.hl(0, 55, 6, red[3])
+    cv.fill(cv.R(0, 12, 55, 14), red[0])                    # überhängendes Tuch
+    cv.form(cv.R(18, 2, 37, 5), BLACK[:3], 1, 1)
+    cv.hl(18, 37, 2, '#7a3a2a')
+    return finish(cv, 28, 26, 26)
+
+
+def tea_cup():
+    """Chawan in dunkler Raku-Glasur; die Teefarbe setzt das Spiel ein (Fläche oben)."""
+    cv = Cv(20, 16, ss=1)
+    body = cv.E(10, 8, 8, 6) & (cv.Y >= 5)
+    cv.form(body, ('#1a1418', '#3a2e30', '#6a5a50'), 2, 1)
+    cv.form(cv.R(7, 13, 12, 14), ('#1a1418', '#3a2e30', '#6a5a50'), 0, 1)
+    cv.fill(cv.E(10, 5, 8, 2), '#c0b090')
+    cv.fill(cv.E(10, 5, 6.5, 1.3), '#ff00ff')                # Platzhalter für den Tee
+    cv.outline(K)
+    return cv
+
+
+def stairs_up():
+    """Steintreppe zurück nach oben, mit Moos und Licht von oben."""
+    cv = Cv(48, 44, ss=1)
+    S = STONE
+    for i in range(5):
+        x0, x1, y0 = 4 + i * 4, 43 - i * 4, 34 - i * 8
+        cv.form(cv.R(x0, y0, x1, y0 + 8), (S[0], S[1], S[2]) if i < 3 else (S[1], S[2], S[3]), 2, 1)
+        cv.hl(x0, x1, y0, S[4] if i > 2 else S[3])
+    cv.fill(cv.R(20, 0, 27, 2), '#d8d0b0')                  # Lichtschein oben
+    m = cv.E(8, 40, 3, 1.5) & cv.m
+    cv.fill(m, MOSS[1])
+    return finish(cv, 24, 42, 22)
+
+
 def build(dst=DST):
     strip([torii(k) for k in ORDER], os.path.join(dst, 'torii_hi.png'))
     strip([hokora(False), hokora(True)], os.path.join(dst, 'hokora_hi.png'))
     strip([slots()], os.path.join(dst, 'slots_hi.png'))
+    strip([counter()], os.path.join(dst, 'counter_hi.png'))
+    strip([saisen()], os.path.join(dst, 'saisen_hi.png'))
+    strip([omikuji()], os.path.join(dst, 'omikuji_hi.png'))
+    strip([musubi(n) for n in range(10)], os.path.join(dst, 'musubi_hi.png'))
+    strip([ema(False), ema(True)], os.path.join(dst, 'ema_hi.png'))
+    strip([onsen(False), onsen(True)], os.path.join(dst, 'onsen_hi.png'))
+    strip([tea_bench()], os.path.join(dst, 'teabench_hi.png'))
+    strip([tea_cup()], os.path.join(dst, 'teacup_hi.png'))
+    strip([stairs_up()], os.path.join(dst, 'stairs_hi.png'))
 
 
 if __name__ == '__main__':
