@@ -57,6 +57,7 @@
 - Runde 33 – Neuer Titelbildschirm, Teil 2: **handgesetztes Logo** – der Schriftzug „Yōkai no Michi“ in der eigenen Pinselschrift, in Goldstufen mit Lichtfase oben links, dunklem Umriss und Schlagschatten, daneben ein rotes Hanko-Siegel mit den Kanji 妖怪の道, Strich für Strich gepixelt (rechte Spalte zuerst, wie ein echter Stempel). Quelle: `art_src/title/logo.py`
 - Runde 34 – Neuer Titelbildschirm, Teil 3: Beim Start blendet erst die Mondnacht auf, dann sinkt das Logo herein, zuletzt erscheint das Menü (jede Taste kürzt ab). Der gewählte Menüpunkt liegt auf einem **zinnoberroten Pinselstrich**, der bei jedem Wechsel neu gezogen wird; ein weicher Schleier hält das Menü lesbar. Über dem Schilf blinken Glühwürmchen, über den See ziehen **Hitodama** – Seelenflammen, die auftauchen und wieder vergehen
 - Runde 35 – Neue Charakterauswahl im Stil des Titels: Die gewählte Figur steht **groß auf einem moosigen Steinpodest** im Mondlicht und steigt bei jedem Wechsel kurz hinauf; ihr Name liegt auf einem zinnoberroten Pinselstrich, Leben, Kraft, Tempo und Wurfrate sind **Goldtusche-Balken**, die sich beim Wechsel füllen. Alle Figuren stehen in einer Leiste am unteren Rand, gesperrte als violetter Schattenriss mit rotem **Siegel 封**. Quelle: `art_src/title/charsel.py`
+- Runde 36 – Pinselstrich-Auswahl überall: Auch im Pause- und Optionsmenü liegt der gewählte Punkt jetzt auf dem zinnoberroten Pinselstrich des Titels statt in einem Kasten, und der Strich wird bei jedem Wechsel neu gezogen
 
 ## 1.4.0 – „Hyakki-Update“ (enthält 1.3 „Kapitel-Update“)
 

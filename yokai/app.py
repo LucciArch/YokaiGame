@@ -406,9 +406,6 @@ class Game:
         items = self.menu_items()
         step = 14 if len(items) <= 10 else 13
         show_news = self.save.data.get('news_seen') != VERSION and not self.headless
-        if self.__dict__.get('_bsel') != self.sel:      # Pinselstrich wird bei jeder Auswahl neu gezogen
-            self._bsel, self._bt = self.sel, 0.0
-        self._bt += dt
         if ma and not show_news:                         # dunkler Schleier hinter dem Menü, an den Seiten auslaufend
             sc_ = self.__dict__.get('_scrim')
             if sc_ is None:
@@ -422,9 +419,7 @@ class Game:
             sel = i == self.sel
             col = (255, 236, 200) if sel else (205, 196, 200)
             if sel and ma:
-                br = gfx.env_img('_title', 'brush')[0]
-                bw = max(2, int(br.get_width() * min(1.0, self._bt / 0.14)))
-                gfx.hi_blit(br.subsurface((0, 0, bw, br.get_height())), W // 2 - br.get_width() // 4 + bw // 4, y + 11, ma, transient=True)
+                self.brush_sel(('title', i), W // 2, y, 84, dt, ma)
             T.add(m, W // 2, y, 10, col, 'c', alpha=ma)
         T.add('v' + VERSION + '   •   F11 / Alt+Enter Vollbild', W - 6, H - 12, 6, (140, 130, 150), 'r', alpha=ma)
         if items and items[self.sel % len(items)] == 'Fortsetzen' and not show_news:
@@ -469,6 +464,19 @@ class Game:
                 self.title_select(self.sel)
             elif n == 'back':
                 pass
+
+    def brush_sel(self, key, cx, y, w, dt, alpha=255):
+        """Zinnober-Pinselstrich (w Weltpixel breit) unter einem gewählten Menüpunkt; wird bei jeder Auswahl neu gezogen."""
+        if self.__dict__.get('_bsel') != key:
+            self._bsel, self._bt = key, 0.0
+        self._bt += dt
+        cache = self.__dict__.setdefault('_brushes', {})
+        br = cache.get(w)
+        if br is None:
+            br = gfx.env_img('_title', 'brush')[0]
+            br = cache[w] = br if br.get_width() == w * 2 else pygame.transform.scale(br, (w * 2, br.get_height()))
+        bw = max(2, int(br.get_width() * min(1.0, self._bt / 0.14)))
+        gfx.hi_blit(br.subsurface((0, 0, bw, br.get_height())), cx - w / 2 + bw / 4, y + 11, alpha, transient=True)
 
     def menu_items(self):
         from .run import run_file
@@ -863,7 +871,7 @@ class Game:
         for i, m in enumerate(items):
             y = 100 + i * 18
             if i == self.sel:
-                gfx.panel(s, (W // 2 - 70, y - 2, 140, 15), 180, (200, 120, 90))
+                self.brush_sel(('pause', i), W // 2, y, 120, dt)
             gfx.TEXT.add(m, W // 2, y, 10, (255, 230, 150) if i == self.sel else (220, 210, 200), 'c')
         for n in nav:
             if n == 'up':
@@ -1446,7 +1454,7 @@ class Game:
         for i, (k, v) in enumerate(opts):
             y = 62 + i * 18
             if i == self.sel:
-                gfx.panel(s, (W // 2 - 120, y - 2, 240, 16), 180, (200, 120, 90))
+                self.brush_sel(('options', i), W // 2 - 20, y, 210, dt)
             T.add(k, W // 2 - 110, y, 9, (255, 230, 150) if i == self.sel else (220, 210, 200))
             T.add(v, W // 2 + 110, y, 9, (255, 255, 255), 'r')
         T.add('Links/Rechts – ändern     Esc – Zurück', W // 2, 270, 7, (160, 150, 150), 'c')
