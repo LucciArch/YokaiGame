@@ -62,5 +62,27 @@ check(len(r.pbullets) == 2 and all(b.fl.get('poison') for b in r.pbullets), 'Bog
 r, p = setup(w_fan=1, homing=1)
 p.fire((1, 0))
 check(r.pbullets and all(b.fl.get('homing') for b in r.pbullets), 'Fächer + Zielsuche')
+# Kreisschild + Feuer: Feind am Schild brennt
+NOIN = {'move': [0, 0], 'shoot': [0, 0], 'dash': False, 'active': False, 'salt': False}
+r, p = setup(orbital=1, burn=1)
+ox, oy = p.orbitals()[0]
+e = Enemy(r, 'nurikabe', ox, oy); r.enemies.append(e); e.spawn_t = 0
+for _ in range(30):
+    e.x, e.y = p.orbitals()[0]
+    r.update(1 / 60, NOIN)
+check(e.burn > 0, 'Kreisschild + Feuer setzt keinen Brand')
+# Aura + Gift
+r, p = setup(aura=1, poison=1)
+e = Enemy(r, 'nurikabe', p.x + 12, p.y); r.enemies.append(e); e.spawn_t = 0
+for _ in range(40):
+    r.update(1 / 60, NOIN)
+check(e.poison > 0, 'Aura + Gift vergiftet nicht')
+# Gefolge + Frost: Gefolge-Würfe tragen die Item-Wirkung
+from yokai.entities import Familiar
+r, p = setup(slow=1)
+p.familiars.append(Familiar(0))
+for _ in range(60):
+    r.update(1 / 60, dict(NOIN, shoot=[1, 0]))
+check(any(b.fl.get('slow') for b in r.pbullets), 'Gefolge wirft ohne Frost')
 print('Waffen-Synergien geprüft, Fehler:', bad)
 sys.exit(1 if bad else 0)

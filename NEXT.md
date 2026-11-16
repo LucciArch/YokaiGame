@@ -31,8 +31,8 @@
 Nach den Grafiken immer weiter daran arbeiten, dass **alle Items miteinander funktionieren** (Beispiel: Laser + Mehrfachwurf
 + Zielsuche muss drei zielsuchende Laser ergeben). Runde 65: Waffen (`weapons.py`) übernehmen alle Wurf-Eigenschaften
 (`weapons.shot_flags`, `shot_angles`, Träger-Geschoss `_carrier` für damage_enemy). Test: `tools/waffentest.py`.
-Nächste Kandidaten: Familiars/Gefolge erben Wurf-Eigenschaften (bisher nur homing), Orbitale/Aura mit Feuer/Gift,
-aktive Items (Geschoss-Salven) mit Mehrfachwurf/Elementen, Bodenfeuer/Explosionen mit Gift/Frost, Sigs prüfen, die nur
+Runde 66: Gefolge erbt `shot_flags`, Kreisschild/Aura nutzen `weapons.touch` + `elem_flags`.
+Nächste Kandidaten: aktive Items (Geschoss-Salven) mit Mehrfachwurf/Elementen, Bodenfeuer/Explosionen mit Gift/Frost, Sigs prüfen, die nur
 für Talismane greifen (z. B. `bullet_tick`) – sollen sie auch für Strahl/Hieb wirken?
 
 # Danach: Requisiten Teil 6 – Enma-chō, Tsukiyomi und Yomi no Oku

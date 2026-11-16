@@ -29,6 +29,23 @@ def shot_flags(p):
     return {k: p.f[k] for k in FLAGS if p.f[k]}
 
 
+ELEMENTS = ('burn', 'poison', 'slow', 'chain', 'knock')
+
+
+def elem_flags(p, keys=ELEMENTS):
+    """Nur die Element-Wirkungen (für Kreisschilde, Aura) – ohne Flugbahn-Eigenschaften."""
+    return {k: p.f[k] for k in keys if p.f[k]}
+
+
+def touch(run, e, dmg, src_x, src_y, fl):
+    """Treffer ohne echtes Geschoss (Kreisschild, Aura), aber mit Element-Wirkungen der Items."""
+    if not fl:
+        run.damage_enemy(e, dmg, None)
+        return
+    ang = math.atan2(e.y - src_y, e.x - src_x)
+    run.damage_enemy(e, dmg, _carrier(e.x, e.y, ang, dmg, fl))
+
+
 def _carrier(x, y, ang, dmg, fl):
     """Unsichtbares Geschoss, über das Hieb und Strahl die Wurf-Eigenschaften an damage_enemy weitergeben."""
     from .entities import Bullet

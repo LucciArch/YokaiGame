@@ -790,7 +790,10 @@ class Player:
                 herr = 'hyakki_herr' in self.sgs
                 fm.cd = 0.3 if herr else 0.6
                 a = math.atan2(self.facing[1], self.facing[0])
-                fl = {'homing': 1} if (herr or i % 2 == 1 or self.f['homing']) else {}
+                fl = weapons.shot_flags(self)                 # Gefolge wirft mit denselben Item-Wirkungen
+                fl.pop('split', None)
+                if herr or i % 2 == 1:
+                    fl['homing'] = 1
                 run.fire_player_bullet(fm.x, fm.y, a, max(2.5, self.damage() * 0.55), 230, 2.5, 0.9, fl)
         # Orbitale
         self.orb_angle += dt * 3.2
@@ -804,7 +807,8 @@ class Player:
                 rad *= 2
             for e in run.enemies:
                 if e.active() and math.hypot(e.x - self.x, e.y - self.y) < rad + e.r:
-                    run.damage_enemy(e, 0.8 * self.f['aura'] + 0.25 * self.damage(), None)
+                    weapons.touch(run, e, 0.8 * self.f['aura'] + 0.25 * self.damage(), self.x, self.y,
+                                  weapons.elem_flags(self, ('burn', 'poison', 'slow')))
 
     def draw_roll(self, x, y, q, right, al, ghost=False):
         i = roll_frame(q)
