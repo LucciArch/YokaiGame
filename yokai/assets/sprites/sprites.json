@@ -334,7 +334,7 @@
  },
  "gyuki": {
   "atk": 4,
-  "h": 86,
+  "h": 84,
   "hi": true,
   "kind": "strip",
   "n": 7,
@@ -766,7 +766,7 @@
  },
  "tsuchigumo": {
   "atk": 4,
-  "h": 86,
+  "h": 84,
   "hi": true,
   "kind": "strip",
   "n": 7,

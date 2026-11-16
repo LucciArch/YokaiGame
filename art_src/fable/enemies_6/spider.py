@@ -16,7 +16,8 @@ FEET_N = [(6, GY), (28, GY), (76, GY), (106, GY)]
 FEET_F = [(14, GY - 3), (40, GY - 3), (80, GY - 3), (112, GY - 3)]
 HIPS_N = [(40, 50), (46, 52), (52, 52), (57, 50)]
 HIPS_F = [(42, 46), (48, 47), (54, 47), (58, 45)]
-KNEE_H = [22, 20, 26, 30]          # Kniehöhe über dem Boden-Ursprung
+KNEE_H = [22, 20, 26, 30]          # Knie-y der fernen Beine
+KNEE_N = [60, 55, 26, 30]          # nahe Vorderbeine greifen tief nach vorn, vor dem Kiefer vorbei
 
 
 def P(x, y):
@@ -75,13 +76,12 @@ def body(c, S, ramps, head_fn, abd_fn):
     p.form(pro, ramps['body'], sd=3, hl=1)
     p.line([P(44, 38 + bob - rear * 0.7), P(56, 38 + bob - rear * 0.7)], ramps['body'][0], only=erode(pro, 1))
     c.stamp(p, 'K')
-    # ---- nahe Beine
+    # ---- Kopf, danach die nahen Beine davor (sie sind dem Betrachter am nächsten)
+    head_fn(c, P(32, 40 + bob - rear * 1.2), S)
     for i in range(4):
         lift = lifts[i] if not rear or i > 1 else 10 + i * 3
         reach = (-sw if i % 2 else sw) - (rear * 0.8 if i < 2 else 0)
         hip = (HIPS_N[i][0], HIPS_N[i][1] + bob - (rear if i < 2 else 0))
-        leg(c, hip, FEET_N[i], KNEE_H[i] + bob - rear * (2 if i < 2 else 0), LEGR, JNT, STR, lift, reach)
-    # ---- Kopf
-    head_fn(c, P(32, 40 + bob - rear * 1.2), S)
+        leg(c, hip, FEET_N[i], KNEE_N[i] + bob - rear * (3 if i < 2 else 0), LEGR, JNT, STR, lift, reach)
     c.blacken()
     return c

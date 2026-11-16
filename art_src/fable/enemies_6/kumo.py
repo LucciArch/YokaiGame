@@ -45,7 +45,7 @@ def draw(bob=0, g=0, crouch=0, air=0, spread=0, fang=0):
             else:
                 ly = gy - (lifts[i] if not far else lifts[(i + 1) % 4]) - (2 if far else 0)
             kx = hx + (fx - hx) * 0.45
-            ky = min(hy, ly) - 4 - (i in (0, 3)) * 2
+            ky = (hy + 2) if (i < 2 and not far and not spread) else min(hy, ly) - 4 - (i in (0, 3)) * 2
             out.append(((hx, hy), (kx, ky), (fx, ly)))
         return out
     for (h, k, f) in legs(True):
@@ -63,8 +63,6 @@ def draw(bob=0, g=0, crouch=0, air=0, spread=0, fang=0):
         p.pxs([q], 'u3')
     p.pxs([P(47, 24 + dy), P(48, 25 + dy)], 'u0')                     # Spinnwarzen
     c.stamp(p, 'K')
-    for (h, k, f) in legs(False):
-        leg(c, h, k, f, BODY, 'u3')
     # Kopfbruststück
     p = C()
     ceph = E(*P(21, 21 + dy), 8.4, 6.4) | E(*P(17, 19 + dy), 5.4, 5.4)
@@ -87,6 +85,8 @@ def draw(bob=0, g=0, crouch=0, air=0, spread=0, fang=0):
         p.form(ch, BODYF if far else BODY, sd=1, hl=1)
         p.fill(L(*P(x - 0.5, 28 + dy), 0.7, *P(x - 1.5 - fang, 30 + dy + fang), 0.4), 'b3')
     c.stamp(p, 'K')
+    for (h, k, f) in legs(False):
+        leg(c, h, k, f, BODY, 'u3')
     c.blacken()
     return c
 
