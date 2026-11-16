@@ -64,3 +64,18 @@ assert [o.kind for o in run.objs if o.kind in ('victory', 'yomi')] == ['victory'
 g.start_run('hana', 9); run = g.run; run.depth = 6; run.go_deeper()
 assert run.depth == 1 and run.loop == 1          # Endlos-Torii führt weiter in die Schleife
 print('Yomi-Pforte OK')
+
+# Rückkehr aus Yomi: der erste Sieg über Izanami schaltet den Pfirsich frei
+g.start_run('hana', 10); run = g.run; run.depth = 7
+run.save['achievements'] = [a for a in run.save['achievements'] if a != 'yomi']
+run.end_run(True)
+assert 'yomi' in run.save['achievements'] and 'yomi_momo' in run.save['items']
+from yokai.epilogue import Epilogue, STORY_YOMI
+assert Epilogue(g, run).blocks[0] == STORY_YOMI[0]
+# Pfirsich: Treffer wirft drei Pfirsiche und verscheucht nahe Feinde
+g.start_run('hana', 11); run = g.run; p = run.player
+p.gain_item('yomi_momo', silent=True)
+e = run.spawn_enemy('shikome', p.x + 40, p.y); e.spawn_t = 0
+nb = len(run.pbullets); p.iframes = 0; p.hurt(1, 'Test')
+assert len(run.pbullets) - nb == 3 and getattr(e, 'sg_fear', 0) > 0, (len(run.pbullets) - nb, getattr(e, 'sg_fear', 0))
+print('Rückkehr aus Yomi OK')

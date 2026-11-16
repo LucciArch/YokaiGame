@@ -114,6 +114,7 @@ TEXT = {
     'felsblock': 'Unbeweglich: nichts bremst dich, Feinde prallen ab',
     'wandbruch': 'Bricht der Schild, stößt er alle Feinde weg',
     'glockenschlag': 'Wirst du getroffen, erstarren alle Feinde',
+    'momo': 'Wirst du getroffen, wirfst du drei Pfirsiche (300 %), nahe Feinde fliehen 3 s',
     # ---- Synergie-Fähigkeiten (verstärken die Fähigkeiten der beteiligten Items)
     'sonnenregen': 'Der Fuchsregen fällt öfter und lässt Münzen fallen',
     'sternenstaub': 'Schwebende Talismane zerstieben in vier Sternsplitter',
@@ -128,6 +129,7 @@ TEXT = {
     'augen_ueberall': 'Das Handauge trifft markierte Feinde auf jede Entfernung',
     'mondteich': 'Mondsichel-Talismane lassen Feinde erstarren',
     'leben_tod': 'Kills schenken manchmal ½ Geisterherz',
+    'izanagis_flucht': 'Auch die Rolle wirft Pfirsiche (alle 3 s), Feinde fliehen doppelt so weit und lang',
     'onmyo_spiegel': 'Der Spiegel wirft jedes 2. Geschoss als Siegel-Explosion zurück',
     'seimei': 'Siegel-Explosion schon nach 3 Treffern, Bann öfter',
     'koi_drache': 'Beschleunigte Talismane werden zu durchbohrenden Drachen',
@@ -827,6 +829,8 @@ def on_hurt(p, run):
             for i in range(8):
                 b = run.fire_player_bullet(p.x, p.y - 3, i / 8 * math.tau, p.damage() * 1.2, 220, 3, 0.8, {'pierce': 1})
                 b.col = (255, 210, 90)
+    if 'momo' in S:
+        _momo(p, run)
     if 'a_un' in S:
         g['agyo'] = 0.01
         _syn(run, 'a_un', p.x, p.y, (220, 220, 200))
@@ -923,11 +927,30 @@ def ebullet_dt(p, b, dt):
     return dt
 
 
+def _momo(p, run):
+    """Izanagis Pfirsiche: drei Würfe auf die nächsten Feinde, nahe Yokai fliehen."""
+    flucht = 'izanagis_flucht' in p.sgs
+    st(p)['momo'] = run.time
+    foes = sorted((e for e in run.enemies if e.active()), key=lambda e: math.hypot(e.x - p.x, e.y - p.y))
+    for k in range(3):
+        a = math.atan2(foes[k % len(foes)].y - p.y, foes[k % len(foes)].x - p.x) if foes else k * math.tau / 3
+        b = run.fire_player_bullet(p.x, p.y - 3, a + (k - 1) * 0.12, p.damage() * 3, 170, 4, 1.4, {'pierce': 1})
+        b.col = (255, 170, 140)
+    reach = 140 if flucht else 90
+    for e in foes:
+        if not e.is_boss and math.hypot(e.x - p.x, e.y - p.y) < reach:
+            e.sg_fear = max(getattr(e, 'sg_fear', 0), 6.0 if flucht else 3.0)
+    _ring(run, p.x, p.y, (255, 170, 140), reach * 0.6)
+
+
 def on_dash(p, run):
     S = p.sgs
     if not S:
         return
     g = st(p)
+    if 'izanagis_flucht' in S and run.time - g.get('momo', -9) >= 3.0:
+        _syn(run, 'izanagis_flucht', p.x, p.y, (255, 170, 140))
+        _momo(p, run)
     if 'tarnung' in S:
         g['invis'] = 2.6 if 'hara_tsuzumi' in S else 1.3
     if 'hara_tsuzumi' in S:

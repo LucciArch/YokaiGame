@@ -2137,6 +2137,7 @@ class Run:
                 s.stat('true_wins')
             if self.depth == 7:
                 s.stat('yomi_wins')
+                self.achieve('yomi')
             self.achieve('seimei')
             self.achieve('hard')
             self.achieve('heaven')
