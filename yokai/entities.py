@@ -509,6 +509,7 @@ class Player:
                 run.banner('Synergie: ' + s['name'], s['desc'], (255, 220, 120), big=True, fx=', '.join(fx_lines(s['fx'])),
                            icons=[(ITEMS[i]['icon'], ITEMS[i]['col']) for i in s['items']])
                 audio.play('synergy')
+                run.slowmo = 0.7
                 run.on_synergy(s['id'])
         # Transformationen (3 Items gleichen Themas)
         counts = defaultdict(int)

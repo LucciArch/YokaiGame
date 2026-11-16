@@ -146,6 +146,7 @@ class Run:
         self.fade = 1.0
         self.pending = None
         self.hitstop = 0.0
+        self.slowmo = 0.0
         self.slide = None
         self._last = None
         self.shrine_room = None
@@ -1422,6 +1423,9 @@ class Run:
         if self.hitstop > 0:
             self.hitstop -= dt
             return
+        if self.slowmo > 0:         # Synergie-Fanfare: kurz Zeitlupe statt Anhalten
+            self.slowmo -= dt
+            dt *= 0.3
         self.time += dt
         self.save['stats']['playtime'] = self.save['stats'].get('playtime', 0) + dt
         p = self.player
