@@ -14,11 +14,25 @@
 - Offen/Ideen: Titelbild-Stimmung nach Iwato-Sieg (wie 'yomi' in `app.py`), Amaterasu-Bossmusik, Boss-Balance
   (bosstest: ~80 Treffer gegen ~30 bei Izanami – etwas schwerer gewollt, beobachten).
 
+# Erledigt (Runden 60–63, Wunsch von Luca)
+- Runde 60: Lichtsystem – `Run.collect_lights()` sammelt alle Lichtquellen (Spielerin, Laternen, leuchtende
+  Requisiten `gfx.PROP_LIGHT`, Wanddekos `gfx.WALL_LIGHT`, Gegner mit `glow`, Bosse, Sockel, Feuer/Blitz/Meteor-Hazards,
+  helle Gegnergeschosse, brennende/Ketten-Ofuda, Explosions-/Seelen-Partikel). `draw_dark` stanzt Lichtkreise,
+  `draw_light_tint` färbt sie, `hi_light` hellt Hi-Res-Figuren an jeder Lichtquelle auf.
+  **Neue leuchtende Requisiten/Wanddekos/Gegner immer in PROP_LIGHT/WALL_LIGHT bzw. mit `glow=` eintragen.**
+- Runde 61: Torii-Pforten (5 Varianten), Kami-/Oni-Schrein, Tanuki-Automat in Hi-Res
+  (`art_src/fable/environment/objects_hi.py`, gebaut auch von `hi.py`).
+- Runde 62: Ladentheke, Saisen, Omikuji, Musubi, Ema, Onsen, Teebank/-schale, Treppe in Hi-Res (gleiche Datei).
+- Runde 63: Symbol für `kaze_bukuro` (`art_src/fable/items/icons_v15.py`, Aufruf mit `PYTHONPATH=..`).
+- Durchsicht: Alle Gegner und Figuren sind Hi-Res, alle Items haben Symbole. Noch Low-Res: das Torii im Epilog
+  (`epilogue.py`, `props.torii`), Minikarten-Symbole sind bewusst klein.
+
 # Nächster Schritt: Requisiten Teil 6 – Enma-chō, Tsukiyomi und Yomi no Oku
 Gleiches Vorgehen wie Runde 56. Warum: letzte Biome mit Grundformen-Requisiten.
 
 # Weitere Ideen
-- Requisiten Teil 6: Enma-chō, Tsukiyomi und Yomi no Oku noch in Grundformen – gleiches Vorgehen wie Runde 56
+- Epilog-Torii auf `torii_hi.png` umstellen
+- Licht: Spielerin-Items mit Feuer/Licht (z. B. Kitsunebi-Familiar, Laternen-Items) als eigene Lichtquelle
 - Wanddekos Yashiki/Kawabe/Ōeyama/Shinkai ebenfalls in Hi-Res überarbeiten (`wall_decos`)
 - Totenpalast-Ambiente: eigene Partikel (Maden-Glühwürmchen, Izanamis acht Donnergötter als Blitze im Hintergrund)
 - Kawabe-/Shinkai-Ambiente: Glühwürmchen über Wasser, aufsteigende Leuchtpartikel in der Tiefsee

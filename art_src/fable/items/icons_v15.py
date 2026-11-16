@@ -43,7 +43,27 @@ def uzume_suzu():
     return c
 
 
-NAMES = ['yomi_momo', 'uzume_suzu']
+def kaze_bukuro():
+    """Fūjins Windsack: prall gefüllter Stoffsack über der Schulter getragen, am Hals verschnürt,
+    aus der Öffnung fährt ein Wirbel – Sturmbögen und ein Ahornblatt."""
+    c = Cv()
+    sack = E(14, 19, 10, 8.5) | E(9, 13, 5, 5) | E(21, 14, 4.5, 4)
+    c.form(sack, '456', 3, 1, ring='K')                                   # jadegrünes Tuch
+    c.fill(sack & ~E(12, 17, 8.5, 7) & (px.Y > 21), '4')
+    for pts in ([(7, 18), (12, 22), (19, 22)], [(10, 25), (16, 26)]):       # Falten
+        c.line(pts, '4', 1)
+    c.form(E(24, 11, 2.6, 3.4), 'qrR', 1, 1, ring='K')                    # rote Schnur am Hals
+    c.line([(22, 13), (26, 9)], 'f', 1)
+    c.form(E(27, 7, 2.4, 1.8), '456', 1, 1, ring='K')                     # offene Öffnung
+    for i, pts in enumerate(([(27, 5), (25, 2), (20, 2), (17, 5)], [(29, 8), (30, 4), (28, 1)],
+                             [(26, 6), (22, 4), (19, 7), (21, 9)])):        # Sturmbögen
+        c.line(pts, 'a' if i != 1 else 'W', 1)
+    c.g(4, 4, ".7.\n797\n.9.", {})                                       # Ahornblatt im Wind
+    sparkle(c, 5, 27, 'W', 'a')
+    return c
+
+
+NAMES = ['yomi_momo', 'uzume_suzu', 'kaze_bukuro']
 
 
 def build():
