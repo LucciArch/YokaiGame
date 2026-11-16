@@ -161,6 +161,15 @@ TEXT = {
     'sturmgott': 'Statik lädt doppelt so schnell, ihr Blitz springt auf drei Feinde',
     'blitzschlag': 'Das Donnerbiest erwacht schon nach 2 Treffern und springt weiter',
     'orochi': 'Das Grasmäher-Schwert trifft Vergiftete 40 % härter',
+    'hannya_zorn': 'Wirst du getroffen, lodert die Hannya: 6 s lang +50 % Schaden und Feuer',
+    'oni_tanz': 'Jeder große Schlag schleudert einen Ring aus acht Talismanen',
+    'oeyama_bande': 'Wer dich berührt, nimmt doppelten Oni-König-Schaden und taumelt',
+    'maskenzug': 'Die Parade zieht weiter: Kills stapeln über die ganze Ebene, bis +60 %',
+    'unterweltgift': 'Der Schlangenkopf verflucht seine Opfer: doppelter Schaden',
+    'wirbelklingen': 'Blutende Feinde zerfallen beim Tod in drei Windsicheln',
+    'strassenkatze': 'Der Iai-Hieb nach der Rolle trifft dreifach',
+    'yamabushi': 'Der Stab läutet jeden 4. Wurf und stößt Feinde weg',
+    'tempelfest': 'Große Schläge lassen die Glocke dröhnen: 3 s doppelte Aura',
 }
 
 BULLET_SIGS = ('sichel', 'kammzinken', 'seidenfaden', 'stromauf', 'gross', 'schweben', 'windstoss', 'koi_drache')
@@ -249,6 +258,9 @@ def on_fire(p, run, bullets):
             sp = math.hypot(b.vx, b.vy)
             b.vx, b.vy = math.cos(a) * sp, math.sin(a) * sp
             b.dmg *= 1.6 if 'oni_rausch' in S else 1.3
+    if g.get('hannya', 0) > 0:
+        for b in bullets:
+            b.fl = dict(b.fl); b.fl['burn'] = 1
     if 'goldfaecher' in S and not p.moving:
         for b in bullets:
             b.dmg *= 1.5 if 'teezeremonie' in S else 1.25
@@ -295,6 +307,12 @@ def on_fire(p, run, bullets):
         extra.append((base + math.pi, 0.8, 1.0))
     for a, dm, sz in extra:
         run.fire_player_bullet(p.x, p.y - 3, a, dmg * dm, spd, size * sz, life, dict(xfl))
+    if any(b.big for b in bullets):
+        if 'tempelfest' in S:
+            g['glocke'] = 3.0
+        if 'oni_tanz' in S:
+            for i in range(8):
+                run.fire_player_bullet(p.x, p.y - 3, i / 8 * math.tau, dmg * 0.9, spd, size, 0.8, {'pierce': 1})
     if 'tempelmusik' in S and any(b.big for b in bullets):
         _ring(run, p.x, p.y, (230, 200, 140), 60)
         for e in run.enemies:
@@ -318,13 +336,16 @@ def on_fire(p, run, bullets):
             run.lightning(tgt.x, tgt.y, dmg * 2 + 4)
             if 'sturmgott' in S:
                 _chain_strikes(run, tgt, 3, dmg * 1.5 + 3)
-    if 'klingen' in S and n % 8 == 0:
+    if 'klingen' in S and n % (4 if 'yamabushi' in S else 8) == 0:
         from . import audio
         audio.play('bell', 0.4)
         _ring(run, p.x, p.y, (255, 230, 150), 60)
         for e in run.enemies:
             if e.active() and math.hypot(e.x - p.x, e.y - p.y) < 64:
                 e.frozen = max(e.frozen, 0.25 if e.is_boss else 0.7)
+                if 'yamabushi' in S and not e.is_boss:
+                    d = math.hypot(e.x - p.x, e.y - p.y) or 1
+                    e.kx += (e.x - p.x) / d * 320; e.ky += (e.y - p.y) / d * 320
     if 'boeser_stern' in S and n % 3 == 0:
         from .entities import Hazard
         tx, ty = p.x + math.cos(base) * 90, p.y + math.sin(base) * 90
@@ -413,7 +434,7 @@ def hit_pre(run, e, b, dmg):
         _float(run, e, 'Kritisch!', (255, 220, 90))
     if 'iaido' in S and g.get('iaido', 0) > 0:
         g['iaido'] = 0
-        dmg *= 2
+        dmg *= 3 if 'strassenkatze' in S else 2
         _float(run, e, 'Iai!', (230, 230, 255))
     if 'daemonenbrecher' in S and (e.is_boss or e.champ):
         dmg *= 1.5
@@ -562,7 +583,12 @@ def on_kill(run, e):
     if 'erstes_feuer' in S and e.burn > 0:
         run.explode(e.x, e.y, 26, p.damage() * 1.4, 'p')
     if 'parade' in S:
-        g['parade'] = min(15, g.get('parade', 0) + 1)
+        g['parade'] = min(20 if 'maskenzug' in S else 15, g.get('parade', 0) + 1)
+    if 'wirbelklingen' in S and getattr(e, 'sg_bleed', 0) > 0:
+        for i in range(3):
+            b = run.fire_player_bullet(e.x, e.y, i / 3 * math.tau + random.uniform(0, 2), p.damage() * 0.7, 180, 2.5, 0.7, {'pierce': 1})
+            b.curve = 2.0
+            b.col = (230, 230, 240)
     if 'leben_tod' in S and random.random() < 0.05:
         p.add_spirit(1)
     if 'lachen' in S:
@@ -587,6 +613,8 @@ def on_hurt(p, run):
     g = st(p)
     g['room_hit'] = True
     g['ts'] = 0
+    if 'hannya_zorn' in S:
+        g['hannya'] = 6.0
     if 'zwischenwelt' in S:
         p.iframes += 0.8
     if 'aufstehen' in S:
@@ -740,7 +768,8 @@ def on_room_enter(run):
         return
     g = st(p)
     g['tiger'] = 0
-    g['parade'] = 0
+    if 'maskenzug' not in S:
+        g['parade'] = 0
     g['room_hit'] = False
     g['webs'] = []
     g['clouds'] = []
@@ -787,6 +816,7 @@ def on_floor(run):
         return
     g = st(p)
     g['kenko_used'] = 0
+    g['parade'] = 0
     g['anmut'] = 0
     g['gokaku'] = 0
     if 'neujahr' in S:
@@ -833,8 +863,10 @@ def contact(p, run, e):
             e.frozen = max(e.frozen, 1.0)
             e.sg_touch = 1.5
         if 'oni_koenig' in S:
-            run.damage_enemy(e, p.damage() * 1.5, None)
+            run.damage_enemy(e, p.damage() * (3.0 if 'oeyama_bande' in S else 1.5), None)
             e.sg_touch = 0.5
+            if 'oeyama_bande' in S and not e.is_boss:
+                e.sg_conf = max(getattr(e, 'sg_conf', 0), 1.0)
         if 'felsblock' in S and not e.is_boss:
             d = math.hypot(e.x - p.x, e.y - p.y) or 1
             e.kx += (e.x - p.x) / d * 380
@@ -901,7 +933,7 @@ def tick(p, run, dt):
     if not S:
         return
     g = st(p)
-    for k in ('invis', 'iaido'):
+    for k in ('invis', 'iaido', 'hannya', 'glocke'):
         if g.get(k, 0) > 0:
             g[k] -= dt
     if p.moving:
@@ -971,6 +1003,8 @@ def tick(p, run, dt):
                     run.damage_enemy(e, dmg * 0.8, None)
                     e.poison = max(e.poison, 2.5)
                     e.poison_dps = max(e.poison_dps, 1.0)
+                    if 'unterweltgift' in S:
+                        e.sg_curse = 4.0
                     run.zap(bx, by, e.x, e.y)
                     break
         elif key == 'jingi':
@@ -1061,6 +1095,8 @@ def dmg_mult(p):
         m *= 1 + 0.05 * max(0, run.depth - 1)
     if 'parade' in S:
         m *= 1 + 0.03 * g.get('parade', 0)
+    if g.get('hannya', 0) > 0:
+        m *= 1.5
     if 'gokaku' in S:
         m *= 1 + 0.1 * g.get('gokaku', 0)
     if 'maskenwechsel' in S and g.get('rooms', 0) % 2 == 0:

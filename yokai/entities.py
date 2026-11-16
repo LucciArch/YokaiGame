@@ -718,6 +718,8 @@ class Player:
         if self.f['aura'] and self.aura_cd <= 0:
             self.aura_cd = 0.33
             rad = 30 + 6 * self.f['aura']
+            if 'tempelfest' in self.sgs and sigs.st(self).get('glocke', 0) > 0:
+                rad *= 2
             for e in run.enemies:
                 if e.active() and math.hypot(e.x - self.x, e.y - self.y) < rad + e.r:
                     run.damage_enemy(e, 0.8 * self.f['aura'] + 0.25 * self.damage(), None)
