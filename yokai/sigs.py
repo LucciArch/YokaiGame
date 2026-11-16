@@ -134,6 +134,15 @@ TEXT = {
     'fuchsstern': 'Die Sternkugel schießt drei Sterne',
     'giftnetz': 'Spinnennetze vergiften',
     'papiersturm': 'Jeder 2. Wurf bringt drei Talismane mehr',
+    'mondschnitt': 'Mondsichel-Talismane schneiden tief: Bluten stapelt bis 6',
+    'rattenschwarm': 'Durchbohrende Talismane lassen Ratten auf Feinde los',
+    'sonnenspiegel': 'Der Spiegel wirft Geschosse als drei Sonnenstrahlen zurück',
+    'goetter_arsenal': 'Treffsicher wächst doppelt so schnell, bis 35 %',
+    'geisterlicht': 'Zwei Irrlichter pro Kill, sie fliegen durch Wände',
+    'faehrmann': 'Jeder 12. Kill: der Fährmann zahlt ½ Geisterherz',
+    'ewiger_winter': 'Erstarrte Feinde nehmen +50 % Schaden, Gebremste erstarren öfter',
+    'tengu_flug': 'Die Rolle entfesselt einen schneidenden Windwirbel',
+    'oni_rausch': 'Torkelnde Talismane treffen +60 % statt +30 %',
 }
 
 BULLET_SIGS = ('sichel', 'kammzinken', 'seidenfaden', 'stromauf', 'gross', 'schweben', 'windstoss', 'koi_drache')
@@ -208,7 +217,7 @@ def on_fire(p, run, bullets):
             a = math.atan2(b.vy, b.vx) + random.uniform(-0.28, 0.28)
             sp = math.hypot(b.vx, b.vy)
             b.vx, b.vy = math.cos(a) * sp, math.sin(a) * sp
-            b.dmg *= 1.3
+            b.dmg *= 1.6 if 'oni_rausch' in S else 1.3
     if 'goldfaecher' in S and not p.moving:
         for b in bullets:
             b.dmg *= 1.25
@@ -372,6 +381,8 @@ def hit_pre(run, e, b, dmg):
         dmg *= 2
     if 'hundert_augen' in S and getattr(e, 'sg_mark', False):
         dmg *= 1.3 if 'allsehend' in S else 1.15
+    if 'ewiger_winter' in S and e.frozen > 0:
+        dmg *= 1.5
     if 'kyudo' in S and b is not None and b.t > 0.45:
         dmg *= 1.6
     if getattr(e, 'sg_oil', 0) > 0 and (b is None or b.fl.get('burn') or b.fl.get('explode')):
@@ -393,7 +404,8 @@ def hit_post(run, e, b, dmg):
         return
     g = st(p)
     if 'treffsicher' in S:
-        g['ts'] = min(0.2, g.get('ts', 0) + 0.02)
+        hi = 'goetter_arsenal' in S
+        g['ts'] = min(0.35 if hi else 0.2, g.get('ts', 0) + (0.04 if hi else 0.02))
     if 'hundert_augen' in S:
         e.sg_mark = True
     if 'donnerbiest' in S:
@@ -408,7 +420,8 @@ def hit_post(run, e, b, dmg):
             _ring(run, e.x, e.y, (255, 230, 120), 34)
             run.explode(e.x, e.y, 28, p.damage() * 2.4, 'p')
     if 'schnitt' in S or 'drei_wiesel' in S:
-        e.sg_bleed = min(3, getattr(e, 'sg_bleed', 0) + 1)
+        deep = 'mondschnitt' in S and b is not None and b.curve
+        e.sg_bleed = min(6 if deep else 3, getattr(e, 'sg_bleed', 0) + (2 if deep else 1))
         e.sg_bleed_t = 3.0
     if 'drei_wiesel' in S:
         if not e.is_boss:
@@ -416,6 +429,13 @@ def hit_post(run, e, b, dmg):
         if random.random() < 0.04 and p.heal(1):
             from . import audio
             audio.play('heal', 0.4)
+    if 'ewiger_winter' in S and e.slowed > 0 and random.random() < 0.15:
+        e.frozen = max(e.frozen, 0.3 if e.is_boss else 1.0)
+    if 'rattenschwarm' in S and b is not None and b.fl.get('pierce') and not b.fl.get('_rat') and random.random() < 0.3:
+        tgt = _nearest(run, e.x, e.y, 160, lambda o: o is not e)
+        a = math.atan2(tgt.y - e.y, tgt.x - e.x) if tgt else random.uniform(0, math.tau)
+        rb = run.fire_player_bullet(e.x, e.y, a, dmg * 0.5, 190, 2, 0.8, {'homing': 1, '_rat': 1})
+        rb.col = (160, 170, 190)
     if b is not None and b.fl.get('_frost') and random.random() < 0.2:
         e.frozen = max(e.frozen, 0.3 if e.is_boss else 1.2)
     if 'kuji' in S and random.random() < (1 / 5 if 'seimei' in S else 1 / 9):
@@ -460,8 +480,17 @@ def on_kill(run, e):
     if 'irrlicht' in S:
         tgt = _nearest(run, e.x, e.y, 200, lambda o: o is not e)
         a = math.atan2(tgt.y - e.y, tgt.x - e.x) if tgt else random.uniform(0, math.tau)
-        b = run.fire_player_bullet(e.x, e.y, a, p.damage() * 0.8, 150, 3, 1.6, {'homing': 1, 'burn': 1})
-        b.col = (120, 190, 255)
+        two = 'geisterlicht' in S
+        for da in ((-0.5, 0.5) if two else (0,)):
+            b = run.fire_player_bullet(e.x, e.y, a + da, p.damage() * 0.8, 150, 3, 1.6,
+                                       {'homing': 1, 'burn': 1, 'spectral': 1} if two else {'homing': 1, 'burn': 1})
+            b.col = (120, 190, 255)
+    if 'faehrmann' in S:
+        g['souls'] = g.get('souls', 0) + 1
+        if g['souls'] >= 12:
+            g['souls'] = 0
+            p.add_spirit(1)
+            _float(run, e, 'Fährgeld', (190, 190, 220))
     if 'ewige_flamme' in S and e.burn > 0:
         tgt = _nearest(run, e.x, e.y, 60, lambda o: o is not e)
         if tgt:
@@ -551,6 +580,11 @@ def block(p, run, b):
             nb = run.fire_player_bullet(b.x, b.y, a, p.damage() * 1.5, 260, 3.5, 1.0,
                                         {'homing': 1, 'explode': 1} if 'onmyo_spiegel' in S else {'homing': 1})
             nb.col = (255, 230, 150)
+            if 'sonnenspiegel' in S:
+                nb.fl['burn'] = 1
+                for da in (-0.3, 0.3):
+                    sb = run.fire_player_bullet(b.x, b.y, a + da, p.damage() * 1.2, 260, 3, 1.0, {'homing': 1, 'burn': 1})
+                    sb.col = (255, 190, 90)
             return True
     if 'schuppenpanzer' in S and random.random() < 0.25:
         return True
@@ -590,6 +624,15 @@ def on_dash(p, run):
         clouds = g.setdefault('clouds', [])
         clouds.append([p.x, p.y, 1.6])
         del clouds[:-4]
+    if 'tengu_flug' in S:
+        _ring(run, p.x, p.y, (200, 230, 210), 55)
+        for e in run.enemies:
+            d = math.hypot(e.x - p.x, e.y - p.y)
+            if e.active() and d < 55 + e.r:
+                run.damage_enemy(e, p.damage() * 1.2, None)
+                if not e.is_boss:
+                    e.kx += (e.x - p.x) / max(d, 1) * 360
+                    e.ky += (e.y - p.y) / max(d, 1) * 360
     if 'flatter' in S:
         for i in range(4):
             a = i / 4 * math.tau + math.pi / 4

@@ -22,6 +22,7 @@
 - Doppelte Synergie-Kennungen behoben (Kitsune no Yomeiri, Hanami-Picknick, Herr der Tiefe zählen jetzt eigenständig)
 - Ebenen-Reihenfolge korrigiert: Geschosse, Hiebe, Partikel und Regen liegen jetzt über den Figuren statt dahinter; HUD und Raum-Überblendung decken auch die Figuren ab
 - Alle Klänge auf einheitliche Lautheit gebracht; Gegnerklänge kommen von links oder rechts, je nachdem wo der Gegner steht
+- Runde 1 – 9 weitere Synergien mit eigener Fähigkeit statt Mehrfachwurf/Kreisschild: Mondsichel-Klinge (Bluten bis 6), Tessos Schwarm (Ratten aus durchbohrenden Talismanen), Sonnenspiegel (drei brennende Rückstrahlen), Göttliches Arsenal (Treffsicher bis 35 %), Geisterlicht (zwei Irrlichter durch Wände), Todesbote (jeder 12. Kill ½ Geisterherz), Ewiger Winter (+50 % auf Erstarrte), Tengu-Flug (Windwirbel bei der Rolle), Oni-Rausch (+60 % torkelnde Talismane)
 
 ## 1.4.0 – „Hyakki-Update“ (enthält 1.3 „Kapitel-Update“)
 
