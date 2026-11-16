@@ -436,10 +436,33 @@ class Game:
     # ================================================================  Zustände
     MENU = ['Neuer Lauf', 'Tägliche Prüfung', 'Herausforderungen', 'Codex der Items', 'Yōkai-Lexikon', 'Erfolge', 'Statistik', 'Steuerung', 'Optionen', 'Beenden']
 
+    TITLE_LAYERS = ('sky', 'far', 'mid', 'mist', 'near')
+
+    def draw_title_bg(self, s):
+        """Gemaltes Mondnacht-Panorama (art_src/fable/title) in Ebenen; je breiter die Ebene, desto stärker die Parallaxe."""
+        t = self.t
+        s.fill((10, 8, 30))
+        for n in self.TITLE_LAYERS:
+            im = (gfx.env_img('title', n) or [None])[0]
+            if im is None:
+                return self.draw_night(s, parade=False)
+            if n == 'mist':                              # Nebel ist nahtlos und doppelt so breit: langsam durchziehen
+                gfx.hi_blit(im, W - (t * 5) % W, H)
+            else:
+                gfx.hi_blit(im, W / 2 + math.sin(t * 0.05) * (im.get_width() / 2 - W) / 2, H)
+        if not hasattr(self, '_petal'):
+            self._petal = pygame.Surface((4, 3), pygame.SRCALPHA)
+            self._petal.fill((250, 190, 215))
+            self._petal.set_at((3, 2), (0, 0, 0, 0))
+        for i in range(30):                              # Blütenblätter vom Kirschbaum
+            rr = random.Random(100 + i)
+            ph = (t * rr.uniform(0.05, 0.12) + rr.random()) % 1
+            gfx.hi_blit(self._petal, (rr.uniform(160, W + 60) - ph * 160 + math.sin(t + i) * 10) % W, ph * H)
+
     def st_title(self, dt, events, nav):
         s = self.screen
         gfx.HI_MODE = True
-        self.draw_night(s)
+        self.draw_title_bg(s)
         T = gfx.TEXT
         T.add('Yōkai no Michi', W // 2, 30, 28, (255, 240, 220), 'c')
         T.add('– Hyakki Yagyō –', W // 2, 66, 11, (230, 140, 130), 'c')
@@ -451,7 +474,7 @@ class Game:
             sel = i == self.sel
             col = (255, 230, 150) if sel else (210, 200, 190)
             if sel:
-                gfx.panel(s, (W // 2 - 70, y - 2, 140, min(15, step + 1)), 170, (200, 120, 90))
+                gfx.hi_panel((W // 2 - 70, y - 2, 140, min(15, step + 1)), 170, (200, 120, 90))
             T.add(m, W // 2, y, 10, col, 'c')
         T.add('v' + VERSION + '   •   F11 / Alt+Enter Vollbild', W - 6, H - 12, 6, (140, 130, 150), 'r')
         if items and items[self.sel % len(items)] == 'Fortsetzen' and not show_news:
