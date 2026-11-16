@@ -1,6 +1,7 @@
 """Soundeffekte für Yōkai no Michi – mit derselben Synth-Engine wie der Soundtrack.
 Erzeugt yokai/assets/sfx/<name>_<n>.ogg (mehrere Varianten je Effekt). Aufruf: python3 sfx.py"""
 import os
+import sys
 import subprocess
 import wave
 
@@ -387,6 +388,77 @@ def s_bossdie(v):
                    (0.9, Y.sho([392, 523, 659, 784], 2.2, 0.6), 1.0)), 1.8, 0.35)
 
 
+# ------------------------------------------------------------------ Gesten der Charakterauswahl (je Figur ein Klang)
+def s_pose_hana(v):
+    """Kagura-Suzu: dreimal geschüttelte Glöckchentraube."""
+    parts = []
+    rng = np.random.RandomState(21)
+    for shake in range(3):
+        for k in range(5):
+            parts.append((shake * 0.13 + rng.uniform(0, 0.03), Y.kane(rng.uniform(2400, 3600), 0.5, 0.5), 0.35))
+    return room(at(1.0, *parts), 0.7, 0.3)
+
+
+def s_pose_kenji(v):
+    """Schwert aus der Scheide: Metall schabt aufwärts, Klinge singt nach."""
+    n = int(SR * 0.3)
+    scrape = sweep_noise(0.3, 1800, 7000, 3.0, 1.2) * np.linspace(0.3, 1, n) ** 2
+    return room(at(1.0, (0, scrape, 0.9), (0.28, Y.kane(3300, 0.6, 0.7), 0.6), (0.28, Y.kane(4950, 0.4, 0.5), 0.3)), 0.6, 0.2)
+
+
+def s_pose_kuzunoha(v):
+    """Kitsunebi entzünden sich: drei gleitende Hauchtöne über einem Koto-Ton."""
+    parts = [(i * 0.1, tone(700 + i * 260, 1100 + i * 380, 0.5, 'sine', 5), 0.35) for i in range(3)]
+    return room(at(1.2, (0, Y.koto(587, 0.9, 0.6), 0.5), *parts), 1.0, 0.4)
+
+
+def s_pose_ponpoko(v):
+    """Hara-tsuzumi: zweimal auf den Bauch – pon, pon – dann Verwandlungsrauch."""
+    puff = sweep_noise(0.35, 2500, 600, 0.8, 0.6) * env(0.35, 0.01, 9)
+    return room(at(0.9, (0, Y.odaiko(150, 0.8, 0.5), 0.8), (0.16, Y.odaiko(170, 0.9, 0.5), 0.9), (0.34, puff, 0.6)), 0.5, 0.2)
+
+
+def s_pose_benkei(v):
+    """Kriegermönch stampft: schwerer Schlag, Geröll, Shakujō-Ringe klirren nach."""
+    return at(0.9, (0, Y.odaiko(48, 1.0, 0.7), 1.0), (0, s_rock(0), 0.7), (0.05, Y.kane(1900, 0.4, 0.4), 0.3),
+              (0.09, Y.kane(2250, 0.4, 0.4), 0.25))
+
+
+def s_pose_okiku(v):
+    """Brunnengeist: fallender, schwankender Klagehauch und ein Tropfen im Brunnen."""
+    t = T(1.0)
+    f = 900 * (0.6 ** t) * (1 + 0.02 * np.sin(2 * np.pi * 6 * t))
+    wail = np.sin(np.cumsum(2 * np.pi * f / SR)) * np.minimum(1, t / 0.15) * np.exp(-t * 2.5) * 0.4
+    drop = tone(1400, 700, 0.08, 'sine', 40)
+    return room(at(1.3, (0, wail, 1.0), (0, Y.sho([440, 466, 659], 0.9, 0.3), 0.6), (0.55, drop, 0.6)), 1.2, 0.45)
+
+
+def s_pose_kotaro(v):
+    """Tengu-Flügel: zwei kräftige Schläge, danach ein Windstoß."""
+    flap = lambda: sweep_noise(0.09, 400, 1600, 1.2, 1.0) * env(0.09, 0.01, 30)
+    gust = sweep_noise(0.5, 500, 2000, 2.0, 1.0) * np.sin(np.linspace(0, np.pi, int(SR * 0.5)))
+    return at(0.8, (0, flap(), 1.0), (0.12, flap(), 1.0), (0.22, gust, 0.8))
+
+
+def s_pose_seimei(v):
+    """Onmyōji hebt die Ofuda: Rin-Schale und ein heller Sho-Akkord."""
+    return room(at(1.4, (0, Y.kane(1318, 0.7, 1.2), 0.7), (0.05, Y.sho([659, 880, 1318], 1.0, 0.5), 0.8)), 1.0, 0.35)
+
+
+def s_pose_akago(v):
+    """Oni-Kind: kurzes Knurren über einem Taiko-Schlag."""
+    t = T(0.45)
+    f = 150 * (1 + 0.2 * np.sin(np.pi * t / 0.45))
+    ph = np.cumsum(2 * np.pi * f / SR)
+    growl = biquad(sum(np.sin(h * ph) / h for h in range(1, 20)), 'bp', 700, 1.2) * np.minimum(1, t / 0.04) * np.clip((0.45 - t) / 0.15, 0, 1)
+    return room(at(0.7, (0, Y.odaiko(70, 0.9, 0.5), 0.8), (0.03, growl * (1 + 0.3 * np.sin(2 * np.pi * 27 * t)), 0.9)), 0.5, 0.2)
+
+
+def s_pose_susanoo(v):
+    """Sturmgott: Donnerschlag mit Windböe."""
+    return at(1.3, (0, s_thunder(0), 1.0), (0, s_gust(0)[:int(SR * 0.8)], 0.5))
+
+
 SFX = {k[2:]: f for k, f in globals().items() if k.startswith('s_')}
 VARIANTS = {'slash': 3, 'eshot': 3, 'shoot': 4, 'hit': 4, 'ehit': 4, 'kill': 4, 'coin': 3, 'kill_ghost': 3, 'kill_big': 2, 'pot': 3}
 PEAK = {'slash': 0.5, 'laser': 0.4, 'bow': 0.45, 'eshot': 0.3, 'shoot': 0.35, 'hit': 0.55, 'ehit': 0.45, 'kill': 0.6, 'hurt': 0.8, 'coin': 0.45, 'move': 0.35, 'select': 0.5,
@@ -398,7 +470,8 @@ LOUD = dict(shoot=-24, move=-22, select=-19, hit=-18, ehit=-20, eshot=-21, coin=
             kill=-15, kill_ghost=-16, kill_big=-12, pickup=-16, heal=-15, spirit=-15, salt=-17, key=-16, trinket=-16, chest=-15,
             item=-14, synergy=-13, unlock=-14, hurt=-11, bell=-15, explode=-11, drum=-13, gust=-17, wave=-17, wisp=-16,
             grab=-14, lock=-16, roar=-11, thunder=-13, blank=-13, buy=-15, door=-16, stairs=-14, splash=-16, rock=-16,
-            dash=-17, bamboo=-16, death=-9, boss=-8, bossdie=-7)
+            dash=-17, bamboo=-16, death=-9, boss=-8, bossdie=-7,
+            **{'pose_' + c: -16 for c in ('hana', 'kenji', 'kuzunoha', 'ponpoko', 'benkei', 'okiku', 'kotaro', 'seimei', 'akago', 'susanoo')})
 
 
 def loudness(x):
@@ -429,7 +502,10 @@ def write(path, x):
 
 if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True)
+    only = set(sys.argv[1:])                        # z. B. „python3 sfx.py pose_hana“ – nur diese neu erzeugen
     for name, fn in sorted(SFX.items()):
+        if only and name not in only:
+            continue
         for v in range(VARIANTS.get(name, 1)):
             Y.seed(hash((name, v)) % 10000)
             x = fn(v)
