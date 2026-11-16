@@ -2341,9 +2341,13 @@ class Run:
             else:
                 gfx.hi_blit(img, cxd, cyd + img.get_height() / 4)
 
+    def dark_level(self):
+        b = self.boss
+        return self.biome['dark'] + (150 if self.curse == 'dunkel' else 0) + (b.extra_dark if b and not b.dead else 0)
+
     def hi_light(self, x, y):
         """Helligkeit für Hi-Res-Sprites (gleiche Logik wie draw_dark: Lichtkreis um den Spieler)."""
-        dark = self.biome['dark'] + (150 if self.curse == 'dunkel' else 0)
+        dark = self.dark_level()
         if y < RY or dark <= 0 or self.room.kind.startswith('shrine'):
             return 1.0
         a = min(215, dark) / 255
@@ -2443,7 +2447,7 @@ class Run:
         for f in self.floats:
             gfx.TEXT.add(f[2], f[0], f[1], 7 if f[2].endswith('!') else 6, f[3], 'c', alpha=int(255 * min(1, f[4] * 3)))
         # Dunkelheit
-        dark = self.biome['dark'] + (150 if self.curse == 'dunkel' else 0)
+        dark = self.dark_level()
         if dark > 0 and not self.room.kind.startswith('shrine'):
             self.draw_dark(s, min(215, dark))
         gfx.color_grade(s, self.biome.get('grade', _GRADE.get(self.biome_id, (0, 0, 0))), 18)

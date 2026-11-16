@@ -924,6 +924,8 @@ class Hazard:
 
     def update(self, dt, run):
         self.t += dt
+        if getattr(self, 'boss', None) is not None and self.boss.dead:   # an einen Boss gebunden (Izanamis Hände)
+            return False
         if self.t < self.warn:
             return True
         if not self.started:

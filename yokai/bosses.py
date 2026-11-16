@@ -67,6 +67,8 @@ class Boss(Enemy):
     # ------------------------------------------------------------ Göttlicher Schutz
     # Endbosse (ab Kapitel VI) nehmen pro Treffer höchstens 2 % und pro Sekunde höchstens 8 % ihrer Max-HP.
     HIT_CAP, SEC_CAP = 0.02, 0.08
+    P2 = 0.5            # Lebensanteil, ab dem Phase 2 beginnt
+    extra_dark = 0      # zusätzliche Dunkelheit im Bossraum (Izanami in Yomi)
 
     @property
     def hp(self):
@@ -183,7 +185,7 @@ class Boss(Enemy):
         sp = 0.75 if self.slowed > 0 else 1.0
         if self.slowed > 0:
             self.slowed -= dt
-        if self.phase == 1 and self.hp < self.maxhp * 0.5:
+        if self.phase == 1 and self.hp < self.maxhp * self.P2:
             self.phase = 2
             self.rest *= 0.7
             audio.play('roar')
@@ -2227,6 +2229,53 @@ class Izanami(Boss):
         self.y = CY - 30
         self.attacks = ['raijin8', 'hags', 'rot', 'veil']
         self.attacks2 = ['raijin8', 'hags', 'rot', 'veil', 'boulder']
+        # In ihrem eigenen Reich (Kapitel VII) ist sie die Endbossin: mehr Leben, drei Phasen
+        self.final = self.run.depth >= 7
+        if self.final:
+            self.maxhp = self.hp = self.maxhp * 2.0
+            self._budget = self.maxhp * self.SEC_CAP
+            self.P2 = 0.66
+
+    def on_phase2(self):
+        if self.final:
+            self.extra_dark = 35
+            self.run.banner('Izanami zeigt ihr wahres Gesicht', 'Maden kriechen aus dem Totengewand', (200, 150, 230), big=True)
+            self.summon('shikome', 2, 60)
+
+    def update(self, dt):
+        super().update(dt)
+        if self.final and self.phase == 2 and not self.dead and self.hp < self.maxhp * 0.33:
+            run = self.run
+            self.phase = 3
+            self.attacks = ['ikazuchi', 'ikazuchi', 'hags', 'rot', 'boulder']
+            self.rest *= 0.8
+            self.extra_dark = 75
+            run.banner('Die acht Donnergötter erwachen', 'Ikazuchi-no-Kami brechen aus ihrem Leib', (190, 170, 255), big=True)
+            audio.play('roar'); audio.play('thunder')
+            run.shake(10)
+            # die Arena wird enger: Hände der Toten greifen vom Rand
+            spots = [(RX + 16 + i * 32, y) for i in range(13) for y in (RY + 14, RY + RH - 14)]
+            spots += [(x, RY + 16 + j * 32) for j in range(1, 6) for x in (RX + 14, RX + RW - 14)]
+            for x, y in spots:
+                h = Hazard(x, y, 15, 1.0, 9999, 0, 'e', 'hands')
+                h.boss = self
+                run.hazards.append(h)
+            self.summon('shikome', 3, 60)
+
+    def a_ikazuchi(self):
+        """Die acht Donnergötter: acht Blitzbahnen aus ihrem verwesten Leib, dann ein gezielter Großer Donner."""
+        off = random.random() * math.tau
+        for k in range(2):
+            self.fire_t = self.t
+            for i in range(8):
+                a = off + k * math.pi / 8 + i * math.tau / 8
+                for d in range(30, 280, 26):
+                    x, y = self.x + math.cos(a) * d, self.y + math.sin(a) * d
+                    if RX < x < RX + RW and RY < y < RY + RH:
+                        self.hazard(x, y, 9, 0.8 + d / 1000, 0.15, 'strike')
+            yield 1.2
+        self.hazard(self.p.x, self.p.y, 22, 0.9, 0.2, 'strike')
+        yield 0.9
 
     def move(self, dt):
         self.x = CX + math.sin(self.t * 0.4) * 80

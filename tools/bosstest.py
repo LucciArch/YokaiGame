@@ -32,6 +32,10 @@ for depth, pool in data.BOSS_POOL.items():
             print('%-12s depth %d  killed=%s  t=%5.1fs  phase=%d hits=%d maxbullets=%d dps=%.1f' % (bid, depth, b.dead, t, b.phase, hits, maxeb, p.damage()*p.s['rate']))
         except Exception:
             traceback.print_exc(); print('CRASH', bid); break
+        if depth == 7:   # Endbossin in Yomi: drei Phasen, die Arena wird dunkler
+            run.update(1 / 60, {'move': [0, 0], 'shoot': [0, 0], 'dash': False, 'active': False, 'salt': False})
+            assert not [h for h in run.hazards if getattr(h, 'boss', None) is b], 'Hände bleiben nach dem Tod'
+            assert b.phase == 3 and b.extra_dark > 0 and run.dark_level() == run.biome['dark'], (b.phase, b.extra_dark)
 
 # Göttlicher Schutz: ab Kapitel VI höchstens 2 % pro Treffer und 8 % pro Sekunde
 g.start_run('hana', 7)
