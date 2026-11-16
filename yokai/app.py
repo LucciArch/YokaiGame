@@ -1183,6 +1183,8 @@ class Game:
                         ingame='Ein Los für 5 Mon: Glück segnet die Ebene, Pech verflucht sie. Für 3 Mon bindest du den Fluch ans Musubi-Gestell.'),
     }
 
+    KUJI = (('daikichi', 'Daikichi'), ('kichi', 'Kichi'), ('chukichi', 'Chūkichi'), ('shokichi', 'Shōkichi'), ('kyo', 'Kyō'))
+
     def _lex_entries(self):
         if self.lex_tab == 3:
             return [sy['id'] for sy in SYNERGIES], set(self.save['synergies_seen'])
@@ -1287,7 +1289,13 @@ class Game:
                 s.blit(im, (cx - im.get_width() // 2, 128 - im.get_height()))
             pygame.draw.ellipse(s, (0, 0, 0), (cx - 18, 126, 36, 6))
             y = self._wrap(ev['lore'], 154, 136, W - 172, 8, (230, 225, 210))
-            self._wrap('Im Spiel: ' + ev['ingame'], 154, y + 6, W - 172, 7, (170, 205, 240))
+            y = self._wrap('Im Spiel: ' + ev['ingame'], 154, y + 6, W - 172, 7, (170, 205, 240))
+            if eid == 'omikuji':
+                got = self.save.data.get('kuji_seen', [])
+                T.add('Gezogene Lose (%d/5):' % len(got), 154, y + 4, 7, (230, 200, 150))
+                for i, (lid, nm) in enumerate(self.KUJI):
+                    T.add(nm if lid in got else '? ? ?', 154 + i * 62, y + 15, 7,
+                          (255, 220, 120) if lid in got else (150, 140, 160))
         elif eid in seen:
             if self.lex_tab == 0:
                 d = ENEMIES[eid]

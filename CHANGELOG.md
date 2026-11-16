@@ -78,6 +78,7 @@
 - Runde 54 – Neuer Erfolg **Alle Lose**: Ziehe am Omikuji-Schrein einmal Daikichi, Kichi, Chūkichi, Shōkichi und Kyō (Daikyō zählt als Kyō) – die gezogenen Lose bleiben über alle Läufe gespeichert
 - Runde 55 – **Ama-no-Iwato, Teil 1:** Neues Biom für den zweiten geheimen Weg in Kapitel VII – die Felsenhöhle, in der sich Amaterasu verborgen hat: dunkle Granitplatten mit eingelassenen Sonnenscheiben aus Blattgold, Fels mit Goldadern, Shimenawa vor dem Felsentor, Feuerkörbe der wartenden Götter. Requisiten aus der Sage: Sakaki-Baum mit Yata-Spiegel, Magatama und Shide, der Langschwanzhahn Tokoyo no Nagadori und der umgedrehte Bottich, auf dem Ame-no-Uzume tanzte
 - Runde 56 – Requisiten Ōeyama und Shinkai in Hi-Res neu: Kanabō der Oni im Fels (mit Eisennieten und Einschlagrissen), Strohfass Komodaru mit Oni-Mon und Schöpfkelle, Knochenhaufen mit roter Oni-Maske; Riesenmuschel mit Perle, die ein Shinkirō ausatmet, Sango-Koralle mit Leuchtfischen, versunkene Tōrō-Steinlaterne mit Seepocken und Seetang
+- Runde 57 – Das Lexikon zeigt auf der Ereignisseite **Omikuji**, welche der fünf Lose (Daikichi, Kichi, Chūkichi, Shōkichi, Kyō) du schon gezogen hast – so siehst du, was für den Erfolg „Alle Lose“ noch fehlt
 
 ## 1.4.0 – „Hyakki-Update“ (enthält 1.3 „Kapitel-Update“)
 

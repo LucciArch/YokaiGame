@@ -32,6 +32,9 @@ try:
     step([K(pygame.K_ESCAPE)], 2); assert g.state == 'lexicon', 'Codex führt nicht zurück ins Lexikon'
     step([K(pygame.K_ESCAPE)], 2); assert g.state == 'title', 'Lexikon/Codex hängen in einer Zurück-Schleife'
     g.save['synergies_seen'].remove(SYNERGIES[0]['id'])
+    g.save.data.setdefault('events_seen', []).append('omikuji'); g.save['kuji_seen'][:] = ['kichi', 'kyo']
+    g.state = 'lexicon'; g.lex_tab = 2; g.lex_sel = list(g.LEX_EVENTS).index('omikuji'); step([], 2)   # Lose-Zeile zeichnen
+    g.save.data['events_seen'].remove('omikuji'); g.save['kuji_seen'][:] = []; g.state = 'title'
     g.save['seen'].remove(jiid)
     menu(0); print('chars', g.state); step([K(pygame.K_RETURN)], 200); print('play', g.state)
     for k in (pygame.K_e, pygame.K_q, pygame.K_SPACE): step([K(k)], 20)
