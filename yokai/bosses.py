@@ -2328,6 +2328,83 @@ class Kagutsuchi(Boss):
         D.arc(s, (180, 20, 10), (x - 5, y + 1, 10, 6), 3.4, 6.0, 1)
 
 
+class Fujin(Boss):
+    sheet = ('boss_fujin', 1, None)
+
+    """Fūjin, der Gott des Windes, mit dem Windsack über dem Kopf."""
+    r = 17
+    WIND = (200, 240, 225)
+
+    def setup(self):
+        self.y = CY - 40
+        self.attacks = ['gust', 'sickles', 'tatsumaki', 'ring']
+        self.attacks2 = ['gust', 'sickles', 'tatsumaki', 'raijin', 'taifun']
+
+    def move(self, dt):
+        self.x = CX + math.sin(self.t * 0.45) * 90
+        self.y = CY - 40 + math.sin(self.t * 0.9) * 12
+
+    def a_ring(self):
+        for k in range(3):
+            self.ring(16, 80, k * 0.2, self.WIND, 3, curve=0.6 if k % 2 else -0.6)
+            yield 0.45
+
+    def a_gust(self):
+        # Der Sack öffnet sich: Sturm drückt vom Gott weg, Blätter fliegen mit
+        audio.play('dash')
+        for i in range(36):
+            d = norm(self.p.x - self.x, self.p.y - self.y)
+            self.run.wind = (d[0] * 85, d[1] * 85, 0.1)
+            if i % 4 == 0:
+                self.fan(3 if self.phase == 1 else 5, 0.35, 105, (110, 190, 90), r=3, curve=random.uniform(-0.8, 0.8))
+            yield 0.05
+        yield 0.4
+
+    def a_sickles(self):
+        # Kamaitachi-Sicheln: gekrümmte Windklingen aus beiden Richtungen
+        for k in range(4 if self.phase == 1 else 6):
+            c = 1.3 if k % 2 else -1.3
+            a = self.ang_p() - c * 0.45
+            self.fan(5, 0.22, 120, self.WIND, ang=a, curve=c)
+            yield 0.4
+        yield 0.3
+
+    def a_tatsumaki(self):
+        # Wirbelstürme: Spiralen um die Spielerin, angekündigt durch Umrisse
+        n = 3 if self.phase == 1 else 4
+        for j in range(n):
+            x = clamp(self.p.x + random.uniform(-60, 60), RX + 24, RX + RW - 24)
+            y = clamp(self.p.y + random.uniform(-45, 45), RY + 24, RY + RH - 24)
+            for i in range(10):
+                ebullet(self.run, x, y, i / 10 * math.tau, 60, self.WIND, 3, delay=0.7, curve=2.2)
+            yield 0.35
+        yield 0.8
+
+    def a_raijin(self):
+        # Fūjin ruft seinen Bruder: Blitze schlagen um die Spielerin ein
+        for i in range(5):
+            a = random.uniform(0, math.tau)
+            self.hazard(self.p.x + math.cos(a) * 30, self.p.y + math.sin(a) * 30, 15, 0.75, 0.15, 'strike')
+            yield 0.18
+        self.hazard(self.p.x, self.p.y, 15, 0.8, 0.15, 'strike')
+        yield 0.9
+
+    def a_taifun(self):
+        # Taifun: der Sturm kreist um den Gott, vier Arme aus Windgeschossen
+        for i in range(55):
+            dx, dy = self.p.x - self.x, self.p.y - self.y
+            d = norm(-dy, dx)
+            self.run.wind = (d[0] * 55, d[1] * 55, 0.1)
+            if i % 2 == 0:
+                for k in range(4):
+                    ebullet(self.run, self.x, self.y, i * 0.12 + k * math.pi / 2, 90, self.WIND, 3, curve=-0.4)
+            yield 0.05
+        yield 0.5
+
+    def render(self, s, t):
+        pygame.draw.circle(s, (60, 140, 90), (int(self.x), int(self.y)), self.r)
+
+
 BOSS_CLASSES = {
     'omukade': Omukade, 'kappa_ou': KappaOu, 'jorogumo': Jorogumo,
     'gashadokuro': Gashadokuro, 'rokurokubi': Rokurokubi, 'nue': Nue,
@@ -2336,7 +2413,7 @@ BOSS_CLASSES = {
     'orochi': Orochi, 'shuten_doji': ShutenDoji, 'tamamo': Tamamo,
     'mikaboshi': Mikaboshi,
     'oonyudo': Oonyudo, 'nurarihyon': Nurarihyon, 'kamaitachi_trio': KamaitachiTrio,
-    'akkorokamui': Akkorokamui, 'enma': Enma, 'izanami': Izanami, 'kagutsuchi': Kagutsuchi,
+    'akkorokamui': Akkorokamui, 'enma': Enma, 'izanami': Izanami, 'kagutsuchi': Kagutsuchi, 'fujin': Fujin,
 }
 
 

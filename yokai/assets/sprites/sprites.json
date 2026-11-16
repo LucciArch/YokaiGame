@@ -89,6 +89,15 @@
   "w": 288,
   "walk": 4
  },
+ "boss_fujin": {
+  "atk": 4,
+  "h": 172,
+  "hi": true,
+  "kind": "strip",
+  "n": 7,
+  "w": 310,
+  "walk": 4
+ },
  "boss_gashadokuro": {
   "atk": 4,
   "h": 181,

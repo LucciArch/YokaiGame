@@ -142,6 +142,7 @@ BOSS_LORE = {
     'enma': ('閻魔大王', 'Der König der Hölle, der die Toten richtet. In seinem Spiegel Jōhari sieht er jede Tat, die ein Mensch begangen hat.'),
     'izanami': ('伊邪那美', 'Die Schöpfergöttin, die bei der Geburt des Feuers starb und Herrin von Yomi wurde. Als Izanagi sie im Tod erblickte, schwor sie, täglich tausend Menschen zu töten.'),
     'kagutsuchi': ('迦具土', 'Der Gott des Feuers, dessen Geburt seine Mutter Izanami tötete. Sein Vater erschlug ihn – aus seinem Blut entstanden weitere Götter.'),
+    'fujin': ('風神', 'Der Gott des Windes, grünhäutig und wild, mit einem gewaltigen Sack voller Stürme über den Schultern. Er tritt stets mit seinem Bruder Raijin auf – so malte ihn Tawaraya Sōtatsu auf seinen berühmten Wandschirm.'),
     'mikaboshi': ('天津甕星', 'Der böse Stern des Himmels, ein Gott, der sich als Einziger nicht der Herrschaft der himmlischen Götter beugte.'),
 }
 

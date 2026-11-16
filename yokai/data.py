@@ -83,7 +83,7 @@ for _b, _pit, _dec in (('chikurin', 'void', 'grass'), ('inari', 'void', 'petals'
     BIOMES[_b].setdefault('decor', _dec)
 BOSS_POOL = {1: ['omukade', 'kappa_ou', 'jorogumo', 'oonyudo'], 2: ['gashadokuro', 'rokurokubi', 'nue', 'nurarihyon'],
              3: ['sojobo', 'raiju', 'yuki_onna', 'kamaitachi_trio'], 4: ['umibozu', 'ryujin', 'bake_kujira', 'akkorokamui'],
-             5: ['orochi', 'shuten_doji', 'tamamo', 'enma'], 6: ['mikaboshi', 'izanami', 'kagutsuchi']}
+             5: ['orochi', 'shuten_doji', 'tamamo', 'enma'], 6: ['mikaboshi', 'izanami', 'kagutsuchi', 'fujin']}
 
 # =====================================================================  ITEMS
 ITEMS = {}
@@ -543,6 +543,7 @@ BOSSES = {
     'izanami': dict(name='Izanami', title='Die Göttin, die in Yomi blieb', hp=1450),
     'kagutsuchi': dict(name='Kagutsuchi', title='Der Gott des Feuers', hp=1450),
     'mikaboshi': dict(name='Amatsu-Mikaboshi', title='Der böse Stern des Himmels', hp=1500),
+    'fujin': dict(name='Fūjin', title='Der Gott des Windes', hp=1600),
 }
 BOSS_REWARD = {  # Freischaltung beim ersten Sieg
     'omukade': 'senbazuru', 'kappa_ou': 'komainu', 'jorogumo': 'ronin_schwur', 'gashadokuro': 'sanzu_muenze',
@@ -550,7 +551,7 @@ BOSS_REWARD = {  # Freischaltung beim ersten Sieg
     'yuki_onna': 'yasakani', 'umibozu': None, 'ryujin': None, 'bake_kujira': None,
     'oonyudo': 'onyudo_kette', 'nurarihyon': 'nurarihyon_pfeife', 'kamaitachi_trio': 'kamaitachi_klingen',
     'akkorokamui': 'akkoro_tinte', 'enma': 'enma_spiegel', 'izanami': 'izanami_schleier', 'kagutsuchi': 'kagutsuchi_glut',
-    'orochi': 'yamata_zahn', 'shuten_doji': 'shuten_schale', 'tamamo': 'kyubi_juwel', 'mikaboshi': 'hoshi_splitter',
+    'fujin': None, 'orochi': 'yamata_zahn', 'shuten_doji': 'shuten_schale', 'tamamo': 'kyubi_juwel', 'mikaboshi': 'hoshi_splitter',
 }
 
 # =====================================================================  PRÜFUNGEN (Herausforderungen)
@@ -609,7 +610,7 @@ ACHIEVEMENTS = [
     ('all_chars', 'Hyakki Yagyō', 'Schalte alle Charaktere frei', None),
     ('secret', 'Verborgene Pfade', 'Finde einen Geheimraum (Reinigungssalz an Wänden!)', ('item', 'geheimkarte')),
     ('secret10', 'Schatzjäger', 'Finde 10 Geheimräume', None),
-    ('all_bosses', 'Bezwinger der Nachtparade', 'Besiege alle 23 Bosse', None),
+    ('all_bosses', 'Bezwinger der Nachtparade', 'Besiege alle 24 Bosse', None),
     ('teahouse', 'Teezeremonie', 'Trinke im Teehaus', None),
     ('slots', 'Glücksspieler', 'Spiele am Tanuki-Automaten', None),
     ('endless', 'Die Nacht endet nie', 'Besiege einen Boss in Takamagahara (schaltet die Endlose Nacht frei)', ('mode', 'endless')),
