@@ -235,11 +235,11 @@
  },
  "boss_shuten_doji": {
   "atk": 4,
-  "h": 106,
+  "h": 128,
   "hi": true,
   "kind": "strip",
   "n": 7,
-  "w": 152,
+  "w": 170,
   "walk": 4
  },
  "boss_sojobo": {

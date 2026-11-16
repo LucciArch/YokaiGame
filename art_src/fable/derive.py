@@ -3,9 +3,7 @@ import importlib, os, sys
 BASE = '/home/claude/fable_art'
 JOBS = {
     # neuer Name: (Ordner, Modul, Zeichenfunktion, Farb-Überschreibungen)
-    'boss_shuten_doji': ('', 'oni', 'oni', {'h0': '#4a4c6a', 'h1': '#a8acc8', 'h2': '#eef0ff',
-                                              't0': '#1c0c2e', 't1': '#3a1e5e', 't2': '#6a3c98',
-                                              'r1': '#5a0c2a', 'r2': '#961a2a', 'r3': '#c43a2c'}),
+    # 'boss_shuten_doji' hat jetzt eine eigene Figur (bosses_1/boss_shuten.py)
     'hyosube': ('', 'kappa', 'kappa', {'g0': '#160a0c', 'g1': '#3a2016', 'g2': '#64402a', 'g3': '#946a44', 'g4': '#c49c6c',
                                          'a0': '#3a2016', 'a1': '#64402a', 'a2': '#946a44', 'xg': '#d8b890'}),
     'bake_danuki': ('heroes', 'ponpoko', 'ponpoko', {'s0': '#120c16', 's1': '#2e2228', 's2': '#54423e', 's3': '#86705a',

@@ -1530,53 +1530,10 @@ class Orochi(Boss):
             sheets.blit_center(s, 'boss_orochi_head', hx, hy, sheets.hdir(self.p.x - hx), self.af('boss_orochi_head', t, 6, i))
 
 
-_GOURD = {}
-
-
-def sake_gourd(sway):
-    """Getrockneter Flaschenkürbis mit roter Kordel, Stopfen und Papierband (Hi-Res, ca. 13x20 Weltpixel)."""
-    if sway in _GOURD:
-        return _GOURD[sway]
-    K = (14, 8, 16)
-    R0, R1, R2, R3 = (96, 60, 34), (168, 116, 56), (214, 170, 92), (250, 226, 160)   # Naturkürbis, hebt sich vom roten Oni ab
-    w, h = 30, 42
-    s = pygame.Surface((w, h), pygame.SRCALPHA)
-    dr = pygame.draw
-    cx = w // 2 + sway
-    dr.line(s, K, (w // 2, 0), (cx, 8), 3)                              # Kordel
-    dr.line(s, (200, 40, 44), (w // 2, 0), (cx, 8), 1)
-    for (yy, r) in ((14, 6), (29, 10)):                                 # zwei Bäuche, oben klein, unten groß
-        dr.circle(s, K, (cx, yy), r + 1)
-    for (yy, r) in ((14, 6), (29, 10)):
-        dr.circle(s, R1, (cx, yy), r)
-    dr.circle(s, R0, (cx + 2, 31), 8)
-    dr.circle(s, R1, (cx + 1, 29), 8)
-    dr.circle(s, R2, (cx - 2, 27), 6)
-    dr.circle(s, R2, (cx - 1, 13), 4)
-    dr.circle(s, R3, (cx - 4, 24), 2)
-    dr.circle(s, R3, (cx - 3, 11), 1)
-    dr.rect(s, K, (cx - 6, 18, 13, 5))                                  # Taille mit Kordelbund
-    dr.rect(s, (200, 40, 44), (cx - 5, 19, 11, 3))                    # rote Kordel um die Taille
-    dr.line(s, (120, 20, 30), (cx - 5, 20), (cx + 5, 20), 1)
-    dr.rect(s, K, (cx - 3, 5, 7, 5))                                    # Stopfen
-    dr.rect(s, (120, 80, 50), (cx - 2, 6, 5, 3))
-    dr.rect(s, K, (cx - 4, 26, 9, 9))                                   # Papierband mit Zeichen „酒“ angedeutet
-    dr.rect(s, (238, 230, 210), (cx - 3, 27, 7, 7))
-    dr.line(s, K, (cx - 1, 28), (cx - 1, 32), 1)
-    dr.line(s, K, (cx + 1, 29), (cx + 2, 29), 1)
-    dr.line(s, K, (cx + 1, 31), (cx + 2, 32), 1)
-    _GOURD[sway] = s
-    return s
 
 
 class ShutenDoji(Boss):
-    sheet = ('boss_shuten_doji', 1, None)
-
-    def render_under(self, s, t):
-        # Sake-Kürbis (Hyōtan) hängt hinten am Gürtel und pendelt – Pixelgrafik in Hi-Res, hinter dem Körper
-        back = -1 if self.face_dir() == sheets.RIGHT else 1
-        img = sake_gourd(int((math.sin(t * 3.0) * 1.5)))
-        gfx.hi_blit(img, self.x + back * 17, self.y + 14)
+    sheet = ('boss_shuten_doji', 1, None)          # Kalebasse und Sake-Schale sind Teil des Sprites
 
     r = 15
 
