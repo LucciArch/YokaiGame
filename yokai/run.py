@@ -161,6 +161,8 @@ class Run:
             self.restore_state(restore)
         else:
             self.save.stat('runs')
+            self.player.pose_t = 0.0
+            audio.play('pose_' + char_id)
             self.apply_challenge()
             if self.relaxed:
                 self.player.maxhp += 2

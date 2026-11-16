@@ -4,7 +4,7 @@ import random
 import pygame
 from collections import defaultdict
 from .settings import *
-from . import gfx, audio, art, sheets, props, costume, weapons, sigs
+from . import gfx, audio, art, sheets, props, costume, weapons, sigs, pose
 from .data import ITEMS, ENEMIES, CHAMPIONS, ACTIVES, CHARS, SYNERGIES, TRANSFORMS, TRINKETS
 
 ONE_TIME = ('hp', 'heal', 'spirit', 'coins', 'keys', 'salts', 'fullheal')
@@ -338,6 +338,9 @@ def roll_ghost(im):
     return g
 
 
+POSE_T = 2.4
+
+
 class Player:
     def __init__(self, run, char_id):
         self.run = run
@@ -363,6 +366,7 @@ class Player:
         self.dash_hit = set()
         self.dash_trail = 0.0
         self.roll_land = 0.0
+        self.pose_t = None                  # Geste aus der Charakterauswahl zu Laufbeginn (Run setzt 0)
         self.roll_ghosts = []
         self.shoot_cd = 0.0
         self.shot_count = 0
@@ -609,6 +613,10 @@ class Player:
         mvx, mvy = inp['move']
         fly = bool(self.f['fly'])
         self.moving = abs(mvx) + abs(mvy) > 0.1
+        if self.pose_t is not None:          # Geste endet nach POSE_T oder sobald man losläuft, rollt oder wirft
+            self.pose_t += dt
+            if self.pose_t > POSE_T or self.moving or inp['dash'] or self.shoot_cd > 0:
+                self.pose_t = None
         # Dash / Rolle
         if inp['dash'] and self.dash_cd <= 0 and self.dash_t <= 0:
             d = norm(mvx, mvy) if self.moving else self.facing
@@ -884,6 +892,11 @@ class Player:
                         fr = m['atk'] + 2
                     else:
                         fr = int(self.anim * 8) % 4 if self.moving else 0
+                    if self.pose_t is not None:
+                        pf, pdy = pose.pose_motion(self.char, self.pose_t)
+                        fr = fr if pf is None else pf
+                        pfade = min(1.0, (POSE_T - self.pose_t) / 0.5)
+                        pdy = int(pdy * 0.5 * pfade)
                 else:
                     if shooting:
                         dd = sheets.dir_from(*self.facing)
@@ -917,6 +930,9 @@ class Player:
             elif hi:
                 al = alpha_s.get_alpha() if alpha_s is not spr and alpha_s.get_alpha() is not None else 255
                 fr_right = getattr(self, '_last_dir', None) == sheets.RIGHT
+                if self.pose_t is not None:
+                    ry += pdy
+                    pose.pose_fx(s, self.char, self.pose_t, self.x, self.y + 9 + ry, 0.5, pfade)
                 costume.draw(self, spr, self.x + rx, self.y + 9 - bob + ry, fr_right, t, 'back', al)
                 gfx.hi_blit(spr, self.x + rx, self.y + 9 - bob + ry, al)
                 costume.draw(self, spr, self.x + rx, self.y + 9 - bob + ry, fr_right, t, 'front', al)
