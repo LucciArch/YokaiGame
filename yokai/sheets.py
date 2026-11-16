@@ -96,6 +96,24 @@ def frame(name, d=DOWN, f=0, scale=None, flash=False, tint=None, alpha=255):
     return s
 
 
+def roll(name, i, right=False):
+    """Ausweich-Rolle (art_src/fable/heroes/roll.py), 5 Zellen: 0 = geduckt (auf die Figur zugeschnitten,
+    Füße unten), 1–4 = Ball (ganze Zelle, Ball-Mitte = Zellmitte). None, wenn die Figur keine hat."""
+    key = ('roll', name, i, right)
+    if key not in _cache:
+        try:
+            raw = _load(name + '_roll')
+        except (pygame.error, FileNotFoundError):
+            _cache[key] = None
+            return None
+        w = raw.get_width() // 5
+        sub = raw.subsurface((i * w, 0, w, raw.get_height()))
+        if i == 0:
+            sub = sub.subsurface(sub.get_bounding_rect())
+        _cache[key] = pygame.transform.flip(sub, True, False) if right else sub
+    return _cache[key]
+
+
 def hdir(dx):
     return RIGHT if dx > 0 else LEFT
 

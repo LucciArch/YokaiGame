@@ -287,40 +287,17 @@ ROLL_T = 0.24
 _roll_cache = {}
 
 
-def roll_pose(q, dx, right):
-    """Rollfortschritt q (0..1) -> (Winkel, sx, sy, vflip, mittig). Gequantelt, damit die Bilder gecacht bleiben."""
-    if q < 0.12:                                     # Absprung: kurz geduckt
-        return 0, 1.2, 0.8, False, False
-    r = round((q - 0.12) / 0.88 * 8) / 8
-    if abs(dx) >= 0.4:                               # seitlich: um sich selbst drehen
-        return int(-360 * r if dx > 0 else 360 * r) % 360, 1.0, 1.0, False, True
-    c = math.cos(r * math.tau)                       # hoch/runter: Purzelbaum als Stauchen + Kopfstand
-    return 0, 1 + 0.25 * (1 - abs(c)), max(0.35, abs(c)), c < 0, True
+def roll_frame(q):
+    """Rollfortschritt q (0..1) -> Bild der Roll-Strecke: geduckt beim Absprung, dann anderthalb Umdrehungen als Ball."""
+    return 0 if q < 0.15 else 1 + int((q - 0.15) / 0.85 * 6) % 4
 
 
-def roll_img(spr, pose):
-    key = (id(spr), pose[:4])
-    im = _roll_cache.get(key)
-    if im is None:
-        ang, sx, sy, vf, _ = pose
-        im = pygame.transform.flip(spr, False, True) if vf else spr
-        w, h = im.get_size()
-        if (sx, sy) != (1.0, 1.0):
-            im = pygame.transform.scale(im, (max(1, int(w * sx)), max(1, int(h * sy))))
-        if ang:
-            im = pygame.transform.rotate(im, ang)
-        if len(_roll_cache) > 800:
-            _roll_cache.clear()
-        _roll_cache[key] = im
-    return im
-
-
-def roll_ghost(spr, im):
+def roll_ghost(im):
     """Verblassende Silhouette in der Grundfarbe der Figur."""
-    key = ('g', id(spr), id(im))
+    key = id(im)
     g = _roll_cache.get(key)
     if g is None:
-        c = pygame.transform.average_color(spr, consider_alpha=True)[:3]
+        c = pygame.transform.average_color(im, consider_alpha=True)[:3]
         col = tuple(min(255, int(v * 1.5) + 40) for v in c)
         g = im.copy()
         g.fill((0, 0, 0, 0), special_flags=pygame.BLEND_RGB_MULT)
@@ -790,6 +767,19 @@ class Player:
                 if e.active() and math.hypot(e.x - self.x, e.y - self.y) < rad + e.r:
                     run.damage_enemy(e, 0.8 * self.f['aura'] + 0.25 * self.damage(), None)
 
+    def draw_roll(self, x, y, q, right, al, ghost=False):
+        i = roll_frame(q)
+        im = sheets.roll(self.char, i, right)
+        if im is None:
+            return
+        if ghost:
+            im = roll_ghost(im)
+        if i == 0:
+            gfx.hi_blit(im, x, y + 9, al)                                # geduckt, Füße am Boden
+        else:
+            cy = y + 9 - 9 - math.sin(math.pi * q) * 3                  # Ball (Radius ~8,5) mit kleinem Hüpfer
+            gfx.hi_blit(im, x, cy + im.get_height() / 4, al)
+
     def roll_dust(self, n):
         if self.f['fly']:
             return
@@ -882,16 +872,12 @@ class Player:
             hi = sheets.has(self.char) and sheets.is_hi(self.char)
             if hi and (self.dash_t > 0 or self.roll_land > 0):
                 al = alpha_s.get_alpha() if alpha_s is not spr and alpha_s.get_alpha() is not None else 255
-                right = getattr(self, '_last_dir', None) == sheets.RIGHT
-                by0 = self.y + 9
-                h = spr.get_height()
+                right = self.dash_dir[0] > 0.3 or (abs(self.dash_dir[0]) <= 0.3 and getattr(self, '_last_dir', None) == sheets.RIGHT)
+                q = 1 - self.dash_t / ROLL_T if self.dash_t > 0 else 0
                 for gx, gy, gq, gl in self.roll_ghosts:
-                    im = roll_img(spr, roll_pose(gq, self.dash_dir[0], right))
-                    gfx.hi_blit(roll_ghost(spr, im), gx, gy + 9 - h / 4 + im.get_height() / 4, int(110 * gl / 0.1))
-                pose = roll_pose(1 - self.dash_t / ROLL_T if self.dash_t > 0 else 0, self.dash_dir[0], right)
-                im = roll_img(spr, pose)
-                # gedreht um die Körpermitte, geduckt mit den Füßen am Boden; Kostüm bleibt während der Rolle aus
-                gfx.hi_blit(im, self.x, by0 - h / 4 + im.get_height() / 4 if pose[4] else by0, al)
+                    self.draw_roll(gx, gy, gq, right, int(110 * gl / 0.1), ghost=True)
+                # Kostüm bleibt während der Rolle aus
+                self.draw_roll(self.x, self.y, q, right, al)
             elif hi:
                 al = alpha_s.get_alpha() if alpha_s is not spr and alpha_s.get_alpha() is not None else 255
                 fr_right = getattr(self, '_last_dir', None) == sheets.RIGHT
