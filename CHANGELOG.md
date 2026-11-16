@@ -62,6 +62,7 @@
 - Runde 38 – Die Titelnacht wandelt sich mit dem Fortschritt: Nach dem **Wahren Sieg** wird es Herbst – roter Mond, rötlicher Nebel, am Zweig hängt **Ahorn** statt Kirschblüte und rote Blätter fallen. Nach der **Rückkehr aus Yomi** liegt eine violette Totennacht über dem See, fahle Seelenasche fällt und doppelt so viele Hitodama ziehen vorbei. Gilt auch für alle Untermenüs
 - Runde 39 – Charakterauswahl lebendiger: Jede Figur zeigt beim Wechsel eine **eigene Geste mit eigenem Klang** – Hana schüttelt Kagura-Glöckchen (kreisende Goldfunken), Kenji zieht das Schwert (Glanz über der Klinge), Kuzunoha wird von drei Fuchsfeuern umkreist, Ponpoko trommelt auf den Bauch und verwandelt sich mit Rauch und Blatt, Benkei stampft Staub auf, Okiku schwebt höher und Brunnenwasser tropft vom Saum, Kotarō wirbelt Tengu-Federn auf, Seimei fächert fünf Ofuda auf, Akago springt in roter Glut, Susanoo ruft einen Doppelblitz
 - Runde 40 – Winter im Titel: Nach einem **Sieg im Oni-Modus** schneit es über der Mondnacht – verschneiter Zweig statt Kirschblüte, kühler Mondhof, nahe und ferne Flocken; die Glühwürmchen schlafen
+- Runde 41 – Synergie-Fanfare: Wird eine Synergie geweckt, fliegen die **Symbole ihrer Items** über dem Banner zusammen, leuchten beim Zusammentreffen in Gold auf und stehen dann mit „+“ verbunden über Name und Spruch – so sieht man auf einen Blick, welche Funde sich verbunden haben
 
 ## 1.4.0 – „Hyakki-Update“ (enthält 1.3 „Kapitel-Update“)
 

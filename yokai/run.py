@@ -119,6 +119,7 @@ class Run:
         self.banners = deque()
         self.banner_t = 0.0
         self.cur_banner = None
+        self._fan_hi = []
         self.shake_amt = 0.0
         self.whiteout = 0.0
         self.hint_txt, self.hint_t = '', 0.0
@@ -897,8 +898,8 @@ class Run:
         seen.append(hid)
         self.hint_txt, self.hint_t = text, 6.0
 
-    def banner(self, title, sub='', col=(255, 240, 200), big=False, fx=''):
-        self.banners.append((title, sub, col, big, fx))
+    def banner(self, title, sub='', col=(255, 240, 200), big=False, fx='', icons=()):
+        self.banners.append((title, sub, col, big, fx, icons))
 
     def shake(self, a):
         if self.save['settings'].get('shake', True):
@@ -2533,6 +2534,8 @@ class Run:
             s.blit(ov, (0, 0))
         gfx.NOCACHE.add(id(top))
         gfx.HI.append((top, W / 2, H, 255, 1.0, True, 'low'))
+        gfx.HI.extend(self._fan_hi)
+        self._fan_hi = []
 
     _light = {}
 
@@ -2695,19 +2698,45 @@ class Run:
             T.add(self.floor_label(), W // 2 + 70, 170, 7, (190, 160, 150), 'c', alpha=a)
         # Banner
         if self.cur_banner:
-            title, sub, col, big, fxs = self.cur_banner
+            title, sub, col, big, fxs, icons = self.cur_banner
             a = int(255 * min(1, self.banner_t * 3, (3.4 - self.banner_t) * 6 + 0.2))
             a = max(0, min(255, a))
-            hh = 44 if fxs else 34
+            ih = 24 if icons else 0
+            hh = (44 if fxs else 34) + ih
             ov = pygame.Surface((W, hh), pygame.SRCALPHA)
             ov.fill((10, 6, 14, int(a * 0.75)))
             y0 = RY + RH - 10 - hh
             s.blit(ov, (0, y0))
+            if icons:
+                self.draw_fanfare(s, icons, col, y0 + 13, a)
+            y0 += ih
             T.add(title, W // 2, y0 + 2, 12 if big else 10, col, 'c', alpha=a)
             if sub:
                 T.add('„%s“' % sub if fxs else sub, W // 2, y0 + 19, 7, (230, 225, 210), 'c', alpha=a)
             if fxs:
                 T.add(fxs, W // 2, y0 + 31, 7, (170, 220, 255), 'c', alpha=a)
+
+    def draw_fanfare(self, s, icons, col, cy, a):
+        """Synergie-Fanfare: die beteiligten Item-Symbole fliegen über dem Banner zusammen, verbunden durch „+“."""
+        age = 3.4 - self.banner_t
+        gap = 30
+        x0 = W // 2 - gap * (len(icons) - 1) / 2
+        join = min(1.0, age * 2.5)
+        flash = max(0.0, 1 - abs(age - 0.45) * 4)  # kurzes Aufleuchten, wenn sie sich treffen
+        if flash > 0:
+            gfx.draw_glow(s, W // 2, int(cy), int(26 + 40 * flash), col, int(150 * flash * a / 255))
+        for i, (icon, icol) in enumerate(icons):
+            tx = x0 + gap * i
+            x = W // 2 + (tx - W // 2) * (2.2 - 1.2 * join)
+            y = cy - 4 * abs(math.sin(age * 5 + i)) * (1 - join)
+            gfx.draw_glow(s, int(x), int(y), 13, icol, int(90 * a / 255))
+            img = gfx.item_img('icons', icon)
+            if img is not None:     # erst nach der HUD-Ebene in die Hi-Res-Warteschlange, sonst liegt der Schleier darüber
+                self._fan_hi.append((img, x, y + 8, a, 1.0, True))
+            else:
+                gfx.draw_icon(s, icon, icol, x, y)
+            if i:
+                gfx.TEXT.add('+', int(tx - gap / 2), int(cy) - 6, 10, col, 'c', alpha=int(a * join))
 
     def draw_lexnew(self, s):
         """Kleiner Hinweis unten links: neuer Yōkai im Lexikon."""
