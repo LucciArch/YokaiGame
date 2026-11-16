@@ -36,12 +36,19 @@ Runde 67: `Run.fire_player_bullet` vererbt `INHERIT` (burn/poison/slow) an jedes
 Nächste Kandidaten: aktive Items (Geschoss-Salven) mit Mehrfachwurf/Elementen, Bodenfeuer/Explosionen mit Gift/Frost, Sigs prüfen, die nur
 für Talismane greifen (z. B. `bullet_tick`) – sollen sie auch für Strahl/Hieb wirken?
 
-# Danach: Requisiten Teil 6 – Enma-chō, Tsukiyomi und Yomi no Oku
-Gleiches Vorgehen wie Runde 56. Warum: letzte Biome mit Grundformen-Requisiten.
+# Erledigt: Requisiten Teil 6 (Runden 68–69)
+- Enma-chō: Kohlebecken auf Krallenfüßen, Jōhari no Kagami, Nintōjō (Miru-me/Kagu-hana). Tsukiyomi: Tsuki no Katsura,
+  Tsukimi-Sanbō mit Dango/Susuki, Usu und Kine. Yomi no Oku: Ōkamuzumi-Pfirsichbaum statt Lacksäule. Lichter in
+  `gfx.PROP_LIGHT` angepasst. Damit hat kein Biom mehr Grundformen-Requisiten.
+- Hinweis für parallele Läufe: Rundennummer erst direkt vor dem Push aus `origin/main` bestimmen (mehrere Sitzungen pushen gleichzeitig).
+
+# Nächster Schritt: weiter mit Lucas Synergie-Wunsch (siehe oben, „Nächste Kandidaten“)
+Warum: dauerhafter Wunsch von Luca, Grafik-Rückstand ist abgearbeitet.
 
 # Weitere Ideen
 - Licht: Spielerin-Items mit Feuer/Licht (z. B. Kitsunebi-Familiar, Laternen-Items) als eigene Lichtquelle
-- Wanddekos Yashiki/Kawabe/Ōeyama/Shinkai ebenfalls in Hi-Res überarbeiten (`wall_decos`)
+- Wanddekos Yashiki/Kawabe/Ōeyama/Shinkai/Enma-chō/Tsukiyomi ebenfalls in Hi-Res überarbeiten (`wall_decos`)
+- Mondpalast-Ambiente: fallende Katsura-Blätter als Partikel, Mondhase als seltener Ereignis-NPC (Mochi-Tausch)
 - Totenpalast-Ambiente: eigene Partikel (Maden-Glühwürmchen, Izanamis acht Donnergötter als Blitze im Hintergrund)
 - Kawabe-/Shinkai-Ambiente: Glühwürmchen über Wasser, aufsteigende Leuchtpartikel in der Tiefsee
 - Shinkirō als Ereignis: eine Hamaguri spiegelt einen Trugladen vor, dessen Items nach dem Kauf verschwinden können
