@@ -1607,7 +1607,7 @@ class Run:
                         if (hx - ox) ** 2 + (hy - oy) ** 2 < (hr + 5) ** 2:
                             if p.orb_hit_cd[id(e)] <= 0:
                                 p.orb_hit_cd[id(e)] = 0.25
-                                self.damage_enemy(e, max(2.0, p.damage() * 0.6), None, burn=bool(p.f['burn']) and False)
+                                self.damage_enemy(e, max(2.0, p.damage() * (1.2 if 'riesenmoench' in p.sgs else 0.6)), None, burn=bool(p.f['burn']) and False)
                             break
 
     def check_locks(self):

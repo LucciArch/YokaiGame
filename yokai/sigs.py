@@ -170,6 +170,15 @@ TEXT = {
     'strassenkatze': 'Der Iai-Hieb nach der Rolle trifft dreifach',
     'yamabushi': 'Der Stab läutet jeden 4. Wurf und stößt Feinde weg',
     'tempelfest': 'Große Schläge lassen die Glocke dröhnen: 3 s doppelte Aura',
+    'schreinwaechter': 'Der Bannkreis wird doppelt so groß, der Wächter brüllt alle 8 s',
+    'unbeweglich': 'Die Wand baut sich 8 s nach dem Bruch wieder auf',
+    'drachenschuppen': '35 % Abwehr, abgewehrte Geschosse kehren als Drachenperle zurück',
+    'daruma_geist': 'Die Welle nach einem Treffer sprengt acht goldene Splitter ab',
+    'yomotsu': 'Abgeprallte Feinde sind versiegelt: starr und verflucht',
+    'riesenmoench': 'Die Gebetsperlen kreisen weiter und treffen doppelt',
+    'totenfaehre': 'Nach 40 Kills liegt wieder eine Münze für den Fährmann bereit',
+    'hyakki_herr': 'Dein Gefolge wirft doppelt so oft und zielt selbst',
+    'kaufmann': 'Der Hammer zählt jede Münze doppelt, Reichtum schon ab 25 Mon (+25 %)',
 }
 
 BULLET_SIGS = ('sichel', 'kammzinken', 'seidenfaden', 'stromauf', 'gross', 'schweben', 'windstoss', 'koi_drache')
@@ -582,6 +591,12 @@ def on_kill(run, e):
         run.hazards.append(Hazard(e.x, e.y + 4, 14, 0.0, 2.5, max(0.8, p.damage() * 0.4), 'p', 'fire'))
     if 'erstes_feuer' in S and e.burn > 0:
         run.explode(e.x, e.y, 26, p.damage() * 1.4, 'p')
+    if 'totenfaehre' in S and p.revives == 0:
+        g['faehre'] = g.get('faehre', 0) + 1
+        if g['faehre'] >= 40:
+            g['faehre'] = 0
+            p.revives = 1
+            _float(run, p, 'Münze für den Fährmann', (190, 220, 230))
     if 'parade' in S:
         g['parade'] = min(20 if 'maskenzug' in S else 15, g.get('parade', 0) + 1)
     if 'wirbelklingen' in S and getattr(e, 'sg_bleed', 0) > 0:
@@ -625,6 +640,10 @@ def on_hurt(p, run):
             if e.active() and d < 60 and not e.is_boss:
                 e.kx += (e.x - p.x) / max(d, 1) * 420
                 e.ky += (e.y - p.y) / max(d, 1) * 420
+        if 'daruma_geist' in S:
+            for i in range(8):
+                b = run.fire_player_bullet(p.x, p.y - 3, i / 8 * math.tau, p.damage() * 1.2, 220, 3, 0.8, {'pierce': 1})
+                b.col = (255, 210, 90)
     if 'a_un' in S:
         g['agyo'] = 0.01
     if 'glockenschlag' in S:
@@ -679,7 +698,10 @@ def block(p, run, b):
                                                 {'homing': 1, 'burn': 1, '_urteil': 1} if 'gericht' in S else {'homing': 1, 'burn': 1})
                     sb.col = (255, 190, 90)
             return True
-    if 'schuppenpanzer' in S and random.random() < 0.25:
+    if 'schuppenpanzer' in S and random.random() < (0.35 if 'drachenschuppen' in S else 0.25):
+        if 'drachenschuppen' in S:
+            nb = run.fire_player_bullet(b.x, b.y, math.atan2(b.y - p.y, b.x - p.x), p.damage() * 1.3, 200, 3.5, 1.2, {'homing': 1})
+            nb.col = (120, 200, 255)
         return True
     if 'panzer' in S and g.get('still', 0) > 1.0 and random.random() < 0.5:
         return True
@@ -687,6 +709,8 @@ def block(p, run, b):
 
 
 def shield_break(p, run):
+    if 'unbeweglich' in p.sgs:
+        st(p)['wand'] = 8.0
     if has(p, 'wandbruch'):
         _ring(run, p.x, p.y, (200, 200, 220), 80)
         for e in run.enemies:
@@ -872,6 +896,9 @@ def contact(p, run, e):
             e.kx += (e.x - p.x) / d * 380
             e.ky += (e.y - p.y) / d * 380
             e.sg_touch = 0.4
+            if 'yomotsu' in S:
+                e.frozen = max(e.frozen, 1.5)
+                e.sg_curse = 3.0
     return False
 
 
@@ -1030,7 +1057,7 @@ def tick(p, run, dt):
         for e in run.enemies:
             if e.active() and not e.is_boss:
                 d = math.hypot(e.x - p.x, e.y - p.y)
-                if d < 28 + e.r:
+                if d < (56 if 'schreinwaechter' in S else 28) + e.r:
                     e.kx += (e.x - p.x) / max(d, 1) * 160 * dt * 10
                     e.ky += (e.y - p.y) / max(d, 1) * 160 * dt * 10
     if 'starrt' in S:
@@ -1041,6 +1068,16 @@ def tick(p, run, dt):
                 d = math.hypot(dx, dy) or 1
                 if d < 170 and (dx * fx + dy * fy) / d > 0.85:
                     e.slowed = max(e.slowed, 0.05)
+    if 'schreinwaechter' in S and fighting:
+        g['schrein'] = g.get('schrein', 0) + dt
+        if g['schrein'] >= 8:
+            g['schrein'] = 0
+            g['agyo'] = 0.01
+    if g.get('wand', 0) > 0:
+        g['wand'] -= dt
+        if g['wand'] <= 0 and 'unbeweglich' in S and p.f['shield']:
+            p.shield_ready = True
+            _ring(run, p.x, p.y, (140, 200, 255), 30)
     if g.get('agyo', 0) > 0:
         g['agyo'] -= dt
         if g['agyo'] <= 0:
@@ -1114,8 +1151,8 @@ def rate_mult(p):
         m *= 1 + g.get('wach', 0)
     if 'maskenwechsel' in S and g.get('rooms', 0) % 2 == 1:
         m *= 1.35
-    if 'reichtum' in S and p.coins >= 50:
-        m *= 1.15
+    if 'reichtum' in S and p.coins >= (25 if 'kaufmann' in S else 50):
+        m *= 1.25 if 'kaufmann' in S else 1.15
     return m
 
 

@@ -385,7 +385,7 @@ class Player:
     def damage(self):
         d = self.s['dmg']
         if self.f['money_dmg']:
-            d += min(4.0, self.coins * 0.05)
+            d += min(6.0, self.coins * 0.1) if 'kaufmann' in self.sgs else min(4.0, self.coins * 0.05)
         if self.f['rage']:
             total = max(1, self.maxhp + self.spirit)
             missing = 1 - (self.hp + self.spirit) / max(total, 1)
@@ -706,9 +706,10 @@ class Player:
             fm.cd -= dt
             sx, sy = inp['shoot']
             if (abs(sx) + abs(sy) > 0.1) and fm.cd <= 0:
-                fm.cd = 0.6
+                herr = 'hyakki_herr' in self.sgs
+                fm.cd = 0.3 if herr else 0.6
                 a = math.atan2(self.facing[1], self.facing[0])
-                fl = {'homing': 1} if (i % 2 == 1 or self.f['homing']) else {}
+                fl = {'homing': 1} if (herr or i % 2 == 1 or self.f['homing']) else {}
                 run.fire_player_bullet(fm.x, fm.y, a, max(2.5, self.damage() * 0.55), 230, 2.5, 0.9, fl)
         # Orbitale
         self.orb_angle += dt * 3.2
@@ -729,7 +730,8 @@ class Player:
         out = []
         for i in range(n):
             a = self.orb_angle + i / max(1, n) * math.tau
-            out.append((self.x + math.cos(a) * 21, self.y - 3 + math.sin(a) * 21))
+            rr = 30 if 'riesenmoench' in self.sgs else 21
+            out.append((self.x + math.cos(a) * rr, self.y - 3 + math.sin(a) * rr))
         return out
 
     def draw(self, s, t):
