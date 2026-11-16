@@ -658,7 +658,7 @@ class Game:
             self.state = 'challenges'
             self.ch_sel = 0
         elif m == 'Codex der Items':
-            self.state = 'codex'
+            self.state = 'codex'; self.codex_back = 'title'
         elif m == 'Yōkai-Lexikon':
             self.state = 'lexicon'; self.lex_sel = 0; self.lex_tab = 0; self.lex_back = 'title'
         elif m == 'Erfolge':
@@ -1219,7 +1219,8 @@ class Game:
             elif n == 'right': self.codex_sel = (self.codex_sel + 1) % len(ids)
             elif n == 'up': self.codex_sel = (self.codex_sel - cols) % len(ids)
             elif n == 'down': self.codex_sel = (self.codex_sel + cols) % len(ids)
-            elif n == 'back': self.state = 'title'
+            elif n == 'back':
+                self.state = getattr(self, 'codex_back', 'title'); self.lex_back = 'title'
             elif isinstance(n, tuple):
                 mx, my = n[1]
                 c = int((mx - 23) // 27)
@@ -1413,13 +1414,25 @@ class Game:
                 T.add('? ? ?', cx, 100, 14, (130, 120, 140), 'c')
             T.add('? ? ?', cx, 140, 12, (150, 140, 160), 'c')
             T.add('Noch keine Begegnung.', cx, 160, 8, (180, 170, 170), 'c')
-        T.add('Links/Rechts: Seite    Hoch/Runter: Eintrag    Esc: Zurück', W // 2, 300, 6, (150, 140, 140), 'c')
+        T.add('Links/Rechts: Seite    Hoch/Runter: Eintrag    ' + ('Enter: Item im Codex    ' if self.lex_tab == 3 else '') + 'Esc: Zurück', W // 2, 300, 6, (150, 140, 140), 'c')
         for nv in nav:
             if nv == 'up': self.lex_sel = (self.lex_sel - 1) % len(ids)
             elif nv == 'down': self.lex_sel = (self.lex_sel + 1) % len(ids)
             elif nv in ('left', 'right'):
                 self.lex_tab = (self.lex_tab + (1 if nv == 'right' else -1)) % 4; self.lex_sel = 0
-            elif nv == 'back': self.state = getattr(self, 'lex_back', 'title')
+            elif nv == 'ok' and self.lex_tab == 3:
+                # Enter springt zu den bekannten Items der Synergie im Codex, mehrfach drücken blättert weiter
+                its = [i for i in SYN_BY_ID[eid]['items'] if i in self.save['seen']]
+                if its:
+                    k = getattr(self, 'lex_item', (None, -1))
+                    k = (eid, (k[1] + 1) % len(its) if k[0] == eid else 0)
+                    self.lex_item = k
+                    if self.lex_back != 'codex':
+                        self.codex_back = 'lexicon'
+                    self.state = 'codex'; self.codex_sel = ITEM_IDS.index(its[k[1]])
+                    audio.play('select')
+            elif nv == 'back':
+                self.state = getattr(self, 'lex_back', 'title'); self.codex_back = 'title'
             elif isinstance(nv, tuple):
                 mx, my = nv[1]
                 if 10 <= mx <= 138 and my >= 44:

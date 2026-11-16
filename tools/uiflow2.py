@@ -27,6 +27,11 @@ try:
     g.state = 'codex'; g.codex_sel = ITEM_IDS.index(jiid); step([K(pygame.K_RETURN)], 2)
     assert g.state == 'lexicon' and g.lex_tab == 3 and jiid in SYNERGIES[g.lex_sel]['items'], 'Codex springt nicht zur Synergie'
     step([K(pygame.K_ESCAPE)], 2); assert g.state == 'codex', 'Lexikon führt nicht zurück in den Codex'
+    g.state = 'lexicon'; g.lex_back = 'title'; g.lex_tab = 3; g.lex_sel = 0; g.save['synergies_seen'].append(SYNERGIES[0]['id']); step([K(pygame.K_RETURN)], 2)
+    assert g.state == 'codex' and ITEM_IDS[g.codex_sel] == jiid, 'Lexikon springt nicht zum Item'
+    step([K(pygame.K_ESCAPE)], 2); assert g.state == 'lexicon', 'Codex führt nicht zurück ins Lexikon'
+    step([K(pygame.K_ESCAPE)], 2); assert g.state == 'title', 'Lexikon/Codex hängen in einer Zurück-Schleife'
+    g.save['synergies_seen'].remove(SYNERGIES[0]['id'])
     g.save['seen'].remove(jiid)
     menu(0); print('chars', g.state); step([K(pygame.K_RETURN)], 200); print('play', g.state)
     for k in (pygame.K_e, pygame.K_q, pygame.K_SPACE): step([K(k)], 20)
