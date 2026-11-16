@@ -1023,7 +1023,9 @@ class Run:
                 if e.active():
                     for hx, hy, hr in e.hitboxes():
                         if math.hypot(hx - x, hy - y) < r + hr:
+                            self._echo = True   # Folgeschaden: löst keine weiteren Feuer/Blitze/Siegel aus
                             self.damage_enemy(e, dmg, None)
+                            self._echo = False
                             break
             for ty in range(ROWS):
                 for tx in range(COLS):

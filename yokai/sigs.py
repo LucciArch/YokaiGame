@@ -497,6 +497,7 @@ def hit_post(run, e, b, dmg):
     if not S:
         return
     g = st(p)
+    echo = getattr(run, '_echo', False)   # Schaden von Bodenfeuer, Blitz oder Explosion
     if 'treffsicher' in S:
         hi = 'goetter_arsenal' in S
         g['ts'] = min(0.35 if hi else 0.2, g.get('ts', 0) + (0.04 if hi else 0.02))
@@ -504,7 +505,7 @@ def hit_post(run, e, b, dmg):
         e.sg_mark = True
     if 'gluecksgoetter' in S and b is not None and b.gold and random.random() < 0.15:
         run.spawn_pickup('coin', e.x, e.y)
-    if 'donnerbiest' in S:
+    if 'donnerbiest' in S and not echo:
         e.sg_thunder = getattr(e, 'sg_thunder', 0) + 1
         if e.sg_thunder >= (2 if 'blitzschlag' in S else 3):
             e.sg_thunder = 0
@@ -513,7 +514,7 @@ def hit_post(run, e, b, dmg):
                 _chain_strikes(run, e, 1, p.damage() * 1.6 + 3)
     if b is not None and b.fl.get('_urteil'):
         e.sg_curse = 6.0
-    if 'pentagramm' in S:
+    if 'pentagramm' in S and not echo:
         e.sg_pent = getattr(e, 'sg_pent', 0) + 1
         if e.sg_pent >= (3 if 'seimei' in S else 5):
             e.sg_pent = 0
@@ -548,7 +549,7 @@ def hit_post(run, e, b, dmg):
     if 'knochenbruch' in S and not e.is_boss and 0 < e.hp < e.maxhp * 0.15:
         e.hp = 0
         _float(run, e, 'Zerbrochen!', (240, 230, 210))
-    if 'springfeuer' in S and random.random() < (0.4 if 'fest_der_laternen' in S else 0.2):
+    if 'springfeuer' in S and not echo and random.random() < (0.4 if 'fest_der_laternen' in S else 0.2):
         from .entities import Hazard
         run.hazards.append(Hazard(e.x, e.y + 4, 10, 0.0, 3.5 if 'fest_der_laternen' in S else 2.0, max(0.6, p.damage() * 0.3), 'p', 'fire'))
     if 'spinnennetz' in S and random.random() < 0.3:

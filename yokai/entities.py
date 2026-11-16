@@ -876,7 +876,9 @@ class Hazard:
                 key = (id(e), tick)
                 if key not in self.done and e.active() and math.hypot(e.x - self.x, e.y - self.y) < self.r + e.r:
                     self.done.add(key)
+                    run._echo = True   # Folgeschaden: löst keine weiteren Feuer/Blitze/Siegel aus
                     run.damage_enemy(e, self.dmg, None, burn=self.kind == 'fire')
+                    run._echo = False
                     if getattr(self, 'sg_conf', False) and not e.is_boss:
                         e.sg_conf = 2.5
         return self.t < self.warn + self.act
