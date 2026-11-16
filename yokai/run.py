@@ -1550,6 +1550,7 @@ class Run:
             if alive:
                 nb.append(b)
             else:
+                sigs.bullet_end(self, b)
                 if b.fl.get('explode') and not b.fl.get('_split'):
                     self.explode(b.x, b.y, 26, b.dmg * 1.3, 'p')
                 else:

@@ -10,18 +10,21 @@ import bot
 
 g = Game()
 bad = 0
-items = [k for k, it in data.ITEMS.items() if any(f.startswith('sig_') for f in it['fx'])]
-for i, iid in enumerate(items):
+items = [[k] for k, it in data.ITEMS.items() if any(f.startswith('sig_') for f in it['fx'])]
+items += [sy['items'] for sy in data.SYNERGIES if any(f.startswith('sig_') for f in sy['fx'])]   # Synergien: alle Teile geben
+for i, group in enumerate(items):
+    iid = '+'.join(group)
     random.seed(i)
     orig = bot.play
     try:
         g.start_run('hana', 100 + i)
-        g.run.player.gain_item(iid, silent=True)
+        for one in group:
+            g.run.player.gain_item(one, silent=True)
         # kurzer Lauf mit demselben Bot, aber begrenzter Zeit
         run = g.run
         p = run.player
         dt = 1 / 60
-        for step in range(60 * 40):
+        for step in range(60 * (40 if len(group) == 1 else 25)):
             p.iframes = max(p.iframes, 0.5) if step % 600 else 0
             en = run.nearest_enemy(p.x, p.y)
             inp = {'move': [0, 0], 'shoot': [0, 0], 'dash': random.random() < 0.02, 'active': False, 'salt': random.random() < 0.003}
@@ -41,5 +44,5 @@ for i, iid in enumerate(items):
     except Exception:
         import traceback; traceback.print_exc()
         print('FEHLER', iid); bad += 1
-print('Signaturen geprüft:', len(items), 'Fehler:', bad)
+print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)

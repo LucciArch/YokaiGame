@@ -18,6 +18,8 @@
 - Klänge überarbeitet: weicherer Ofuda-Wurf, kräftigere Treffer, eigene Klänge für vergehende Geister, schwere Gegner, zerbrechende Krüge und Felsen, Truhen, Geisterherzen, Salz, Anhänger, Bosssieg und den eigenen Tod
 - **Jedes Item fühlt sich eigen an:** 94 Items haben jetzt eine eigene Fähigkeit statt geteilter Effekte – z. B. der Yata-Spiegel wirft jedes dritte Geschoss zurück, Senbazuru faltet pro Raum einen Kranich (zehn retten vor dem Tod), die Tsukuyomi-Sichel lässt Talismane in Bögen fliegen, Gashadokuros Knochen zerbricht angeschlagene Feinde, die Rauchpfeife hinterlässt Rauch, der Geschosse schluckt
 - Zielsuchend, Mehrfachwurf, Gift, Kreisschilde usw. tragen jetzt höchstens zwei Items
+- 30 Synergien verstärken jetzt die Fähigkeiten ihrer Items, statt nur Werte zu geben – z. B. Sanshu no Jingi richtet alle 5 s die drei stärksten Feinde, Shinobi lässt Wurfsterne dreimal abprallen, Tsunami teilt Talismane beim Abprallen, Sonne & Mond wechselt zwischen Feuer- und Frostwürfen
+- Doppelte Synergie-Kennungen behoben (Kitsune no Yomeiri, Hanami-Picknick, Herr der Tiefe zählen jetzt eigenständig)
 - Ebenen-Reihenfolge korrigiert: Geschosse, Hiebe, Partikel und Regen liegen jetzt über den Figuren statt dahinter; HUD und Raum-Überblendung decken auch die Figuren ab
 - Alle Klänge auf einheitliche Lautheit gebracht; Gegnerklänge kommen von links oder rechts, je nachdem wo der Gegner steht
 

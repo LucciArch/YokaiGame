@@ -103,9 +103,40 @@ TEXT = {
     'felsblock': 'Unbeweglich: nichts bremst dich, Feinde prallen ab',
     'wandbruch': 'Bricht der Schild, stößt er alle Feinde weg',
     'glockenschlag': 'Wirst du getroffen, erstarren alle Feinde',
+    # ---- Synergie-Fähigkeiten (verstärken die Fähigkeiten der beteiligten Items)
+    'sonnenregen': 'Der Fuchsregen fällt öfter und lässt Münzen fallen',
+    'sternenstaub': 'Schwebende Talismane zerstieben in vier Sternsplitter',
+    'jingi': 'Alle 5 s richten die Insignien die drei stärksten Feinde',
+    'gewittersturm': 'Weggewehte Geschosse rufen manchmal einen Blitz',
+    'neun_flammen': 'Der Neunerfächer besteht aus suchendem Fuchsfeuer',
+    'kranichschwarm': 'Für je drei gefaltete Kraniche fliegt ein Kranich mehr',
+    'himmelsbote': 'Im Laufen stößt die Krähe doppelt so oft herab',
+    'kyudo': 'Weit geflogene Talismane treffen 60 % stärker',
+    'tengu_sturm': 'Jeder 6. Wurf entfesselt einen Sturmring um dich',
+    'allsehend': 'Markierte Feinde nehmen +30 % Schaden, der Blick lenkt weiter',
+    'augen_ueberall': 'Das Handauge trifft markierte Feinde auf jede Entfernung',
+    'mondteich': 'Mondsichel-Talismane lassen Feinde erstarren',
+    'leben_tod': 'Kills schenken manchmal ½ Geisterherz',
+    'onmyo_spiegel': 'Der Spiegel wirft jedes 2. Geschoss als Siegel-Explosion zurück',
+    'seimei': 'Siegel-Explosion schon nach 3 Treffern, Bann öfter',
+    'koi_drache': 'Beschleunigte Talismane werden zu durchbohrenden Drachen',
+    'drachenkoenig': 'Der Seidenfaden schneidet doppelt',
+    'verfluchte_sterne': 'Sternenfall verwirrt getroffene Feinde',
+    'katzenreich': 'Doppelte Würfe kommen jedes zweite Mal',
+    'ninja': 'Wurfsterne prallen bis zu dreimal ab',
+    'ninja_flug': 'Im Laufen fliegt jeder 3. Wurf auch nach hinten',
+    'tintenpanzer': 'Im Schneckenhaus blendet Tinte Feinde in der Nähe',
+    'tiefsee_blick': 'Der starre Blick verletzt Feinde',
+    'brandung': 'Talismane teilen sich beim Abprallen',
+    'a_un': 'Wirst du getroffen, brüllt der Wächter alle zurück',
+    'sonne_mond': 'Würfe wechseln: Sonne (Feuer) und Mond (Frost)',
+    'taifun': 'Talismane wehen Geschosse in weitem Umkreis weg',
+    'fuchsstern': 'Die Sternkugel schießt drei Sterne',
+    'giftnetz': 'Spinnennetze vergiften',
+    'papiersturm': 'Jeder 2. Wurf bringt drei Talismane mehr',
 }
 
-BULLET_SIGS = ('sichel', 'kammzinken', 'seidenfaden', 'stromauf', 'gross', 'schweben', 'windstoss')
+BULLET_SIGS = ('sichel', 'kammzinken', 'seidenfaden', 'stromauf', 'gross', 'schweben', 'windstoss', 'koi_drache')
 
 
 def has(p, name):
@@ -162,6 +193,13 @@ def on_fire(p, run, bullets):
         g['sichel'] = -g.get('sichel', 1)
         for b in bullets:
             b.curve = 1.7 * g['sichel']
+            if 'mondteich' in S:
+                b.fl = dict(b.fl); b.fl['slow'] = 1; b.fl['_frost'] = 1
+    if 'sonne_mond' in S:
+        sun = n % 2 == 0
+        for b in bullets:
+            b.fl = dict(b.fl); b.fl['burn' if sun else '_frost'] = 1
+            b.col = (255, 190, 90) if sun else (180, 220, 255)
     if 'rueckenwind' in S and p.moving:
         for b in bullets:
             b.vx *= 1.3; b.vy *= 1.3; b.dmg *= 1.15
@@ -185,7 +223,7 @@ def on_fire(p, run, bullets):
     if 'falkenblick' in S:
         for b in bullets:
             a = math.atan2(b.vy, b.vx)
-            best, bd = None, 0.45
+            best, bd = None, (0.9 if 'allsehend' in S else 0.45)
             for e in run.enemies:
                 if e.active():
                     w = math.atan2(e.y - b.y, e.x - b.x)
@@ -202,15 +240,27 @@ def on_fire(p, run, bullets):
             g['wach'] = 0
     g['last_fire'] = run.time
     extra = []
+    xfl = {'homing': 1, 'burn': 1} if 'neun_flammen' in S else {}
     if 'neun' in S and n % 9 == 0:
         extra += [(base + (i - 4) * 0.13, 0.7, 1.0) for i in range(9)]
-    if 'buendel' in S and n % 4 == 0:
+    if 'buendel' in S and n % (2 if 'papiersturm' in S else 4) == 0:
         extra += [(base + random.uniform(-0.35, 0.35), 0.5, 0.7) for _ in range(3)]
     if 'drei_baellchen' in S and n % 3 == 0:
         extra += [(base - 0.12, 0.8, 0.9), (base + 0.12, 0.8, 0.9)]
+    if 'ninja_flug' in S and p.moving and n % 3 == 0:
+        extra.append((base + math.pi, 0.8, 1.0))
     for a, dm, sz in extra:
-        run.fire_player_bullet(p.x, p.y - 3, a, dmg * dm, spd, size * sz, life, {})
-    if 'zweischwanz' in S and random.random() < 0.25:
+        run.fire_player_bullet(p.x, p.y - 3, a, dmg * dm, spd, size * sz, life, dict(xfl))
+    if 'tengu_sturm' in S and n % 6 == 0:
+        _ring(run, p.x, p.y, (220, 240, 255), 70)
+        for eb in run.ebullets:
+            if (eb.x - p.x) ** 2 + (eb.y - p.y) ** 2 < 70 ** 2:
+                eb.dead = True
+        for e in run.enemies:
+            d = math.hypot(e.x - p.x, e.y - p.y)
+            if e.active() and d < 80 and not e.is_boss:
+                e.kx += (e.x - p.x) / max(d, 1) * 400; e.ky += (e.y - p.y) / max(d, 1) * 400
+    if 'zweischwanz' in S and random.random() < (0.5 if 'katzenreich' in S else 0.25):
         run.fire_player_bullet(p.x, p.y - 3, base, dmg * 0.8, spd, size, life, {}, delay=0.08)
     if 'statik' in S and g.get('statik', 0) >= 3.0:
         g['statik'] = 0
@@ -230,7 +280,9 @@ def on_fire(p, run, bullets):
         tgt = _nearest(run, tx, ty, 80)
         if tgt:
             tx, ty = tgt.x, tgt.y
-        run.hazards.append(Hazard(tx, ty, 16, 0.45, 0.12, dmg * 2.2, 'p', 'meteor'))
+        h = Hazard(tx, ty, 16, 0.45, 0.12, dmg * 2.2, 'p', 'meteor')
+        h.sg_conf = 'verfluchte_sterne' in S
+        run.hazards.append(h)
 
 
 def bullet_tick(b, run, dt):
@@ -260,13 +312,39 @@ def bullet_tick(b, run, dt):
         if b.fl['_sf'] > 0.07:
             b.fl['_sf'] = 0
             from .entities import Hazard
-            run.hazards.append(Hazard(b.x, b.y, 4, 0.0, 0.5, max(0.5, b.dmg * 0.18), 'p', 'silk'))
+            k = 2 if 'drachenkoenig' in run.player.sgs else 1
+            run.hazards.append(Hazard(b.x, b.y, 4, 0.0, 0.5, max(0.5, b.dmg * 0.18 * k), 'p', 'silk'))
+    if 'koi_drache' in tags and b.t > 0.35 and not b.fl.get('pierce'):
+        b.fl = dict(b.fl); b.fl['pierce'] = 1
+        b.r *= 1.5; b.col = (255, 150, 90)
     if 'windstoss' in tags:
-        rr = (b.r + 5) ** 2
+        S = run.player.sgs
+        rr = (b.r + (14 if 'taifun' in S else 5)) ** 2
         for eb in run.ebullets:
             if not eb.dead and (eb.x - b.x) ** 2 + (eb.y - b.y) ** 2 < rr:
                 eb.dead = True
+                if 'gewittersturm' in S and random.random() < 0.08:
+                    tgt = run.nearest_enemy(b.x, b.y, 200)
+                    if tgt:
+                        run.lightning(tgt.x, tgt.y, run.player.damage() * 1.5 + 3)
     return True
+
+
+def bullet_end(run, b):
+    """Ein Spieler-Talisman verschwindet (Treffer, Wand oder Reichweite)."""
+    if b.fl.get('_sw') and 'sternenstaub' in run.player.sgs:
+        for i in range(4):
+            a = i / 4 * math.tau + 0.4
+            nb = run.fire_player_bullet(b.x, b.y, a, b.dmg * 0.5, 200, 2, 0.35, {})
+            nb.col = (255, 240, 170)
+
+
+def bullet_bounce(run, b):
+    if 'brandung' in run.player.sgs and not b.fl.get('_br'):
+        b.fl = dict(b.fl); b.fl['_br'] = 1
+        a = math.atan2(b.vy, b.vx)
+        for da in (-0.35, 0.35):
+            run.fire_player_bullet(b.x, b.y, a + da, b.dmg * 0.6, math.hypot(b.vx, b.vy), max(1.5, b.r * 0.8), 0.5, {'_br': 1})
 
 
 def hit_pre(run, e, b, dmg):
@@ -293,7 +371,9 @@ def hit_pre(run, e, b, dmg):
     if getattr(e, 'sg_curse', 0) > 0:
         dmg *= 2
     if 'hundert_augen' in S and getattr(e, 'sg_mark', False):
-        dmg *= 1.15
+        dmg *= 1.3 if 'allsehend' in S else 1.15
+    if 'kyudo' in S and b is not None and b.t > 0.45:
+        dmg *= 1.6
     if getattr(e, 'sg_oil', 0) > 0 and (b is None or b.fl.get('burn') or b.fl.get('explode')):
         dmg *= 1.6
     if 'schlagfolge' in S:
@@ -323,7 +403,7 @@ def hit_post(run, e, b, dmg):
             run.lightning(e.x, e.y, p.damage() * 1.6 + 3)
     if 'pentagramm' in S:
         e.sg_pent = getattr(e, 'sg_pent', 0) + 1
-        if e.sg_pent >= 5:
+        if e.sg_pent >= (3 if 'seimei' in S else 5):
             e.sg_pent = 0
             _ring(run, e.x, e.y, (255, 230, 120), 34)
             run.explode(e.x, e.y, 28, p.damage() * 2.4, 'p')
@@ -336,7 +416,9 @@ def hit_post(run, e, b, dmg):
         if random.random() < 0.04 and p.heal(1):
             from . import audio
             audio.play('heal', 0.4)
-    if 'kuji' in S and random.random() < 1 / 9:
+    if b is not None and b.fl.get('_frost') and random.random() < 0.2:
+        e.frozen = max(e.frozen, 0.3 if e.is_boss else 1.2)
+    if 'kuji' in S and random.random() < (1 / 5 if 'seimei' in S else 1 / 9):
         e.frozen = max(e.frozen, 0.4 if e.is_boss else 1.5)
         _float(run, e, 'Gebannt', (220, 200, 255))
     if 'knochenbruch' in S and not e.is_boss and 0 < e.hp < e.maxhp * 0.15:
@@ -361,12 +443,12 @@ def hit_post(run, e, b, dmg):
         _float(run, e, 'Verwirrt', (255, 170, 230))
     if 'tinte' in S:
         e.sg_blind = 3.0
-    if 'wurfstern' in S and b is not None and not b.fl.get('_ric'):
-        tgt = _nearest(run, e.x, e.y, 130, lambda o: o is not e)
+    if 'wurfstern' in S and b is not None and b.fl.get('_ric', 0) < (3 if 'ninja' in S else 1):
+        tgt = _nearest(run, e.x, e.y, 130, lambda o: o is not e and id(o) not in b.hit)
         if tgt:
             a = math.atan2(tgt.y - e.y, tgt.x - e.x)
-            nb = run.fire_player_bullet(e.x, e.y, a, dmg * 0.7, p.s['shotspd'], max(1.5, b.r * 0.8), 0.6, {'_ric': 1})
-            nb.hit.add(id(e))
+            nb = run.fire_player_bullet(e.x, e.y, a, dmg * 0.7, p.s['shotspd'], max(1.5, b.r * 0.8), 0.6, {'_ric': b.fl.get('_ric', 0) + 1})
+            nb.hit |= b.hit | {id(e)}
 
 
 def on_kill(run, e):
@@ -390,6 +472,8 @@ def on_kill(run, e):
         run.explode(e.x, e.y, 26, p.damage() * 1.4, 'p')
     if 'parade' in S:
         g['parade'] = min(15, g.get('parade', 0) + 1)
+    if 'leben_tod' in S and random.random() < 0.05:
+        p.add_spirit(1)
     if 'lachen' in S:
         for o in run.enemies:
             if o is not e and o.active() and not o.is_boss and math.hypot(o.x - e.x, o.y - e.y) < 75:
@@ -422,6 +506,8 @@ def on_hurt(p, run):
             if e.active() and d < 60 and not e.is_boss:
                 e.kx += (e.x - p.x) / max(d, 1) * 420
                 e.ky += (e.y - p.y) / max(d, 1) * 420
+    if 'a_un' in S:
+        g['agyo'] = 0.01
     if 'glockenschlag' in S:
         _ring(run, p.x, p.y, (255, 230, 150), 90)
         for e in run.enemies:
@@ -460,9 +546,10 @@ def block(p, run, b):
                 return True
     if 'spiegel' in S:
         g['mirror'] = g.get('mirror', 0) + 1
-        if g['mirror'] % 3 == 0:
+        if g['mirror'] % (2 if 'onmyo_spiegel' in S else 3) == 0:
             a = math.atan2(-b.vy, -b.vx)
-            nb = run.fire_player_bullet(b.x, b.y, a, p.damage() * 1.5, 260, 3.5, 1.0, {'homing': 1})
+            nb = run.fire_player_bullet(b.x, b.y, a, p.damage() * 1.5, 260, 3.5, 1.0,
+                                        {'homing': 1, 'explode': 1} if 'onmyo_spiegel' in S else {'homing': 1})
             nb.col = (255, 230, 150)
             return True
     if 'schuppenpanzer' in S and random.random() < 0.25:
@@ -707,8 +794,10 @@ def tick(p, run, dt):
             from .entities import Particle
             run.particles.append(Particle(p.x + random.uniform(-6, 6), p.y - 6, 0, 0, 0.15, (255, 250, 160), 1))
     fighting = any(e.active() for e in run.enemies)
-    for key, period in (('sternkugel', 1.4), ('kranichflug', 2.0), ('augenhand', 0.9), ('sonnenkraehe', 3.0),
-                        ('fuchsregen', 3.5), ('schlangenschweif', 0.5), ('kichern', 1.0)):
+    for key, period in (('sternkugel', 1.4), ('kranichflug', 2.0), ('augenhand', 0.9),
+                        ('sonnenkraehe', 1.5 if ('himmelsbote' in S and p.moving) else 3.0),
+                        ('fuchsregen', 2.0 if 'sonnenregen' in S else 3.5), ('schlangenschweif', 0.5), ('kichern', 1.0),
+                        ('jingi', 5.0), ('tintenpanzer', 1.0), ('tiefsee_blick', 0.5)):
         if key not in S:
             continue
         tk = 't_' + key
@@ -722,15 +811,22 @@ def tick(p, run, dt):
             ox, oy = p.x + math.cos(a) * 24, p.y - 3 + math.sin(a) * 24
             tgt = _nearest(run, ox, oy, 220)
             if tgt:
-                b = run.fire_player_bullet(ox, oy, math.atan2(tgt.y - oy, tgt.x - ox), dmg * 0.6, 240, 2.2, 1.0, {'homing': 1})
-                b.col = (255, 240, 160)
+                a0 = math.atan2(tgt.y - oy, tgt.x - ox)
+                for da in ((-0.3, 0, 0.3) if 'fuchsstern' in S else (0,)):
+                    b = run.fire_player_bullet(ox, oy, a0 + da, dmg * 0.6, 240, 2.2, 1.0, {'homing': 1})
+                    b.col = (255, 240, 160)
         elif key == 'kranichflug':
             tgt = _nearest(run, p.x, p.y, 260)
             if tgt:
-                b = run.fire_player_bullet(p.x, p.y - 8, math.atan2(tgt.y - p.y, tgt.x - p.x), dmg * 0.9, 170, 3.0, 1.6, {'homing': 1, 'pierce': 1})
-                b.col = (250, 250, 255)
+                k = 1 + (min(3, g.get('cranes', 0) // 3) if 'kranichschwarm' in S else 0)
+                for i in range(k):
+                    a = math.atan2(tgt.y - p.y, tgt.x - p.x) + (i - (k - 1) / 2) * 0.5
+                    b = run.fire_player_bullet(p.x, p.y - 8, a, dmg * 0.9, 170, 3.0, 1.6, {'homing': 1, 'pierce': 1})
+                    b.col = (250, 250, 255)
         elif key == 'augenhand':
             tgt = _nearest(run, p.x, p.y, 75)
+            if tgt is None and 'augen_ueberall' in S:
+                tgt = _nearest(run, p.x, p.y, 999, lambda o: getattr(o, 'sg_mark', False))
             if tgt:
                 b = run.fire_player_bullet(p.x, p.y - 3, math.atan2(tgt.y - p.y, tgt.x - p.x), dmg * 0.7, 260, 2.5, 0.5, {})
                 b.col = (255, 140, 140)
@@ -745,6 +841,8 @@ def tick(p, run, dt):
                 e = random.choice(cand)
                 from .entities import Hazard
                 run.hazards.append(Hazard(e.x, e.y, 14, 0.3, 0.15, dmg * 1.5, 'p', 'water'))
+                if 'sonnenregen' in S and random.random() < 0.15:
+                    run.spawn_pickup('coin', e.x, e.y)
         elif key == 'schlangenschweif':
             bx, by = p.x - p.facing[0] * 16, p.y - p.facing[1] * 16
             for e in run.enemies:
@@ -754,6 +852,21 @@ def tick(p, run, dt):
                     e.poison_dps = max(e.poison_dps, 1.0)
                     run.zap(bx, by, e.x, e.y)
                     break
+        elif key == 'jingi':
+            for e in sorted((e for e in run.enemies if e.active()), key=lambda e: -e.hp)[:3]:
+                run.lightning(e.x, e.y, dmg * 2.5 + 4)
+        elif key == 'tintenpanzer':
+            if g.get('still', 0) > 1.0:
+                for e in run.enemies:
+                    if e.active() and math.hypot(e.x - p.x, e.y - p.y) < 65:
+                        e.sg_blind = 2.0
+        elif key == 'tiefsee_blick':
+            fx, fy = p.facing
+            for e in run.enemies:
+                dx, dy = e.x - p.x, e.y - p.y
+                d = math.hypot(dx, dy) or 1
+                if e.active() and d < 170 and (dx * fx + dy * fy) / d > 0.85:
+                    run.damage_enemy(e, max(0.5, dmg * 0.25), None)
         elif key == 'kichern':
             for e in run.enemies:
                 if e.active() and not e.is_boss and math.hypot(e.x - p.x, e.y - p.y) < 85 and random.random() < 0.2:
@@ -791,6 +904,8 @@ def tick(p, run, dt):
             for e in run.enemies:
                 if e.active() and (e.x - w[0]) ** 2 + (e.y - w[1]) ** 2 < 18 ** 2:
                     e.slowed = max(e.slowed, 0.1)
+                    if 'giftnetz' in S:
+                        e.poison = max(e.poison, 2.0); e.poison_dps = max(e.poison_dps, 1.0)
             if random.random() < 0.08:
                 from .entities import Particle
                 run.particles.append(Particle(w[0] + random.uniform(-10, 10), w[1] + random.uniform(-6, 6), 0, 0, 0.4, (230, 230, 240), 1))

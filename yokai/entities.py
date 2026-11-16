@@ -198,6 +198,8 @@ class Bullet:
         if nx < RX or nx > RX + RW or ny < RY or ny > RY + RH:
             if self.bounces > 0:
                 self.bounces -= 1
+                if self.owner == 'p':
+                    sigs.bullet_bounce(run, self)
                 if nx < RX or nx > RX + RW:
                     self.vx = -self.vx
                 if ny < RY or ny > RY + RH:
@@ -210,6 +212,8 @@ class Bullet:
                 run.break_tile(tx, ty)
             if self.bounces > 0:
                 self.bounces -= 1
+                if self.owner == 'p':
+                    sigs.bullet_bounce(run, self)
                 t1, _, _ = tile_at(run.room, nx, self.y)
                 if t1 in SOLID_TILES:
                     self.vx = -self.vx
@@ -869,6 +873,8 @@ class Hazard:
                 if key not in self.done and e.active() and math.hypot(e.x - self.x, e.y - self.y) < self.r + e.r:
                     self.done.add(key)
                     run.damage_enemy(e, self.dmg, None, burn=self.kind == 'fire')
+                    if getattr(self, 'sg_conf', False) and not e.is_boss:
+                        e.sg_conf = 2.5
         return self.t < self.warn + self.act
 
     def draw(self, s, tm):
