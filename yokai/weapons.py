@@ -61,8 +61,7 @@ def melee(run, x, y, ang, radius, arc, dmg, knock=180, kind='w_sword', col=(230,
 
 def beam(run, x, y, ang, dmg, width=4, col=(255, 236, 150)):
     """Lichtstrahl bis zur nächsten Wand; trifft alles auf der Linie."""
-    from .entities import tile_at
-    from .settings import SOLID_TILES
+    from .entities import solid_hit
     dx, dy = math.cos(ang), math.sin(ang)
     L = 0
     while L < 460:
@@ -70,8 +69,7 @@ def beam(run, x, y, ang, dmg, width=4, col=(255, 236, 150)):
         tx, ty = x + dx * L, y + dy * L
         if tx < RX or tx > RX + RW or ty < RY or ty > RY + RH:
             break
-        t, _, _ = tile_at(run.room, tx, ty)
-        if t in SOLID_TILES:
+        if solid_hit(run.room, tx, ty):
             break
     for e in list(run.enemies):
         if not e.active():

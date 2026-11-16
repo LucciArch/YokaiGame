@@ -26,16 +26,44 @@ def tile_at(room, x, y):
     return None, tx, ty
 
 
+# Gezeichnete Grundfläche fester Requisiten in ihrer Kachel: (y-Mitte, halbe Breite, halbe Höhe)
+FOOT = {T_ROCK: (19, 11, 10), T_POT: (23, 8, 7), T_LANTERN: (21, 9, 9)}
+LOW_TILES = (T_ROCK, T_POT)          # niedrig genug, um darüber zu fliegen
+
+
+def solid_hit(room, x, y, r=0, over=False):
+    """Kreis (x, y, r) gegen die Grundflächen fester Requisiten; liefert (t, tx, ty) oder None.
+    Zu festen Nachbarn hin reicht die Fläche bis an den Kachelrand, damit Felsreihen dicht bleiben.
+    over=True: Felsen und Krüge werden überflogen."""
+    tiles = room.tiles
+    for ty in range(max(0, int((y - r - RY) // TILE)), min(ROWS - 1, int((y + r - RY) // TILE)) + 1):
+        row = tiles[ty]
+        for tx in range(max(0, int((x - r - RX) // TILE)), min(COLS - 1, int((x + r - RX) // TILE)) + 1):
+            t = row[tx]
+            if t not in SOLID_TILES or (over and t in LOW_TILES):
+                continue
+            cy, hw, hh = FOOT[t]
+            bx, by = RX + tx * TILE, RY + ty * TILE
+            l = bx if tx > 0 and row[tx - 1] in SOLID_TILES else bx + 16 - hw
+            rt = bx + TILE if tx < COLS - 1 and row[tx + 1] in SOLID_TILES else bx + 16 + hw
+            tp = by if ty > 0 and tiles[ty - 1][tx] in SOLID_TILES else by + cy - hh
+            bt = by + TILE if ty < ROWS - 1 and tiles[ty + 1][tx] in SOLID_TILES else by + cy + hh
+            dx, dy = x - min(max(x, l), rt), y - min(max(y, tp), bt)
+            if dx * dx + dy * dy <= r * r:
+                return t, tx, ty
+    return None
+
+
 def blocked(room, x, y, r, fly=False):
     if x - r < RX or x + r > RX + RW or y - r < RY or y + r > RY + RH:
         return True
-    for cx in (x - r, x + r):
-        for cy in (y - r, y + r):
-            t, _, _ = tile_at(room, cx, cy)
-            if t in SOLID_TILES:
-                return True
-            if t == T_PIT and not fly:
-                return True
+    if solid_hit(room, x, y, r):
+        return True
+    if not fly:
+        for cx in (x - r, x + r):
+            for cy in (y - r, y + r):
+                if tile_at(room, cx, cy)[0] == T_PIT:
+                    return True
     return False
 
 
@@ -206,16 +234,16 @@ class Bullet:
                     self.vy = -self.vy
                 return True
             return False
-        t, tx, ty = tile_at(run.room, nx, ny)
-        if t in SOLID_TILES and not fl.get('spectral'):
+        hit = None if fl.get('spectral') else solid_hit(run.room, nx, ny)
+        if hit:
+            t, tx, ty = hit
             if t == T_POT:
                 run.break_tile(tx, ty)
             if self.bounces > 0:
                 self.bounces -= 1
                 if self.owner == 'p':
                     sigs.bullet_bounce(run, self)
-                t1, _, _ = tile_at(run.room, nx, self.y)
-                if t1 in SOLID_TILES:
+                if solid_hit(run.room, nx, self.y):
                     self.vx = -self.vx
                 else:
                     self.vy = -self.vy
@@ -656,15 +684,17 @@ class Player:
         run = self.run
         room = run.room
         steps = max(1, int(max(abs(dx), abs(dy)) / 4) + 1)
+        # Flug über einem Fels verloren: Requisiten ignorieren, bis die Figur heraus ist
+        over = fly or bool(solid_hit(room, self.x, self.y + 1.5, self.r - 0.5))
         for _ in range(steps):
             sx, sy = dx / steps, dy / steps
             nx, ny = self.x + sx, self.y + sy
-            if not self.collides(nx, self.y, fly):
+            if not self.collides(nx, self.y, fly, over):
                 self.x = nx
-            if not self.collides(self.x, ny, fly):
+            if not self.collides(self.x, ny, fly, over):
                 self.y = ny
 
-    def collides(self, x, y, fly):
+    def collides(self, x, y, fly, over=None):
         run = self.run
         r = self.r
         room = run.room
@@ -680,13 +710,13 @@ class Player:
                         return False
         if x - r < RX or x + r > RX + RW or y - r < RY or y + r > RY + RH:
             return True
-        for cx in (x - r, x + r):
-            for cy in (y - r + 3, y + r):
-                t, _, _ = tile_at(room, cx, cy)
-                if t in SOLID_TILES:
-                    return True
-                if t == T_PIT and not fly:
-                    return True
+        if solid_hit(room, x, y + 1.5, r - 0.5, fly if over is None else over):
+            return True
+        if not fly:
+            for cx in (x - r, x + r):
+                for cy in (y - r + 3, y + r):
+                    if tile_at(room, cx, cy)[0] == T_PIT:
+                        return True
         return False
 
     def fire(self, d):

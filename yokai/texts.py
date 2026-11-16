@@ -20,7 +20,7 @@ FX_NAMES = {
     'freeze': ('Chance, Feinde einzufrieren', '%'), 'multishot': ('Zusätzliche Talismane pro Wurf', '+'),
     'back': ('Talisman nach hinten', '+'), 'side': ('Talismane zu beiden Seiten', '+'),
     'orbital': ('Kreisende Schilde, die Geschosse blocken', '+'), 'familiar': ('Shikigami-Begleiter, die mitschießen', '+'),
-    'aura': ('Schadensaura um dich herum', '+'), 'fly': ('Du fliegst über Gruben und Stacheln', ''),
+    'aura': ('Schadensaura um dich herum', '+'), 'fly': ('Du fliegst über Gruben, Stacheln, Felsen und Krüge', ''),
     'dash_fire': ('Die Rolle hinterlässt Feuer', ''), 'dash_dmg': ('Die Rolle verletzt Feinde', ''),
     'dash_reflect': ('Die Rolle löscht Geschosse', ''), 'hurt_ring': ('Bei Treffer: Talismanring', ''),
     'hurt_dmg': ('Nach einem Treffer kurz mehr Schaden', ''), 'kill_heal': ('Chance auf Heilung pro Kill', '%'),

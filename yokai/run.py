@@ -2393,7 +2393,8 @@ class Run:
                 self.yomeiri.draw_under(s)
                 self.yomeiri.draw_lanes(s, t)
         ents += getattr(self, 'apparitions', [])
-        ents.sort(key=lambda e: e.y)
+        fly_dy = 20 if p.f['fly'] else 0       # Fliegende liegen über Felsen und Krügen
+        ents.sort(key=lambda e: e.y + fly_dy if e is p else e.y)
         for e in ents:
             e.draw(s, t)
         near, nd = None, 42
