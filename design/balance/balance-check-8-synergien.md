@@ -1,6 +1,6 @@
 # Balance-Check 8 – Synergie-Fähigkeiten
 
-Werkzeug: `python tools/synbalance.py [boss] [tiefe]` (Standard: Shuten-dōji, Ebene 5, Hana).
+Werkzeug: `python tools/synbalance.py [boss] [tiefe] [ids]` (Standard: Shuten-dōji, Ebene 5, Hana; `ids` z. B. `onmyodo,feuerwerk` misst nur diese).
 Jede Synergie bekommt nur ihre eigenen Items und kämpft dreimal (Seeds 11–13) gegen denselben Boss;
 Vergleich mit gleich vielen Zufalls-Items. Zeitlimit 180 s, „Treffer“ = erlittene Treffer.
 
@@ -52,3 +52,19 @@ Onmyōdō und Feuerwerk bleiben die stärksten Angriffs-Synergien (~26 s) – st
 Synergien mit „×1,00 (180 s)“ sind Schutz-, Glücks- oder Raum-Fähigkeiten, die gegen einen einzelnen Boss
 nicht wirken; sie sind hier nicht bewertbar. Omamori-Sammler und Hanami-Picknick erhöhen die erlittenen Treffer
 nur, weil sie mehr Leben geben und der Test so länger läuft.
+
+## Nachtrag Runde 9–11
+
+Seit Runde 9 starten die Onmyōdō-Papierdiener am Rand des explodierenden Gegners (statt in seiner Mitte)
+und fliegen als Hitogata sichtbar zurück. Sie trafen vorher sofort und unsichtbar.
+
+```
+python synbalance.py shuten_doji 5 onmyodo,feuerwerk,oni_rausch
+feuerwerk        Zeit ×0.18 ( 32.5 s)  Treffer -45.7
+oni_rausch       Zeit ×0.23 ( 40.6 s)  Treffer -46.7
+onmyodo          Zeit ×0.26 ( 46.3 s)  Treffer -43.7
+```
+
+Onmyōdō 26,0 s → 46,3 s – die hier angeregte Abschwächung (Schaden 0,7 → 0,5) ist damit unnötig.
+Feuerwerk 27,3 s → 32,5 s (Streuung durch geänderte Zufallsfolge, Wirkung unverändert). Beide liegen jetzt
+im oberen Mittelfeld neben Oni-Rausch, keine Synergie sticht mehr allein heraus.

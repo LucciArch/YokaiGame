@@ -10,6 +10,7 @@ from yokai.bosses import make_boss
 
 BOSS = sys.argv[1] if len(sys.argv) > 1 else 'shuten_doji'
 DEPTH = int(sys.argv[2]) if len(sys.argv) > 2 else 5
+ONLY = sys.argv[3].split(',') if len(sys.argv) > 3 else None   # z. B. onmyodo,feuerwerk
 g = Game(headless=True)
 
 
@@ -44,6 +45,8 @@ for n in (2, 3):
     print('Zufall %d Items: %.1f s, %.1f Treffer' % (n, *base[n]))
 out = []
 for sy in data.SYNERGIES:
+    if ONLY and sy['id'] not in ONLY:
+        continue
     rs = [fight(sy['items'], s) for s in SEEDS]
     assert sy['id'] in rs[0][2].synergies, sy['id'] + ' wird nicht ausgelöst'
     bt, bh = base[min(3, len(sy['items']))]
