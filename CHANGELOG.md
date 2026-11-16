@@ -73,6 +73,7 @@
 - Runde 49 – Lexikon und Codex in beide Richtungen verknüpft: Auf der Synergie-Seite springt **Enter** zu den beteiligten Items im Codex (mehrfach drücken blättert durch sie), **Esc** führt zurück ins Lexikon
 - Runde 50 – **Gesten beim Laufstart**: Im ersten Raum macht deine Figur einmal ihre Geste aus der Charakterauswahl samt Klang – Hana streut Goldfunken, Kenji zieht die Klinge, Kuzunoha ruft Fuchsfeuer, Ponpoko verschwindet im Rauch, Benkei landet mit Staub, Okiku schwebt aus dem Brunnen, Kotarō schlägt mit den Flügeln, Seimei fächert Ofuda auf, Akago glüht, Susanoo ruft den Doppelblitz. Losgehen, Rollen oder Werfen bricht sie sofort ab
 - Runde 51 – **Omikuji im Lexikon**: Die Lose stehen jetzt auf der Lexikon-Seite „Ereignisse“ (mit Sage und Spielhinweis). Neuer Erfolg **Fluch gebunden** für ein Unglückslos am Musubi-Gestell. Das Gestell steht jetzt auch in jedem Kami-Schrein, damit sich Flüche öfter lösen lassen. Der Zähler von „Festtagsgast“ zählt weiter nur die vier Festereignisse
+- Runde 52 – **Flussufer und Spukhaus neu eingerichtet**: Am Kawabe liegt eine Gurke als Kappa-Opfer auf dem nassen Flussfels, Rohrkolben stehen im Seichtwasser mit einem Glühwürmchen, und ein Suijin-Stein mit eingemeißeltem **水神**, Shimenawa, Gurke und Sake-Schale ehrt den Flussgott. Im Yashiki hat die Tansu Eisenbeschläge und eine Lade, aus der zwei Augen schauen, im zerrissenen Andon brennt kaltes Totenlicht, und um den goldenen Byōbu mit Kiefer und roter Sonne greifen bleiche Finger
 
 ## 1.4.0 – „Hyakki-Update“ (enthält 1.3 „Kapitel-Update“)
 

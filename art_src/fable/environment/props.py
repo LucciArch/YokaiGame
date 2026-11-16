@@ -44,6 +44,12 @@ GLYPHS = [                                               # 家 之 墓, 7x7 Hi-R
 ]
 
 
+SUIJIN = [                                               # 水 神
+    ["...x...", "...x...", "xx.x.x.", ".x.xx..", ".xxx.x.", "x..x..x", "..xx..."],
+    [".x....x..", "xxx.xxxxx", "..x.x.x.x", ".xx.xxxxx", "x.x.x.x.x", "..x.xxxxx", "..x...x.."],
+]
+
+
 # ------------------------------------------------------------------ shared motifs
 def boulder(cv, rng, ramp, cx=16, by=28, rx=11, ry=9):
     """Felsbrocken mit drei Facetten (Licht oben links), Rissen, Körnung und Kieseln am Fuß."""
@@ -578,64 +584,146 @@ def rocks(name):
         out.append(fin(cv, P))
 
     elif name == 'kawabe':
-        cv, rng, m = plain_boulder(0)
-        cover(cv, m, MOSS, 6, rng)
+        cv, rng, m = plain_boulder(0, rx=11, ry=8)           # Flussfels mit Kappa-Opfergurke, nass am Wasserrand
+        cover(cv, m, MOSS, 4, rng)
+        for (x, y) in ((9, 22), (10, 23.5), (22.5, 24), (23, 25.5), (13, 26.5)):
+            cv.hpx(x, y, WATER[3])
+        cu = capsule(cv, 12, 14.5, 1.7, 19, 13.5, 1.5)          # Gurke: Lieblingsspeise der Kappa
+        cv.fill(dil(cu), K)
+        cv.form(cu, ('#1c4a24', '#2e7a34', '#5aa848'), 1, 1)
+        for x in (13.5, 15.5, 17.5):
+            cv.hpx(x, 14, '#9ad070')
+        cv.hpx(19.5, 12.5, '#c8b040')
         out.append(fin(cv, P))
-        cv, rng = new(1)                                     # cattail clump
-        a, b = P['leaf']
-        for (x0, x1, h) in ((10, 7, 14), (13, 12, 21), (17, 18, 23), (20, 24, 16), (15, 15, 12), (22, 21, 10)):
-            cv.line([(x0, 28), (x1, 28 - h)], a)
-            cv.line([(x0 + 1, 28), (x1 + 1, 28 - h)], MOSS[1])
-        for (x, y) in ((12, 5), (18, 3), (24, 10)):
-            cv.rect(x, y, x + 1, y + 5, '#4a2e26')
-            cv.vl(x, y, y + 4, '#74502c')
-        cv.rect(8, 27, 24, 28, MOSS[0])
-        out.append(fin(cv, P))
-        cv, rng = new(2)                                     # stump with mushrooms
-        w = ('#1c121c', '#33242a', '#4e382e', '#6e5238')
-        m, t = cyl(cv, w, 16, 28, 8, 10, top=('#4e382e', '#7a6444', '#988458'))
-        for x in (10, 13, 19, 22):
-            cv.vl(x, 22, 27, w[0])
-        cover(cv, t, MOSS, 2, rng)
-        for (x, y) in ((6, 23), (22, 20)):
-            cv.grid(x, y, ".rrr.\nrRrrr\n..s..\n..s..", dict(r=RED[2], R=PAPER[2], s=PAPER[1]))
+        for x0, x1, y in ((3, 29, 29), (6, 26, 30.5)):       # Wellenringe um den Fuß
+            for i in range(int((x1 - x0) * 2)):
+                x = x0 + i * .5
+                if (i // 3) % 2 == 0 and not cv.m[int(y * cv.ss), int(x * cv.ss)]:
+                    cv.hpx(x, y, WATER[2] if y < 30 else WATER[1])
+
+        cv, rng = new(1)                                     # Gama-Röhricht im Seichtwasser, ein Glühwürmchen
+        pool = cv.E(16, 27.5, 11, 2.6)
+        cv.fill(pool, WATER[1])
+        cv.fill(pool & ~sh(pool, 0, 2 * cv.ss), WATER[0])
+        for (x0, x1, h, d) in ((10, 6, 15, 1), (13, 12, 21, 0), (18, 19, 23, 1), (21, 25, 17, 0), (15, 16, 12, 1),
+                               (23, 22, 10, 0), (8, 5, 9, 0)):
+            bl = cv.PG([(x0 - 1, 28), (x1, 28 - h), (x0 + 1.5, 28)])
+            cv.fill(dil(bl), K)
+            cv.fill(bl, MOSS[2] if d else MOSS[1])
+            cv.hline([(x0 - .5, 27), (x1, 29 - h)], MOSS[3] if d else MOSS[2])
+        for (x, y) in ((12, 5), (18, 3), (24, 9)):           # Kolben mit Lichtkante und Spitze
+            hd = capsule(cv, x + .5, y + 1, 1.2, x + .5, y + 5, 1.2)
+            cv.fill(dil(hd), K)
+            cv.form(hd, ('#2e1a16', '#5a3824', '#8a5a32'), 1, 1)
+            cv.hline([(x + .5, y - 1.5), (x + .5, y - .2)], MOSS[2])
+        for (x, y) in ((6, 28), (25, 27.5), (16, 29)):
+            cv.hline([(x, y), (x + 2, y)], WATER[3])
+        out.append(fin(cv, P, shadow=False))
+        cv.fill(cv.E(27, 8, .9, .9), '#6a8a2a')              # Hotaru
+        cv.hpx(27, 8, '#e8f070')
+        cv.hpx(26.5, 7.5, '#f8ffc0')
+
+        cv, rng = new(2)                                     # Suijin-Stein: Flussgott, Shimenawa, Gurke und Sake
+        m = cv.PG([(10, 28), (9, 15), (11, 7), (15, 4), (20, 5), (23, 10), (23, 20), (24, 28)])
+        cv.fill(dil(m), K)
+        cv.form(m, (k[1], k[2], k[3]), 3, 1)
+        cv.line([(20, 7), (21, 12), (20, 15)], k[1])
+        for gi, g in enumerate(SUIJIN):                      # eingemeißelt: 水神
+            for j, row in enumerate(g):
+                for i2, ch in enumerate(row):
+                    if ch == 'x':
+                        x, y = 16 - len(row) / 4 + i2 * .5, 12.5 + gi * 4.5 + j * .5
+                        cv.hpx(x + .5, y + .5, k[3])
+                        cv.hpx(x, y, k[0])
+        rope(cv, 8, 24, 9, 1.2, shide=(8, 22))
+        cover(cv, m & (cv.Y >= 24), MOSS, 2, rng)
+        cu = capsule(cv, 6, 27, 1.3, 10.5, 26.5, 1.2)
+        cv.fill(dil(cu), K)
+        cv.form(cu, ('#1c4a24', '#2e7a34', '#5aa848'), 1, 1)
+        cv.rect(23, 26, 26, 27, PAPER[2])                    # Sakazuki mit Rand
+        cv.hl(23, 26, 26, PAPER[3])
+        cv.hpx(24.5, 26, RED[2])
+        cv.hpx(25, 26, RED[2])
         out.append(fin(cv, P))
 
     elif name == 'yashiki':
-        cv, rng = new(0)                                     # tansu chest
-        box(cv, k, 6, 8, 26, 28, top=4)
-        for y in (17, 22):
-            cv.hl(7, 23, y, k[0])
-        for (x, y) in ((14, 14), (14, 19), (14, 24)):
-            cv.rect(x, y, x + 3, y + 1, IRON[2])
-            cv.hl(x, x + 3, y + 1, IRON[0])
-        cv.vl(15, 23, 27, k[0])
+        lac = ('#140c14', '#2a1820', '#46282a', '#663a30')  # dunkles Kiri-Holz, rot lackiert gealtert
+        cv, rng = new(0)                                     # Tansu: Eisenbeschläge, Ringgriffe, oberste Lade offen
+        box(cv, lac, 6, 7, 26, 28, top=3)
+        for y in (13, 19, 24):
+            cv.hl(7, 23, y, lac[0])
+            cv.hl(7, 23, y + 1, lac[2])
+        cv.vl(15, 19, 24, lac[0])
+        cv.rect(7, 10, 23, 12, K)                            # die Lade steht einen Spalt offen ...
+        cv.hl(7, 23, 10, lac[0])
+        for x in (12, 18):                                   # ... und etwas schaut heraus
+            cv.hpx(x, 11, GOLD[3])
+            cv.hpx(x + .5, 11, GOLD[2])
+            cv.hpx(x, 11.5, GOLD[1])
+        for (x, y) in ((6, 10), (23, 10), (6, 25), (23, 25)):     # Kanamono an den Ecken
+            cv.rect(x, y, x + 2, y + 2, IRON[2])
+            cv.hpx(x + .5, y + .5, IRON[3])
+            cv.hpx(x + 2, y + 2, IRON[0])
+        for (x, y) in ((10.5, 16), (19.5, 16), (10.5, 21.5), (19.5, 21.5), (15.5, 26)):
+            cv.hline([(x - 1.5, y - .5), (x + 1.5, y - .5)], IRON[1])     # Warabite-Bügelgriff
+            cv.hline([(x - 1.5, y), (x - 1, y + .5), (x + 1, y + .5), (x + 1.5, y)], IRON[2])
+            cv.hpx(x - 1, y + .5, IRON[3])
         out.append(fin(cv, P))
-        cv, rng = new(1)                                     # unlit andon lamp
-        pa = ('#2a2636', '#4a4456', '#6a6276', '#8a8290')
-        cv.rect(10, 9, 22, 25, pa[1])
-        cv.rect(10, 9, 14, 25, pa[2])
-        cv.rect(19, 9, 22, 25, pa[0])
+
+        cv, rng = new(1)                                     # Andon: kalt brennt darin ein Totenlicht
+        fr = ('#120a10', '#2a1a1a', '#4a3024', '#6a4a30')
+        pap = cv.R(10, 8, 22, 24)
+        cv.fill(pap, '#6a6478')
+        glow = cv.E(16, 17, 6, 7) & pap
+        cv.fill(glow, '#7a7aa8')
+        cv.fill(cv.E(16, 18, 3.6, 4.4) & pap, ONIBI[2])
+        cv.fill(cv.E(16, 18.5, 1.6, 2.4) & pap, ONIBI[3])
+        cv.fill(pap & (cv.X >= 19.5), mix('#6a6478', K, .35))
         for x in (10, 16, 22):
-            cv.vl(x, 8, 28, k[1] if x < 22 else k[0])
-        for y in (8, 14, 20, 25):
-            cv.hl(10, 22, y, k[1])
-        cv.hl(10, 22, 8, k[2])
-        cv.fill(cv.PG([(17, 10), (21, 13), (18, 13), (20, 19)]), K)   # torn paper
-        cv.rect(9, 26, 23, 26, k[2])
+            cv.vl(x, 7, 28, fr[2] if x < 22 else fr[1])
+        for y in (7, 13, 19, 24):
+            cv.hl(9, 23, y, fr[2])
+            cv.hl(10, 22, y + 1, fr[0]) if y < 24 else None
+        cv.hl(9, 23, 7, fr[3])
+        cv.rect(9, 25, 23, 26, fr[2])
+        cv.hl(9, 23, 25, fr[3])
+        for x in (9, 23):
+            cv.vl(x, 26, 28, fr[1])
+        tear = cv.PG([(17, 9), (20, 9.5), (19, 11), (19.5, 12.5), (18, 11.5)])
+        cv.fill(dil(tear) & pap & ~tear, PAPER[3])
+        cv.fill(tear, K)
+        cv.hline([(17, 9), (16.5, 10.5)], PAPER[3])           # loser Papierfetzen
+        cv.hpx(19, 11, ONIBI[1])
         out.append(fin(cv, P))
-        cv, rng = new(2)                                     # byobu folding screen
-        g = ('#2a2230', '#4a3c3a', '#6a5a44', '#8a7a54')
-        for i, (x0, x1, ya, yb) in enumerate(((4, 11, 9, 6), (11, 18, 6, 9), (18, 25, 9, 6))):
-            m = cv.PG([(x0, ya), (x1, yb), (x1, yb + 19), (x0, ya + 19)])
-            cv.fill(m, g[2] if i % 2 == 0 else g[1])
-            cv.line([(x0, ya), (x1, yb)], k[1])
-            cv.line([(x0, ya + 19), (x1, yb + 19)], k[0])
-            cv.vl(x0, min(ya, yb), ya + 19, k[0])
-        cv.vl(25, 6, 25, k[0])
-        cv.line([(6, 20), (9, 15), (12, 19), (15, 14), (20, 21), (23, 17)], g[0])   # ink mountains
-        cv.fill(cv.E(20, 12, 1.6, 1.6), RED[1])
+
+        cv, rng = new(2)                                     # Byōbu mit Blattgold, Kiefer und roter Sonne; eine Hand am Rand
+        g = (GOLD[0], GOLD[1], GOLD[2], GOLD[3])
+        panels = ((4, 11, 9, 6), (11, 18, 6, 9), (18, 25, 9, 6))
+        for i, (x0, x1, ya, yb) in enumerate(panels):
+            pm = cv.PG([(x0, ya), (x1, yb), (x1, yb + 19), (x0, ya + 19)])
+            cv.fill(pm, g[2] if i % 2 == 0 else g[1])
+            cv.fill(pm & (cv.Y > (ya + yb) / 2 + 13), g[1] if i % 2 == 0 else g[0])
+            cv.line([(x0, ya), (x1, yb)], K)
+            cv.line([(x0, ya + 19), (x1, yb + 19)], K)
+            cv.vl(x0, min(ya, yb), max(ya, yb) + 19, K)
+            cv.hline([(x0 + .5, ya + 1), (x1 - .5, yb + 1)], g[3] if i % 2 == 0 else g[2])
+        cv.vl(25, 6, 25, K)
+        cv.line([(9, 25), (9, 19), (10, 15), (12, 13)], '#2a1a14')     # Kiefernstamm in Tusche
+        cv.line([(10, 15), (7, 14)], '#2a1a14')
+        for (x, y) in ((6, 13), (11, 12), (14, 13), (8, 17)):
+            cv.grid(x - 1, y - 1, "aaa\n.a.", dict(a='#1c3a2a'))
+        cv.line([(13, 20), (16, 17), (19, 21), (22, 18)], '#3a2a20')     # ferne Berge
+        sun = cv.E(21.5, 12.5, 2, 2)
+        cv.fill(sun, RED[2])
+        cv.hpx(21, 12, RED[3])
+        for y in (24.5, 25):                                 # Goldwolken
+            cv.hline([(5, y + 1), (9, y)], g[3])
+        cv.hline([(19, 25.5), (24, 24)], g[3])
         out.append(fin(cv, P))
+        for y in (8, 9.5, 11):                               # bleiche Finger greifen um die Kante
+            cv.hline([(24.5, y), (26.5, y)], '#c8c0c8')
+            cv.hpx(26.5, y + .5, '#8a7a88')
+            cv.hpx(24, y, '#6a2a3a')
 
     elif name == 'oeyama':
         cv, rng, m = plain_boulder(0)
