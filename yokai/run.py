@@ -457,6 +457,7 @@ class Run:
               'curse': 'Fluchraum: Betreten kostet Leben, dafür lockt ein dunkler Schatz.',
               'yomeiri': 'Fuchshochzeit: Schieß nicht auf den Zug – dann bekommst du ein Geschenk.',
               'kakurenbo': 'Versteckspiel: Achte auf rosa Funken über einer Urne – zwei Versuche.',
+              'omikuji': 'Omikuji: Für 5 Mon ein Los ziehen. Ein Unglückslos bindest du für 3 Mon ans Gestell.',
               'ema': 'Ema-Wand: Berühre eine Tafel – nur ein Wunsch geht in Erfüllung.',
               'hyakki': 'Hyakki Yagyō: Weiche der Parade aus. Ohne Treffer gibt es zwei Truhen.',
               'challenge': 'Prüfungsraum: Mehrere Wellen überstehen, dann gibt es eine Belohnung.',
@@ -702,8 +703,9 @@ class Run:
                 self.pickups.append(Pickup('chest', cx + 30, cy, pop=False))
                 self.pickups.append(Pickup('spirit', cx, cy + 30, pop=False))
         elif k == 'omikuji':
-            self.objs.append(Obj('omikuji', cx - 40, cy))
-            self.objs.append(Obj('saisen', cx + 40, cy + 6))
+            self.objs.append(Obj('omikuji', cx - 50, cy))
+            self.objs.append(Obj('musubi', cx, cy - 40, n=random.randint(2, 5)))
+            self.objs.append(Obj('saisen', cx + 50, cy + 6))
         elif k == 'onsen':
             self.objs.append(Obj('onsen', cx, cy))
             self.banner('Heiße Quelle', 'Ein Bad heilt Körper und Geist', (140, 210, 230))
@@ -1864,35 +1866,67 @@ class Run:
                 self.pedestals.append(Pedestal(self.pick_item('K'), o.x, o.y - 30))
                 self.banner('Ein Kami erhört dich!', '', (255, 230, 150))
         elif k == 'omikuji':
-            if p.coins < 5:
+            if o.used or p.coins < 5:
                 return
             p.coins -= 5
-            o.cool = 1.0
+            o.used = True
             r = random.random() - 0.02 * p.s['luck']
             if r < 0.10:
+                o.data['kuji'] = 'kichi'
                 self.banner('Daikichi – Großes Glück!', 'Ein göttliches Geschenk', (255, 220, 120), big=True)
                 self.pedestals.append(Pedestal(self.pick_item('K'), o.x + 40, o.y - 30))
                 self.achieve('daikichi')
                 self.save.stat('daikichi')
                 audio.play('unlock')
-            elif r < 0.45:
-                self.banner('Kichi – Glück', 'Kleine Geschenke', (240, 220, 160))
-                for i in range(3):
-                    self.random_drop(o.x, o.y + 10)
-                audio.play('pickup')
-            elif r < 0.7:
+            elif r < 0.35:
+                o.data['kuji'] = 'kichi'
+                self.blessing = random.choice([b for b in BLESSINGS if b != self.blessing])
+                name, sub = BLESSINGS[self.blessing]
+                self.banner('Kichi – ' + name, sub, (255, 225, 140))
+                audio.play('unlock', 0.6)
+                if self.blessing == 'kami':
+                    p.heal(2)
+                    p.spirit += 2
+            elif r < 0.55:
+                o.data['kuji'] = 'kichi'
                 p.bonus['dmg'] += 0.3
                 p.recalc()
                 self.banner('Chūkichi – Mittleres Glück', 'Schaden +0.3', (240, 220, 160))
                 audio.play('pickup')
-            elif r < 0.9:
-                self.banner('Shōkichi – Kleines Glück', 'Ein paar Münzen', (220, 210, 170))
+            elif r < 0.75:
+                o.data['kuji'] = 'kichi'
+                self.banner('Shōkichi – Kleines Glück', 'Kleine Geschenke', (220, 210, 170))
                 for i in range(3):
-                    self.spawn_pickup('coin', o.x, o.y + 10)
+                    self.random_drop(o.x, o.y + 10)
+                audio.play('pickup')
             else:
-                self.banner('Kyō – Pech!', 'Binde den Zettel an den Baum…', (200, 120, 255))
-                p.iframes = 0
-                p.hurt(1, 'ein Unglückslos')
+                o.data['kuji'] = 'kyo'
+                dai = r >= 0.93
+                if p.f['curse_immune']:
+                    self.banner('Kyō – Pech!', 'Doch dein Schutz hält den Fluch fern', (200, 120, 255))
+                else:
+                    # nur Flüche, die nicht schon beim Erzeugen der Ebene greifen müssen
+                    self.curse = random.choice([c for c in ('dunkel', 'nebel', 'verirrt') if c != self.curse])
+                    self.banner('Daikyō – Großes Unglück!' if dai else 'Kyō – Pech!', CURSES[self.curse] + ' – binde das Los an das Gestell', (200, 120, 255), big=dai)
+                if dai:
+                    p.iframes = 0
+                    p.hurt(1, 'ein Unglückslos')
+                audio.play('drum', 0.7)
+        elif k == 'musubi':
+            if not self.curse or self.curse == 'labyrinth' or self.challenge == 'dunkle_nacht':
+                if not o.used:
+                    self.hint('musubi', 'Musubi-Gestell: Ein Unglückslos hier anbinden – für 3 Mon bleibt der Fluch zurück.')
+                return
+            if p.coins < 3:
+                self.hint('musubi_mon', 'Das Gestell verlangt ein Opfer von 3 Mon, um den Fluch zu binden.')
+                return
+            p.coins -= 3
+            o.cool = 1.0
+            o.data['n'] = min(9, o.data.get('n', 0) + 1)
+            self.banner('Der Fluch bleibt am Gestell zurück', CURSES[self.curse] + ' aufgehoben', (230, 225, 210))
+            self.curse = None
+            audio.play('bell', 0.6)
+            burst(self, o.x, o.y - 12, (240, 236, 220), 16, 50)
         elif k == 'tea':
             if o.used or p.coins < o.data['price']:
                 return

@@ -391,6 +391,34 @@ def omikuji():
     return _get(('omikuji',), mk)
 
 
+def musubi(n):
+    """Omikuji-kake: Holzgestell mit Strohseilen, an die Unglückslose geknotet werden (n Zettel)."""
+    def mk():
+        s = pygame.Surface((38, 32), pygame.SRCALPHA)
+        wood = (78, 50, 36)
+        for x in (2, 33):                                        # Pfosten mit Kappe
+            _box(s, x, 3, 3, 27, wood)
+            _box(s, x - 1, 1, 5, 3, sh(wood, 0.8))
+        _box(s, 1, 4, 36, 2, (104, 68, 44))                     # Querbalken
+        rope = (204, 178, 112)
+        for ry in (11, 19, 26):                                  # drei Strohseile, leicht durchhängend
+            for x in range(5, 33):
+                yy = ry + (1 if 10 < x < 28 else 0)
+                s.set_at((x, yy), rope)
+                if x % 3 == 0:
+                    s.set_at((x, yy), sh(rope, 0.7))
+        spots = [(8, 11), (17, 12), (26, 12), (12, 20), (22, 20), (29, 19), (7, 26), (16, 27), (25, 27)]
+        for i, (x, y) in enumerate(spots[:n]):                   # geknotete Zettel: Knoten oben, zwei Enden
+            paper = (244, 240, 228) if i % 3 else (232, 226, 210)
+            s.fill(paper, (x - 1, y - 2, 3, 2))
+            s.fill(paper, (x - 1, y + 1, 1, 4)); s.fill(paper, (x + 1, y + 1, 1, 3))
+            s.set_at((x, y), (176, 40, 40))                      # rote Losschrift
+            s.set_at((x - 1, y + 4), sh(paper, 0.75)); s.set_at((x + 1, y + 3), sh(paper, 0.75))
+        s.fill((60, 40, 30), (1, 29, 6, 2)); s.fill((60, 40, 30), (31, 29, 6, 2))
+        return _outline(s)
+    return _get(('musubi', n), mk)
+
+
 def ema(col, used):
     """Ema: hölzerne Votivtafel (Fünfeck) an roter Kordel, mit gemaltem Zeichen."""
     def mk():

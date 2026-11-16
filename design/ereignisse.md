@@ -9,6 +9,7 @@ und spielen die Nachtmarkt-Musik „Yomise“.
 | Kitsune no Yomeiri (Fuchshochzeit) | alle | ca. jede 7. Ebene | Nicht auf den Zug schießen | Schleier der Fuchsbraut, danach meist Fuchs-Items / Fuchsfeuer greifen an |
 | Kakurenbo (Versteckspiel) | ab II | ca. jede 7. Ebene | Die richtige von vier Urnen zerschlagen (rosa Funken verraten sie), zwei Versuche | Glück +1 und Temari-Ball (danach Mon) / nichts |
 | Ema-Wand | alle | ca. jede 6. Ebene | Einen von drei Wünschen wählen | Schaden, Herz, Mon, Karte+Schlüssel, Seelenherzen oder Feuerrate |
+| Omikuji-Schrein | alle | Sonderraum | Ein Los ziehen (5 Mon), Unglückslos am Musubi-Gestell anbinden (3 Mon) | Item, Ebenen-Segen, Schaden oder Drops / Ebenen-Fluch, bei Daikyō −1 Herz |
 | Hyakki Yagyō (Nachtparade) | ab II | ca. jede 9. Ebene | Den drei Reihen der Parade ausweichen | Eine Truhe, ohne Treffer zwei; Treffer kosten Herzen |
 
 Code: `yokai/yomeiri.py`, Raumverteilung in `yokai/rooms.py` (`extras`).

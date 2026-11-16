@@ -1699,7 +1699,15 @@ class Obj:
             gfx.TEXT.add('Saisen', x, y + 9, 6, (230, 210, 170), 'c')
         elif k == 'omikuji':
             put(props.omikuji(), y + 9)
-            gfx.TEXT.add('Omikuji 5 Mon', x, y + 10, 6, (230, 210, 170), 'c')
+            kuji = self.data.get('kuji')
+            if kuji:                                   # gezogenes Los schwebt mit 吉/凶-Siegel über dem Kasten
+                seal = gfx.env_img('_title', 'seal_' + kuji)
+                if seal:
+                    gfx.hi_blit(gfx.mini(seal[0], 36), x, y - 28 + int(math.sin(t * 2) * 1.5))
+            else:
+                gfx.TEXT.add('Omikuji 5 Mon', x, y + 10, 6, (230, 210, 170), 'c')
+        elif k == 'musubi':
+            put(props.musubi(self.data.get('n', 0)), y + 14)
         elif k == 'onsen':
             put(props.onsen(self.used), y + 16)
             if not self.used:
