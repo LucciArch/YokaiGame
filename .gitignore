@@ -5,3 +5,4 @@ dist/
 *.spec
 spielstand.json
 release_notes.md
+production/session-logs/
