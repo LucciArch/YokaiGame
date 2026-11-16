@@ -85,6 +85,7 @@
 - Runde 61 – **Pforten, Schreine und Tanuki-Automat neu gezeichnet** in doppelter Pixeldichte: Das Torii zur nächsten Ebene mit geschwungenem schwarzem Kasagi, Namenstafel, Keilen, Shimenawa mit Shide und schwarzen Sockelhülsen – in Zinnober, Blattgold (Takamagahara), weißem Holz (Heimkehr), morschem Violettlack mit Rissen (Yomi) und Sonnenorange (Ama-no-Iwato). Der Kami-Schrein hat ein Kupferdach mit Grünspan, Chigi, Gittertüren und einen leuchtenden Bronzespiegel, der Oni-Schrein ein schwarzes Dach mit Hörnern, rote Augen im Dunkel, zerrissene Ofuda und Knochen. Der Tanuki-Automat ist jetzt ein Shigaraki-Tanuki mit Strohhut, Augenmaske und Sakeflasche, und die Walzen sind endlich im Fenster zu sehen
 - Runde 62 – **Alle Raumobjekte in Hi-Res:** Ladentheke des Tanuki-Händlers mit Noren, Soroban und Münzen, Saisen-Kasten mit Lattendeckel, Messingbeschlägen und gedrehtem Glockenseil, Omikuji-Stand mit Dach und Losbüchse, Musubi-Gestell mit Strohseilen und geknoteten Losen, Ema-Tafeln (beschriftet, wenn eingelöst), Felsen-Onsen mit Bambusrinne und Wasserstrahl, Teehaus-Bank mit rotem Mōsen und Raku-Teeschale, Steintreppe zurück nach oben; auch das Lexikon zeigt Omikuji und Ema neu
 - Runde 63 – Fūjins Windsack **Kaze-bukuro** hat endlich ein eigenes Symbol: jadegrüner Sack mit roter Schnur, aus dem ein Sturmwirbel fährt (bisher stand dort nur eine Wolke)
+- Runde 64 – Auch im Epilog steht jetzt das neue Hi-Res-Torii auf dem Hügel
 
 ## 1.4.0 – „Hyakki-Update“ (enthält 1.3 „Kapitel-Update“)
 

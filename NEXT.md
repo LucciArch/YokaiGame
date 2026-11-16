@@ -24,14 +24,13 @@
   (`art_src/fable/environment/objects_hi.py`, gebaut auch von `hi.py`).
 - Runde 62: Ladentheke, Saisen, Omikuji, Musubi, Ema, Onsen, Teebank/-schale, Treppe in Hi-Res (gleiche Datei).
 - Runde 63: Symbol für `kaze_bukuro` (`art_src/fable/items/icons_v15.py`, Aufruf mit `PYTHONPATH=..`).
-- Durchsicht: Alle Gegner und Figuren sind Hi-Res, alle Items haben Symbole. Noch Low-Res: das Torii im Epilog
-  (`epilogue.py`, `props.torii`), Minikarten-Symbole sind bewusst klein.
+- Durchsicht: Alle Gegner und Figuren sind Hi-Res, alle Items haben Symbole. Runde 64: Epilog-Torii nutzt `torii_hi.png`.
+  Minikarten-Symbole sind bewusst klein.
 
 # Nächster Schritt: Requisiten Teil 6 – Enma-chō, Tsukiyomi und Yomi no Oku
 Gleiches Vorgehen wie Runde 56. Warum: letzte Biome mit Grundformen-Requisiten.
 
 # Weitere Ideen
-- Epilog-Torii auf `torii_hi.png` umstellen
 - Licht: Spielerin-Items mit Feuer/Licht (z. B. Kitsunebi-Familiar, Laternen-Items) als eigene Lichtquelle
 - Wanddekos Yashiki/Kawabe/Ōeyama/Shinkai ebenfalls in Hi-Res überarbeiten (`wall_decos`)
 - Totenpalast-Ambiente: eigene Partikel (Maden-Glühwürmchen, Izanamis acht Donnergötter als Blitze im Hintergrund)

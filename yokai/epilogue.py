@@ -139,9 +139,13 @@ class Epilogue:
         pygame.draw.rect(s, ground, (0, 250, W, H - 250))
         # Torii auf dem Hügel
         if not hasattr(self.g, '_title_torii_hi'):
-            from . import props
-            ti = props.torii((170, 34, 36))
-            self.g._title_torii_hi = gfx.scale2x(pygame.transform.scale(ti, (ti.get_width() * 2, ti.get_height() * 2)))
+            hi = gfx.env_img('_shared', 'torii_hi', 96)
+            if hi:
+                self.g._title_torii_hi = pygame.transform.scale_by(hi[0], 2)
+            else:
+                from . import props
+                ti = props.torii((170, 34, 36))
+                self.g._title_torii_hi = gfx.scale2x(pygame.transform.scale(ti, (ti.get_width() * 2, ti.get_height() * 2)))
         gfx.hi_blit(self.g._title_torii_hi, 300, 252)
         # Zug der Yōkai zieht nach links davon und verblasst im Morgenlicht
         a = int(255 * max(0.0, 1 - d * 1.4))
