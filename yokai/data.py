@@ -554,6 +554,7 @@ BOSSES = {
     'akkorokamui': dict(name='Akkorokamui', title='Der rote Riesenkrake', hp=560),
     'enma': dict(name='Enma-Daiō', title='Richter der Unterwelt', hp=860),
     'izanami': dict(name='Izanami', title='Die Göttin, die in Yomi blieb', hp=1450),
+    'amaterasu': dict(name='Amaterasu', title='Die Sonne, die sich verbarg', hp=2400),
     'kagutsuchi': dict(name='Kagutsuchi', title='Der Gott des Feuers', hp=1450),
     'mikaboshi': dict(name='Amatsu-Mikaboshi', title='Der böse Stern des Himmels', hp=1500),
     'fujin': dict(name='Fūjin', title='Der Gott des Windes', hp=1600),
@@ -563,7 +564,7 @@ BOSS_REWARD = {  # Freischaltung beim ersten Sieg
     'rokurokubi': 'tengu_auge', 'nue': 'yata_kagami', 'sojobo': None, 'raiju': 'kusanagi',
     'yuki_onna': 'yasakani', 'umibozu': None, 'ryujin': None, 'bake_kujira': None,
     'oonyudo': 'onyudo_kette', 'nurarihyon': 'nurarihyon_pfeife', 'kamaitachi_trio': 'kamaitachi_klingen',
-    'akkorokamui': 'akkoro_tinte', 'enma': 'enma_spiegel', 'izanami': 'izanami_schleier', 'kagutsuchi': 'kagutsuchi_glut',
+    'akkorokamui': 'akkoro_tinte', 'enma': 'enma_spiegel', 'izanami': 'izanami_schleier', 'amaterasu': None, 'kagutsuchi': 'kagutsuchi_glut',
     'fujin': 'kaze_bukuro', 'orochi': 'yamata_zahn', 'shuten_doji': 'shuten_schale', 'tamamo': 'kyubi_juwel', 'mikaboshi': 'hoshi_splitter',
 }
 
@@ -660,7 +661,8 @@ DEPTH_BIOMES[7] = ['yomi_oku']
 BIOMES['iwato'] = dict(name='Felsenhöhle der Sonne', jp='Ama-no-Iwato', depth=7, floor=(42, 28, 30), floor_pat='stone',
                        wall=(46, 28, 28), wall_pat='rock', rock=(110, 80, 60), moss=False, ambient='embers',
                        enemies=['komainu', 'tennin', 'karasu_tengu', 'kitsunebi_e', 'yamabiko', 'katawaguruma', 'kamaitachi', 'nurikabe'],
-                       music=('iwato', 220, 100, 'mystic', 57), dark=95, grade=(110, 60, 10), pit='void', decor='cracks')
+                       music=('iwato', 220, 100, 'mystic', 57), dark=95, grade=(110, 60, 10), pit='void', decor='cracks',
+                       boss='amaterasu')
 BOSS_POOL[6].remove('izanami')    # Izanami wartet jetzt in ihrem eigenen Reich
 BOSS_POOL[7] = ['izanami']
 

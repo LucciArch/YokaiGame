@@ -71,6 +71,15 @@
   "w": 322,
   "walk": 4
  },
+ "boss_amaterasu": {
+  "atk": 4,
+  "h": 146,
+  "hi": true,
+  "kind": "strip",
+  "n": 7,
+  "w": 188,
+  "walk": 4
+ },
  "boss_bake_kujira": {
   "atk": 4,
   "h": 122,

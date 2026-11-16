@@ -106,6 +106,7 @@ class Run:
         self.floor_no = 0       # fortlaufende Ebenen-Nummer
         self._prev_biome = None
         self._prev_boss = None
+        self.oku = None                 # Kapitel VII: 'yomi_oku' oder 'iwato', je nach gewählter Pforte
         self.time = 0.0
         self.result = None
         self.char = char_id
@@ -174,7 +175,7 @@ class Run:
 
     # ---------------------------------------------------------------- Lauf speichern / fortsetzen
     RUN_KEYS = ('relaxed', 'depth', 'stage', 'floor_no', 'loop', 'loop_mult', 'time', 'kills', 'rooms_cleared', 'coins_got',
-                'pool', 'active_pool', '_prev_biome', '_prev_boss')
+                'pool', 'active_pool', '_prev_biome', '_prev_boss', 'oku')
     PLAYER_SKIP = {'run', 'x', 'y', 'iframes', 'dash_t', 'dash_cd', 'dash_dir', 'dash_hit', 'dash_trail', 'shoot_cd',
                    'facing', 'flip', 'moving', 'anim', 'familiars', 'orb_angle', 'orb_hit_cd', 'aura_cd', 'knock',
                    'wind', 'vx', 'vy', 'hurt_buff', 'kagura', 'room_dmg_buff', 'recoil', 'temp', 'dead', 's', 'f'}
@@ -317,6 +318,8 @@ class Run:
         self.floor_no += 1
         self.bullet_speed_mult = ((1.12 if self.hard else 1.0) + 0.07 * self.loop + 0.045 * (self.tier - 1)) * (0.88 if self.relaxed else 1)
         opts = [b for b in DEPTH_BIOMES[self.depth] if not (self.stage == 1 and b == self._prev_biome)] or DEPTH_BIOMES[self.depth]
+        if self.depth == 7 and self.oku:                 # Kapitel VII: die gewählte Pforte bestimmt das Reich
+            opts = [self.oku]
         self.biome_id = rng.choice(opts)
         self._prev_biome = self.biome_id
         self.biome = BIOMES[self.biome_id]
@@ -340,7 +343,7 @@ class Run:
                 r.kind = 'shop'
                 r.locked = False
         bopts = [b for b in BOSS_POOL[self.depth] if not (self.stage == 1 and b == self._prev_boss)] or BOSS_POOL[self.depth]
-        self.boss_id = rng.choice(bopts)
+        self.boss_id = self.biome.get('boss') or rng.choice(bopts)
         self._prev_boss = self.boss_id
         self.rooms[self.boss_pos].boss_id = self.boss_id
         self.room = None
@@ -387,7 +390,7 @@ class Run:
             self.depth = depth or self.depth + 1
             self.stage = 0
         self.descend = 1.3
-        if self.depth > 6 and depth != 7:     # nur die Yomi-Pforte führt nach Kapitel VII
+        if self.depth > 6 and depth != 7:     # nur die Yomi- und die Iwato-Pforte führen nach Kapitel VII
             self.depth = 1
             self.loop += 1
             self.loop_mult = 1 + 0.6 * self.loop
@@ -1264,8 +1267,9 @@ class Run:
             if self.save['heaven_unlocked']:
                 self.objs.append(Obj('heaven', cx + 70, cy + 40))
         elif self.depth == 6 and self.save['stats'].get('true_wins', 0) and not self.challenge:
-            self.objs.append(Obj('victory', cx - 70, cy + 40))
-            self.objs.append(Obj('yomi', cx + 70, cy + 40))
+            self.objs.append(Obj('victory', cx - 105, cy + 40))
+            self.objs.append(Obj('iwato', cx, cy + 40))
+            self.objs.append(Obj('yomi', cx + 105, cy + 40))
         elif self.depth >= 6:
             self.objs.append(Obj('victory', cx, cy + 40))
         else:
@@ -2020,7 +2024,12 @@ class Run:
         elif k == 'heaven':
             self.go_deeper(6)
             self.banner('Takamagahara', 'Die Himmelsgefilde – hier wartet der böse Stern', (255, 230, 150), big=True)
+        elif k == 'iwato':
+            self.oku = 'iwato'
+            self.go_deeper(7)
+            self.banner('Ama-no-Iwato', 'Die Sonne hat sich in der Felsenhöhle verborgen – die Welt bleibt dunkel', (255, 210, 120), big=True)
         elif k == 'yomi':
+            self.oku = 'yomi_oku'
             self.go_deeper(7)
             self.banner('Yomi no Kuni', 'Tief im Totenreich wartet Izanami – wer hier isst, kehrt nie zurück', (190, 120, 220), big=True)
         elif k == 'victory':
@@ -2187,7 +2196,9 @@ class Run:
             s['char_wins'][self.char] = s['char_wins'].get(self.char, 0) + 1
             if self.depth >= 6:
                 s.stat('true_wins')
-            if self.depth == 7:
+            if self.depth == 7 and self.biome_id == 'iwato':
+                s.stat('iwato_wins')
+            elif self.depth == 7:
                 s.stat('yomi_wins')
                 self.achieve('yomi')
             self.achieve('seimei')

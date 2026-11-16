@@ -2478,6 +2478,119 @@ class Fujin(Boss):
         pygame.draw.circle(s, (60, 140, 90), (int(self.x), int(self.y)), self.r)
 
 
+class Amaterasu(Boss):
+    """Amaterasu-ōmikami, Endbossin von Ama-no-Iwato (Kapitel VII, zweiter Weg).
+    Phase 1: Sie hält sich in der Felsenhöhle verborgen – Dunkelheit, nur Lichtbahnen dringen durch die Spalten.
+    Phase 2: Ame-no-Uzume tanzt, die Götter lachen, die Sonne tritt hervor: Sonnenscheiben, Yata-Spiegel, Magatama.
+    Phase 3: Ōhirume – die volle Sonne: Feuerspirale und Sonnensäulen."""
+    sheet = ('boss_amaterasu', 1, None)
+    r = 15
+    GOLD = (255, 214, 90)
+    FIRE = (255, 140, 40)
+
+    def setup(self):
+        self.y = CY - 30
+        self.P2 = 0.66
+        self.extra_dark = 70
+        self.alpha = 150
+        self.attacks = ['cracks', 'mirror', 'magatama']
+        self.attacks2 = ['sunrings', 'mirror', 'magatama', 'pillars']
+
+    def on_phase2(self):
+        run = self.run
+        self.extra_dark = 0
+        self.alpha = 255
+        run.banner('Ame-no-Uzume tanzt', 'Die Götter lachen – neugierig tritt die Sonne aus der Höhle', (255, 220, 140), big=True)
+        audio.play('unlock')
+        self.ring(36, 70, 0, self.GOLD, 3)
+
+    def update(self, dt):
+        super().update(dt)
+        if self.phase == 2 and not self.dead and self.hp < self.maxhp * 0.33:
+            self.phase = 3
+            self.attacks = ['spiral', 'pillars', 'sunrings', 'mirror']
+            self.rest *= 0.8
+            run = self.run
+            run.banner('Ōhirume-no-Muchi', 'Die volle Sonne – der Himmel brennt', (255, 190, 90), big=True)
+            audio.play('roar')
+            run.shake(10)
+            self.summon('komainu', 2, 60)
+
+    def a_cracks(self):
+        """Licht durch die Spalten der Höhle: vier Bahnen drehen sich zweimal weiter."""
+        off = self.ang_p()
+        for k in range(3):
+            self.fire_t = self.t
+            for i in range(4):
+                a = off + k * 0.35 + i * math.tau / 4
+                for d in range(26, 300, 24):
+                    x, y = self.x + math.cos(a) * d, self.y + math.sin(a) * d
+                    if RX < x < RX + RW and RY < y < RY + RH:
+                        self.hazard(x, y, 10, 0.75 + d / 1200, 0.15, 'strike')
+            yield 0.7
+        yield 0.5
+
+    def a_mirror(self):
+        """Yata no Kagami: ein Fächer zur Spielerin, dann wirft der Spiegel ihn von der Gegenseite zurück."""
+        a = self.ang_p()
+        px, py = self.p.x, self.p.y
+        self.fan(7, 0.16, 120, self.GOLD, r=3)
+        yield 0.7
+        mx = clamp(2 * px - self.x, RX + 12, RX + RW - 12)
+        my = clamp(2 * py - self.y, RY + 12, RY + RH - 12)
+        self.run.particles.append(Particle(mx, my, 0, 0, 0.5, (255, 250, 210), 6))
+        audio.play('bell', 0.6)
+        self.fan(7, 0.16, 110, (255, 250, 210), x=mx, y=my, r=3)
+        yield 0.8
+
+    def a_magatama(self):
+        """Yasakani no Magatama: Ketten aus Krummjuwelen, die in Bögen fliegen."""
+        for k in range(6):
+            self.fire_t = self.t
+            for j in range(5):
+                a = k * 0.5 + j * math.tau / 5
+                ebullet(self.run, self.x, self.y, a, 85, (90, 220, 150), 4, curve=1.4 if k % 2 else -1.4)
+            yield 0.25
+        yield 0.6
+
+    def a_sunrings(self):
+        """Sonnenscheiben: drei Ringe, jeder versetzt, der letzte brennt."""
+        for k in range(3):
+            self.ring(14 + 3 * self.phase, 80 + k * 10, k * 0.17, self.FIRE if k == 2 else self.GOLD, 4 if k == 2 else 3,
+                      eff='burn' if k == 2 else None)
+            yield 0.45
+        yield 0.5
+
+    def a_pillars(self):
+        """Sonnensäulen fallen vom Himmel, wo die Spielerin steht."""
+        for i in range(4 + self.phase):
+            self.hazard(self.p.x + random.uniform(-14, 14), self.p.y + random.uniform(-10, 10), 20, 0.85, 0.25, 'fire')
+            yield 0.3
+        yield 0.6
+
+    def a_spiral(self):
+        """Ōhirume: dreiarmige Feuerspirale aus dem Sonnenkranz."""
+        for k in range(48):
+            if k % 4 == 0:
+                self.fire_t = self.t
+            for j in range(3):
+                ebullet(self.run, self.x, self.y - 6, k * 0.19 + j * math.tau / 3, 85, self.FIRE, 3)
+            yield 0.06
+        yield 0.6
+
+    def move(self, dt):
+        if self.phase == 1:                     # in der Höhle bleibt sie fast still
+            self.x = CX + math.sin(self.t * 0.3) * 20
+            self.y = CY - 40
+        else:
+            self.x = CX + math.sin(self.t * 0.45) * 90
+            self.y = CY - 30 + math.sin(self.t * 0.9) * 22
+
+    def render_under(self, s, t):
+        k = 0.5 + 0.5 * math.sin(t * 3)
+        gfx.draw_glow(s, int(self.x), int(self.y - 14), 40 if self.phase > 1 else 22, (255, 200, 90), int((60 if self.phase > 1 else 30) + 30 * k))
+
+
 BOSS_CLASSES = {
     'omukade': Omukade, 'kappa_ou': KappaOu, 'jorogumo': Jorogumo,
     'gashadokuro': Gashadokuro, 'rokurokubi': Rokurokubi, 'nue': Nue,
@@ -2486,7 +2599,7 @@ BOSS_CLASSES = {
     'orochi': Orochi, 'shuten_doji': ShutenDoji, 'tamamo': Tamamo,
     'mikaboshi': Mikaboshi,
     'oonyudo': Oonyudo, 'nurarihyon': Nurarihyon, 'kamaitachi_trio': KamaitachiTrio,
-    'akkorokamui': Akkorokamui, 'enma': Enma, 'izanami': Izanami, 'kagutsuchi': Kagutsuchi, 'fujin': Fujin,
+    'akkorokamui': Akkorokamui, 'enma': Enma, 'izanami': Izanami, 'amaterasu': Amaterasu, 'kagutsuchi': Kagutsuchi, 'fujin': Fujin,
 }
 
 

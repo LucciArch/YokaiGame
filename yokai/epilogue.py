@@ -37,6 +37,9 @@ STORY_TRUE = ['Der böse Stern ist gefallen, und die Himmelsgefilde sind frei.',
 STORY_YOMI = ['Izanami sinkt zurück in die Finsternis ihres Palastes. Die acht Donnergötter verstummen.',
               'Wie einst Izanagi rollst du den großen Fels vor Yomotsu Hirasaka – diesmal kehrt niemand zurück, der dir folgt.']
 
+STORY_IWATO = ['Vor der Felsenhöhle lachen die Götter, Ame-no-Uzume tanzt, und Amaterasu tritt neugierig ins Licht.',
+               'Ein Shimenawa wird vor Ama-no-Iwato gespannt – nie wieder soll sich die Sonne verbergen.']
+
 T_STORY = 4.2        # Sekunden pro Textblock
 T_CREDITS = 15.0
 
@@ -47,7 +50,7 @@ class Epilogue:
         self.t = 0.0
         self.true = run.depth >= 6
         self.char = run.char
-        story = STORY_YOMI if run.depth >= 7 else STORY_TRUE if self.true else STORY_NORMAL
+        story = STORY_IWATO if run.biome_id == 'iwato' else STORY_YOMI if run.depth >= 7 else STORY_TRUE if self.true else STORY_NORMAL
         end = ENDINGS.get(self.char, ('', ''))[1 if self.true else 0]
         self.blocks = story + [end]
         seen = [e for e in game.save.data.get('enemies_seen', []) if e in ENEMIES and sheets.has(ENEMIES[e]['sprite'])
