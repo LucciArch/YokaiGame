@@ -32,3 +32,17 @@ for depth, pool in data.BOSS_POOL.items():
             print('%-12s depth %d  killed=%s  t=%5.1fs  phase=%d hits=%d maxbullets=%d dps=%.1f' % (bid, depth, b.dead, t, b.phase, hits, maxeb, p.damage()*p.s['rate']))
         except Exception:
             traceback.print_exc(); print('CRASH', bid); break
+
+# Göttlicher Schutz: ab Kapitel VI höchstens 2 % pro Treffer und 8 % pro Sekunde
+g.start_run('hana', 7)
+run = g.run; run.depth = 6; run.room.cleared = False
+b = make_boss(run, 'mikaboshi'); run.enemies = [b]; run.boss = b
+b.spawn_t = 0
+h0 = b.hp
+run.damage_enemy(b, 1e9, None)
+assert abs((h0 - b.hp) - b.maxhp * 0.02) < 1, (h0, b.hp)
+for _ in range(20):
+    run.damage_enemy(b, 1e9, None)
+assert h0 - b.hp <= b.maxhp * 0.08 + 1, h0 - b.hp
+assert b.ward_t > 0
+print('Göttlicher Schutz greift: %.1f %% in einem Augenblick' % ((h0 - b.hp) / b.maxhp * 100))

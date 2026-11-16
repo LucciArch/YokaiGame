@@ -37,7 +37,7 @@ def fight(items, seed):
         b = make_boss(run, BOSS); run.enemies = [b]; run.boss = b
     t, dt, hits = 0, 1 / 60, 0
     if TOD and b:
-        b.hp = b.maxhp * 0.45
+        b._hp = b.maxhp * 0.45   # an der Schadensobergrenze vorbei
     while (RAUM or not b.dead) and t < 180:
         t += dt
         if RAUM:

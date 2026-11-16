@@ -49,6 +49,9 @@ class Boss(Enemy):
         self.attacks = ['ring']
         self.attacks2 = None
         self.rest = 0.9
+        self.divine = run.depth >= 6
+        self._budget = self.maxhp * self.SEC_CAP
+        self.ward_t = 0.0
         self.setup()
         if self.sheet:
             try:
@@ -60,6 +63,25 @@ class Boss(Enemy):
 
     def setup(self):
         pass
+
+    # ------------------------------------------------------------ Göttlicher Schutz
+    # Endbosse (ab Kapitel VI) nehmen pro Treffer höchstens 2 % und pro Sekunde höchstens 8 % ihrer Max-HP.
+    HIT_CAP, SEC_CAP = 0.02, 0.08
+
+    @property
+    def hp(self):
+        return self._hp
+
+    @hp.setter
+    def hp(self, v):
+        old = getattr(self, '_hp', None)
+        if old is not None and v < old and getattr(self, 'divine', False):
+            loss = min(old - v, self.maxhp * self.HIT_CAP, max(0.0, self._budget))
+            if loss < old - v - 0.01:
+                self.ward_t = 0.8
+            self._budget -= loss
+            v = old - loss
+        self._hp = v
 
     # ------------------------------------------------------------ Hilfen
     @property
@@ -141,6 +163,8 @@ class Boss(Enemy):
         run = self.run
         self.t += dt
         self.flash = max(0, self.flash - dt)
+        self.ward_t = max(0.0, self.ward_t - dt)
+        self._budget = min(self.maxhp * self.SEC_CAP, self._budget + self.maxhp * self.SEC_CAP * dt)
         if self.spawn_t > 0:
             self.spawn_t -= dt
             return

@@ -1050,7 +1050,9 @@ class Run:
             dmg *= 2
             self.floats.append([e.x, e.y - 14, 'Kritisch!', (255, 220, 90), 0.6])
         dmg = sigs.hit_pre(self, e, b, dmg)
+        h0 = e.hp
         e.hp -= dmg
+        dmg = min(dmg, h0 - e.hp)                    # Göttlicher Schutz kann den Treffer kappen
         e.flash = 0.07
         if b is not None:
             for _ in range(3):
@@ -2625,6 +2627,11 @@ class Run:
             tx_ = bx + int(bw * 0.25)                                                      # Wut-Schwelle
             pygame.draw.line(s, (255, 240, 220), (tx_, by - 2), (tx_, by + 5), 1)
             T.add(b.name, bx - 6, by - 4, 7, (255, 220, 200), 'r')
+            if getattr(b, 'divine', False):
+                warded = b.ward_t > 0
+                if warded:
+                    pygame.draw.rect(s, (255, 236, 160), (bx - 2, by - 2, bw + 4, 8), 1)
+                T.add('Göttlicher Schutz', bx + bw // 2, by - 9, 6, (255, 236, 160) if warded else (170, 150, 110), 'c')
         # Titelkarte
         if self.title_t > 0 and self.boss_intro <= 0:
             a = int(255 * min(1, self.title_t))
