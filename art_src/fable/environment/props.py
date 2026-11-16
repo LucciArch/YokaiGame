@@ -933,28 +933,98 @@ def rocks(name):
         out.append(fin(cv, P))
 
     elif name == 'enma_cho':
-        cv, rng = new(0)                                     # stone brazier
-        box(cv, k, 10, 24, 22, 28, top=2)
-        cv.rect(13, 17, 19, 23, k[1])
-        cv.vl(13, 17, 23, k[2])
-        cv.rect(18, 17, 19, 23, k[0])
-        bowl = cv.E(16, 14, 9.4, 5) & (cv.Y >= 13)
-        cv.form(bowl, (k[0], k[1], k[2]), 3, 1)
-        cv.hl(7, 25, 13, GOLD[1])
-        cv.fill(cv.E(16, 12, 6, 1.6), LAVA[1])
-        flame(cv, 10, 7)
-        flame(cv, 16, 6)
+        cv, rng = new(0)                                     # Bronzenes Kohlebecken auf drei Krallenfüßen
+        for (x0, x1) in ((11, 8), (21, 24), (16, 16)):
+            leg = capsule(cv, x0, 16, 1.1, x1, 26.5, .9)
+            cv.fill(dil(leg), K)
+            cv.form(leg, BRONZE[:3], 1, 1)
+            cv.fill(cv.E(x1, 27, 1.8, 1), BRONZE[2])        # Klaue
+            for dx in (-1.2, 0, 1.2):
+                cv.hpx(x1 + dx, 27.6, BRONZE[3])
+        bowl = cv.E(16, 13.5, 9.5, 5.2) & (cv.Y >= 12.5)
+        cv.fill(dil(bowl), K)
+        cv.form(bowl, BRONZE[:3], 2, 1)
+        for x in (10, 13, 16, 19, 22):                       # Rankenmuster
+            cv.hpx(x, 15.5, BRONZE[3])
+            cv.hpx(x + .5, 16, BRONZE[0])
+        cv.fill(cv.E(16, 16, 2, 1.6), K)                     # Oni-Fratze vorn
+        cv.hpx(15.5, 15.6, LAVA[3]); cv.hpx(16.5, 15.6, LAVA[3])
+        rim = cv.E(16, 12.5, 9.6, 2.2) & ~cv.E(16, 12.3, 8.6, 1.4)
+        cv.fill(rim, GOLD[2])
+        cv.fill(rim & (cv.Y > 12.8), GOLD[1])
+        cv.fill(cv.E(16, 12.3, 8.4, 1.4), LAVA[1])           # Glut
+        cv.fill(cv.E(16, 12.3, 5, .8), LAVA[2])
+        for (x, y) in ((9.5, 6), (15, 4), (19.5, 6.5)):
+            flame(cv, x, y)
+        for (x, y) in ((12, 3), (20, 2), (17, 1)):           # Funken
+            cv.hpx(x, y, LAVA[3])
         out.append(fin(cv, P))
-        cv, rng = new(1)                                     # judgment stele with gold script
+
+        cv, rng = new(1)                                     # Jōhari no Kagami: der Spiegel, der alle Taten zeigt
         box(cv, k, 8, 24, 24, 28, top=2)
-        m = cv.PG([(11, 23), (11, 7), (16, 4), (21, 7), (21, 23)])
-        cv.form(m, (k[0], k[1], k[2]), 3, 1)
-        for (x, ys) in ((14, (9, 12, 16, 19)), (17, (8, 11, 14, 18))):
-            for y in ys:
-                cv.rect(x, y, x + 1, y + 1, GOLD[1])
-                cv.px(x + 1, y + 1, GOLD[0])
+        for x in (10.5, 21.5):                               # Ständer
+            post = cv.R(x - .8, 17, x + .8, 24)
+            cv.fill(dil(post), K)
+            cv.form(post, RED[:3], 1, 1)
+        halo = cv.E(16, 12, 9, 9.5) & (cv.Y <= 19)           # Flammenkranz um den Spiegel
+        for i in range(9):
+            ang = math.pi * (1.1 + i * .1)
+            tx, ty = 16 + math.cos(ang) * 11, 12 + math.sin(ang) * 11.5
+            halo |= capsule(cv, 16 + math.cos(ang) * 8, 12 + math.sin(ang) * 8, 1.6, tx, ty, .3)
+        cv.fill(dil(halo), K)
+        cv.form(halo, GOLD[:3], 1, 1)
+        frame = cv.E(16, 12, 7, 7)
+        cv.fill(frame, RED[1])
+        cv.fill(frame & ~sh(frame, 1, 1), RED[3])
+        glass = cv.E(16, 12, 5.6, 5.6)
+        cv.fill(dil(glass) & frame, K)
+        cv.form(glass, ('#3a1a2a', '#6a2a3a', '#b05a4a'), 2, 1)
+        soul = cv.E(16, 11, 1.5, 1.6) | (cv.E(16, 15, 2.6, 2.6) & (cv.Y <= 16.5))   # Seele im Spiegel
+        cv.fill(soul & glass, '#e8c8b8')
+        cv.fill(soul & glass & ~sh(soul, -1, 0), '#c09a90')
+        cv.hline([(12.5, 8.5), (14, 7.5)], '#ffe8d0')        # Glanz
+        cv.hpx(16, 4.5, GOLD[3])
+        cv.fill(cv.E(16, 19.2, 2.2, 1), GOLD[2])
         out.append(fin(cv, P))
-        out.append(fin(pillar(2, k, bands=GOLD), P))
+
+        cv, rng = new(2)                                     # Nintōjō: Enmas Stab mit Miru-me und Kagu-hana
+        base = cv.E(16, 26.5, 7, 2.5) | cv.R(10, 23, 22, 26.5)
+        cv.fill(dil(base), K)
+        cv.form(base, k[:3], 2, 1)
+        cv.fill(cv.E(16, 23, 6, 1.6), k[3])
+        staff = capsule(cv, 16, 23, 1.2, 16, 12, 1)
+        cv.fill(dil(staff), K)
+        cv.form(staff, WOOD[1:], 1, 1)
+        for y in (21, 17):
+            cv.fill(staff & (cv.Y >= y) & (cv.Y < y + .8), GOLD[2])
+        lotus = cv.E(16, 12, 6, 2)                           # Lotussockel
+        cv.fill(dil(lotus), K)
+        cv.form(lotus, GOLD[:3], 1, 1)
+        for x in (11.5, 14, 16.5, 19):
+            cv.hline([(x, 12.5), (x + 1, 11)], GOLD[0])
+        for (cx, skin, side) in ((12.4, '#d8c8b8', -1), (19.6, '#9a3a2a', 1)):
+            head = cv.E(cx, 7.2, 3.2, 3.7)
+            hair = cv.E(cx, 6, 3.6, 3.4) & ~cv.E(cx, 7.6, 2.5, 3)
+            if side < 0:                                     # Miru-me: weißes Gesicht, langes schwarzes Haar
+                hair |= cv.R(cx - 3.5, 6, cx - 2.3, 11) | cv.R(cx + 2.3, 6, cx + 3.5, 11)
+            else:                                            # Kagu-hana: roter Zornkopf mit Haarknoten
+                hair |= cv.E(cx, 3, 1.4, 1.3)
+            cv.fill(dil(head | hair), K)
+            cv.form(head, (mix(skin, K, .45), skin, mix(skin, '#ffffff', .2)), 1, 1)
+            cv.fill(hair, '#1a1018')
+            cv.fill(hair & ~sh(hair, 1, 1), '#3a2a40')
+            for sx in (-1, 1):
+                ex = cx + sx * 1.3
+                cv.hline([(ex - .8, 6 - sx * side * .4), (ex + .8, 6 + sx * side * .4)], K)   # Brauen
+                cv.hpx(ex - .5, 7, '#f0e8d8'); cv.hpx(ex, 7, '#f0e8d8')
+                cv.hpx(ex - .5 + side * .5 * 0, 7, K) if side > 0 else cv.hpx(ex, 7, '#b02020')
+            if side < 0:
+                cv.hline([(cx - .5, 9.5), (cx + .5, 9.5)], '#a02030')
+            else:
+                cv.fill(cv.E(cx + .3, 8.2, 1, 1.1), mix(skin, '#ffffff', .2))   # die große, witternde Nase
+                cv.hpx(cx + .8, 8.8, K)
+                cv.hline([(cx - 1, 10), (cx, 9.6), (cx + 1, 10)], K)
+        out.append(fin(cv, P))
 
     elif name == 'tsukiyomi':
         cv, rng, m = plain_boulder(0)                        # moon rock with craters

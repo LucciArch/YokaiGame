@@ -701,7 +701,8 @@ PROP_LIGHT = {
     ('shinkai', 0): (16, 21, SEA, 36),                     # Perle der Hamaguri
     ('shinkai', 1): (16, 14, SEA, 26),                     # Leuchtfische
     ('shinkai', 2): (16, 14, SEA, 52),                     # versunkene Tōrō
-    ('enma_cho', 0): (14, 8, FIRE, 56),                    # Kohlebecken
+    ('enma_cho', 0): (15, 7, FIRE, 56),                    # Kohlebecken
+    ('enma_cho', 1): (16, 12, (255, 120, 90), 28),         # Jōhari-Spiegel
     ('yomi_oku', 0): (15, 8, ONIBI_C, 44),                 # Säule mit Totenfeuer
     ('yomi_oku', 1): (16, 26, ONIBI_C, 44),                # Herd der Unterwelt
 }
