@@ -52,6 +52,7 @@
 - Runde 28 – Ehrliche Hitboxen: Felsen, Krüge und Steinlaternen blocken nur noch dort, wo sie gezeichnet sind (Grundfläche statt voller Kachel) – für Figuren, Gegner, Talismane und Strahlen; Felsreihen bleiben dicht. Mit Flug-Items fliegst du jetzt über Felsen und Krüge (Laternen bleiben fest) und wirst dabei über ihnen gezeichnet. Neuer Test `tools/kolltest.py`
 - Runde 29 – Requisiten neu modelliert: Felsbrocken in neun Biomen (u. a. Bambuswald, Kurama, Schneeberg, Hölle, Mondpalast) haben jetzt eine Licht- und eine Schattenflanke, Risse mit Lichtkante, Körnung und Kiesel am Fuß; die Bambusstümpfe im Bambuswald sind schräg geschnitten, hohl, mit Knotenringen und Blattzweigen
 - Runde 30 – Grundfläche je Requisit: Jede Fels-Variante blockt nur so breit, wie sie gezeichnet ist (aus ihrem Sprite abgeleitet) – schmale Pfeiler, Takenoko, Grabsteine und Totenpfähle lassen dich jetzt dicht vorbei
+- Runde 31 – Requisiten Teil 2: Takamagahara hat jetzt Wolkenfelsen mit eingerollten Kumo-Spiralen und ein goldenes Magatama auf seinem Wolkenkissen; auf dem Schneeberg liegen facettierte Eisbrocken mit Rissen, Luftblasen und Schneekappe, die Eiszapfen stehen in einer Schneewehe
 
 ## 1.4.0 – „Hyakki-Update“ (enthält 1.3 „Kapitel-Update“)
 

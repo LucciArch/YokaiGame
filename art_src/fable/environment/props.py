@@ -363,16 +363,34 @@ def rocks(name):
         for (x, w, h, l) in ((5, 7, 14, -2), (19, 8, 16, 3), (11, 9, 23, 0)):
             spire(cv, k, x, 28, w, h, l)
         cv.line([(15, 12), (14, 16)], k[3])
+        drift = (cv.E(10, 28, 7, 2.6) | cv.E(21, 28.4, 6, 2.2)) & (cv.Y <= 28.6)
+        cv.fill(drift, P['snow'][1])
+        cv.fill(drift & ~sh(drift, 0, -1), P['snow'][2])
         out.append(fin(cv, P))
         cv, rng, m = plain_boulder(1, ramp=STONE)            # snow-covered boulder
         cover(cv, m, sn, 7, rng)
         out.append(fin(cv, P))
-        cv, rng = new(2)                                     # ice block
-        box(cv, k, 6, 9, 25, 28, top=6)
-        cv.line([(9, 18), (13, 26)], k[2])
-        cv.line([(15, 16), (20, 26)], k[2])
-        cv.line([(10, 17), (11, 19)], k[3])
-        cv.line([(9, 11), (14, 11)], '#d8ecf8')
+        cv, rng = new(2)                                     # Eisbrocken: drei Facetten, Risse, Luftblasen, Schneekappe
+        top = [(7, 13), (13, 9), (22, 8), (26, 12), (20, 15), (11, 16)]
+        m = cv.PG([(7, 13), (13, 9), (22, 8), (26, 12), (26, 25), (20, 29), (9, 28), (5, 24)])
+        left = cv.PG([(7, 13), (11, 16), (20, 15), (20, 29), (9, 28), (5, 24)]) & m
+        cv.fill(m, k[0])                                     # Schattenseite rechts
+        cv.fill(left, k[1])
+        cv.fill(left & (cv.X < 9), k[2])                     # Lichtkante links
+        cv.fill(cv.PG(top) & m, k[2])
+        cv.fill(cv.PG([(13, 10), (21, 9), (23, 11), (15, 12)]), k[3])
+        cv.hline([(11, 16), (20, 15), (26, 12)], k[3])       # Kanten fangen das Mondlicht
+        cv.hline([(20, 15), (20, 28)], mix(k[1], k[3], .5))
+        for path in (((10, 19), (12, 22), (11, 25)), ((15, 17), (17, 21)), ((23, 15), (22, 19), (24, 23))):
+            cv.hline(path, mix(k[0], K, .3))
+            cv.hline([(x + .5, y) for x, y in path], k[3])
+        for bx, by in ((13, 24), (16, 26), (8, 21), (23, 25)):
+            cv.hpx(bx, by, k[3])
+        sn = P['snow']
+        cap = cv.PG([(8, 13), (13, 9), (22, 8), (26, 12), (24, 13), (19, 12), (15, 14), (11, 13)])
+        cv.fill(cap, '#d8e8f4')
+        cv.fill(cap & (cv.Y > 11.5), sn[2])
+        cv.a[~m] = 0
         out.append(fin(cv, P))
 
     elif name == 'ryugu':
@@ -485,22 +503,38 @@ def rocks(name):
         pass
 
     elif name == 'takamagahara':
-        cv, rng = new(0)                                     # solid cloud lump
-        m = cv.E(11, 21, 6.4, 5.4) | cv.E(20, 22, 7.4, 5) | cv.E(16, 15, 6.4, 5.4) | cv.E(22, 16, 4, 3.4)
+        cv, rng = new(0)                                     # Kumo-ishi: Wolkenfels mit eingerollten Wolkenschnecken
+        lobes = ((10, 22, 6, 5), (21, 22, 7, 5), (15, 14, 6.5, 5.6), (23, 15, 4.4, 3.8), (7, 17, 3.6, 3.2))
+        m = np.zeros(cv.a.shape[:2], bool)
+        for cx_, cy_, rx_, ry_ in lobes:
+            m |= cv.E(cx_, cy_, rx_, ry_)
         m &= cv.Y <= 27
-        cv.form(m, (k[0], k[1], k[2]), 4, 1)
-        cv.fill(cv.E(15, 14, 4, 3) & ~cv.E(16, 15, 4, 3), k[3])
-        cv.fill((cv.E(10, 21, 4.4, 3.6) & ~cv.E(11, 22, 4.4, 3.6)), k[2])
+        cv.form(m, (k[0], k[1], k[2]), 3, 1)
+        for cx_, cy_, rx_, ry_ in lobes:                     # jede Wolke ein eigener Bausch mit Lichtkuppe
+            lit = cv.E(cx_ - rx_ * .25, cy_ - ry_ * .35, rx_ * .6, ry_ * .45) & m
+            cv.fill(lit, k[2])
+            cv.fill(lit & ~sh(lit, 1, 1), k[3])
+            cv.hline([(cx_ + rx_ * math.cos(a), cy_ + ry_ * math.sin(a)) for a in np.linspace(.15, 1.6, 6)], k[0])
+        for cx_, cy_, r in ((15, 15, 3.2), (21, 22, 3.4), (9, 22, 2.6)):   # Kumo-Spiralen
+            pts = [(cx_ + r * (1 - t * .8) * math.cos(t * 9.4), cy_ + r * .8 * (1 - t * .8) * math.sin(t * 9.4))
+                   for t in np.linspace(0, 1, 18)]
+            cv.hline(pts, mix(k[0], K, .3))
+        cv.a[~m] = 0
         out.append(fin(cv, P))
         out.append(fin(pillar(1, WHITE, bands=GOLD), P))     # white pillar, gold bands
         cv, rng = new(2)                                     # sacred jewel on a cloud cushion
         m = cv.E(12, 24, 5.4, 3.6) | cv.E(20, 24, 5.4, 3.6) | cv.E(16, 22, 5, 3)
         m &= cv.Y <= 27
         cv.form(m, (k[0], k[1], k[2]), 2, 1)
-        j = cv.E(16, 14, 5.4, 5.4)
+        # Magatama: runder Kopf oben mit Schnurloch, Schweif rollt rechts herum nach unten
+        j = ((cv.E(16, 14, 6, 6.4) & (cv.X >= 16)) | cv.E(16, 10.8, 3.2, 3.2)) & ~cv.E(16, 17.2, 3.2, 3.2)
         cv.fill(dil(j), GOLD[0])
-        cv.form(j, (GOLD[0], GOLD[1], GOLD[2]), 3, 1)
-        cv.rect(13, 11, 14, 12, GOLD[3])
+        cv.form(j, (GOLD[0], GOLD[1], GOLD[2]), 2, 1)
+        cv.fill(cv.E(18.5, 10.5, 1.4, 1.2), GOLD[3])
+        cv.fill(cv.E(16, 10.8, 1.1, 1.1), mix(GOLD[0], K, .5))   # Schnurloch
+        for i, (cx_, cy_) in enumerate(((10, 24), (21, 24))):
+            cv.hline([(cx_ + 2 * (1 - t * .8) * math.cos(t * 9 + i * 3), cy_ + 1.4 * (1 - t * .8) * math.sin(t * 9 + i * 3))
+                      for t in np.linspace(0, 1, 14)], k[0])
         out.append(fin(cv, P))
 
     elif name == 'kawabe':
