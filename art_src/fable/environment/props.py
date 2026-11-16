@@ -692,6 +692,35 @@ def rocks(name):
         cv.fill(dil(hm), K)
         cv.form(hm, (w[1], w[2], w[3]), 1, 1)
         out.append(fin(cv, P))
+
+    elif name == 'yomi_oku':
+        cv = pillar(0, VIOLET, bands=(GOLD[0], mix(GOLD[1], VIOLET[1], .5), GOLD[1]), broken=True)
+        cv.line([(13, 18), (12, 22), (14, 26)], VIOLET[0])          # Lack platzt ab
+        cv.grid(13, 6, "..a..\n.ab..\n.abb.\nabcba\n.bcb.", dict(a=ONIBI[1], b=ONIBI[2], c=ONIBI[3]))
+        out.append(fin(cv, P))
+        cv, rng = new(1)                                     # Yomotsu-hegui: Herd der Unterwelt mit Eisentopf
+        clay = ('#1e1018', '#3a2228', '#56362e', '#74503c')
+        m = cv.R(6, 15, 26, 28) | cv.E(16, 15, 10, 3)
+        cv.form(m, (clay[0], clay[1], clay[2]), 3, 1)
+        mouth = (cv.R(12, 22, 20, 28) | cv.E(16, 22, 4, 3)) & (cv.Y <= 28)
+        cv.fill(dil(mouth) & m, clay[0])
+        cv.fill(mouth, K)
+        cv.fill(cv.E(16, 27, 3.4, 2.2) & mouth, ONIBI[1])
+        cv.fill(cv.E(16, 27.5, 1.8, 1.2) & mouth, ONIBI[3])
+        cv.grid(15, 23, ".a\naa", dict(a=ONIBI[0]))
+        cv.hl(7, 25, 17, clay[3])
+        pot = cv.E(16, 11, 7, 4.6) & (cv.Y >= 8)
+        cv.fill(dil(pot), K)
+        cv.form(pot, IRON[:3], 2, 1)
+        cv.fill(cv.E(16, 8, 6.4, 1.6), IRON[0])
+        cv.fill(cv.E(16, 8.2, 5, 1), VIOLET[2])                  # was darin brodelt, isst man besser nicht
+        for (x, y) in ((12, 5), (18, 3), (21, 6)):
+            cv.grid(x, y, ".o\no.", dict(o=ONIBI[0]))
+        out.append(fin(cv, P))
+        cv, rng, m = plain_boulder(2, rx=12, ry=10)          # Chibiki-iwa: der Fels, der Yomi verschließt
+        rope(cv, 4, 28, 13, 3.4, shide=(9, 16, 23))
+        cv.a[~dil(dil(m))] = 0
+        out.append(fin(cv, P))
     return out
 
 
@@ -980,4 +1009,24 @@ def wall_decos(name, base):
             b.rect(x - 1, 10, x + 1, 11, s[2])
             b.px(x - 1, 10, s[3])
             b.px(x, 12, s[0])
+    elif name == 'yomi_oku':
+        v = VIOLET                                           # zerschlissene Misu-Jalousie mit Quaste
+        a.rect(5, 5, 26, 13, v[2])
+        for y in range(6, 14, 2):
+            a.hl(5, 26, y, v[1])
+        a.vl(26, 5, 13, v[0])
+        a.rect(4, 4, 27, 4, GOLD[0])
+        a.hl(4, 27, 3, v[2])
+        a.fill(a.PG([(18, 9), (24, 9), (22, 14), (19, 12)]), K)
+        a.vl(9, 5, 11, RED[1])
+        a.rect(8, 12, 10, 13, RED[2])
+        b2 = b
+        niche(b2, 10, 21, 5)                                  # Tōrō mit kaltem Totenfeuer
+        b2.vl(15, 5, 6, IRON[1])
+        b2.rect(13, 7, 18, 7, IRON[2])
+        b2.rect(13, 8, 18, 12, IRON[0])
+        b2.rect(14, 8, 17, 11, ONIBI[1])
+        b2.rect(15, 9, 16, 10, ONIBI[3])
+        b2.vl(15, 8, 11, IRON[0])
+        b2.rect(12, 13, 19, 13, IRON[2])
     return [a, b]

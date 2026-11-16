@@ -2,7 +2,7 @@
 from core import mix
 
 ORDER = ['chikurin', 'inari', 'obakedera', 'hakaba', 'kurama', 'yukiyama', 'ryugu', 'uminobe', 'yomi', 'jigoku',
-         'takamagahara', 'kawabe', 'yashiki', 'oeyama', 'shinkai', 'enma_cho', 'tsukiyomi']
+         'takamagahara', 'kawabe', 'yashiki', 'oeyama', 'shinkai', 'enma_cho', 'tsukiyomi', 'yomi_oku']
 
 
 def B(floor_pat, wall_pat, pit, dark, f, cap, w, k, **extra):
@@ -29,6 +29,8 @@ ICE = ('#1c2c58', '#2e4c80', '#5080b0', '#98cce8')
 GLOW = ('#0e3a4a', '#1a6a78', '#3aa8a8', '#90e8d0')     # deep-sea bioluminescence
 STONE = ('#191a28', '#2a2c40', '#40445c', '#5c627e')
 SILVER = ('#2a3050', '#4a5478', '#7a86a8', '#b4c0d8')
+VIOLET = ('#1a0c24', '#2e1638', '#48244e', '#6a3a64')     # Izanamis morscher Schwarzlack
+ONIBI = ('#2a1a5a', '#5a3aa8', '#9a7ae0', '#d8c8ff')      # kaltes Totenfeuer
 
 BIOMES = {
     'chikurin': B('grass', 'bamboo', 'void', 0,
@@ -88,4 +90,7 @@ BIOMES = {
     'tsukiyomi': B('cloud', 'cloud', 'cloud', 50,
                    ('#1f2338', '#2a2e46', '#353b55', '#464e6c'), ('#22263e', '#30354e', '#9aa6c8'),
                    SILVER, ('#262c48', '#465070', '#7682a4', '#b0bcd4')),
+    'yomi_oku': B('stone', 'stone', 'void', 80,
+                  ('#100a14', '#1c1220', '#26182a', '#322036'), ('#0c0610', '#180c1c', '#6a3a64'),
+                  VIOLET, ('#160c1c', '#2c1a30', '#463048', '#64506a')),
 }

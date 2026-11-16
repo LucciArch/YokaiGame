@@ -69,6 +69,8 @@ def cap_tex(name, P, w, h, seed=0):
             scat(["mm.\nmmm", "mmm\n.mm", "mm"], dict(m=MOSS[0]), area // 60)
         if name == 'enma_cho':
             scat(["gg"], dict(g=GOLD[0]), area // 90, pad=3)
+        if name == 'yomi_oku':
+            scat(["vv.\nvvv", "v\nv"], dict(v=VIOLET[0]), area // 70, pad=2)
     elif pat in ('rock', 'bone') or name == 'shinkai':
         for _ in range(area // 30):
             rx, ry = rng.uniform(2, 4), rng.uniform(1.4, 2.4)
@@ -214,6 +216,15 @@ def face(name, P, seed=0):
             f.grid(3, 0, "mmmm.\n.mmn.\n..m..", dict(m=MOSS[0], n=MOSS[1]))
             f.grid(20, 0, "mmm\nmn.\nm..", dict(m=MOSS[0], n=MOSS[1]))
             f.line([(27, 5), (25, 7), (26, 9)], w0)
+        if name == 'yomi_oku':                      # Schwarzlack-Band mit Knochennieten, Fäulnisspuren
+            f.rect(0, 0, 31, 1, VIOLET[1])
+            f.hl(0, 31, 0, VIOLET[2])
+            f.hl(0, 31, 2, w0)
+            for x in range(4, 32, 8):
+                f.px(x, 1, BONE[2])
+                f.px(x + 1, 1, BONE[1])
+            f.vl(11, 3, 7, VIOLET[0])
+            f.vl(26, 3, 5, VIOLET[0])
         if name == 'enma_cho':
             f.rect(0, 0, 31, 1, RED[1])
             f.hl(0, 31, 0, RED[2])

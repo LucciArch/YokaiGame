@@ -475,6 +475,23 @@ def deco_floor(name, P, rng, which):
             cv.line([(12, 14), (15, 13), (19, 18)], LAVA[1])
             cv.line([(15, 13), (17, 9)], LAVA[0])
             cv.rect(15, 14, 16, 14, LAVA[2])
+    elif name == 'yomi_oku':
+        v0, v1, v2, v3 = VIOLET
+        if which == 0:   # Yomotsu-hegui: umgestürzte Lackschale, verschütteter Totenreis
+            blob(cv, rng, 17, 18, 4.4, P['fb'], 9, 24)
+            m = cv.E(13, 14, 4.6, 3.4) & cv.R(0, 0, 31, 15)
+            cv.fill(dil(m), f0)
+            cv.form(m, (v0, v1, v2), 1, 1)
+            cv.hl(10, 16, 15, RED[1])
+            for (x, y) in ((17, 16), (19, 17), (16, 19), (20, 19), (18, 21), (22, 18), (15, 17)):
+                cv.px(x, y, BONE[2])
+            cv.px(21, 20, BONE[1])
+        else:            # Riss, aus dem kaltes Totenfeuer schimmert
+            cv.line([(8, 12), (12, 15), (15, 13), (19, 18), (24, 19)], ONIBI[0])
+            cv.line([(12, 15), (15, 13), (19, 18)], ONIBI[1])
+            cv.line([(15, 13), (16, 8)], ONIBI[0])
+            cv.rect(15, 14, 16, 14, ONIBI[2])
+            cv.grid(19, 8, "o.\noo", dict(o=ONIBI[1]))
     elif name == 'tsukiyomi':
         s0, s1, s2, s3 = SILVER
         if which == 0:   # crescent inlay

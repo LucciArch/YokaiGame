@@ -658,7 +658,6 @@ BOSS_POOL[7] = ['izanami']
 
 for _k, _b in BIOMES.items():
     _b['_id'] = _k
-BIOMES['yomi_oku']['_id'] = 'yomi'   # shortcut: nutzt die Kacheln der Unterwelt, eigene Grafik wenn Kapitel VII ausgebaut wird
 
 
 # Jedes Item bekommt sein eigenes Symbol (assets/items/icons/<id>.png), falls vorhanden
