@@ -795,54 +795,141 @@ def rocks(name):
             cv.hpx(24, y, '#6a2a3a')
 
     elif name == 'oeyama':
-        cv, rng, m = plain_boulder(0)
+        cv, rng, m = plain_boulder(0, rx=11, ry=8)           # Kanabō der Oni, in den Fels gerammt
+        for path in ([(15, 17), (12, 20), (12.5, 23)], [(17, 18), (20, 21)]):     # Einschlagrisse
+            cv.hline(path, K)
+            cv.hline([(x + .5, y + .5) for x, y in path], k[2])
+        kb = capsule(cv, 15.5, 18, 1.4, 21.5, 2.5, 2.7)
+        cv.fill(dil(kb), K)
+        cv.form(kb, IRON[:3], 1, 1)
+        cv.hline([(15.5, 17), (20.5, 3.5)], IRON[3])
+        for i in range(6):                                   # Eisennieten, versetzt
+            t = .12 + i * .16
+            x, y = 15.5 + 6 * t, 18 - 15.5 * t
+            for sx in ((-1.5, 1.3) if i % 2 else (0,)):
+                cv.fill(cv.E(x + sx + .3, y + .3, .7, .7), K)
+                cv.fill(cv.E(x + sx, y, .55, .55), '#b0b8d0')
+        cv.fill(cv.E(16, 17.5, 3, 1.2) & ~kb, k[0])        # Splitter am Einschlag
         out.append(fin(cv, P))
-        cv, rng = new(1)                                     # komodaru sake barrel
-        m, t = cyl(cv, STRAW, 16, 28, 9, 15, top=(STRAW[1], STRAW[2], STRAW[3]))
+
+        cv, rng = new(1)                                     # Komodaru: Strohfass mit Seil, Oni-Mon und Schöpfkelle
+        m, t = cyl(cv, STRAW, 16, 28, 9, 15, top=WOOD[1:])
         side = m & ~t
-        for y in (18, 25):
-            cv.fill(side & (cv.Y == y), STRAW[0])
-        for x in (9, 23):
-            cv.fill(side & (cv.X == x), STRAW[0])
-        cv.rect(13, 19, 18, 24, PAPER[2])
-        cv.rect(14, 20, 17, 23, RED[2])
-        cv.rect(15, 21, 16, 22, PAPER[2])
+        for x in range(8, 25, 2):                            # Strohhalme
+            cv.fill(side & (cv.X >= x) & (cv.X < x + .5), STRAW[1])
+        for y in (17, 25):                                   # Seilbänder
+            bm = side & (cv.Y >= y) & (cv.Y < y + 1.5)
+            cv.fill(bm, STRAW[3])
+            cv.fill(bm & (cv.Y >= y + 1), STRAW[1])
+            for x in range(8, 25, 2):
+                cv.hpx(x, y + .5, STRAW[0])
+        lab = cv.R(12, 18.5, 20, 24.5)                       # Etikett: schwarz mit rotem Oni-Mon
+        cv.fill(lab, '#1a1018')
+        cv.fill(cv.E(16, 21.5, 2.4, 2.4), RED[2])
+        cv.fill(cv.E(16, 21.5, 1.2, 1.2), GOLD[3])
+        for sx in (-1, 1):
+            cv.hline([(16 + sx * 1, 19.6), (16 + sx * 2.2, 18.6)], GOLD[3])     # Hörner im Mon
+        for y in (14.5, 15.5):                               # Holzdeckel mit Fugen
+            cv.hline([(9, y), (23, y)], WOOD[0]) if y < 15 else None
+        cv.hline([(10, 12.5), (22, 12.5)], WOOD[0])
+        h = capsule(cv, 10, 11.5, .5, 25, 7, .5)             # Hishaku-Kelle quer über dem Deckel
+        cv.fill(dil(h), K)
+        cv.fill(h, WOOD[3])
+        cup = cv.E(25.5, 7.5, 2, 1.6)
+        cv.fill(dil(cup), K)
+        cv.form(cup, WOOD[1:], 1, 1)
+        cv.fill(cv.E(25.5, 7, 1.2, .6), '#c8b8a0')         # Sake darin
         out.append(fin(cv, P))
-        cv, rng = new(2)                                     # skulls on stakes
-        w = ('#1c121c', '#3a2428', '#58382c')
-        for (x, top) in ((10, 12), (21, 8)):
-            cv.rect(x, top, x + 1, 28, w[1])
-            cv.vl(x + 1, top, 28, w[0])
-        skull(cv, 10.5, 11, BONE, r=3.8)
-        skull(cv, 21.5, 7, BONE, r=3.8)
-        cv.line([(6, 28), (14, 25)], w[2])
-        cv.line([(17, 26), (26, 28)], w[2])
+
+        cv, rng = new(2)                                     # Knochenhaufen der Ōeyama-Bande, obenauf eine Oni-Maske
+        heap = cv.E(16, 27, 12, 5) & (cv.Y <= 28)
+        cv.fill(dil(heap), K)
+        cv.form(heap, BONE[:3], 2, 1)
+        for (x0, y0, x1, y1) in ((6, 26, 13, 23), (18, 24, 26, 27), (10, 27, 17, 25), (20, 23, 24, 21)):
+            bone(cv, x0, y0, x1, y1, BONE)
+        skull(cv, 8.5, 22, BONE, r=3)
+        skull(cv, 24, 22.5, BONE, r=2.8)
+        face = cv.E(16, 15, 5.4, 6.2) & (cv.Y <= 21)          # Hannya-artige Oni-Maske, leicht schräg aufgelegt
+        horns = capsule(cv, 12, 10, 1.3, 9.5, 4, .4) | capsule(cv, 20, 10, 1.3, 22.5, 4, .4)
+        cv.fill(dil(face | horns), K)
+        cv.form(horns, BONE[1:], 1, 1)
+        cv.form(face, RED, 2, 1)
+        cv.fill(face & (cv.Y < 10.5), '#1a1018')           # Haaransatz
+        for sx in (-1, 1):
+            br = cv.PG([(16 + sx * 1, 12.5), (16 + sx * 4.2, 11), (16 + sx * 4, 12.5)])
+            cv.fill(br, K)
+            cv.fill(cv.E(16 + sx * 2.3, 14.2, 1.1, .8), GOLD[3])
+            cv.hpx(16 + sx * 2.3, 14.2, K)
+        cv.fill(cv.R(13, 18, 19, 19.5), K)                  # Maul mit Hauern
+        for x in (13.5, 18):
+            cv.hline([(x, 18), (x, 16.5)], BONE[3])
+        cv.hline([(14.5, 19), (17.5, 19)], BONE[3])
+        cv.hline([(15.5, 15), (16.5, 16)], RED[0])
         out.append(fin(cv, P))
 
     elif name == 'shinkai':
-        cv, rng = new(0)                                     # brain coral
-        m = cv.E(16, 21, 10.4, 8.4) & (cv.Y <= 28)
-        cv.form(m, (k[0], k[1], k[2]), 4, 1)
-        for pts in ([(8, 20), (11, 17), (14, 19), (17, 16), (20, 18)], [(9, 24), (13, 22), (16, 24), (20, 22), (23, 24)],
-                    [(12, 14), (15, 13), (18, 14)]):
-            cv.line(pts, k[0])
-            cv.line([(x, y + 1) for x, y in pts], k[3] if pts[0][1] < 21 else k[2])
+        cv, rng = new(0)                                     # Riesenmuschel: die Hamaguri atmet ein Shinkirō aus
+        lo = cv.E(16, 23, 11, 5.2) & (cv.Y >= 21)
+        up = cv.E(16, 21, 11, 7.5) & (cv.Y <= 21) & ~cv.R(0, 0, 32, 13)
+        cv.fill(dil(lo | up), K)
+        cv.form(up, (k[1], k[2], k[3]), 2, 1)
+        cv.form(lo, (k[0], k[1], k[2]), 2, 1)
+        for x in range(8, 26, 3):                            # Rippen
+            cv.hline([(16 + (x - 16) * .4, 15), (x, 20)], k[1])
+            cv.hline([(x, 22.5), (16 + (x - 16) * .9, 27)], k[0])
+        gap = cv.E(16, 21.6, 9.5, 1.3)
+        cv.fill(gap, K)
+        cv.fill(cv.E(16, 21.6, 1.8, 1.4), GLOW[3])         # Perle
+        cv.hpx(15.5, 21, '#ffffff')
+        cv.fill(cv.E(16, 21.6, 6, .6) & ~cv.E(16, 21.6, 2, 2), GLOW[1])
         out.append(fin(cv, P))
-        cv, rng = new(1)                                     # glowing tube sponges
-        for (x, h, r) in ((9, 12, 3), (22, 15, 3.2), (15.5, 21, 3.6)):
-            m, t = cyl(cv, k, x, 28, r, h, top=(GLOW[0], GLOW[1], GLOW[2]))
-            cv.fill(cv.E(x, 28 - h, r - 1.4, 1), K)
+        for i, (x, y) in enumerate(((16, 11), (15, 9), (17, 7), (16, 5), (14, 3.5), (19, 4))):   # Spiegelbild-Dunst
+            cv.hpx(x, y, GLOW[2] if i < 3 else GLOW[1])
+            cv.hpx(x + .5, y - .5, GLOW[1])
+
+        cv, rng = new(1)                                     # Sango-Koralle mit Leuchtfischen
+        rc = ('#3a0e2a', '#7a1a3a', '#b03a4a', '#e07a6a')
+        br = np.zeros_like(cv.m)
+        for (x0, y0, x1, y1, r) in ((16, 28, 15, 15, 1.6), (15, 15, 10, 8, 1), (15, 17, 21, 9, 1.1), (21, 9, 24, 5, .7),
+                                    (12, 11, 8, 13, .7), (19, 12, 18, 6, .7), (16, 22, 24, 17, 1), (24, 17, 26, 13, .6),
+                                    (15, 23, 7, 19, .9), (7, 19, 6, 15, .6)):
+            br |= capsule(cv, x0, y0, r + .3, x1, y1, r)
+        cv.fill(dil(br), K)
+        cv.form(br, rc[:3], 1, 1)
+        for (x, y) in ((10, 8), (24, 5), (18, 6), (8, 13), (26, 13), (6, 15)):
+            cv.hpx(x, y, rc[3])
+        rock = cv.E(16, 28, 5, 2) & (cv.Y <= 28)
+        cv.form(rock, k[:3], 1, 1)
         out.append(fin(cv, P))
-        cv, rng = new(2)                                     # giant spiral shell
-        s = (P['shell'][0], P['shell'][1], P['shell'][2], '#6a8a98')
-        m = cv.E(15, 19, 10.4, 9) & (cv.Y <= 28)
-        cv.form(m, (s[0], s[1], s[2]), 4, 1)
-        for (rx, ry) in ((7, 6), (4, 3.4)):
-            ring = (cv.E(14, 18, rx, ry) & ~cv.E(14.6, 18.6, rx - 1, ry - 1)) & m
-            cv.fill(ring, s[0])
-        cv.fill(cv.E(13.5, 18, 1.4, 1.2), s[3])
-        cv.fill(cv.PG([(22, 22), (27, 24), (27, 28), (20, 28)]), s[1])
-        cv.fill(cv.PG([(23, 24), (26, 25), (26, 27), (22, 27)]), K)
+        for (x, y, d) in ((5, 8, 1), (26, 21, -1)):          # Leuchtfische
+            f = cv.E(x, y, 1.6, .9) | cv.PG([(x - d * 1.4, y), (x - d * 2.8, y - 1), (x - d * 2.8, y + 1)])
+            cv.fill(f, GLOW[2])
+            cv.fill(f & (cv.Y > y + .2), GLOW[1])
+            cv.hpx(x + d * .8, y - .2, K)
+            cv.hpx(x - d * .2, y - .5, GLOW[3])
+
+        cv, rng = new(2)                                     # versunkene Tōrō-Steinlaterne mit Seepocken, Licht noch an
+        st = k
+        base = cv.R(11, 25, 21, 28)
+        post = cv.R(14, 18, 18, 25)
+        fbox = cv.R(11.5, 11, 20.5, 17)
+        roof = cv.PG([(7, 11), (10, 8), (16, 5.5), (22, 8), (25, 11), (23, 10.5), (9, 10.5)])
+        cap = cv.E(16, 5, 1.4, 1.6)
+        sil = base | post | fbox | roof | cap | cv.R(12, 17, 20, 18)
+        cv.fill(dil(sil), K)
+        for part in (base, post, fbox, cv.R(12, 17, 20, 18), roof, cap):
+            cv.form(part, (st[0], st[1], st[2]), 1, 1)
+        cv.fill(cv.R(13.5, 12.5, 18.5, 15.5), K)            # Lichtfenster
+        cv.fill(cv.E(16, 14, 2, 1.4), GLOW[2])
+        cv.fill(cv.E(16, 14, 1, .7), GLOW[3])
+        cv.hline([(9, 10), (23, 10)], st[3])
+        for (x, y) in ((12, 26), (19.5, 25.5), (14.5, 20), (21, 9), (8.5, 10.5), (17.5, 22.5)):   # Seepocken
+            cv.hpx(x, y, BONE[3])
+            cv.hpx(x + .5, y + .5, BONE[1])
+        for (x0, h, s) in ((10, 9, 1), (22, 12, -1), (20, 6, 1)):   # Seetang windet sich hoch
+            pts = [(x0 + math.sin(i * .9) * s, 28 - i) for i in range(h)]
+            cv.hline(pts, MOSS[2])
+            cv.hline([(x + .5, y) for x, y in pts], MOSS[1])
         out.append(fin(cv, P))
 
     elif name == 'enma_cho':
