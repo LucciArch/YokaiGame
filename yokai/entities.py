@@ -1741,14 +1741,22 @@ class Obj:
                 f_ = 0.5 + 0.5 * math.sin(t * 3 + i * 0.5)
                 pr.fill((int(20 + 40 * f_ * (col[0] / 255)), int(10 + 30 * f_ * (col[1] / 255)), int(24 + 40 * f_ * (col[2] / 255))), (0, i, 22, 1))
             s.blit(pr, (x - 11, y - 16))
-            put(props.torii(col), y + 5)
+            hi = gfx.env_img('_shared', 'torii_hi', 96)
+            if hi:
+                gfx.hi_blit(hi[('torii', 'heaven', 'victory', 'yomi', 'iwato').index(k)], x, y + 7)
+            else:
+                put(props.torii(col), y + 5)
             txt = {'torii': 'Tiefer hinab', 'heaven': 'Aufstieg nach Takamagahara', 'victory': 'Die Reise beenden', 'yomi': 'Hinab nach Yomi no Kuni', 'iwato': 'Zur Felsenhöhle Ama-no-Iwato'}[k]
             gfx.TEXT.add(txt, x, y + 8, 6, (255, 240, 200), 'c')
         elif k == 'shrine':
             oni = self.data.get('oni')
             col = (200, 40, 50) if oni else (250, 230, 150)
             gfx.draw_glow(s, x, y - 6, 22, col, 90)
-            put(props.hokora(bool(oni)), y + 6)
+            hi = gfx.env_img('_shared', 'hokora_hi', 64)
+            if hi:
+                gfx.hi_blit(hi[1 if oni else 0], x, y + 7)
+            else:
+                put(props.hokora(bool(oni)), y + 6)
             gfx.TEXT.add('Oni-Schrein' if oni else 'Kami-Schrein', x, y + 8, 6, col, 'c')
         elif k == 'ema':
             col = tuple(self.data['col'])
@@ -1769,12 +1777,18 @@ class Obj:
                 gfx.TEXT.add(nm, x, y + 10, 6, (240, 225, 190), 'c')
                 gfx.TEXT.add('%d Mon' % price, x, y + 18, 6, (255, 230, 120), 'c')
         elif k == 'slots':
-            put(props.slots_cab(), y + 11)
+            hi = gfx.env_img('_shared', 'slots_hi', 64)
+            if hi:
+                gfx.hi_blit(hi[0], x, y + 11)
+                s.fill((18, 12, 20), (x - 9, y - 10, 18, 7))      # Walzen liegen unter dem ausgestanzten Fenster
+                s.fill((40, 30, 40), (x - 9, y - 10, 18, 1))
+            else:
+                put(props.slots_cab(), y + 11)
             icons = ['coin', 'leaf', 'heart', 'flame', 'star']
             for i in range(3):
                 ic = icons[int((t * 12 if self.cool > 0.3 else 0) + i * 2 + self.data.get('res', 0)) % len(icons)]
                 D.circle(s, {'coin': (230, 190, 70), 'leaf': (90, 170, 80), 'heart': (220, 50, 60), 'flame': (255, 140, 40), 'star': (250, 230, 120)}[ic],
-                         (x - 6 + i * 6, y - 8), 2)
+                         (x - 6 + i * 6, y - 7 if hi else y - 8), 2)
             gfx.TEXT.add('Tanuki-Automat 3 Mon', x, y + 12, 6, (240, 225, 190), 'c')
         elif k == 'back':
             put(props.stairs_up(), y + 10)

@@ -8,6 +8,7 @@ from biomes import ORDER
 from props import rocks
 import shared
 import shared_hi
+import objects_hi
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DST = os.path.join(HERE, '..', '..', '..', 'yokai', 'assets', 'env')
@@ -17,6 +18,7 @@ def build():
     for n in ORDER:
         strip(rocks(n), os.path.join(DST, n, 'rock_hi.png'))
     shared_hi.build(os.path.join(DST, '_shared'))
+    objects_hi.build(os.path.join(DST, '_shared'))
 
 
 if __name__ == '__main__':
