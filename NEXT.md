@@ -1,21 +1,23 @@
 # Nächster Schritt
 
-**Raum-Synergien messbar machen und nachbalancieren** – Runden 18–19 haben die letzten 12 ungebundenen Items
-in 6 neue Synergien gebracht (Gashadokuro, Tsukumogami, Shinsen, Nanakorobi Yaoki, Jinmenju, Mokumokuren);
-jetzt gehört jedes Item zu mindestens einer Synergie (96 insgesamt).
+**Ausweichender Mess-Bot für Dash- und Nahkampf-Synergien** – Runde 20 hat `tools/synbalance.py --raum`
+(drei Gegnerwellen) gebracht und Tsukuyomis Sichelbögen repariert (Mondschein-Teich lief ins Zeitlimit),
+Runde 21 eigene Grafik für Ratten und Knochensplitter. Im Raum-Bericht
+(`design/balance/balance-check-20-raum.md`) sind die langsamsten Kampf-Synergien alle rollen- oder
+schwertabhängig: Herrenlose Katze ×1.49 (Rōnin-Schwert = Nahkampf), Tengu-Flug ×1.60 (Windwirbel bei der
+Rolle), Schreinwächter ×1.68, Hara-tsuzumi, Tsukumogami. Der Mess-Bot rollt aber nur alle 2 s ziellos und
+hält Abstand – das misst diese Synergien unfair.
 
-1. `tools/synbalance.py` um einen Messmodus in einem normalen Gegnerraum (statt nur gegen Shuten-dōji)
-   erweitern, damit Raum-Synergien vergleichbar werden (Gelächter der Nacht, Enenra, Hara-tsuzumi,
-   Gashadokuro, Mokumokuren, Tsukumogami).
-2. Ausreißer (deutlich schneller/langsamer als der Median) angleichen, Bericht unter `design/balance/`.
+1. In `synbalance.py` einen Bot-Modus ergänzen, der zum nächsten Feind hin rollt und mit Nahkampfwaffe
+   (`p.f['w_sword']`) nah herangeht, Geschossen grob ausweicht.
+2. Raum- und `--tod`-Messung damit wiederholen; echte Ausreißer angleichen, Bericht ergänzen.
 
-Warum: Die neuen Synergien wirken vor allem gegen viele Normalgegner – die Boss-Messung erreicht mit
-2 Zufalls-Items das Zeitlimit und sagt über sie nichts aus. Besonders Gashadokuro (Zerbrechen unter 25 %
-plus Splitter) und Mokumokuren (zielsuchende große Talismane) könnten zu stark sein.
+Warum: Erst dann lässt sich entscheiden, ob Herrenlose Katze/Tengu-Flug wirklich schwach sind.
 
 ## Weitere Ideen
-- Bot mit Ausweichen für `synbalance.py --tod`, damit Doppeltes Katzenglück und Tsukumogami (Rolle) messbar werden
-- Eigene Grafik für Ratten (Tessos Schwarm), Windsicheln und Gashadokuro-Knochensplitter statt eingefärbter Talismane
-- Eigenes Geschoss-Sprite für Fūjins Windklingen und Blätter (jetzt runde Kugeln)
-- Weitere Ereignisräume (z. B. Tanuki-Bauchtrommel-Wettstreit)
+- Eigenes Geschoss-Sprite für Fūjins Windklingen und Blätter (jetzt runde Kugeln) und für Windsicheln
 - Synergien mit drei Items (z. B. die drei Kaiserinsignien als „große“ Kombination mit Fanfare)
+- Weitere Ereignisräume (z. B. Tanuki-Bauchtrommel-Wettstreit)
+- Kanabō allein ist im Raum langsamer als gar kein Item (weniger Schüsse, mehr Fehlschüsse) – prüfen,
+  ob der Feuerraten-Malus (-0,4) zu hart ist
+- Raum-Messung auch in Tiefe 4 (mit mehr Items), damit späte Gegner abgedeckt sind
