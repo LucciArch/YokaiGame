@@ -1206,6 +1206,18 @@ def hi_blit(surf, cx, by, alpha=255, transient=False):
 
 
 _tint_cache = {}
+_mult_cache = {}
+
+
+def tinted_mult(surf, col):
+    """Bild mit Farbe multipliziert (Stimmung des Titelhimmels), gecacht."""
+    key = (id(surf), col)
+    im = _mult_cache.get(key)
+    if im is None:
+        im = _mult_cache[key] = surf.copy()
+        im.fill(col + (255,), special_flags=pygame.BLEND_RGBA_MULT)
+    return im
+
 
 
 def tinted(surf, mode):

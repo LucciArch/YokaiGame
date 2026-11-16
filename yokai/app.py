@@ -337,8 +337,15 @@ class Game:
         """Titel-Panorama aus art_src/title/panorama.py: Ebenen mit sanfter Parallaxe, Glitzern und Blüten."""
         t = self.t
         sway = math.sin(t * 0.11)
+        # Die Nacht wandelt sich mit dem Fortschritt: nach dem Wahren Sieg Herbst (roter Mond, Ahorn), nach Yomi Totennacht
+        mood = 'yomi' if 'yomi' in self.save['achievements'] else 'aki' if self.save['stats'].get('true_wins', 0) else None
+        tint = {'aki': (255, 196, 160), 'yomi': (200, 168, 255)}.get(mood)
         for name, par in (('sky', 0), ('far', 8), ('mid', 16), ('fog', 24), ('near', 32)):
             im = gfx.env_img('_title', name)
+            if tint and name in ('sky', 'fog'):
+                im = [gfx.tinted_mult(im[0], tint)]
+            elif mood == 'aki' and name == 'near':
+                im = [self._maple(im[0])]
             drift = math.sin(t * 0.07) if name == 'fog' else sway    # Nebel zieht gegen die Berge
             s.blit(im[0], (-par + int(round(drift * par)), 0))
             if name == 'sky':
@@ -352,6 +359,8 @@ class Game:
                     w_ = max(2, int(14 - k * 0.12 + 5 * math.sin(t * 2.3 + k * 0.7)))
                     x = 388 + int(3 * math.sin(t * 1.7 + k * 0.4) + sway * 8) - w_ // 2
                     s.fill((236, 222, 176) if k < 24 else (150, 140, 150), (x, y, w_, 1))
+                if mood:
+                    gfx.draw_glow(s, 388, 64, 54 + 3 * math.sin(t * 0.8), (230, 70, 40) if mood == 'aki' else (150, 80, 220), 70)
         lx = 480 - 70 + 32 + int(round(sway * 32))       # Tōrō aus der Vordergrund-Ebene (dort bei Breite-70)
         gfx.draw_glow(s, lx, 273, 22 + 2 * math.sin(t * 5), (255, 170, 80), 60)
         for i in range(22):                              # fallende Kirschblüten vom Zweig oben links
@@ -359,7 +368,8 @@ class Game:
             ph = (t * rr.uniform(0.04, 0.09) + rr.random()) % 1
             px = (rr.uniform(0, 160) + ph * 200 + math.sin(t * 1.3 + i) * 8) % W
             py = 20 + ph * (H - 20)
-            s.fill((250, 190, 215), (int(px), int(py), 2, 1 + (i % 2)))
+            pc = {'aki': ((214, 70, 34), (240, 140, 50)), 'yomi': ((170, 140, 220), (120, 100, 170))}.get(mood, ((250, 190, 215),) * 2)[i % 2]
+            s.fill(pc, (int(px), int(py), 2 + (mood == 'aki'), 1 + (i % 2)))   # Ahornblätter etwas breiter
         for i in range(14):                              # Glühwürmchen über dem Schilf
             rr = random.Random(300 + i)
             x = (rr.uniform(0, W) + 18 * math.sin(t * rr.uniform(0.2, 0.5) + i)) % W
@@ -368,9 +378,10 @@ class Game:
             if b > 0.2:
                 gfx.draw_glow(s, int(x), int(y), 5, (200, 240, 110), int(70 * b))
                 s.fill((236, 255, 150) if b > 0.7 else (170, 200, 90), (int(x), int(y), 1, 1))
-        for i in range(3):                               # Hitodama: Seelenflammen schweben über dem See
+        nh = 6 if mood == 'yomi' else 3                  # nach Yomi folgen doppelt so viele Seelen
+        for i in range(nh):                              # Hitodama: Seelenflammen schweben über dem See
             rr = random.Random(500 + i)
-            ph = (t * 0.035 + i / 3) % 1
+            ph = (t * 0.035 + i / nh) % 1
             x = 150 + ph * 220 + 6 * math.sin(t * 0.9 + i)
             y = 214 + 10 * math.sin(t * 0.7 + i * 2) - 6
             a_ = math.sin(ph * math.pi)                  # taucht auf und vergeht wieder
@@ -381,6 +392,18 @@ class Game:
                 s.fill((70, 120, 220) if k > 2 else (130, 190, 255), (int(x - 2 - k * 2), int(y - 1 - k + math.sin(t * 7 + k) * 1.2), 4 - k // 2, 3 - k // 3))
             s.fill((150, 205, 255), (int(x) - 2, int(y) - 1, 5, 5))
             s.fill((235, 248, 255), (int(x) - 1, int(y), 3, 3))
+
+    def _maple(self, near):
+        """Vordergrund mit Ahorn statt Kirschblüte: Blütenpalette des Zweigs oben links auf Herbstrot tauschen."""
+        im = self.__dict__.get('_maple_im')
+        if im is None:
+            im = self._maple_im = near.copy()
+            pa = pygame.PixelArray(im.subsurface((0, 0, 180, 160)))
+            for old, new in (((106, 40, 72), (92, 24, 20)), ((168, 64, 106), (168, 42, 26)),
+                             ((224, 126, 164), (222, 92, 36)), ((255, 192, 216), (250, 166, 70))):
+                pa.replace(old, new)
+            del pa
+        return im
 
     # ================================================================  Zustände
     MENU = ['Neuer Lauf', 'Tägliche Prüfung', 'Herausforderungen', 'Codex der Items', 'Yōkai-Lexikon', 'Erfolge', 'Statistik', 'Steuerung', 'Optionen', 'Beenden']

@@ -1,18 +1,19 @@
-# Erledigt (Runden 35–36): Charakterauswahl und Menüs im Titelstil
-- Runde 35: `st_chars` neu – Figur groß (Faktor 2) auf Steinpodest im Mondlicht, Name auf Pinselstrich, Werte als
-  Goldtusche-Balken (Leben/Kraft/Tempo/Wurfrate aus `CHARS`), Figurenleiste unten, gesperrte als Schattenriss mit
-  Siegel 封. Grafik: `art_src/title/charsel.py` → `pedestal.png`, `lock.png`, `ink.png` (in `assets/env/_title/`).
-- Runde 36: `Game.brush_sel(key, cx, y, w, dt)` – Pinselstrich-Auswahl in Titel, Pause und Optionen.
+# Erledigt (Runden 37–38): Untermenüs im Titelstil, wandelnde Titelnacht
+- Runde 37: `App.veil(s, rect, a)` (weicher Nachtschleier statt `gfx.panel`) und `App.page_head(title, seal, sub)`
+  (Überschrift mit Hanko-Siegel) in Herausforderungen, Codex, Lexikon, Erfolge, Statistik, Steuerung. Siegel aus
+  `art_src/title/charsel.py` (`SEALS`: 力 玉 妖 功 史 手). `brush_sel` hat jetzt einen Strich je Auswahlreihe (`key[0]`).
+- Runde 38: `draw_night` liest den Fortschritt: `true_wins` → Herbst (`aki`: Himmel/Nebel getönt, Ahorn per Palettentausch
+  `_maple`), Erfolg `yomi` → violette Totennacht mit 6 Hitodama. Helfer `gfx.tinted_mult`.
 
-# Nächster Schritt: Restliche Untermenüs im Titelstil
-Herausforderungen (`st_challenges`), Codex, Lexikon, Erfolge und Statistik nutzen noch die alten Kasten-Tafeln
-(`gfx.panel`) mit goldenem Rand für die Auswahl. Auswahl auf `brush_sel` umstellen, Tafeln durch einen weichen
-Schleier wie im Titel (`_scrim`) ersetzen, Überschriften in größerer Schrift mit kleinem Siegel daneben.
-Warum: Titel, Charakterwahl und Pause sind jetzt aus einem Guss – die Lexikon-/Codex-Seiten fallen dagegen ab.
+# Nächster Schritt: Charakterauswahl lebendiger
+Jede Figur bekommt beim Wechsel eine kurze eigene Geste auf dem Podest (Kenji zieht das Schwert, Okiku schwebt höher,
+Seimei hebt ein Ofuda, Benkei stampft – mit Staub/Funken) und einen eigenen kurzen Klang (Schwertziehen, Glocke,
+Windstoß …, offline in `art_src/music/` synthetisieren). Warum: Titel und Menüs sind jetzt aus einem Guss; die
+Figurenwahl ist der letzte Schritt vor jedem Lauf und soll die Figuren unterscheidbar und begehrenswert machen.
 
 # Weitere Ideen
-- Titel: Tageszeit/Jahreszeit je nach Fortschritt (nach dem Wahren Sieg roter Herbstmond, nach Yomi violette Nacht)
-- Charakterauswahl: kurze Idle-Pose je Figur (Kenji zieht das Schwert, Okiku schwebt) und eigener Klang beim Wechsel
-- Requisiten Teil 3: eigene Requisiten für `yomi_oku`, Grabsteine Hakaba mit Inschrift/Opfergaben
+- Requisiten Teil 3: eigene Requisiten für `yomi_oku` (Kapitel VII), Grabsteine in Hakaba mit Inschrift/Opfergaben
 - Zweiter Weg: Pforte nach **Takamagahara no Oku** mit Amaterasu (Ama-no-Iwato) als Endbossin
-- Synergien mit drei Items (die drei Kaiserinsignien als „große“ Kombination mit Fanfare)
+- Synergie-Fanfare: beim Wecken einer Synergie kurze Einblendung mit den Item-Symbolen und eigenem Klang
+- Titel: Jahreszeit auch für weitere Meilensteine (Schnee nach dem Oni-Modus-Sieg)
+- Codex: Filter nach Thema/Fundort und Sprung zu den Synergien eines Items im Lexikon
