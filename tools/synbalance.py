@@ -1,5 +1,6 @@
 """Misst jede Synergie gegen denselben Boss: Kampfzeit und Treffer im Vergleich zu gleich vielen Zufalls-Items.
-Aufruf: python tools/synbalance.py [boss] [tiefe]  –  Ausgabe sortiert nach Tempo (Faktor < 1 = schneller als Zufall)."""
+Aufruf: python tools/synbalance.py [boss] [tiefe] [ids]  –  Ausgabe sortiert nach Tempo (Faktor < 1 = schneller als Zufall).
+Mit --tod: Überlebenszeit ohne Gott-Modus gegen einen Boss, der in Phase 2 festgehalten wird (Faktor > 1 = zäher als Zufall)."""
 import os, sys, math, random
 os.environ['SDL_VIDEODRIVER'] = 'dummy'; os.environ['SDL_AUDIODRIVER'] = 'dummy'
 os.environ['APPDATA'] = os.path.join(os.environ.get('TEMP', '/tmp'), 'yokai_syn')
@@ -8,6 +9,9 @@ from yokai.app import Game
 from yokai import data, gfx
 from yokai.bosses import make_boss
 
+TOD = '--tod' in sys.argv
+if TOD:
+    sys.argv.remove('--tod')
 BOSS = sys.argv[1] if len(sys.argv) > 1 else 'shuten_doji'
 DEPTH = int(sys.argv[2]) if len(sys.argv) > 2 else 5
 ONLY = sys.argv[3].split(',') if len(sys.argv) > 3 else None   # z. B. onmyodo,feuerwerk
@@ -23,6 +27,8 @@ def fight(items, seed):
         p.gain_item(iid, silent=True)
     b = make_boss(run, BOSS); run.enemies = [b]; run.boss = b
     t, dt, hits = 0, 1 / 60, 0
+    if TOD:
+        b.hp = b.maxhp * 0.45
     while not b.dead and t < 180:
         t += dt
         hp0 = p.total_hp()
@@ -31,12 +37,17 @@ def fight(items, seed):
         run.update(dt, inp)
         if p.total_hp() < hp0:
             hits += 1
+        if TOD:
+            b.hp = max(b.hp, b.maxhp * 0.3)   # Boss bleibt in Phase 2, nur das Überleben zählt
+            if p.dead or run.result:
+                break
+            continue
         p.hp = p.maxhp; p.dead = False; run.result = None
         gfx.TEXT.clear(); gfx.HI.clear()
     return t, hits, run.player
 
 
-SEEDS = (11, 12, 13)
+SEEDS = tuple(range(11, 23)) if TOD else (11, 12, 13)   # Überleben streut stärker, ist aber schnell
 pool = [i for i in data.ITEM_IDS if not data.ITEMS[i].get('active')]
 base = {}
 for n in (2, 3):
@@ -52,5 +63,5 @@ for sy in data.SYNERGIES:
     bt, bh = base[min(3, len(sy['items']))]
     t = sum(r[0] for r in rs) / len(rs); h = sum(r[1] for r in rs) / len(rs)
     out.append((t / bt, h - bh, sy['id'], t))
-for f, dh, sid, t in sorted(out):
+for f, dh, sid, t in sorted(out, reverse=TOD):
     print('%-16s Zeit ×%.2f (%5.1f s)  Treffer %+5.1f' % (sid, f, t, dh))

@@ -579,6 +579,7 @@ def hit_post(run, e, b, dmg):
         e.sg_mark = True
     if 'gluecksgoetter' in S and b is not None and b.gold and random.random() < 0.15:
         run.spawn_pickup('coin', e.x, e.y)
+        _syn(run, 'gluecksgoetter', e.x, e.y, (255, 220, 110))
     if 'donnerbiest' in S and not echo:
         e.sg_thunder = getattr(e, 'sg_thunder', 0) + 1
         if e.sg_thunder >= (2 if 'blitzschlag' in S else 3):
@@ -681,6 +682,7 @@ def on_kill(run, e):
             g['souls'] = 0
             p.add_spirit(1)
             _float(run, e, 'Fährgeld', (190, 190, 220))
+            _syn(run, 'faehrmann', e.x, e.y + 10, (190, 190, 220))
     if 'ewige_flamme' in S and e.burn > 0:
         tgt = _nearest(run, e.x, e.y, 60, lambda o: o is not e)
         if tgt:
@@ -702,6 +704,7 @@ def on_kill(run, e):
             g['faehre'] = 0
             p.revives = 1
             _float(run, p, 'Münze für den Fährmann', (190, 220, 230))
+            _syn(run, 'totenfaehre', p.x, p.y + 10, (190, 220, 230))
     if 'parade' in S:
         g['parade'] = min(20 if 'maskenzug' in S else 15, g.get('parade', 0) + 1)
     if 'wirbelklingen' in S and getattr(e, 'sg_bleed', 0) > 0:
@@ -712,6 +715,7 @@ def on_kill(run, e):
             b.col = (230, 230, 240)
     if 'leben_tod' in S and random.random() < 0.05:
         p.add_spirit(1)
+        _syn(run, 'leben_tod', e.x, e.y, (200, 160, 230))
     if 'lachen' in S:
         for o in run.enemies:
             if o is not e and o.active() and not o.is_boss and math.hypot(o.x - e.x, o.y - e.y) < 75:
@@ -754,6 +758,7 @@ def on_hurt(p, run):
                 b.col = (255, 210, 90)
     if 'a_un' in S:
         g['agyo'] = 0.01
+        _syn(run, 'a_un', p.x, p.y, (220, 220, 200))
     if 'glockenschlag' in S:
         _ring(run, p.x, p.y, (255, 230, 150), 90)
         for e in run.enemies:
@@ -771,6 +776,8 @@ def on_hurt(p, run):
     if 'kenko' in S and g.get('kenko_used', 0) < (2 if 'omamori_set' in S else 1) and p.total_hp() == 1:
         g['kenko_used'] = g.get('kenko_used', 0) + 1
         p.heal(2)
+        if g['kenko_used'] == 2:
+            _syn(run, 'omamori_set', p.x, p.y, (255, 200, 210))
     if 'kraniche' in S and p.total_hp() <= 0 and g.get('cranes', 0) >= 10:
         g['cranes'] = 0
         p.hp = max(p.hp, 1) if not p.spirit_only else p.hp
@@ -895,6 +902,8 @@ def on_coin(p, run, v):
     extra = 0
     if 'fuchsglueck' in S and v == 1 and random.random() < (0.4 if 'fuchsgeld' in S else 0.2):
         extra = 4
+        if 'fuchsgeld' in S:
+            _syn(run, 'fuchsgeld', p.x, p.y, (255, 170, 90))
     if 'tanuki_bauch' in S:
         g['bauch'] = g.get('bauch', 0) + v + extra
         while g['bauch'] >= 25:
@@ -942,6 +951,8 @@ def on_room_clear(run):
         run.spawn_pickup('key', p.x, p.y - 20)
     if 'sternschnuppe' in S and random.random() < (0.08 + 0.006 * luck) * (3 if 'wunsch' in S else 1):
         run.random_drop(p.x + random.uniform(-30, 30), p.y - 24)
+        if 'wunsch' in S:
+            _syn(run, 'wunsch', p.x, p.y, (255, 240, 170))
     if 'kraniche' in S and g.get('cranes', 0) < 10:
         g['cranes'] = g.get('cranes', 0) + 1
         if g['cranes'] == 10:
@@ -977,6 +988,8 @@ def on_chest(run, pk):
     if 'kinun' in run.player.sgs:
         for _ in range(2 if 'omamori_set' in run.player.sgs else 1):
             run.random_drop(pk.x, pk.y)
+        if 'omamori_set' in run.player.sgs:
+            _syn(run, 'omamori_set', pk.x, pk.y, (255, 200, 210))
 
 
 def on_salt(p, run):
@@ -989,6 +1002,8 @@ def on_pot(run, x, y):
     p = run.player
     if 'hausglueck' in p.sgs and st(p).get('pot', 0) < (2 if 'gluecksheim' in p.sgs else 1):
         st(p)['pot'] = st(p).get('pot', 0) + 1
+        if st(p)['pot'] == 2:
+            _syn(run, 'gluecksheim', x, y, (255, 190, 200))
         return True
     return False
 
@@ -1148,6 +1163,7 @@ def tick(p, run, dt):
                 run.hazards.append(Hazard(e.x, e.y, 14, 0.3, 0.15, dmg * 1.5, 'p', 'water'))
                 if 'sonnenregen' in S and random.random() < 0.15:
                     run.spawn_pickup('coin', e.x, e.y)
+                    _syn(run, 'sonnenregen', e.x, e.y, (255, 200, 120))
         elif key == 'schlangenschweif':
             bx, by = p.x - p.facing[0] * 16, p.y - p.facing[1] * 16
             for e in run.enemies:
@@ -1169,6 +1185,7 @@ def tick(p, run, dt):
                 for e in run.enemies:
                     if e.active() and math.hypot(e.x - p.x, e.y - p.y) < 65:
                         e.sg_blind = 2.0
+                        _syn(run, 'tintenpanzer', p.x, p.y, (110, 110, 170))
         elif key == 'tiefsee_blick':
             fx, fy = p.facing
             for e in run.enemies:

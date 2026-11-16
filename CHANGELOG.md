@@ -36,6 +36,7 @@
 - Runde 12 – Neuer Boss für Kapitel VI: **Fūjin, der Gott des Windes** – grünhäutig auf einer Gewitterwolke, den Windsack über dem Kopf. Sein Sturm drückt dich weg und treibt Blätter mit, Kamaitachi-Sicheln fliegen in Bögen, Wirbelstürme drehen sich um dich; in Phase 2 ruft er Blitze seines Bruders Raijin und entfesselt einen kreisenden Taifun. Eigene Hi-Res-Figur, Lexikon-Eintrag, Erfolg jetzt „alle 24 Bosse“
 - Runde 13 – Wer Fūjin zum ersten Mal besiegt, schaltet **Kaze-bukuro** (Fūjins Windsack) frei: alle 4 s öffnet sich der Sack beim Wurf – ein Sturm in Wurfrichtung fegt feindliche Geschosse fort, schneidet Feinde (150 % Schaden) und stößt sie zurück; dazu +Tempo und +Feuerrate
 - Runde 14 – Neue Synergie **Fūjin-Raijin-zu** (Kaze-bukuro + Raijins Trommelstock), nach dem berühmten Wandschirm von Tawaraya Sōtatsu: Der Windsack öffnet sich jede Sekunde, und Raijin schlägt in jeden Feind ein, den der Sturm erfasst (gemessen: Shuten-dōji in 60 s)
+- Runde 15 – Schutz- und Glücks-Synergien sichtbar: A und Un, Omamori-Sammler, Totenfähre, Todesbote, Leben und Tod, Aus der Tiefsee, Glücksgötter, Fuchshochzeit, Glückliches Haus, Fuchsgeld und Wunsch erfüllt zeigen beim ersten Auslösen pro Raum ihren Namen mit Welle. Neuer Messmodus `tools/synbalance.py --tod` (Überlebenszeit ohne Gott-Modus), Bericht unter `design/balance/balance-check-15-ueberleben.md`
 
 ## 1.4.0 – „Hyakki-Update“ (enthält 1.3 „Kapitel-Update“)
 
