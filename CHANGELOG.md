@@ -66,6 +66,7 @@
 - Runde 42 – Synergie-Fanfare, Teil 2: Beim Wecken einer Synergie läuft das Spiel einen Atemzug lang in **Zeitlupe** (nicht angehalten), während Koto und Tempelglocke erklingen und die Item-Symbole zusammenfliegen
 - Runde 43 – Codex-Sprung zu Synergien: Im Codex springt **Enter** von einem Item direkt zu seiner Synergie auf der Lexikon-Seite **Synergien** (mehrmals drücken blättert durch alle Synergien des Items), Esc führt zurück in den Codex; die Synergie-Zeile bricht jetzt um statt aus dem Bild zu laufen. Behoben: Der Codex stürzte bei entdeckten Ereignis-Items (Schleier der Fuchsbraut, Temari-Ball) ab
 - Runde 44 – Transformations-Fanfare: Werden drei Items desselben Themas zur **Transformation**, fliegen ihre drei Symbole über dem Banner zusammen – wie bei Synergien. Die kurze Zeitlupe setzt jetzt genau ein, wenn das Fanfare-Banner erscheint, statt schon während der vorherigen Item-Meldung zu verstreichen
+- Runde 45 – Endbildschirm im Titelstil: Statt des Kastens liegt die Laufübersicht auf einem weichen **Nachtschleier**, und neben der Überschrift prangt ein rotes Hanko-Siegel wie ein Omikuji-Los – **吉** (Glück) nach einem Sieg, **凶** (Unglück) nach dem Fall
 
 ## 1.4.0 – „Hyakki-Update“ (enthält 1.3 „Kapitel-Update“)
 

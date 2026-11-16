@@ -1077,8 +1077,13 @@ class Game:
             T.add('Ebene %d – %s' % (run.floor_no, run.biome['name']) + ('  (Entspannt)' if run.relaxed else ''), W // 2, 56, 9, (230, 210, 200), 'c')
             if ks:
                 T.add('Bezwungen von: ' + ks, W // 2, 68, 7, (220, 150, 140), 'c')
+        # Omikuji-Siegel neben der Überschrift: 吉 nach einem Sieg, 凶 nach dem Fall
+        head = gfx.text_w('Sieg!' if run.depth < 6 else 'Wahrer Sieg!' if run.depth == 6 else 'Rückkehr aus Yomi!', 22) if win \
+            else gfx.text_w('Du bist gefallen…', 22)
+        gfx.hi_blit(gfx.mini(gfx.env_img('_title', 'seal_kichi' if win else 'seal_kyo')[0], 36), W // 2 - head / 2 - 18, 54,
+                    min(255, int(self.over_t * 400)))
         p = run.player
-        gfx.panel(s, (60, 80, W - 120, 150), 200)
+        self.veil(s, (52, 78, W - 104, 156), 200)
         rows = [('Charakter', CHARS[p.char]['name']), ('Zeit', '%d:%02d' % (run.time // 60, run.time % 60)),
                 ('Besiegte Yokai', str(run.kills)), ('Räume', str(run.rooms_cleared)), ('Items', str(len(p.items))),
                 ('Synergien', str(len(p.synergies))), ('Punkte', str(run.score())), ('Seed', str(run.seed))]
