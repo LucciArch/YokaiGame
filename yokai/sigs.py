@@ -143,6 +143,15 @@ TEXT = {
     'ewiger_winter': 'Erstarrte Feinde nehmen +50 % Schaden, Gebremste erstarren öfter',
     'tengu_flug': 'Die Rolle entfesselt einen schneidenden Windwirbel',
     'oni_rausch': 'Torkelnde Talismane treffen +60 % statt +30 %',
+    'oni_krieger': 'Tigerhieb: die ersten drei Treffer jedes Raums',
+    'gluecksgoetter': 'Goldene Treffer lassen manchmal Mon fallen',
+    'onmyodo': 'Siegel-Explosionen entlassen drei Papierdiener',
+    'hanami': 'Die Blüte hält länger: 15 s lang bis +60 % Schaden',
+    'teezeremonie': 'Im Stehen +50 % Schaden, die Wachheit bleibt',
+    'sushi': 'Doppelt starke Würfe vergiften und explodieren',
+    'omamori_set': 'Kenkō rettet zweimal pro Ebene, Truhen geben doppelt mehr',
+    'tempelmusik': 'Jeder vierte Schlag hallt als Klangwelle um dich',
+    'bushi': 'Ehre wiegt schwerer: +45 % statt +25 %',
 }
 
 BULLET_SIGS = ('sichel', 'kammzinken', 'seidenfaden', 'stromauf', 'gross', 'schweben', 'windstoss', 'koi_drache')
@@ -220,11 +229,13 @@ def on_fire(p, run, bullets):
             b.dmg *= 1.6 if 'oni_rausch' in S else 1.3
     if 'goldfaecher' in S and not p.moving:
         for b in bullets:
-            b.dmg *= 1.25
+            b.dmg *= 1.5 if 'teezeremonie' in S else 1.25
     if 'nasebrennt' in S:
         if run.time - g.get('last_fire', -9) > 1.0:
             for b in bullets:
                 b.dmg *= 2; b.col = (170, 255, 120)
+                if 'sushi' in S:
+                    b.fl = dict(b.fl); b.fl['poison'] = 1; b.fl['explode'] = 1
     if 'schweiss' in S and g.get('schweiss', 0) > 0:
         g['schweiss'] = 0
         for b in bullets:
@@ -245,6 +256,8 @@ def on_fire(p, run, bullets):
     if 'wach' in S:
         if run.time - g.get('last_fire', -9) < 0.7:
             g['wach'] = min(0.6, g.get('wach', 0) + 0.04)
+        elif 'teezeremonie' in S and not p.moving:
+            pass
         else:
             g['wach'] = 0
     g['last_fire'] = run.time
@@ -260,6 +273,11 @@ def on_fire(p, run, bullets):
         extra.append((base + math.pi, 0.8, 1.0))
     for a, dm, sz in extra:
         run.fire_player_bullet(p.x, p.y - 3, a, dmg * dm, spd, size * sz, life, dict(xfl))
+    if 'tempelmusik' in S and any(b.big for b in bullets):
+        _ring(run, p.x, p.y, (230, 200, 140), 60)
+        for e in run.enemies:
+            if e.active() and math.hypot(e.x - p.x, e.y - p.y) < 60 + e.r:
+                run.damage_enemy(e, dmg * 0.8, None)
     if 'tengu_sturm' in S and n % 6 == 0:
         _ring(run, p.x, p.y, (220, 240, 255), 70)
         for eb in run.ebullets:
@@ -373,8 +391,8 @@ def hit_pre(run, e, b, dmg):
         dmg *= 1.5
     if 'hochmut' in S:
         dmg *= 1 + min(0.5, math.hypot(e.x - p.x, e.y - p.y) / 300)
-    if 'tigerfell' in S and not g.get('tiger'):
-        g['tiger'] = 1
+    if 'tigerfell' in S and g.get('tiger', 0) < (3 if 'oni_krieger' in S else 1):
+        g['tiger'] = g.get('tiger', 0) + 1
         dmg *= 3
         _float(run, e, 'Tigerhieb!', (255, 190, 80))
     if getattr(e, 'sg_curse', 0) > 0:
@@ -408,6 +426,8 @@ def hit_post(run, e, b, dmg):
         g['ts'] = min(0.35 if hi else 0.2, g.get('ts', 0) + (0.04 if hi else 0.02))
     if 'hundert_augen' in S:
         e.sg_mark = True
+    if 'gluecksgoetter' in S and b is not None and b.gold and random.random() < 0.15:
+        run.spawn_pickup('coin', e.x, e.y)
     if 'donnerbiest' in S:
         e.sg_thunder = getattr(e, 'sg_thunder', 0) + 1
         if e.sg_thunder >= 3:
@@ -419,6 +439,10 @@ def hit_post(run, e, b, dmg):
             e.sg_pent = 0
             _ring(run, e.x, e.y, (255, 230, 120), 34)
             run.explode(e.x, e.y, 28, p.damage() * 2.4, 'p')
+            if 'onmyodo' in S:
+                for i in range(3):
+                    sb = run.fire_player_bullet(e.x, e.y, i / 3 * math.tau, p.damage() * 0.7, 160, 2.5, 1.4, {'homing': 1})
+                    sb.col = (240, 240, 240)
     if 'schnitt' in S or 'drei_wiesel' in S:
         deep = 'mondschnitt' in S and b is not None and b.curve
         e.sg_bleed = min(6 if deep else 3, getattr(e, 'sg_bleed', 0) + (2 if deep else 1))
@@ -551,8 +575,8 @@ def on_hurt(p, run):
             if 'johari' in S:
                 run.zap(p.x, p.y, e.x, e.y)
                 run.damage_enemy(e, p.damage() * 8, None)
-    if 'kenko' in S and not g.get('kenko_used') and p.total_hp() == 1:
-        g['kenko_used'] = True
+    if 'kenko' in S and g.get('kenko_used', 0) < (2 if 'omamori_set' in S else 1) and p.total_hp() == 1:
+        g['kenko_used'] = g.get('kenko_used', 0) + 1
         p.heal(2)
     if 'kraniche' in S and p.total_hp() <= 0 and g.get('cranes', 0) >= 10:
         g['cranes'] = 0
@@ -709,7 +733,7 @@ def on_floor(run):
     if not S:
         return
     g = st(p)
-    g['kenko_used'] = False
+    g['kenko_used'] = 0
     g['anmut'] = 0
     g['gokaku'] = 0
     if 'neujahr' in S:
@@ -724,7 +748,8 @@ def on_gain(p, iid):
 
 def on_chest(run, pk):
     if 'kinun' in run.player.sgs:
-        run.random_drop(pk.x, pk.y)
+        for _ in range(2 if 'omamori_set' in run.player.sgs else 1):
+            run.random_drop(pk.x, pk.y)
 
 
 def on_salt(p, run):
@@ -972,12 +997,13 @@ def dmg_mult(p):
     m = 1.0
     if 'vergaenglich' in S:
         t = run.time - getattr(run, 'room_enter_time', run.time)
-        if t < 10 and not run.room.cleared:
-            m *= 1 + 0.4 * (1 - t / 10)
+        dur, top = (15, 0.6) if 'hanami' in S else (10, 0.4)
+        if t < dur and not run.room.cleared:
+            m *= 1 + top * (1 - t / dur)
     if 'satt' in S and p.hp >= p.maxhp and p.maxhp > 0:
         m *= 1.2
     if 'ehre' in S and not getattr(p, 'hit_this_floor', False):
-        m *= 1.25
+        m *= 1.45 if 'bushi' in S else 1.25
     if 'lange_reise' in S:
         m *= 1 + 0.05 * max(0, run.depth - 1)
     if 'parade' in S:
