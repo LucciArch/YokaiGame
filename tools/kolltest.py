@@ -32,4 +32,24 @@ p.x, p.y = bx + 16, by + 19
 for _ in range(40):
     p.move(-1.5, 0, False)
 assert not solid_hit(room, p.x, p.y + 1.5, p.r - 0.5), 'Figur bleibt im Fels stecken'
+# Grundfläche je Sprite-Variante: schmale Felsen blocken schmal, Reihen bleiben dicht
+from yokai import gfx, entities
+from yokai.data import BIOMES
+entities.FOOT_BIOME = BIOMES['ryugu']
+room.tiles = [[T_FLOOR] * COLS for _ in range(ROWS)]
+narrow = None
+for tx in range(1, COLS - 1):
+    fx, hw = gfx.rock_foot(RX + tx * TILE, by, BIOMES['ryugu'])
+    if hw <= 8:
+        narrow = tx, fx, hw; break
+assert narrow, 'Ryūgū braucht eine schmale Variante'
+tx, fx, hw = narrow
+room.tiles[3][tx] = T_ROCK
+x0 = RX + tx * TILE
+assert solid_hit(room, x0 + fx, by + 19), 'schmaler Fels muss in der Mitte blocken'
+assert not solid_hit(room, x0 + fx + hw + 3, by + 19, 1), 'schmaler Fels darf neben sich nicht blocken'
+for b in BIOMES.values():
+    for x in range(0, 3 * 32 * 7, 32):
+        f = gfx.rock_foot(x, 0, b)
+        assert f is None or (5 <= f[1] <= 12 and 4 <= f[0] <= 28), (b.get('_id'), f)
 print('Kollisionstest ok')

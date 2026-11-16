@@ -697,6 +697,23 @@ def hi_tile(t, x, y, biome):
     return None
 
 
+_foot_cache = {}
+
+
+def rock_foot(x, y, biome):
+    """(x-Mitte, halbe Breite) der Fels-Variante an (x, y), aus dem Alpha ihres Rumpfs (ohne Bodenschatten)."""
+    img = hi_tile(T_ROCK, x, y, biome)
+    if img is None:
+        return None
+    key = id(img)
+    if key not in _foot_cache:
+        xs = [px for py in range(32, 52, 2) for px in range(64) if img.get_at((px, py)).a > 128]
+        x0, x1 = (min(xs), max(xs)) if xs else (10, 54)
+        fx = (x0 + x1) / 4
+        _foot_cache[key] = (fx, min(12, fx, 32 - fx, max(5, (x1 - x0) / 4)))  # bleibt in der Kachel
+    return _foot_cache[key]
+
+
 def env_tile(surf, t, x, y, biome):
     """Gibt True zurück, wenn ein handgesetztes Tile gezeichnet wurde."""
     bid = biome.get('_id', '')

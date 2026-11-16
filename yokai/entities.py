@@ -29,6 +29,7 @@ def tile_at(room, x, y):
 # Gezeichnete Grundfläche fester Requisiten in ihrer Kachel: (y-Mitte, halbe Breite, halbe Höhe)
 FOOT = {T_ROCK: (19, 11, 10), T_POT: (23, 8, 7), T_LANTERN: (21, 9, 9)}
 LOW_TILES = (T_ROCK, T_POT)          # niedrig genug, um darüber zu fliegen
+FOOT_BIOME = {}                      # Biom der aktuellen Ebene: Felsbreite je Sprite-Variante (Run.new_floor)
 
 
 def solid_hit(room, x, y, r=0, over=False):
@@ -44,8 +45,11 @@ def solid_hit(room, x, y, r=0, over=False):
                 continue
             cy, hw, hh = FOOT[t]
             bx, by = RX + tx * TILE, RY + ty * TILE
-            l = bx if tx > 0 and row[tx - 1] in SOLID_TILES else bx + 16 - hw
-            rt = bx + TILE if tx < COLS - 1 and row[tx + 1] in SOLID_TILES else bx + 16 + hw
+            fx = 16
+            if t == T_ROCK:
+                fx, hw = gfx.rock_foot(bx, by, FOOT_BIOME) or (fx, hw)
+            l = bx if tx > 0 and row[tx - 1] in SOLID_TILES else bx + fx - hw
+            rt = bx + TILE if tx < COLS - 1 and row[tx + 1] in SOLID_TILES else bx + fx + hw
             tp = by if ty > 0 and tiles[ty - 1][tx] in SOLID_TILES else by + cy - hh
             bt = by + TILE if ty < ROWS - 1 and tiles[ty + 1][tx] in SOLID_TILES else by + cy + hh
             dx, dy = x - min(max(x, l), rt), y - min(max(y, tp), bt)

@@ -4,7 +4,7 @@ import random
 import pygame
 from collections import deque, defaultdict
 from .settings import *
-from . import gfx, props, weapons, audio, sigs
+from . import gfx, props, weapons, audio, sigs, entities
 from .data import (TRINKETS, BIOMES, DEPTH_BIOMES, BOSS_POOL, ITEMS, ITEM_IDS, ACTIVES, ENEMIES, CHAMPIONS, BOSSES,
                    BOSS_REWARD, CHARS, ACHIEVEMENTS, TRANSFORMS, SYNERGIES, CHAR_ORDER)
 from .rooms import generate_floor, build_room_tiles, Room
@@ -316,6 +316,7 @@ class Run:
         self.biome_id = rng.choice(opts)
         self._prev_biome = self.biome_id
         self.biome = BIOMES[self.biome_id]
+        entities.FOOT_BIOME = self.biome
         bs = self.save.data.setdefault('biomes_seen', [])
         if self.biome_id not in bs:
             bs.append(self.biome_id)

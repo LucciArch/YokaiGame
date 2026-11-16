@@ -51,6 +51,7 @@
 - Runde 27 – **Rückkehr aus Yomi:** Wer Izanami in ihrem Totenpalast besiegt, erhält den Erfolg „Rückkehr aus Yomi“ und schaltet den **Pfirsich von Yomotsu Hirasaka** frei (+1 Herz) – wie Izanagi auf der Flucht wirfst du drei Pfirsiche (300 % Schaden), sobald dich etwas trifft, und nahe Yokai fliehen 3 s. Neue Synergie **Izanagis Flucht** (Pfirsich + Izanamis Kamm): auch die Rolle wirft Pfirsiche (alle 3 s), Feinde fliehen doppelt so weit und lang. Eigener Epilog-Text nach dem Sieg in Yomi, neues handgepixeltes Item-Symbol
 - Runde 28 – Ehrliche Hitboxen: Felsen, Krüge und Steinlaternen blocken nur noch dort, wo sie gezeichnet sind (Grundfläche statt voller Kachel) – für Figuren, Gegner, Talismane und Strahlen; Felsreihen bleiben dicht. Mit Flug-Items fliegst du jetzt über Felsen und Krüge (Laternen bleiben fest) und wirst dabei über ihnen gezeichnet. Neuer Test `tools/kolltest.py`
 - Runde 29 – Requisiten neu modelliert: Felsbrocken in neun Biomen (u. a. Bambuswald, Kurama, Schneeberg, Hölle, Mondpalast) haben jetzt eine Licht- und eine Schattenflanke, Risse mit Lichtkante, Körnung und Kiesel am Fuß; die Bambusstümpfe im Bambuswald sind schräg geschnitten, hohl, mit Knotenringen und Blattzweigen
+- Runde 30 – Grundfläche je Requisit: Jede Fels-Variante blockt nur so breit, wie sie gezeichnet ist (aus ihrem Sprite abgeleitet) – schmale Pfeiler, Takenoko, Grabsteine und Totenpfähle lassen dich jetzt dicht vorbei
 
 ## 1.4.0 – „Hyakki-Update“ (enthält 1.3 „Kapitel-Update“)
 
