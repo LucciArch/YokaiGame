@@ -459,9 +459,9 @@ class Game:
             if info is None:
                 from .run import load_run_file
                 d = load_run_file() or {}
-                roman = ['', 'I', 'II', 'III', 'IV', 'V', 'VI']
+                roman = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII']
                 info = self._cont_info = ('%s  ·  Ebene %d  ·  Kapitel %s  ·  %d Items' % (
-                    CHARS.get(d.get('char'), {}).get('name', '?'), d.get('floor_no', 0) + 1, roman[min(6, max(1, d.get('depth', 1)))],
+                    CHARS.get(d.get('char'), {}).get('name', '?'), d.get('floor_no', 0) + 1, roman[min(7, max(1, d.get('depth', 1)))],
                     len(d.get('player', {}).get('items', []))) if d else '')
             T.add(info, W // 2 + 76, 85, 6, (200, 220, 170))
         else:
@@ -919,9 +919,9 @@ class Game:
         T = gfx.TEXT
         win = run.result == 'win'
         if win:
-            T.add('Sieg!' if run.depth < 6 else 'Wahrer Sieg!', W // 2, 30, 22, (255, 230, 150), 'c')
-            T.add('Die Nacht der hundert Dämonen ist vorüber.' if run.depth < 6 else 'Der böse Stern ist gefallen. Der Himmel ist frei.',
-                  W // 2, 60, 9, (240, 230, 210), 'c')
+            T.add('Sieg!' if run.depth < 6 else 'Wahrer Sieg!' if run.depth == 6 else 'Rückkehr aus Yomi!', W // 2, 30, 22, (255, 230, 150), 'c')
+            T.add('Die Nacht der hundert Dämonen ist vorüber.' if run.depth < 6 else 'Der böse Stern ist gefallen. Der Himmel ist frei.' if run.depth == 6
+                  else 'Izanami ruht. Der Felsen von Yomotsu Hirasaka schließt sich hinter dir.', W // 2, 60, 9, (240, 230, 210), 'c')
         else:
             T.add('Du bist gefallen…', W // 2, 30, 22, (230, 110, 110), 'c')
             ks = getattr(run.player, 'last_src', None)

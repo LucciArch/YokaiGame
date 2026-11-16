@@ -643,8 +643,19 @@ ACHIEVEMENTS = [
 ]
 
 
+# Kapitel VII (geheim, nach dem ersten Wahren Sieg): Izanamis Totenpalast tief in Yomi no Kuni
+BIOMES['yomi_oku'] = dict(name='Totenpalast', jp='Yomi no Oku', depth=7, floor=(40, 26, 44), floor_pat='stone',
+                          wall=(30, 14, 30), wall_pat='bone', rock=(80, 60, 80), moss=False, ambient='embers',
+                          enemies=['shikome', 'gaki', 'shinigami', 'mezu', 'gozu', 'kasha', 'onibi', 'oni'],
+                          music=('iwato', 165, 108, 'mystic', 54), weather='ash', dark=80,
+                          grade=(70, 20, 90), pit='void', decor='bones')
+DEPTH_BIOMES[7] = ['yomi_oku']
+BOSS_POOL[6].remove('izanami')    # Izanami wartet jetzt in ihrem eigenen Reich
+BOSS_POOL[7] = ['izanami']
+
 for _k, _b in BIOMES.items():
     _b['_id'] = _k
+BIOMES['yomi_oku']['_id'] = 'yomi'   # shortcut: nutzt die Kacheln der Unterwelt, eigene Grafik wenn Kapitel VII ausgebaut wird
 
 
 # Jedes Item bekommt sein eigenes Symbol (assets/items/icons/<id>.png), falls vorhanden

@@ -259,7 +259,7 @@ class Run:
     def path_nodes(self):
         """Alle Ebenen des Laufs als (Kapitel, Abschnitt)."""
         out = []
-        last = 6 if (self.save['heaven_unlocked'] or self.depth >= 6) and not (self.challenge and self.challenge != 'bossrush') else 5
+        last = 7 if self.depth >= 7 else 6 if (self.save['heaven_unlocked'] or self.depth >= 6) and not (self.challenge and self.challenge != 'bossrush') else 5
         for d in range(1, last + 1):
             two = d in self.TWO_STAGE and (not self.challenge or self.challenge == 'langer_weg')
             out += [(d, 0), (d, 1)] if two else [(d, 0)]
@@ -300,8 +300,8 @@ class Run:
         s.blit(surf, (int(ox), y - 6))
 
     def floor_label(self):
-        roman = ['', 'I', 'II', 'III', 'IV', 'V', 'VI']
-        return 'Ebene %d  ·  Kapitel %s' % (self.floor_no, roman[min(6, self.depth)])
+        roman = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII']
+        return 'Ebene %d  ·  Kapitel %s' % (self.floor_no, roman[min(7, self.depth)])
 
     @property
     def enemy_dmg(self):
@@ -382,7 +382,7 @@ class Run:
             self.depth = depth or self.depth + 1
             self.stage = 0
         self.descend = 1.3
-        if self.depth > 6:
+        if self.depth > 6 and depth != 7:     # nur die Yomi-Pforte führt nach Kapitel VII
             self.depth = 1
             self.loop += 1
             self.loop_mult = 1 + 0.6 * self.loop
@@ -1254,7 +1254,10 @@ class Run:
             self.objs.append(Obj('victory', cx - 70, cy + 40))
             if self.save['heaven_unlocked']:
                 self.objs.append(Obj('heaven', cx + 70, cy + 40))
-        elif self.depth == 6:
+        elif self.depth == 6 and self.save['stats'].get('true_wins', 0) and not self.challenge:
+            self.objs.append(Obj('victory', cx - 70, cy + 40))
+            self.objs.append(Obj('yomi', cx + 70, cy + 40))
+        elif self.depth >= 6:
             self.objs.append(Obj('victory', cx, cy + 40))
         else:
             self.objs.append(Obj('torii', cx, cy + 40))
@@ -1967,6 +1970,9 @@ class Run:
         elif k == 'heaven':
             self.go_deeper(6)
             self.banner('Takamagahara', 'Die Himmelsgefilde – hier wartet der böse Stern', (255, 230, 150), big=True)
+        elif k == 'yomi':
+            self.go_deeper(7)
+            self.banner('Yomi no Kuni', 'Tief im Totenreich wartet Izanami – wer hier isst, kehrt nie zurück', (190, 120, 220), big=True)
         elif k == 'victory':
             if self.result is None:
                 self.result = 'win'
@@ -2127,8 +2133,10 @@ class Run:
         if win:
             s.stat('wins')
             s['char_wins'][self.char] = s['char_wins'].get(self.char, 0) + 1
-            if self.depth == 6:
+            if self.depth >= 6:
                 s.stat('true_wins')
+            if self.depth == 7:
+                s.stat('yomi_wins')
             self.achieve('seimei')
             self.achieve('hard')
             self.achieve('heaven')

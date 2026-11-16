@@ -1670,8 +1670,8 @@ class Obj:
                     a_ = 1 - ((t * 20 + i * 9) % 26) / 26
                     c_ = int(170 + 70 * a_)
                     D.circle(s, (c_, c_, min(255, c_ + 8)), (x - 10 + i * 10 + int(math.sin(t * 2 + i) * 3), int(yy)), 2 if a_ > 0.4 else 1)
-        elif k in ('torii', 'heaven', 'victory'):
-            col = {'torii': (196, 46, 38), 'heaven': (226, 190, 96), 'victory': (236, 234, 228)}[k]
+        elif k in ('torii', 'heaven', 'victory', 'yomi'):
+            col = {'torii': (196, 46, 38), 'heaven': (226, 190, 96), 'victory': (236, 234, 228), 'yomi': (150, 70, 170)}[k]
             gfx.draw_glow(s, x, y - 8, 26, col, 70)
             pr = pygame.Surface((22, 20), pygame.SRCALPHA)       # schimmerndes Portal zwischen den Pfeilern
             for i in range(20):
@@ -1679,7 +1679,7 @@ class Obj:
                 pr.fill((int(20 + 40 * f_ * (col[0] / 255)), int(10 + 30 * f_ * (col[1] / 255)), int(24 + 40 * f_ * (col[2] / 255))), (0, i, 22, 1))
             s.blit(pr, (x - 11, y - 16))
             put(props.torii(col), y + 5)
-            txt = {'torii': 'Tiefer hinab', 'heaven': 'Aufstieg nach Takamagahara', 'victory': 'Die Reise beenden'}[k]
+            txt = {'torii': 'Tiefer hinab', 'heaven': 'Aufstieg nach Takamagahara', 'victory': 'Die Reise beenden', 'yomi': 'Hinab nach Yomi no Kuni'}[k]
             gfx.TEXT.add(txt, x, y + 8, 6, (255, 240, 200), 'c')
         elif k == 'shrine':
             oni = self.data.get('oni')

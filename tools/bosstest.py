@@ -46,3 +46,17 @@ for _ in range(20):
 assert h0 - b.hp <= b.maxhp * 0.08 + 1, h0 - b.hp
 assert b.ward_t > 0
 print('Göttlicher Schutz greift: %.1f %% in einem Augenblick' % ((h0 - b.hp) / b.maxhp * 100))
+
+# Yomi-Pforte: nach dem ersten Wahren Sieg führt sie von Kapitel VI nach Kapitel VII zu Izanami
+g.start_run('hana', 8); run = g.run
+run.save['stats']['true_wins'] = 1
+run.depth = 6; run.objs = []; run.boss_room_rewards()
+gate = [o for o in run.objs if o.kind == 'yomi']
+assert gate, [o.kind for o in run.objs]
+run.interact(gate[0])
+assert (run.depth, run.biome_id, run.boss_id) == (7, 'yomi_oku', 'izanami'), (run.depth, run.biome_id, run.boss_id)
+run.objs = []; run.boss_room_rewards()
+assert [o.kind for o in run.objs if o.kind in ('victory', 'yomi')] == ['victory']
+g.start_run('hana', 9); run = g.run; run.depth = 6; run.go_deeper()
+assert run.depth == 1 and run.loop == 1          # Endlos-Torii führt weiter in die Schleife
+print('Yomi-Pforte OK')
