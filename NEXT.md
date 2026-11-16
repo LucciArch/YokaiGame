@@ -1,5 +1,22 @@
 # Nächster Schritt
 
+**Ausweich-Rolle animieren (Wunsch von Luca, hat Vorrang)** – Die Rolle mit der Leertaste ist heute nur
+eine halbtransparente Figur, die nach vorn gleitet, plus graue Punkte (`Player.update`/`Player.draw` in
+`yokai/entities.py`, `dash_t` = 0,24 s). Sie soll für alle Figuren richtig aussehen:
+
+1. Echte Rolle: Die Figur dreht sich in Rollrichtung um sich selbst (Hi-Res-Sprite in 4–6 Schritten drehen,
+   bei Bewegung nach oben/unten eher stauchen/strecken), kurz geduckt beim Absprung und beim Aufkommen
+   (Squash & Stretch), Schatten bleibt flach am Boden.
+2. Nachbilder: 2–3 verblassende Silhouetten in Figurenfarbe statt grauer Punkte, dazu Staubwölkchen beim
+   Absprung und Aufkommen (Gras/Schnee/Wasser je nach Gebiet eingefärbt).
+3. Rollen-Synergien (Tengu-Flug, Hara-tsuzumi, Sommerwind, Feuerkind usw.) behalten ihre Effekte;
+   Kostüme (`costume.draw`) müssen mitdrehen oder während der Rolle ausgeblendet werden.
+4. Mit einem Screenshot-Streifen (mehrere Bilder der Rolle) prüfen, für mindestens zwei Figuren.
+
+Warum: Die Rolle drückt man ständig – eine gute Animation verbessert das Spielgefühl in jedem Raum.
+
+## Danach
+
 **Ausweichender Mess-Bot für Dash- und Nahkampf-Synergien** – Runde 20 hat `tools/synbalance.py --raum`
 (drei Gegnerwellen) gebracht und Tsukuyomis Sichelbögen repariert (Mondschein-Teich lief ins Zeitlimit),
 Runde 21 eigene Grafik für Ratten und Knochensplitter. Im Raum-Bericht
