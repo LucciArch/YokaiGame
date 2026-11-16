@@ -385,6 +385,8 @@ SYNERGIES = [
     dict(id='tsukumogami', name='Tsukumogami', desc='Schirm und Papierpuppe erwachen', items=['karakasa', 'hitogata'], fx=dict(orbital=1, sig_tsukumogami=1)),
     dict(id='shinsen', name='Shinsen', desc='Reine Gaben für den Fuchsgott', items=['kiyome_sack', 'fuchsschrein'], fx=dict(sig_shinsen=1)),
     dict(id='nanakorobi', name='Nanakorobi Yaoki', desc='Siebenmal fallen, achtmal aufstehen', items=['daruma_otoshi', 'omamori_gokaku'], fx=dict(sig_nanakorobi=1)),
+    dict(id='jinmenju', name='Jinmenju', desc='Der Gesichterbaum lacht über erfüllte Wünsche', items=['ema', 'jinmen_frucht'], fx=dict(sig_jinmenju=1)),
+    dict(id='mokumokuren', name='Mokumokuren', desc='Augen im zerrissenen Papier', items=['shoji_papier', 'geheimkarte'], fx=dict(sig_mokumokuren=1)),
     dict(id='sommerwind', name='Sommerwind', desc='Windglocke und Spatzenfeder', items=['furin', 'suzume_feder'], fx=dict(salts_regen=0.15, sig_sommerwind=1)),
 ]
 

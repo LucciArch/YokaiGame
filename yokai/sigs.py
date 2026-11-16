@@ -105,6 +105,8 @@ TEXT = {
     'tsukumogami': 'Die Rolle wirft Geschosse als zielsuchende Papierpuppen zurück, +1 Papierschild',
     'shinsen': 'Gesäuberte Räume geben dreimal so oft Schlüssel, Reinigungssalz heilt ein ganzes Herz',
     'nanakorobi': 'Schlagfolge bis +80 %, Erfolg zählt Räume unter 15 s und stapelt bis 8×',
+    'jinmenju': 'Jeder Boss erfüllt zwei Wünsche und heilt dich ganz',
+    'mokumokuren': 'Talismane wachsen weiter und suchen, sobald sie groß sind, ihr Ziel',
     'fujin_raijin': 'Der Windsack öffnet sich jede Sekunde, und Raijin schlägt in jeden getroffenen Feind ein',
     'erstes_feuer': 'Brennende Feinde explodieren beim Tod',
     'fuchsregen': 'Ein Sonnenregen fällt auf deine Feinde',
@@ -467,7 +469,11 @@ def bullet_tick(b, run, dt):
         b.vx *= f; b.vy *= f
         b.dmg *= 1 + 0.6 * dt
     if 'gross' in tags:
-        b.r = min(b.r * (1 + 1.2 * dt), 12)
+        moku = 'mokumokuren' in run.player.sgs
+        b.r = min(b.r * (1 + 1.2 * dt), 16 if moku else 12)
+        if moku and b.r > 7 and not b.fl.get('homing'):
+            _syn(run, 'mokumokuren', b.x, b.y, (245, 240, 225))
+            b.fl = dict(b.fl); b.fl['homing'] = 1
     if 'kammzinken' in tags and b.t > 0.2 and not b.fl.get('_kz'):
         b.fl = dict(b.fl); b.fl['_kz'] = 1
         a = math.atan2(b.vy, b.vx)
@@ -772,13 +778,19 @@ def on_kill(run, e):
                 if far:
                     _syn(run, 'gelaechter', e.x, e.y, (255, 170, 230))
     if 'ema' in S and e.is_boss:
-        k = random.choice(('dmg', 'rate', 'spd', 'range', 'luck'))
-        v = {'dmg': 0.5, 'rate': 0.4, 'spd': 6, 'range': 30, 'luck': 1}[k]
-        bonus = g.setdefault('ema', {})
-        bonus[k] = bonus.get(k, 0) + v
-        p.recalc()
         from .texts import FX_NAMES
-        run.banner('Ema: Wunsch erfüllt', '%s +%g' % (FX_NAMES[k][0], v), (255, 220, 140))
+        wishes = []
+        for _ in range(2 if 'jinmenju' in S else 1):
+            k = random.choice(('dmg', 'rate', 'spd', 'range', 'luck'))
+            v = {'dmg': 0.5, 'rate': 0.4, 'spd': 6, 'range': 30, 'luck': 1}[k]
+            bonus = g.setdefault('ema', {})
+            bonus[k] = bonus.get(k, 0) + v
+            wishes.append('%s +%g' % (FX_NAMES[k][0], v))
+        if 'jinmenju' in S:
+            p.heal(p.maxhp)
+            _syn(run, 'jinmenju', e.x, e.y, (240, 190, 140))
+        p.recalc()
+        run.banner('Ema: Wunsch erfüllt', ', '.join(wishes), (255, 220, 140))
 
 
 def on_hurt(p, run):
