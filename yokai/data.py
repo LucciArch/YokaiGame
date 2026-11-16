@@ -381,6 +381,10 @@ SYNERGIES = [
     dict(id='hara_tsuzumi', name='Hara-tsuzumi', desc='Der Tanuki trommelt auf seinen Bauch', items=['tanuki_beutel', 'tanuki_blatt_p'], fx=dict(sig_hara_tsuzumi=1)),
     dict(id='gelaechter', name='Gelächter der Nacht', desc='Kerakera-onna und Hyōsube lachen im Chor', items=['kerakera_faecher', 'hyosube_haar'], fx=dict(sig_gelaechter=1)),
     dict(id='enenra', name='Enenra', desc='Der Rauch des ersten Feuers lebt', items=['enenra_pfeife', 'kagutsuchi_glut'], fx=dict(sig_enenra=1)),
+    dict(id='gashadokuro', name='Gashadokuro', desc='Die Knochen der Ungeborgenen stehen auf', items=['gashadokuro_knochen', 'shiro_kimono'], fx=dict(sig_gashadokuro=1)),
+    dict(id='tsukumogami', name='Tsukumogami', desc='Schirm und Papierpuppe erwachen', items=['karakasa', 'hitogata'], fx=dict(orbital=1, sig_tsukumogami=1)),
+    dict(id='shinsen', name='Shinsen', desc='Reine Gaben für den Fuchsgott', items=['kiyome_sack', 'fuchsschrein'], fx=dict(sig_shinsen=1)),
+    dict(id='nanakorobi', name='Nanakorobi Yaoki', desc='Siebenmal fallen, achtmal aufstehen', items=['daruma_otoshi', 'omamori_gokaku'], fx=dict(sig_nanakorobi=1)),
     dict(id='sommerwind', name='Sommerwind', desc='Windglocke und Spatzenfeder', items=['furin', 'suzume_feder'], fx=dict(salts_regen=0.15, sig_sommerwind=1)),
 ]
 

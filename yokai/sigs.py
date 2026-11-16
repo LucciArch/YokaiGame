@@ -101,6 +101,10 @@ TEXT = {
     'hara_tsuzumi': 'Bauchtrommel: die Rolle schlägt eine Schockwelle, die Tarnung hält doppelt so lang',
     'gelaechter': 'Das Lachen hallt weit: Kills verscheuchen Feinde im doppelten Umkreis, Verängstigte nehmen +30 % Schaden',
     'enenra': 'Der Rauch glimmt: Feinde im Rauch brennen, explodierende Feinde hinterlassen Rauch',
+    'gashadokuro': 'Feinde unter 25 % Leben zerbrechen in vier Knochensplitter, die weiterfliegen',
+    'tsukumogami': 'Die Rolle wirft Geschosse als zielsuchende Papierpuppen zurück, +1 Papierschild',
+    'shinsen': 'Gesäuberte Räume geben dreimal so oft Schlüssel, Reinigungssalz heilt ein ganzes Herz',
+    'nanakorobi': 'Schlagfolge bis +80 %, Erfolg zählt Räume unter 15 s und stapelt bis 8×',
     'fujin_raijin': 'Der Windsack öffnet sich jede Sekunde, und Raijin schlägt in jeden getroffenen Feind ein',
     'erstes_feuer': 'Brennende Feinde explodieren beim Tod',
     'fuchsregen': 'Ein Sonnenregen fällt auf deine Feinde',
@@ -581,7 +585,9 @@ def hit_pre(run, e, b, dmg):
         dmg *= 1.6
     if 'schlagfolge' in S:
         if g.get('last_tgt') == id(e):
-            g['chain'] = min(6, g.get('chain', 0) + 1)
+            g['chain'] = min(10 if 'nanakorobi' in S else 6, g.get('chain', 0) + 1)
+            if g['chain'] == 7:
+                _syn(run, 'nanakorobi', e.x, e.y, (230, 90, 70))
         else:
             g['chain'] = 0
         g['last_tgt'] = id(e)
@@ -658,9 +664,15 @@ def hit_post(run, e, b, dmg):
     if 'kuji' in S and random.random() < (1 / 5 if 'seimei' in S else 1 / 9):
         e.frozen = max(e.frozen, 0.4 if e.is_boss else 1.5)
         _float(run, e, 'Gebannt', (220, 200, 255))
-    if 'knochenbruch' in S and not e.is_boss and 0 < e.hp < e.maxhp * 0.15:
+    if 'knochenbruch' in S and not e.is_boss and 0 < e.hp < e.maxhp * (0.25 if 'gashadokuro' in S else 0.15):
         e.hp = 0
         _float(run, e, 'Zerbrochen!', (240, 230, 210))
+        if 'gashadokuro' in S and not echo:
+            _syn(run, 'gashadokuro', e.x, e.y, (240, 230, 210))
+            a0 = random.uniform(0, math.tau)
+            for i in range(4):
+                nb = run.fire_player_bullet(e.x, e.y, a0 + i * math.tau / 4, p.damage() * 0.6, 220, 3, 0.6, {'pierce': 1})
+                nb.col = (235, 228, 205)
     if 'springfeuer' in S and not echo and random.random() < (0.4 if 'fest_der_laternen' in S else 0.2):
         from .entities import Hazard
         run.hazards.append(Hazard(e.x, e.y + 4, 10, 0.0, 3.5 if 'fest_der_laternen' in S else 2.0, max(0.6, p.damage() * 0.3), 'p', 'fire'))
@@ -829,6 +841,11 @@ def on_hurt(p, run):
 def block(p, run, b):
     """Feindliches Geschoss trifft gleich – True, wenn es abgewehrt wird."""
     S = p.sgs
+    if 'tsukumogami' in S and p.dash_t > 0:
+        _syn(run, 'tsukumogami', p.x, p.y, (220, 80, 60))
+        nb = run.fire_player_bullet(b.x, b.y, math.atan2(-b.vy, -b.vx), p.damage() * 1.2, 240, 3.5, 1.2, {'homing': 1})
+        nb.col = (180, 200, 250)
+        return True
     if not S or p.iframes > 0:
         return False
     g = st(p)
@@ -1000,8 +1017,10 @@ def on_room_clear(run):
         if g['ewig'] >= 5:
             g['ewig'] = 0
             p.heal(1)
-    if 'opfergabe' in S and random.random() < 0.1 + 0.01 * luck:
+    if 'opfergabe' in S and random.random() < (0.1 + 0.01 * luck) * (3 if 'shinsen' in S else 1):
         run.spawn_pickup('key', p.x, p.y - 20)
+        if 'shinsen' in S:
+            _syn(run, 'shinsen', p.x, p.y, (240, 240, 245))
     if 'sternschnuppe' in S and random.random() < (0.08 + 0.006 * luck) * (3 if 'wunsch' in S else 1):
         run.random_drop(p.x + random.uniform(-30, 30), p.y - 24)
         if 'wunsch' in S:
@@ -1013,8 +1032,8 @@ def on_room_clear(run):
     if 'anmut' in S and not g.get('room_hit'):
         g['anmut'] = min(1.0, g.get('anmut', 0) + 0.15)
         p.recalc()
-    if 'gokaku' in S and run.time - getattr(run, 'room_enter_time', run.time) < 10:
-        g['gokaku'] = min(5, g.get('gokaku', 0) + 1)
+    if 'gokaku' in S and run.time - getattr(run, 'room_enter_time', run.time) < (15 if 'nanakorobi' in S else 10):
+        g['gokaku'] = min(8 if 'nanakorobi' in S else 5, g.get('gokaku', 0) + 1)
 
 
 def on_floor(run):
@@ -1047,7 +1066,9 @@ def on_chest(run, pk):
 
 def on_salt(p, run):
     if 'reinigung' in p.sgs:
-        p.heal(1)
+        p.heal(2 if 'shinsen' in p.sgs else 1)
+        if 'shinsen' in p.sgs:
+            _syn(run, 'shinsen', p.x, p.y, (240, 240, 245))
 
 
 def on_pot(run, x, y):
