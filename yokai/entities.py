@@ -739,8 +739,7 @@ class Player:
         self.shot_count += 1
         wk = weapons.weapon_of(self)
         made = weapons.fire(self, d, wk) if wk else None
-        if made is not None:
-            sigs.on_fire(self, run, made)
+        if made is not None:                              # on_fire läuft in weapons.fire
             rc = self.f['raijin_chance']
             if rc and random.random() < rc * (1 + self.s['luck'] * 0.08):
                 tgt = run.nearest_enemy(self.x, self.y, 400)

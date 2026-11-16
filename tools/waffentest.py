@@ -88,5 +88,37 @@ check(any(b.fl.get('slow') for b in r.pbullets), 'Gefolge wirft ohne Frost')
 r, p = setup(poison=1)
 b = r.fire_player_bullet(p.x, p.y, 0, 3, 200, 3, 1, {'homing': 1})
 check(b.fl.get('poison') and b.fl.get('homing'), 'Fähigkeits-Geschoss erbt kein Gift')
+# Wurf-Fähigkeiten (on_fire) wirken auf den Hieb selbst: Nase brennt verdoppelt den Schwerthieb
+from yokai import sigs
+
+
+def sword_hit(sg=(), **f):
+    r, p = setup(w_sword=1, **f)
+    p.sgs = set(sg)
+    e = Enemy(r, 'nurikabe', p.x + 20, p.y - 4); r.enemies.append(e); e.spawn_t = 0
+    e.hp = e.maxhp = 999
+    p.fire((1, 0))
+    return r, p, e, 999 - e.hp
+
+
+_, _, _, plain = sword_hit()
+_, _, _, nase = sword_hit({'nasebrennt'})
+check(nase > plain * 1.8, 'Nase brennt verdoppelt den Schwerthieb nicht (%.1f / %.1f)' % (nase, plain))
+# Sonne & Mond färbt den Strahl: jeder zweite Angriff brennt
+r, p = setup(w_laser=1)
+p.sgs = {'sonne_mond'}
+e = Enemy(r, 'nurikabe', p.x + 120, p.y - 4); r.enemies.append(e); e.spawn_t = 0
+e.hp = e.maxhp = 999
+p.fire((1, 0)); p.fire((1, 0))
+check(e.burn > 0, 'Sonne & Mond entzündet den Strahl nicht')
+# Großer Schlag einer Hiebwaffe weckt die Tempelmusik
+r, p, e, _ = sword_hit({'tempelmusik'}, big_every=1)
+check('tempelmusik' in sigs.st(p).get('syn_seen', []), 'Großer Schwerthieb weckt die Tempelmusik nicht')
+# Goldwurf mit Waffe: Treffer markiert den Feind (Münzen beim Tod)
+r, p, e, _ = sword_hit(gold_shots=1)
+check(e.gold_hit, 'Goldwurf-Item wirkt nicht beim Schwerthieb')
+r, p = setup(w_bow=1, gold_shots=1)
+p.fire((1, 0))
+check(r.pbullets and all(b.gold for b in r.pbullets), 'Goldwurf-Item wirkt nicht beim Bogen')
 print('Waffen-Synergien geprüft, Fehler:', bad)
 sys.exit(1 if bad else 0)

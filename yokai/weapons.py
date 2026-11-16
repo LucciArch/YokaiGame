@@ -49,7 +49,9 @@ def touch(run, e, dmg, src_x, src_y, fl):
 def _carrier(x, y, ang, dmg, fl):
     """Unsichtbares Geschoss, über das Hieb und Strahl die Wurf-Eigenschaften an damage_enemy weitergeben."""
     from .entities import Bullet
-    return Bullet(x, y, math.cos(ang) * 200, math.sin(ang) * 200, dmg, 3, 0.1, 'p', (255, 255, 255), fl)
+    b = Bullet(x, y, math.cos(ang) * 200, math.sin(ang) * 200, dmg, 3, 0.1, 'p', (255, 255, 255), fl)
+    b.big, b.gold = bool(fl.get('_big')), bool(fl.get('_gold'))   # großer Schlag / Goldwurf reisen im fl mit
+    return b
 
 
 def _hit(run, e, hx, hy, dmg, ang, fl):
@@ -218,7 +220,19 @@ def fire(p, d, wk):
         dmg *= 3
     x, y = p.x, p.y - 4
     fl = shot_flags(p)
-    col = run.shot_col(fl)
+    gold = bool(p.f['gold_shots'] and random.random() < p.f['gold_shots'])
+    from . import sigs
+    tint = None
+    if wk not in ('w_bow', 'w_fan'):
+        # Hieb und Strahl treffen sofort: Wurf-Fähigkeiten (Schaden, Feuer, Frost, großer Schlag) vorher auf ein Probe-Geschoss
+        proto = _carrier(x, y, base, dmg, dict(fl, _big=big, _gold=gold))
+        sigs.on_fire(p, run, [proto])
+        dmg, fl = proto.dmg, {k: v for k, v in proto.fl.items() if v}
+        if proto.col != (255, 255, 255):
+            tint = proto.col
+    col = tint or ((255, 215, 90) if gold else run.shot_col(fl))
+    if tint or gold:
+        fl = dict(fl, _tint=1)                              # eingefärbter Hieb zeigt seine Farbe
     angs = shot_angles(p, base)
     homing = bool(fl.get('homing'))
     made = []
@@ -278,7 +292,11 @@ def fire(p, d, wk):
                 made.append(b)
         audio.play('gust', 0.5)
     for b in made:
-        b.big = big
+        b.big, b.gold = big, gold
+        if gold:
+            b.col = (255, 215, 90)
+    if wk in ('w_bow', 'w_fan'):
+        sigs.on_fire(p, run, made)
     return made
 
 
