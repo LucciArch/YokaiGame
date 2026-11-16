@@ -76,6 +76,7 @@
 - Runde 52 – **Flussufer und Spukhaus neu eingerichtet**: Am Kawabe liegt eine Gurke als Kappa-Opfer auf dem nassen Flussfels, Rohrkolben stehen im Seichtwasser mit einem Glühwürmchen, und ein Suijin-Stein mit eingemeißeltem **水神**, Shimenawa, Gurke und Sake-Schale ehrt den Flussgott. Im Yashiki hat die Tansu Eisenbeschläge und eine Lade, aus der zwei Augen schauen, im zerrissenen Andon brennt kaltes Totenlicht, und um den goldenen Byōbu mit Kiefer und roter Sonne greifen bleiche Finger
 - Runde 53 – Die Startgeste ist jetzt ganz zu sehen: Die Unverwundbarkeit zu Laufbeginn blinkt nicht mehr, solange deine Figur ihre Geste zeigt (ein Treffer beendet die Geste sofort)
 - Runde 54 – Neuer Erfolg **Alle Lose**: Ziehe am Omikuji-Schrein einmal Daikichi, Kichi, Chūkichi, Shōkichi und Kyō (Daikyō zählt als Kyō) – die gezogenen Lose bleiben über alle Läufe gespeichert
+- Runde 55 – **Ama-no-Iwato, Teil 1:** Neues Biom für den zweiten geheimen Weg in Kapitel VII – die Felsenhöhle, in der sich Amaterasu verborgen hat: dunkle Granitplatten mit eingelassenen Sonnenscheiben aus Blattgold, Fels mit Goldadern, Shimenawa vor dem Felsentor, Feuerkörbe der wartenden Götter. Requisiten aus der Sage: Sakaki-Baum mit Yata-Spiegel, Magatama und Shide, der Langschwanzhahn Tokoyo no Nagadori und der umgedrehte Bottich, auf dem Ame-no-Uzume tanzte
 
 ## 1.4.0 – „Hyakki-Update“ (enthält 1.3 „Kapitel-Update“)
 

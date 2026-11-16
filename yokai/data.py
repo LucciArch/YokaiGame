@@ -655,6 +655,12 @@ BIOMES['yomi_oku'] = dict(name='Totenpalast', jp='Yomi no Oku', depth=7, floor=(
                           music=('iwato', 165, 108, 'mystic', 54), weather='ash', dark=80,
                           grade=(70, 20, 90), pit='void', decor='bones')
 DEPTH_BIOMES[7] = ['yomi_oku']
+# Kapitel VII, zweiter Weg (nach dem ersten Wahren Sieg): Ama-no-Iwato, die Felsenhöhle der verborgenen Sonne.
+# Nicht in DEPTH_BIOMES – nur die Iwato-Pforte führt hierher (Run.oku).
+BIOMES['iwato'] = dict(name='Felsenhöhle der Sonne', jp='Ama-no-Iwato', depth=7, floor=(42, 28, 30), floor_pat='stone',
+                       wall=(46, 28, 28), wall_pat='rock', rock=(110, 80, 60), moss=False, ambient='embers',
+                       enemies=['komainu', 'tennin', 'karasu_tengu', 'kitsunebi_e', 'yamabiko', 'katawaguruma', 'kamaitachi', 'nurikabe'],
+                       music=('iwato', 220, 100, 'mystic', 57), dark=95, grade=(110, 60, 10), pit='void', decor='cracks')
 BOSS_POOL[6].remove('izanami')    # Izanami wartet jetzt in ihrem eigenen Reich
 BOSS_POOL[7] = ['izanami']
 

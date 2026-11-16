@@ -383,6 +383,75 @@ def rocks(name):
         cv.form(top, (k[1], k[2], k[3]), 1, 1)
         out.append(fin(cv, P))
 
+    elif name == 'iwato':
+        cv, rng = new(0)                                     # Sakaki mit Yata-Spiegel, Magatama und Shide (wie in der Sage)
+        tr = ('#1c1012', '#3a2418', '#5a3a22')
+        cv.fill(cv.R(15, 14, 17, 28), tr[1])
+        cv.vl(15, 14, 28, tr[2])
+        cv.vl(17, 16, 28, tr[0])
+        cv.line([(16, 18), (11, 13)], tr[1])
+        cv.line([(16, 16), (21, 11)], tr[1])
+        for (x, y, rx, ry) in ((10, 10, 5, 3.6), (22, 9, 5, 3.4), (16, 6, 5.5, 3.6), (13, 15, 3.6, 2.4), (20, 14, 3.4, 2.2)):
+            m = cv.E(x, y, rx, ry)
+            cv.fill(dil(m), K)
+            cv.form(m, (MOSS[0], MOSS[1], MOSS[2]), 1, 1)
+        for (x, y) in ((9, 9), (14, 5), (21, 8), (18, 5), (12, 14)):
+            cv.hpx(x, y, MOSS[3])
+        mir = cv.E(16, 13, 3.2, 3.2)                         # Yata no Kagami am Stamm
+        cv.fill(dil(mir), K)
+        cv.form(mir, (SUN[1], SUN[2], SUN[3]), 1, 1)
+        cv.fill(cv.E(16, 13, 2, 2), '#f8f0c8')
+        cv.hpx(15, 12, '#ffffff')
+        cv.hline([(10, 15), (10, 18)], PAPER[2])             # Magatama-Schnur links
+        for y in (16, 18):
+            cv.fill(cv.E(10, y + .5, .9, .9), '#3ab07a')
+            cv.hpx(9.5, y, '#9ae8b8')
+        cv.grid(21, 15, "pP\npP\n.pP\n.pP", dict(p=PAPER[2], P=PAPER[3]))   # Shide rechts
+        cv.rect(12, 27, 20, 28, STRAW[1])                    # Wurzelballen in Stroh gebunden
+        cv.hl(12, 20, 27, STRAW[2])
+        out.append(fin(cv, P))
+
+        cv, rng = new(1)                                     # Tokoyo no Nagadori: der Hahn, der die Sonne ruft
+        cv.rect(7, 22, 25, 23, '#5a3a22')                    # Sitzstange
+        cv.hl(7, 25, 22, '#7a5432')
+        for x in (9, 23):
+            cv.vl(x, 24, 28, '#3a2418')
+        tail = cv.PG([(13, 14), (7, 12), (4, 16), (5, 22), (8, 26), (10, 21), (13, 19)])
+        cv.fill(dil(tail), K)
+        cv.form(tail, ('#14141e', '#26283a', '#3a4060'), 1, 1)
+        for (a, b) in (((12, 15), (5, 17)), ((12, 17), (6, 22)), ((12, 18), (8, 25))):
+            cv.hline([a, b], '#7a8ab0')                      # lange, schillernde Schwanzfedern
+        body = cv.E(16, 17, 4.6, 3.8)
+        cv.fill(dil(body), K)
+        cv.form(body, ('#a04a18', '#d0702a', '#f0a040'), 1, 1)
+        neck = cv.E(19, 12, 2.4, 3.6)
+        cv.fill(dil(neck), K)
+        cv.form(neck, (SUN[1], SUN[2], SUN[3]), 1, 1)
+        cv.grid(18, 7, "r.r\nrrr", dict(r=RED[2]))         # Kamm
+        cv.px(21, 11, '#e8c048')                             # Schnabel
+        cv.px(22, 11, '#a88028')
+        cv.px(20, 10, K)
+        cv.px(20, 13, RED[2])                                # Kehllappen
+        cv.vl(15, 21, 21, '#e8c048')
+        cv.vl(17, 21, 21, '#e8c048')
+        out.append(fin(cv, P))
+
+        cv, rng = new(2)                                     # Ukefune: umgedrehter Bottich, auf dem Ame-no-Uzume tanzte
+        m, t = cyl(cv, ('#1c1012', '#4a2e1e', '#6e4a2c', '#8e6a40'), 16, 28, 10, 9)
+        for x in (9, 13, 19, 23):
+            cv.vl(x, 20, 27, '#2e1c14')
+        for y in (21, 26):                                   # Bambusreifen
+            cv.hl(6, 26, y, STRAW[2])
+            cv.hl(6, 26, y + 1, STRAW[0])
+        cv.rect(11, 17, 21, 17, PAPER[2])                    # Sakaki-Zweig mit Glöckchen auf dem Deckel
+        cv.line([(11, 16), (21, 14)], '#3a2418')
+        for (x, y) in ((13, 14), (17, 13), (20, 12)):
+            cv.grid(x, y, "gG\n.g", dict(g=MOSS[1], G=MOSS[2]))
+        for (x, y) in ((12, 17), (15, 16), (18, 15)):
+            cv.fill(cv.E(x, y, .8, .8), SUN[2])
+            cv.hpx(x - .5, y - .5, SUN[3])
+        out.append(fin(cv, P))
+
     elif name == 'kurama':
         cv, rng, m = plain_boulder(0)
         out.append(fin(cv, P))
@@ -1074,6 +1143,15 @@ def wall_decos(name, base):
         b.hl(5, 19, 9, w1)
         sil = b.E(12, 8.5, 2.4, 2) | b.PG([(9, 9), (15, 9), (16, 11), (8, 11)])
         b.fill(sil & b.R(5, 7, 19, 11), '#2a1c22')
+    elif name == 'iwato':
+        rope(a, 2, 29, 4, 3, shide=(8, 15, 22))              # Shimenawa vor dem Felsentor
+        niche(b, 11, 20, 5)                                  # Kagaribi: Feuerkorb der wartenden Götter
+        b.vl(13, 10, 14, IRON[1])
+        b.vl(18, 10, 14, IRON[1])
+        b.rect(12, 8, 19, 10, IRON[2])
+        b.hl(12, 19, 8, IRON[3])
+        flame(b, 13, 3, LAVA)
+        b.px(15, 4, SUN[3])
     elif name == 'oeyama':
         wd = ('#1c121c', '#3a2428', '#58382c')
         for (x, top) in ((6, 3), (24, 5)):                   # skull trophies on stakes

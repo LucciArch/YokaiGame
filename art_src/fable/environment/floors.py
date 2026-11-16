@@ -492,6 +492,21 @@ def deco_floor(name, P, rng, which):
             cv.line([(15, 13), (16, 8)], ONIBI[0])
             cv.rect(15, 14, 16, 14, ONIBI[2])
             cv.grid(19, 8, "o.\noo", dict(o=ONIBI[1]))
+    elif name == 'iwato':
+        if which == 0:   # eingelassene Sonnenscheibe aus Blattgold, acht Strahlen
+            for i in range(8):
+                a = i * math.pi / 4
+                cv.line([(15.5 + math.cos(a) * 5, 15.5 + math.sin(a) * 5), (15.5 + math.cos(a) * 9, 15.5 + math.sin(a) * 9)], SUN[1])
+            m = cv.E(15.5, 15.5, 4.2, 4.2)
+            cv.fill(dil(m), f0)
+            cv.form(m, (SUN[1], SUN[2], SUN[3]), 1, 1)
+            cv.fill(cv.E(15.5, 15.5, 1.6, 1.6), SUN[1])
+        else:            # Sakaki-Blätter und eine lange Hahnenfeder (Tokoyo no Nagadori)
+            for (x, y) in ((9, 10), (21, 19), (12, 21)):
+                cv.grid(x, y, ".gg\nggG\n.g.", dict(g=MOSS[1], G=MOSS[2]))
+            cv.line([(14, 12), (17, 14), (20, 14), (23, 12)], PAPER[2])
+            cv.line([(15, 13), (18, 15), (21, 15)], PAPER[1])
+            cv.px(23, 12, SUN[2])
     elif name == 'tsukiyomi':
         s0, s1, s2, s3 = SILVER
         if which == 0:   # crescent inlay

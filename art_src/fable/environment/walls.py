@@ -84,6 +84,8 @@ def cap_tex(name, P, w, h, seed=0):
             scat(["mm.\nmmm", "mmm\n.mm"], dict(m=MOSS[0]), area // 50)
         if name == 'jigoku':
             scat(["ee", "e\ne"], dict(e=LAVA[0]), area // 80, pad=2)
+        if name == 'iwato':
+            scat(["s", "s\n.s"], dict(s=SUN[0]), area // 90, pad=2)
     elif pat == 'ice':
         scat([".aaaa.\naaaaaa", "aaa\n.aa", ".aaa\naaaa"], dict(a=c1), area // 34)
     elif pat == 'coral':      # ryugu lacquer beam with gold studs
@@ -241,6 +243,11 @@ def face(name, P, seed=0):
             f.fill(m, MOSS[1])
             f.grid(6, 3, "m.m\nmmm", dict(m=MOSS[0]))
             f.grid(22, 2, "mm.\n.mm", dict(m=MOSS[0]))
+        if name == 'iwato':                         # Goldadern im Fels: hier drinnen schläft die Sonne
+            f.line([(5, 1), (7, 4), (6, 7)], SUN[0])
+            f.line([(7, 4), (8, 5)], SUN[1])
+            f.line([(21, 2), (19, 5), (21, 8)], SUN[0])
+            f.px(19, 5, SUN[2])
         if name == 'jigoku':
             f.line([(11, 0), (13, 3), (11, 6), (13, 9)], LAVA[0])
             f.line([(13, 3), (11, 6)], LAVA[1])

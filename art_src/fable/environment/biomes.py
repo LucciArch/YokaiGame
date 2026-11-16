@@ -2,7 +2,7 @@
 from core import mix
 
 ORDER = ['chikurin', 'inari', 'obakedera', 'hakaba', 'kurama', 'yukiyama', 'ryugu', 'uminobe', 'yomi', 'jigoku',
-         'takamagahara', 'kawabe', 'yashiki', 'oeyama', 'shinkai', 'enma_cho', 'tsukiyomi', 'yomi_oku']
+         'takamagahara', 'kawabe', 'yashiki', 'oeyama', 'shinkai', 'enma_cho', 'tsukiyomi', 'yomi_oku', 'iwato']
 
 
 def B(floor_pat, wall_pat, pit, dark, f, cap, w, k, **extra):
@@ -30,6 +30,7 @@ GLOW = ('#0e3a4a', '#1a6a78', '#3aa8a8', '#90e8d0')     # deep-sea bioluminescen
 STONE = ('#191a28', '#2a2c40', '#40445c', '#5c627e')
 SILVER = ('#2a3050', '#4a5478', '#7a86a8', '#b4c0d8')
 VIOLET = ('#1a0c24', '#2e1638', '#48244e', '#6a3a64')     # Izanamis morscher Schwarzlack
+SUN = ('#5a2410', '#a04a18', '#e08a28', '#ffd878')         # Amaterasus Sonnengold
 ONIBI = ('#2a1a5a', '#5a3aa8', '#9a7ae0', '#d8c8ff')      # kaltes Totenfeuer
 
 BIOMES = {
@@ -93,4 +94,7 @@ BIOMES = {
     'yomi_oku': B('stone', 'stone', 'void', 80,
                   ('#100a14', '#1c1220', '#26182a', '#322036'), ('#0c0610', '#180c1c', '#6a3a64'),
                   VIOLET, ('#160c1c', '#2c1a30', '#463048', '#64506a')),
+    'iwato': B('stone', 'rock', 'void', 70,              # Ama-no-Iwato: Felsenhöhle der verborgenen Sonne
+               ('#120c10', '#1e1418', '#2a1c1e', '#382624'), ('#0e080a', '#1c1012', '#a04a18'),
+               ('#1a1012', '#2e1c1c', '#463028', '#62443a'), ('#1a1012', '#34221e', '#523a2e', '#72543e')),
 }
