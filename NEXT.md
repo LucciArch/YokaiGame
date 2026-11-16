@@ -1,21 +1,18 @@
-# Erledigt (Runden 32–34): Titelbildschirm komplett neu
-- Runde 32: Panorama in fünf Ebenen (`art_src/title/panorama.py` → `yokai/assets/env/_title/`): Himmel mit Mondhof,
-  Fuji-Kette, Zedernkamm mit Pagode, Nebel, Vordergrund (Torii im See, Schilf, Tōrō, Kirschzweig). Spiegelungen im
-  Wasser sind mitgebacken. `app.draw_night` legt die Ebenen mit Parallaxe übereinander (auch Hintergrund aller Menüs).
-- Runde 33: Logo (`art_src/title/logo.py`): Schriftzug aus YokaiFude, Goldstufen, Hanko-Siegel 妖怪の道 (Kanji als
-  Strich-Skelette im 16er-Raster). Hi-Res-Ebene.
-- Runde 34: Einblendung (Nacht → Logo → Menü), Pinselstrich-Auswahl (`brush.png`), Menüschleier, Glühwürmchen, Hitodama.
+# Erledigt (Runden 35–36): Charakterauswahl und Menüs im Titelstil
+- Runde 35: `st_chars` neu – Figur groß (Faktor 2) auf Steinpodest im Mondlicht, Name auf Pinselstrich, Werte als
+  Goldtusche-Balken (Leben/Kraft/Tempo/Wurfrate aus `CHARS`), Figurenleiste unten, gesperrte als Schattenriss mit
+  Siegel 封. Grafik: `art_src/title/charsel.py` → `pedestal.png`, `lock.png`, `ink.png` (in `assets/env/_title/`).
+- Runde 36: `Game.brush_sel(key, cx, y, w, dt)` – Pinselstrich-Auswahl in Titel, Pause und Optionen.
 
-# Nächster Schritt: Kapitel-Kartenbildschirm / Charakterauswahl im selben Stil
-Die Charakterauswahl (`st_chars`) und die Untermenüs (`menu_bg`) nutzen jetzt zwar das Panorama, aber ihre Tafeln
-(`gfx.panel`) wirken neben dem neuen Titel altmodisch. Charakterauswahl neu: Figur groß auf einem Steinpodest am
-Seeufer, Name als Pinselschrift-Banner, Werte als Tuschebalken, gesperrte Figuren als Schattenriss mit Siegel.
-Pinselstrich-Auswahl (`brush.png`) auch in Pause-, Options- und Untermenüs verwenden.
-Warum: Der erste Eindruck endet nicht beim Titel – der Sprung in die alten Tafeln fällt jetzt auf.
+# Nächster Schritt: Restliche Untermenüs im Titelstil
+Herausforderungen (`st_challenges`), Codex, Lexikon, Erfolge und Statistik nutzen noch die alten Kasten-Tafeln
+(`gfx.panel`) mit goldenem Rand für die Auswahl. Auswahl auf `brush_sel` umstellen, Tafeln durch einen weichen
+Schleier wie im Titel (`_scrim`) ersetzen, Überschriften in größerer Schrift mit kleinem Siegel daneben.
+Warum: Titel, Charakterwahl und Pause sind jetzt aus einem Guss – die Lexikon-/Codex-Seiten fallen dagegen ab.
 
 # Weitere Ideen
-- Titel: Tageszeit/Jahreszeit je nach Fortschritt (z. B. nach dem Wahren Sieg roter Herbstmond, nach Yomi violette Nacht)
+- Titel: Tageszeit/Jahreszeit je nach Fortschritt (nach dem Wahren Sieg roter Herbstmond, nach Yomi violette Nacht)
+- Charakterauswahl: kurze Idle-Pose je Figur (Kenji zieht das Schwert, Okiku schwebt) und eigener Klang beim Wechsel
 - Requisiten Teil 3: eigene Requisiten für `yomi_oku`, Grabsteine Hakaba mit Inschrift/Opfergaben
 - Zweiter Weg: Pforte nach **Takamagahara no Oku** mit Amaterasu (Ama-no-Iwato) als Endbossin
-- Eigenes Geschoss-Sprite für Pfirsiche, Fūjins Windklingen und Windsicheln
 - Synergien mit drei Items (die drei Kaiserinsignien als „große“ Kombination mit Fanfare)
