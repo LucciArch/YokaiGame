@@ -733,6 +733,76 @@ def crescent(ang):
     return s
 
 
+# ---------------------------------------------------------------- Tessos Eisenzahn-Ratte und Gashadokuro-Knochensplitter (2x)
+_RAT = ("""
+.............kk.......
+............kpGk......
+.......kkkkkkGGGkk....
+.....kkGGGGGGGGGrGk...
+kk..kGGGGGGGGGGGGGGkk.
+pkkkgggGGGgggggggggGpk
+.kpkgggggggggggggggkwk
+...kdgggddddddddggkk..
+....kdddkkkkkkdddk....
+....kpk.......kpk.....
+....kk........kk......""", """
+.............kk.......
+............kpGk......
+.......kkkkkkGGGkk....
+.....kkGGGGGGGGGrGk...
+....kGGGGGGGGGGGGGGkk.
+kkkkgggGGGgggggggggGpk
+pkpkgggggggggggggggkwk
+...kdgggddddddddggkk..
+....kdddkkkkkkdddk....
+...kpk.........kpk....
+...kk..........kk.....""")
+_BONE = """
+.kk.............
+kWWk............
+kWWWkkkkkkkk.k..
+.kWWWWWWWWWWkWk.
+.kcccccccWWWWWWk
+kccckkkkkcccckk.
+kcck.....kkck...
+.kk........k...."""
+_PIX = {'k': (14, 9, 16), 'g': (118, 116, 138), 'G': (168, 166, 188), 'd': (76, 72, 92), 'p': (214, 132, 146),
+        'r': (255, 60, 50), 'w': (214, 220, 234), 'W': (240, 232, 210), 'c': (182, 170, 142)}
+
+
+def _pixmap(art):
+    rows = art.strip('\n').split('\n')
+    s = pygame.Surface((len(rows[0]), len(rows)), pygame.SRCALPHA)
+    for y, row in enumerate(rows):
+        assert len(row) == len(rows[0]), row
+        for x, ch in enumerate(row):
+            if ch != '.':
+                s.set_at((x, y), _PIX[ch])
+    return s
+
+
+def rat(ang, frame):
+    """Ratte in Laufrichtung; nach links gespiegelt statt kopfüber gedreht."""
+    left = math.cos(ang) < 0
+    a = math.pi - ang if left else ang
+    step = int(round(math.degrees(math.atan2(math.sin(a), math.cos(a))) / 15))
+    key = ('rat', frame % 2, left, step)
+    if key not in _cache:
+        im = _pixmap(_RAT[frame % 2])
+        if left:
+            im = pygame.transform.flip(im, True, False)
+        _cache[key] = pygame.transform.rotate(im, step * 15 if left else -step * 15)
+    return _cache[key]
+
+
+def bone(ang):
+    step = int(round(math.degrees(ang) / 15)) % 24
+    key = ('bone', step)
+    if key not in _cache:
+        _cache[key] = pygame.transform.rotate(_pixmap(_BONE), -step * 15)
+    return _cache[key]
+
+
 # ---------------------------------------------------------------- Hitogata: Papierdiener des Onmyōji (2x)
 def hitogata(tilt):
     step = int(round(tilt / 10)) % 36

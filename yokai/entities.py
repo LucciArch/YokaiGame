@@ -236,6 +236,10 @@ class Bullet:
                 img = props.hitogata(math.sin(self.t * 14) * 25)
                 gfx.hi_blit(img, x, y + img.get_height() / 4)
                 return
+            if gfx.HI_MODE and self.delay <= 0 and self.kind in ('rat', 'bone'):
+                img = props.rat(ang, int(self.t * 14)) if self.kind == 'rat' else props.bone(self.t * 14)
+                gfx.hi_blit(img, x, y + img.get_height() / 4)
+                return
             if gfx.HI_MODE and self.delay <= 0 and (getattr(self, 'arrow', False) or getattr(self, 'crescent', False)):
                 img = props.arrow(ang) if getattr(self, 'arrow', False) else props.crescent(ang)
                 gfx.hi_blit(img, x, y + img.get_height() / 4)

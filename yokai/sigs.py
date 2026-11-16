@@ -671,6 +671,7 @@ def hit_post(run, e, b, dmg):
         a = math.atan2(tgt.y - e.y, tgt.x - e.x) if tgt else random.uniform(0, math.tau)
         rb = run.fire_player_bullet(e.x, e.y, a, dmg * 0.5, 190, 2, 0.8, {'homing': 1, '_rat': 1})
         rb.col = (160, 170, 190)
+        rb.kind = 'rat'
     if b is not None and b.fl.get('_frost') and random.random() < 0.2:
         e.frozen = max(e.frozen, 0.3 if e.is_boss else 1.2)
     if 'kuji' in S and random.random() < (1 / 5 if 'seimei' in S else 1 / 9):
@@ -685,6 +686,7 @@ def hit_post(run, e, b, dmg):
             for i in range(4):
                 nb = run.fire_player_bullet(e.x, e.y, a0 + i * math.tau / 4, p.damage() * 0.6, 220, 3, 0.6, {'pierce': 1})
                 nb.col = (235, 228, 205)
+                nb.kind = 'bone'
     if 'springfeuer' in S and not echo and random.random() < (0.4 if 'fest_der_laternen' in S else 0.2):
         from .entities import Hazard
         run.hazards.append(Hazard(e.x, e.y + 4, 10, 0.0, 3.5 if 'fest_der_laternen' in S else 2.0, max(0.6, p.damage() * 0.3), 'p', 'fire'))
