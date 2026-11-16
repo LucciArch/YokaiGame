@@ -378,6 +378,9 @@ SYNERGIES = [
     dict(id='maskenzug', name='Maskenzug', desc='Die Parade der hundert Gesichter', items=['hyakki_rolle', 'noh_maske'], fx=dict(crit=0.05, sig_maskenzug=1)),
     dict(id='fujin_raijin', name='Fūjin-Raijin-zu', desc='Wind und Donner wie auf dem Wandschirm', items=['kaze_bukuro', 'raijin_trommel'], fx=dict(sig_fujin_raijin=1)),
     dict(id='verfluchte_sterne', name='Verfluchte Sterne', desc='Fuchs und Stern leuchten gemeinsam', items=['hoshi_splitter', 'kyubi_juwel'], fx=dict(crit=0.1, sig_verfluchte_sterne=1)),
+    dict(id='hara_tsuzumi', name='Hara-tsuzumi', desc='Der Tanuki trommelt auf seinen Bauch', items=['tanuki_beutel', 'tanuki_blatt_p'], fx=dict(sig_hara_tsuzumi=1)),
+    dict(id='gelaechter', name='Gelächter der Nacht', desc='Kerakera-onna und Hyōsube lachen im Chor', items=['kerakera_faecher', 'hyosube_haar'], fx=dict(sig_gelaechter=1)),
+    dict(id='enenra', name='Enenra', desc='Der Rauch des ersten Feuers lebt', items=['enenra_pfeife', 'kagutsuchi_glut'], fx=dict(sig_enenra=1)),
     dict(id='sommerwind', name='Sommerwind', desc='Windglocke und Spatzenfeder', items=['furin', 'suzume_feder'], fx=dict(salts_regen=0.15, sig_sommerwind=1)),
 ]
 

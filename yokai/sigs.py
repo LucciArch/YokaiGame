@@ -98,6 +98,9 @@ TEXT = {
     'schweiss': 'Nach einer Rolle: der nächste Wurf +40 %',
     'schweben': 'Talismane bleiben am Ende ihrer Bahn schweben',
     'windsack': 'Alle 4 s öffnet sich der Windsack: ein Sturm in Wurfrichtung fegt Geschosse fort und schneidet Feinde',
+    'hara_tsuzumi': 'Bauchtrommel: die Rolle schlägt eine Schockwelle, die Tarnung hält doppelt so lang',
+    'gelaechter': 'Das Lachen hallt weit: Kills verscheuchen Feinde im doppelten Umkreis, Verängstigte nehmen +30 % Schaden',
+    'enenra': 'Der Rauch glimmt: Feinde im Rauch brennen, explodierende Feinde hinterlassen Rauch',
     'fujin_raijin': 'Der Windsack öffnet sich jede Sekunde, und Raijin schlägt in jeden getroffenen Feind ein',
     'erstes_feuer': 'Brennende Feinde explodieren beim Tod',
     'fuchsregen': 'Ein Sonnenregen fällt auf deine Feinde',
@@ -566,6 +569,8 @@ def hit_pre(run, e, b, dmg):
             _syn(run, 'allsehend', e.x, e.y, (255, 120, 160))
     if 'ewiger_winter' in S and e.frozen > 0:
         dmg *= 1.5
+    if 'gelaechter' in S and getattr(e, 'sg_fear', 0) > 0:
+        dmg *= 1.3
     if 'orochi' in S and e.poison > 0:
         _syn(run, 'orochi', e.x, e.y, (150, 235, 110))
         dmg *= 1.4
@@ -723,6 +728,10 @@ def on_kill(run, e):
         run.hazards.append(Hazard(e.x, e.y + 4, 14, 0.0, 2.5, max(0.8, p.damage() * 0.4), 'p', 'fire'))
     if 'erstes_feuer' in S and e.burn > 0:
         run.explode(e.x, e.y, 26, p.damage() * 1.4, 'p')
+        if 'enenra' in S:
+            clouds = g.setdefault('clouds', [])
+            clouds.append([e.x, e.y, 2.5])
+            del clouds[:-6]
     if 'tennyo' in S:
         g['bluete'] = min(g.get('bluete', 0) + 2, run.time - getattr(run, 'room_enter_time', run.time))
     if 'totenfaehre' in S and p.revives == 0:
@@ -744,9 +753,12 @@ def on_kill(run, e):
         p.add_spirit(1)
         _syn(run, 'leben_tod', e.x, e.y, (200, 160, 230))
     if 'lachen' in S:
+        far = 'gelaechter' in S
         for o in run.enemies:
-            if o is not e and o.active() and not o.is_boss and math.hypot(o.x - e.x, o.y - e.y) < 75:
-                o.sg_fear = 2.0
+            if o is not e and o.active() and not o.is_boss and math.hypot(o.x - e.x, o.y - e.y) < (150 if far else 75):
+                o.sg_fear = 3.0 if far else 2.0
+                if far:
+                    _syn(run, 'gelaechter', e.x, e.y, (255, 170, 230))
     if 'ema' in S and e.is_boss:
         k = random.choice(('dmg', 'rate', 'spd', 'range', 'luck'))
         v = {'dmg': 0.5, 'rate': 0.4, 'spd': 6, 'range': 30, 'luck': 1}[k]
@@ -880,7 +892,19 @@ def on_dash(p, run):
         return
     g = st(p)
     if 'tarnung' in S:
-        g['invis'] = 1.3
+        g['invis'] = 2.6 if 'hara_tsuzumi' in S else 1.3
+    if 'hara_tsuzumi' in S:
+        _syn(run, 'hara_tsuzumi', p.x, p.y, (200, 150, 90))
+        _ring(run, p.x, p.y, (200, 150, 90), 60)
+        from . import audio
+        audio.play('roar', 0.25)
+        for e in run.enemies:
+            d = math.hypot(e.x - p.x, e.y - p.y)
+            if e.active() and d < 60 + e.r:
+                run.damage_enemy(e, p.damage() * 1.2, None)
+                if not e.is_boss:
+                    e.kx += (e.x - p.x) / max(d, 1) * 450
+                    e.ky += (e.y - p.y) / max(d, 1) * 450
     if 'iaido' in S:
         g['iaido'] = 1.2
     if 'schweiss' in S:
@@ -1235,6 +1259,8 @@ def tick(p, run, dt):
             for e in run.enemies:
                 if e.active() and not e.is_boss and math.hypot(e.x - p.x, e.y - p.y) < 85 and random.random() < 0.2:
                     e.frozen = max(e.frozen, 0.45)
+                    if 'gelaechter' in S:
+                        e.sg_fear = max(getattr(e, 'sg_fear', 0), 1.5)
     if 'bannkreis' in S:
         for e in run.enemies:
             if e.active() and not e.is_boss:
@@ -1289,10 +1315,19 @@ def tick(p, run, dt):
     clouds = g.get('clouds')
     if clouds:
         from .entities import Particle
+        hot = 'enenra' in S
         for c in clouds:
             c[2] -= dt
             if random.random() < 0.5:
-                run.particles.append(Particle(c[0] + random.uniform(-14, 14), c[1] + random.uniform(-10, 10), 0, -6, 0.5, (150, 150, 160), 4))
+                run.particles.append(Particle(c[0] + random.uniform(-14, 14), c[1] + random.uniform(-10, 10), 0, -6, 0.5,
+                                              (190, 110, 70) if hot and random.random() < 0.4 else (150, 150, 160), 4))
+            if hot:
+                for e in run.enemies:
+                    if e.active() and (e.x - c[0]) ** 2 + (e.y - c[1]) ** 2 < (20 + e.r) ** 2:
+                        if e.burn <= 0:
+                            _syn(run, 'enenra', e.x, e.y, (255, 140, 70))
+                        e.burn = max(e.burn, 2.0)
+                        e.burn_dps = max(e.burn_dps, max(0.8, p.damage() * 0.35))
         g['clouds'] = [c for c in clouds if c[2] > 0]
 
 
