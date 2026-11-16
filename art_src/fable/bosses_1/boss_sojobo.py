@@ -5,8 +5,11 @@ NAME = 'boss_sojobo'
 CW, CH = 292, 208
 OX, OY = 70, 50          # local baseline y=150
 BLKF = ('h0', 'h1', 'h2')
-PUR = ('p1', 'p2', 'p3')
-PFAR = ('p0', 'p1', 'p2')
+# Yamabushi-Gewand (suzukake) in Safran statt Violett
+col('sj0', '#2e1e1a'); col('sj1', '#6e4a26'); col('sj2', '#a87c36'); col('sj3', '#d8b266')
+add_rim('sj0 sj1 sj2', 'xt')
+PUR = ('sj1', 'sj2', 'sj3')
+PFAR = ('sj0', 'sj1', 'sj2')
 HAK = ('i0', 'i1', 'i2')
 WHT = ('v1', 'v2', 'v3')
 GOLD = ('y0', 'y1', 'y2')
@@ -139,7 +142,7 @@ def sojobo(**kw):
 
     def sleeve_arm(sh_, el, ha, rp, far):
         p = C()
-        up = L(*sh_, 7.0, *el, 6.2) | E(sh_[0], sh_[1] + 1, 7.5, 6.5)
+        up = L(*sh_, 6.0, *el, 5.2) | E(sh_[0], sh_[1] + 1, 6.4, 5.6)
         p.form(up, rp, sd=4, hl=1)
         q = lerp(sh_, el, 0.5)
         p.line([(q[0] - 3, q[1] - 2), (q[0] + 2, q[1] + 3)], rp[0], only=up)          # Stoff-Falte
@@ -151,11 +154,11 @@ def sojobo(**kw):
             nx, ny = -nx, -ny
         # weiter, herabhängender Ärmel: weich gerundet statt kantig
         mid = lerp(el, ha, 0.55)
-        w = (L(*el, 6.6, *ha, 6.0) | E(mid[0] + nx * 7, mid[1] + ny * 7, 9.5, 7.5)
-             | L(mid[0] + nx * 4, mid[1] + ny * 4, 6.0, ha[0] + nx * 11, ha[1] + ny * 11, 5.0))
+        w = (L(*el, 5.6, *ha, 5.0) | E(mid[0] + nx * 5, mid[1] + ny * 5, 7.0, 5.4)
+             | L(mid[0] + nx * 3, mid[1] + ny * 3, 4.6, ha[0] + nx * 8, ha[1] + ny * 8, 3.6))
         p.form(w, rp, sd=5, hl=1)
         p.line([(el[0] + nx * 3, el[1] + ny * 6), (mid[0] + nx * 11, mid[1] + ny * 11)], rp[0], only=w)   # Faltenwurf
-        cuff = L(ha[0] - nx * 4, ha[1] - ny * 4, 1.6, ha[0] + nx * 14, ha[1] + ny * 14, 1.6)
+        cuff = L(ha[0] - nx * 4, ha[1] - ny * 4, 1.4, ha[0] + nx * 11, ha[1] + ny * 11, 1.4)
         p.fill(cuff & w, 'v1')                                            # weißes Futter am Ärmelsaum
         c.stamp(p, 'K')
         p = C()
@@ -183,26 +186,35 @@ def sojobo(**kw):
 
     # ---- robe
     p = C()
-    robe = (L(*B((89, 62)), 6.5, *B((85, 95)), 6.0) | L(*B((110, 61)), 6.5, *B((115, 95)), 6.0)
-            | PG([B((89, 56)), B((110, 55)), B((117, 98)), B((83, 98))]) | E(*B((99, 59)), 13, 5))
+    robe = (E(*B((99, 68)), 15, 15) | E(*B((99, 86)), 16, 12)                 # runde Schultern, weicher Fall
+            | PG([B((86, 74)), B((113, 74)), B((118, 98)), B((81, 98))]))
     p.form(robe, PUR, sd=7, hl=1)
     collar = PG([B((90, 55)), B((96, 55)), B((100, 70)), B((104, 55)), B((110, 55)), B((101, 76)), B((99, 76))])
     p.form(collar & robe, WHT, sd=1, hl=1)                                   # weißer Kragen des Untergewands (V)
     for a_, b_ in (((84, 66), (83, 92)), ((116, 66), (118, 92))):            # Faltenwurf an den Seiten
-        p.line([B(a_), B(b_)], 'p1', only=robe)
-    p.line([B((92, 56)), B((98, 76)), B((97, 96))], 'p0', only=robe)
+        p.line([B(a_), B(b_)], 'sj1', only=robe)
+    p.line([B((92, 56)), B((98, 76)), B((97, 96))], 'sj0', only=robe)
+    for y in range(62, 96, 6):                                               # Suzukake-Karomuster
+        for x in range(84, 118, 6):
+            p.pxs([B((x + (y // 6) % 2 * 3, y))], 'sj1')
     belt = PG([B((82, 88)), B((118, 87)), B((118, 95)), B((82, 96))])
     p.form(belt, WHT, sd=2, hl=1)
     p.line([B((82, 92)), B((118, 91))], 'v0', only=belt)
     # yuigesa: sash with gold pom-poms
     for a_, b_ in (((90, 56), (104, 86)), ((108, 55), (92, 86))):
         p.line([B(a_), B(b_)], 'c1', only=robe); p.line([B((a_[0] + 1, a_[1])), B((b_[0] + 1, b_[1]))], 'c0', only=robe)
-    for (x, y) in ((93, 63), (105, 62), (99, 74), (95, 82)):
-        p.form(E(*B((x, y)), 3.4, 3.4), GOLD, sd=1, hl=1)
+    for (x, y), rp in zip(((93, 63), (105, 62), (99, 74), (95, 82)),
+                          (('m1', 'm2', 'm3'), WHT, ('g1', 'g2', 'g3'), ('m1', 'm2', 'm3'))):
+        p.form(E(*B((x, y)), 3.6, 3.6), rp, sd=1, hl=1)                      # Bonten-Quasten
+        p.pxs([B((x - 1, y - 1)), B((x + 1, y)), B((x, y + 1))], rp[0])
     c.stamp(p, 'K')
 
+    # ---- Hals verbindet Kopf und Gewand
+    p = C()
+    p.form(L(*B((92, 52)), 5.0, *B((96, 60)), 6.0), SK, sd=2, hl=0)
+    c.stamp(p, 'K')
     # ---- white mane behind the head
-    hx, hy = B((60, 26))
+    hx, hy = B((70, 28))
     p = C()
     hd = S['beard']
     mane = E(hx + 15, hy + 7, 10.4, 9.4)

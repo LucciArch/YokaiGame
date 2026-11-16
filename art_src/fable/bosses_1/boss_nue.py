@@ -6,11 +6,13 @@ CW, CH = 300, 184
 OX, OY = 62, 42          # local baseline y=130
 FUR = ('s1', 's2', 's3')
 TIG = ('t0', 't1', 't2')
+col('t2', '#f0b038')
 TFAR = ('s1', 't0', 't1')
 SNK = ('g1', 'g2', 'g3')
 CLD = ('h0', 'i1', 'i2')
+col('z0', '#2c2836'); col('z1', '#5e5660'); col('z2', '#958a88'); col('z3', '#c4b8ac'); add_rim('z0 z1 z2', 'z3')
 
-LEG = dict(zip('fFGabcdeKYZWwq', ['b0', 'b1', 'b2', 'r0', 'r1', 'r2', 'r3', 'r4', 'K', 'y2', 'y3', 'b3', 'b2', 'q']))
+LEG = dict(zip('fFGabcdeKYZWwq', ['z0', 'z1', 'z2', 'r0', 'r1', 'r2', 'r3', 'r4', 'K', 'y2', 'y3', 'b3', 'b2', 'q']))
 FACE = """
 ........fffFFFFff.......
 .....ffFFGGFFFFFFff.....
@@ -54,10 +56,10 @@ def tleg(c, J, ramp, far=False):
     # geschwungene Streifen: schmale schräge Keile, abwechselnd von vorn und hinten
     for i_, t0 in enumerate((0.25, 0.5, 0.75)):
         q = lerp(a, b, t0); side = 1 if i_ % 2 else -1
-        p.fill(tri((q[0] + side * 8, q[1] - 1), 160 if side > 0 else 20, 10, 3.6) & up, 's0')
+        p.fill(tri((q[0] + side * 8, q[1] - 1), 160 if side > 0 else 20, 10, 3.6) & up, 'K')
     for i_, t0 in enumerate((0.3, 0.7)):
         q = lerp(b, d, t0); side = -1 if i_ % 2 else 1
-        p.fill(tri((q[0] + side * 5, q[1]), 160 if side > 0 else 20, 6, 2.6) & lo, 's0')
+        p.fill(tri((q[0] + side * 5, q[1]), 160 if side > 0 else 20, 6, 2.6) & lo, 'K')
     c.stamp(p, 'K')
     for i in range(4):                                            # Krallen
         cx = int(e[0] - 8 + i * 3.6); cy = int(e[1] + 3)
@@ -177,11 +179,11 @@ def nue(**kw):
     p = C()
     ch, ru = F((92, 82)), Bk((144, 84))
     mid = lerp(ch, ru, 0.5)
-    body = (E(ch[0] - 1, ch[1] - 5, 19, 18) | E(mid[0] + 2, mid[1] + 4, 23, 12) | E(ru[0] + 2, ru[1] - 2, 16, 15)
-            | L(ch[0], ch[1] - 2, 15, ru[0], ru[1] - 1, 12))
+    body = (E(ch[0] - 1, ch[1] - 5, 19, 17) | E(mid[0] + 2, mid[1] + 6, 21, 13) | E(ru[0] + 2, ru[1] - 3, 17, 16)
+            | L(ch[0], ch[1] - 4, 13, ru[0], ru[1] - 3, 11))          # eingesattelter Rücken, hängender Bauch
     tuft = np.zeros_like(body)
     for t in (0.0, 0.14, 0.28, 0.42, 0.56, 0.7, 0.84, 0.98):                               # weiche Fellbuckel am Rücken
-        q = lerp(ch, ru, t); tuft |= tri((q[0] + 1, q[1] - 14 - (7 if t < 0.25 else 2 if t < 0.5 else 0)), 290, 5, 7)
+        q = lerp(ch, ru, t); tuft |= tri((q[0] + 1, q[1] - 13 - (6 if t < 0.25 else 2 if t < 0.5 else 0)), 300, 3, 8)
     for t, l_ in ((0.25, 5), (0.45, 6), (0.65, 5)):                                          # Bauchzotteln
         q = lerp(ch, ru, t); tuft |= tri((q[0], q[1] + 19), 100, l_, 6)
     full = body | tuft
@@ -190,6 +192,12 @@ def nue(**kw):
     p.fill(back & (p.a == I('s2')), 's1'); p.fill(back & (p.a == I('s3')), 's2')
     bel = full & ~sh(full, 0, -7) & (px.X > ch[0] - 6) & (px.X < ru[0] + 4)                # heller Bauch
     p.fill(bel & (p.a == I('s2')), 's3')
+    for (q, rx, ry) in ((ch, 10, 7), (ru, 9, 6)):                                         # Volumen: Licht auf Schulter und Kruppe
+        hl_ = E(q[0] - 3, q[1] - 9, rx, ry) & body
+        p.fill(hl_ & (p.a == I('s2')), 's3')
+    p.fill(E(mid[0] - 4, mid[1] - 9, 7, 4) & body & (p.a == I('s1')), 's2')
+    sh_band = L(ch[0] + 8, ch[1] - 16, 3, ch[0] + 12, ch[1] + 8, 3) & body                  # dunkles Schulterband (Tanuki)
+    p.fill(sh_band, 's1')
     import random as _r
     rg = _r.Random(7)
     for k in range(34):                                                                    # Fellstriche, schräg nach hinten
@@ -207,20 +215,20 @@ def nue(**kw):
     HX, HY = F((40 + hx, 50 + hy))
     p = C()
     cx, cy = HX + 14, HY + 11
-    mane = E(cx + 4, cy, 17.4, 16.4)
-    for a_, l_ in ((215, 6), (250, 8), (280, 11), (305, 13), (330, 15), (355, 15), (20, 15), (45, 13), (70, 12), (100, 10), (130, 8)):
-        mane |= tri(pol((cx + 4, cy), a_, 14), a_ + (25 if a_ > 180 else -15), l_, 10)
+    mane = E(cx + 4, cy, 15.0, 14.0)                                  # Makakenfell: kürzer, weicher
+    for a_, l_ in ((250, 4), (280, 6), (305, 7), (330, 8), (355, 8), (20, 8), (45, 7), (70, 6), (100, 5)):
+        mane |= tri(pol((cx + 4, cy), a_, 13), a_ + (25 if a_ > 180 else -15), l_, 9)
     ruff = tri((cx + 10, cy + 12), 75, 20, 16) | tri((cx + 2, cy + 13), 95, 15, 12)
-    p.form(mane | ruff, ('b0', 'b1', 'b2'), sd=5, hl=1)
+    p.form(mane | ruff, ('z0', 'z1', 'z2'), sd=5, hl=1)
     for a_ in (300, 335, 10, 45, 80):
-        q0 = pol((cx + 4, cy), a_, 11); p.line([q0, pol(q0, a_ + 10, 6)], 'b0', only=mane)
+        q0 = pol((cx + 4, cy), a_, 10); p.line([q0, pol(q0, a_ + 10, 5)], 'z0', only=mane)
     c.stamp(p, 'K')
     p = C()
     p.form(E(HX + 21, HY + 10, 3.4, 4.4), ('r0', 'r1', 'r2'), sd=1, hl=0)                     # ear
     c.stamp(p, 'K')
     p = C()
     p.grid(HX, HY, FACE, LEG)
-    c.stamp(p, 'K', skip=('b0', 'b1', 'b2'))
+    c.stamp(p, 'K', skip=('z0', 'z1', 'z2'))
 
     # ---- low storm cloud in front of the hind feet
     cloud(c, [(178 + cl, 123, 14, 6), (160 - cl, 125, 10, 4.4)], ())
