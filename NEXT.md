@@ -1,21 +1,22 @@
-# Erledigt (Runden 52–54)
-- Runde 52: Requisiten Kawabe (Flussfels mit Kappa-Gurke + Wellenringe, Rohrkolben im Seichtwasser mit Hotaru,
-  Suijin-Stein mit 水神 `SUIJIN`-Glyphen) und Yashiki (Tansu mit Augen in offener Lade, Andon mit Onibi-Licht,
-  goldener Byōbu mit Fingern) in `art_src/fable/environment/props.py`. Neu bauen: `build.py kawabe yashiki`, `hi.py`,
-  dann `rock.png` nach `yokai/assets/env/<biom>/` kopieren; floor/wall-PNGs danach per `git checkout` zurücksetzen
-  (nur Metadaten-Änderungen).
-- Runde 53: Kein Startblinken während der Geste (`pose_t`), `hurt()` beendet die Geste.
-- Runde 54: Erfolg `alle_lose`, Spielstand-Liste `kuji_seen`; Test am Ende von `tools/sigtest.py`.
+# Erledigt (Runden 55–57)
+- Runde 55 (parallele Sitzung): Ama-no-Iwato Teil 1 – Biom `iwato` (Kacheln, Wände, Requisiten) und Biom-Daten in
+  `yokai/data.py`; noch **ohne** Pforte, Boss und Einbindung in `Run.oku`.
+- Runde 56: Requisiten Ōeyama (Kanabō im Fels, Komodaru mit Oni-Mon, Knochenhaufen mit Oni-Maske) und Shinkai
+  (Hamaguri mit Perle und Shinkirō-Dunst, Sango-Koralle mit Leuchtfischen, versunkene Tōrō) in
+  `art_src/fable/environment/props.py`. Neu bauen: `build.py <biom>`, `hi.py`, `rock.png` nach `yokai/assets/env/<biom>/`
+  kopieren, floor/wall-PNGs per `git checkout` zurücksetzen.
+- Runde 57: Lexikon-Ereignisseite Omikuji zeigt die gezogenen Lose (`App.KUJI`, `kuji_seen`); uiflow2 zeichnet sie.
 
-# Nächster Schritt: Requisiten Teil 5 – Ōeyama und Shinkai
-Gleiches Vorgehen wie Runde 52. Ōeyama (Kapitel nach dem Yashiki) und Shinkai haben noch Grundformen-Requisiten
-(Felsen, Spitzen). Ideen: Ōeyama – Sake-Fass der Oni, Kanabō im Fels, Knochenhaufen mit Oni-Maske; Shinkai –
-Riesenmuschel mit Perle, Korallen mit Leuchtfischen, versunkene Steinlaterne. Warum: Stilbruch fällt neben den
-neuen Hi-Res-Figuren auf; die Biome davor sind jetzt fertig.
+# Nächster Schritt: Ama-no-Iwato Teil 2 – Pforte und Endbossin Amaterasu
+Biom `iwato` existiert, ist aber nicht erreichbar. Als Nächstes: Iwato-Pforte nach dem ersten Wahren Sieg
+(analog zur Yomi-Pforte in `Run.oku`), Raumfolge in Kapitel VII, Endbossin **Amaterasu** (Hi-Res-Figur, Phasen:
+verborgen im Fels → Spiegel-Lichtstrahlen → Sonnenscheibe), Lexikon-Eintrag, Erfolg und Epilog.
+Warum: Der Inhalt ist halb fertig im Spiel und bringt den zweiten Weg mit echtem Endkampf.
+Achtung: Eine zweite Sitzung arbeitet evtl. parallel daran – vorher `git log` prüfen.
 
 # Weitere Ideen
-- Zweiter Weg: Pforte nach **Takamagahara no Oku** mit Amaterasu (Ama-no-Iwato) als Endbossin
+- Requisiten Teil 6: Enma-chō, Tsukiyomi und Yomi no Oku noch in Grundformen – gleiches Vorgehen wie Runde 56
+- Wanddekos Yashiki/Kawabe/Ōeyama/Shinkai ebenfalls in Hi-Res überarbeiten (`wall_decos`)
 - Totenpalast-Ambiente: eigene Partikel (Maden-Glühwürmchen, Izanamis acht Donnergötter als Blitze im Hintergrund)
-- Lexikon-Ereignisseite zeigt bei Omikuji, welche der fünf Lose schon gezogen sind (`kuji_seen`)
-- Kawabe-Ambiente: Glühwürmchen-Partikel über Wasserflächen
-- Wanddekos Yashiki/Kawabe ebenfalls in Hi-Res überarbeiten (`wall_decos`)
+- Kawabe-/Shinkai-Ambiente: Glühwürmchen über Wasser, aufsteigende Leuchtpartikel in der Tiefsee
+- Shinkirō als Ereignis: eine Hamaguri spiegelt einen Trugladen vor, dessen Items nach dem Kauf verschwinden können
