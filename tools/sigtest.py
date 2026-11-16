@@ -44,5 +44,12 @@ for i, group in enumerate(items):
     except Exception:
         import traceback; traceback.print_exc()
         print('FEHLER', iid); bad += 1
+# Omikuji: nach vielen Zügen sind alle fünf Lose gezogen und der Erfolg „Alle Lose“ ist da
+from yokai.entities import Obj
+g.start_run('hana', 7)
+for i in range(200):
+    o = Obj('omikuji', 100, 100); g.run.player.coins = 99; g.run.player.iframes = 1; g.run.interact(o)
+if len(g.save['kuji_seen']) != 5 or 'alle_lose' not in g.save['achievements']:
+    print('FEHLER Omikuji', g.save['kuji_seen']); bad += 1
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)

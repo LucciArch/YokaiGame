@@ -18,6 +18,7 @@ DEFAULT = {
     },
     'char_wins': {},
     'transforms_seen': [],
+    'kuji_seen': [],        # gezogene Omikuji-Lose (Erfolg „Alle Lose“)
     'synergies_seen': [],
     'hard_unlocked': False,
     'heaven_unlocked': False,

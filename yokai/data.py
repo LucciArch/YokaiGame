@@ -612,6 +612,7 @@ ACHIEVEMENTS = [
     ('synergy10', 'Meister der Harmonie', 'Entdecke 10 verschiedene Synergien', None),
     ('transform', 'Verwandlung', 'Erlebe eine Transformation', None),
     ('daikichi', 'Großes Glück', 'Ziehe ein Daikichi-Omikuji', None),
+    ('alle_lose', 'Alle Lose', 'Ziehe Daikichi, Kichi, Chūkichi, Shōkichi und Kyō je einmal', None),
     ('onsen', 'Entspannung', 'Bade in einer heißen Quelle', None),
     ('rich', 'Wie Daikoku', 'Habe 99 Mon gleichzeitig', None),
     ('nohit', 'Unberührt', 'Besiege einen Boss ohne Treffer', None),

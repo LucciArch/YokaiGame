@@ -1876,6 +1876,10 @@ class Run:
             o.used = True
             self.event_done('omikuji')
             r = random.random() - 0.02 * p.s['luck']
+            lot = 'daikichi' if r < 0.10 else 'kichi' if r < 0.35 else 'chukichi' if r < 0.55 else 'shokichi' if r < 0.75 else 'kyo'
+            self.save.add_to('kuji_seen', lot)
+            if len(self.save['kuji_seen']) >= 5:
+                self.achieve('alle_lose')
             if r < 0.10:
                 o.data['kuji'] = 'kichi'
                 self.banner('Daikichi – Großes Glück!', 'Ein göttliches Geschenk', (255, 220, 120), big=True)

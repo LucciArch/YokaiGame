@@ -75,6 +75,7 @@
 - Runde 51 – **Omikuji im Lexikon**: Die Lose stehen jetzt auf der Lexikon-Seite „Ereignisse“ (mit Sage und Spielhinweis). Neuer Erfolg **Fluch gebunden** für ein Unglückslos am Musubi-Gestell. Das Gestell steht jetzt auch in jedem Kami-Schrein, damit sich Flüche öfter lösen lassen. Der Zähler von „Festtagsgast“ zählt weiter nur die vier Festereignisse
 - Runde 52 – **Flussufer und Spukhaus neu eingerichtet**: Am Kawabe liegt eine Gurke als Kappa-Opfer auf dem nassen Flussfels, Rohrkolben stehen im Seichtwasser mit einem Glühwürmchen, und ein Suijin-Stein mit eingemeißeltem **水神**, Shimenawa, Gurke und Sake-Schale ehrt den Flussgott. Im Yashiki hat die Tansu Eisenbeschläge und eine Lade, aus der zwei Augen schauen, im zerrissenen Andon brennt kaltes Totenlicht, und um den goldenen Byōbu mit Kiefer und roter Sonne greifen bleiche Finger
 - Runde 53 – Die Startgeste ist jetzt ganz zu sehen: Die Unverwundbarkeit zu Laufbeginn blinkt nicht mehr, solange deine Figur ihre Geste zeigt (ein Treffer beendet die Geste sofort)
+- Runde 54 – Neuer Erfolg **Alle Lose**: Ziehe am Omikuji-Schrein einmal Daikichi, Kichi, Chūkichi, Shōkichi und Kyō (Daikyō zählt als Kyō) – die gezogenen Lose bleiben über alle Läufe gespeichert
 
 ## 1.4.0 – „Hyakki-Update“ (enthält 1.3 „Kapitel-Update“)
 
