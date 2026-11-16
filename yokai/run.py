@@ -724,6 +724,8 @@ class Run:
                     pd = Pedestal(iid, cx + dx, cy - 10, group='kami')
                 pd.shrine = 'oni' if oni else 'kami'
                 self.pedestals.append(pd)
+            if not oni:                                  # Kami-Schrein: hier lässt sich ein Fluch ebenfalls anbinden
+                self.objs.append(Obj('musubi', cx, cy - 52, n=random.randint(1, 4)))
             self.objs.append(Obj('back', cx, RY + RH - 24))
         if k == 'curse' and not room.extra.get('hurt'):
             room.extra['hurt'] = True
@@ -1872,6 +1874,7 @@ class Run:
                 return
             p.coins -= 5
             o.used = True
+            self.event_done('omikuji')
             r = random.random() - 0.02 * p.s['luck']
             if r < 0.10:
                 o.data['kuji'] = 'kichi'
@@ -1927,6 +1930,7 @@ class Run:
             o.data['n'] = min(9, o.data.get('n', 0) + 1)
             self.banner('Der Fluch bleibt am Gestell zurück', CURSES[self.curse] + ' aufgehoben', (230, 225, 210))
             self.curse = None
+            self.achieve('musubi')
             audio.play('bell', 0.6)
             burst(self, o.x, o.y - 12, (240, 236, 220), 16, 50)
         elif k == 'tea':

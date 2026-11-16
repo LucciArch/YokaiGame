@@ -594,6 +594,7 @@ ACHIEVEMENTS = [
     ('ema_wunsch', 'Ein Wunsch', 'Hänge eine Ema-Tafel auf', None),
     ('feste', 'Festtagsgast', 'Erlebe Fuchshochzeit, Versteckspiel, Ema-Wand und Nachtparade', None),
     ('hyakki', 'Unbemerkt', 'Lass die Nachtparade vorbeiziehen, ohne getroffen zu werden', None),
+    ('musubi', 'Fluch gebunden', 'Binde ein Unglückslos an das Musubi-Gestell', None),
     ('lexikon_half', 'Yōkai-Kundige', 'Begegne der Hälfte aller Yōkai', None),
     ('lexikon_all', 'Hyakki Yagyō', 'Begegne allen Yōkai des Lexikons', None),
     ('kenji', 'Herrenlos', 'Besiege einen Boss in Kapitel II', ('char', 'kenji')),

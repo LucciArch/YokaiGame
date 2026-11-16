@@ -1177,6 +1177,10 @@ class Game:
                     lore='Ema sind kleine Holztafeln, auf die man in Schreinen seine Wünsche schreibt. Früher opferte man '
                          'den Göttern Pferde – heute genügt ein gemaltes.',
                     ingame='Drei Tafeln, drei Wünsche – nur einer geht in Erfüllung.'),
+        'omikuji': dict(name='Omikuji', spr=None,
+                        lore='Für eine kleine Gabe zieht man im Schrein ein Los, das von Daikichi, großem Glück, bis Daikyō, '
+                             'großem Unglück, reicht. Ein schlechtes Los knotet man an ein Gestell – so bleibt das Unglück im Schrein zurück.',
+                        ingame='Ein Los für 5 Mon: Glück segnet die Ebene, Pech verflucht sie. Für 3 Mon bindest du den Fluch ans Musubi-Gestell.'),
     }
 
     def _lex_entries(self):
@@ -1278,8 +1282,8 @@ class Game:
                     cache[key] = pygame.transform.scale(fr, (fr.get_width() * 2, fr.get_height() * 2))
                 gfx.hi_blit(cache[key], cx, 128 - int(abs(math.sin(self.t * 3)) * 2))
             else:
-                im = props.ema((240, 90, 80), False)
-                im = pygame.transform.scale(im, (im.get_width() * 3, im.get_height() * 3))
+                im = props.omikuji() if eid == 'omikuji' else props.ema((240, 90, 80), False)
+                im = pygame.transform.scale_by(im, 2 if eid == 'omikuji' else 3)
                 s.blit(im, (cx - im.get_width() // 2, 128 - im.get_height()))
             pygame.draw.ellipse(s, (0, 0, 0), (cx - 18, 126, 36, 6))
             y = self._wrap(ev['lore'], 154, 136, W - 172, 8, (230, 225, 210))
@@ -1412,7 +1416,7 @@ class Game:
             if prog:
                 cur = min(prog[1], self.save['stats'].get(prog[0], 0))
             elif aid == 'feste':
-                prog = (None, 4); cur = len(self.save.data.get('events_seen', []))
+                prog = (None, 4); cur = len(set(self.save.data.get('events_seen', [])) & set(Run.EVENT_KINDS))
             elif aid == 'synergy10':
                 prog = (None, 10); cur = len(self.save['synergies_seen'])
             elif aid in ('lexikon_half', 'lexikon_all'):
