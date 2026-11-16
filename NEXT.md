@@ -50,15 +50,22 @@ für Talismane greifen (z. B. `bullet_tick`) – sollen sie auch für Strahl/Hie
   Strahl, `gross`/`seidenfaden` für Hiebe. `sichel`, `schweben`, `koi_drache` bleiben bewusst Talisman-only.
 - Alle Fälle in `tools/waffentest.py`. Alle 98 Synergien haben schon eigene sig_-Fähigkeiten.
 
-# Nächster Schritt: Item-Synergien weiter – Hit-/Kill-Sigs mit Waffen prüfen
-Warum: Lucas Dauerwunsch. Offen ist, ob `hit_pre`/`hit_post`/`on_kill`-Sigs, die `b.fl` oder `b.big`/`b.gold` lesen,
-mit dem unsichtbaren Träger-Geschoss (`weapons._carrier`) richtig greifen (z. B. Goldwürfe, großer Wurf bei Hieben,
-`on_fire`-Sigs wie `sonne_mond`/`rausch`, die nur Talismane verändern – für Strahl/Hieb Farbe/Element wechseln?).
+# Erledigt (Runden 73–74)
+- Runde 73: `weapons.fire` ruft `sigs.on_fire` selbst auf. Hieb/Strahl: vorher auf ein Probe-Geschoss (`_carrier` mit
+  `_big`/`_gold` im fl), dessen dmg/fl/Farbe dann der Angriff nutzt; Bogen/Fächer wie bisher danach auf die Pfeile.
+  Goldwürfe (`gold_shots`) jetzt für alle Waffen. Tests in `tools/waffentest.py` (schlagen auf altem Code fehl).
+- Runde 74: `Run.LAMP_ITEMS` – Laternen-/Feuer-Items vergrößern und färben das Spielerinnen-Licht.
+  Achtung: `ITEMS[i]['icon']` ist meist die Item-ID (eigene Symbole), nicht 'lantern'/'flame'.
+
+# Nächster Schritt: Item-Synergien – Hit-Sigs, die Geschoss-Eigenschaften lesen, bei Waffen
+Warum: Lucas Dauerwunsch „alle Items funktionieren miteinander“. Offen: `mondschnitt` liest `b.curve` (bei Hieben nie
+gesetzt – Sichel-Hiebe könnten als „gebogen“ zählen), `kyudo` liest `b.t > 0.45` (Strahl nie – ferne Strahltreffer
+könnten zählen), `wurfstern` erzeugt bei jedem Hieb-Treffer einen Abpraller (prüfen, ob zu stark gegen Gruppen).
 Ein Test pro Fund in `tools/waffentest.py`.
 
 # Weitere Ideen
-- Licht: Spielerin-Items mit Feuer/Licht (Kitsunebi-Familiar, Laternen-Items) als eigene Lichtquelle
 - Wanddekos Yashiki/Kawabe/Ōeyama/Shinkai/Enma-chō/Tsukiyomi in Hi-Res überarbeiten (`wall_decos`)
 - Amaterasu-Bossmusik und Titelbild-Stimmung nach dem Iwato-Sieg
 - Mondpalast-Ambiente: fallende Katsura-Blätter, Mondhase als seltener Ereignis-NPC (Mochi-Tausch)
 - Shinkirō als Ereignis: eine Hamaguri spiegelt einen Trugladen vor
+- Kitsune-Laterne (Anhänger) und Onryō-Kerze ebenfalls als Lichtquelle (`LAMP_ITEMS` gilt nur für Items)
