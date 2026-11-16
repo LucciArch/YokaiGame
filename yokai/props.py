@@ -731,3 +731,25 @@ def crescent(ang):
     s = pygame.transform.rotate(s, -step * 10)
     _cache[key] = s
     return s
+
+
+# ---------------------------------------------------------------- Hitogata: Papierdiener des Onmyōji (2x)
+def hitogata(tilt):
+    step = int(round(tilt / 10)) % 36
+    key = ('hitogata', step)
+    if key in _cache:
+        return _cache[key]
+    s = pygame.Surface((16, 20), pygame.SRCALPHA)
+    ol, pa, sh_ = (14, 9, 16), (240, 236, 226), (196, 188, 176)
+    body = [(6, 5), (10, 5), (15, 8), (15, 10), (11, 9), (11, 13), (13, 19), (9, 19), (8, 15),
+            (7, 19), (3, 19), (5, 13), (5, 9), (1, 10), (1, 8)]
+    pygame.draw.polygon(s, ol, body)
+    pygame.draw.polygon(s, pa, [(6, 6), (10, 6), (14, 8), (14, 9), (10, 8), (10, 13), (12, 18), (10, 18),
+                                (8, 13), (6, 18), (4, 18), (6, 13), (6, 8), (2, 9), (2, 8)])
+    pygame.draw.circle(s, ol, (8, 3), 3)
+    pygame.draw.circle(s, pa, (8, 3), 2)
+    pygame.draw.line(s, sh_, (9, 7), (9, 13))                       # Falz
+    pygame.draw.rect(s, (200, 30, 40), (7, 9, 2, 3))                 # Siegel
+    s = pygame.transform.rotate(s, -step * 10)
+    _cache[key] = s
+    return s

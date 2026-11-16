@@ -2431,7 +2431,7 @@ class Run:
         for pt in self.ambient:
             pt.draw(ov)
         for f in self.floats:
-            gfx.TEXT.add(f[2], f[0], f[1], 6 if f[2] != 'Kritisch!' else 7, f[3], 'c', alpha=int(255 * min(1, f[4] * 3)))
+            gfx.TEXT.add(f[2], f[0], f[1], 7 if f[2].endswith('!') else 6, f[3], 'c', alpha=int(255 * min(1, f[4] * 3)))
         # Dunkelheit
         dark = self.biome['dark'] + (150 if self.curse == 'dunkel' else 0)
         if dark > 0 and not self.room.kind.startswith('shrine'):

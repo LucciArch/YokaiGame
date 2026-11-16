@@ -241,6 +241,33 @@ def _float(run, e, txt, col):
     run.floats.append([e.x, e.y - 16, txt, col, 0.6])
 
 
+_SYN_NAME = {}
+
+
+def _syn(run, key, x, y, col):
+    """Erstes Auslösen einer Synergie im Raum: Name als Schriftzug und farbige Welle."""
+    g = st(run.player)
+    seen = g.setdefault('syn_seen', [])   # Liste statt Menge: p.sg wird als JSON gespeichert
+    if key in seen:
+        return
+    seen.append(key)
+    if not _SYN_NAME:
+        from .data import SYNERGIES
+        _SYN_NAME.update({k[4:]: s['name'] for s in SYNERGIES for k in s['fx'] if k.startswith('sig_')})
+    from .entities import Particle
+    run.floats.append([x, y - 22, _SYN_NAME.get(key, key) + '!', col, 1.1])
+    run.particles.append(Particle(x, y, 0, 0, 0.45, col, 38, kind='wave'))
+
+
+def _sparks(run, x, y, cols, n=10, spd=110):
+    from .entities import Particle
+    for _ in range(n):
+        a = random.uniform(0, math.tau)
+        v = random.uniform(0.5, 1) * spd
+        run.particles.append(Particle(x, y, math.cos(a) * v, math.sin(a) * v, random.uniform(0.25, 0.5),
+                                      random.choice(cols), 2, 60, kind='spark'))
+
+
 # ====================================================================== Haken
 def on_fire(p, run, bullets):
     S = p.sgs
@@ -269,6 +296,7 @@ def on_fire(p, run, bullets):
         for b in bullets:
             b.fl = dict(b.fl); b.fl['burn' if sun else '_frost'] = 1
             b.col = (255, 190, 90) if sun else (180, 220, 255)
+        _syn(run, 'sonne_mond', p.x, p.y, (255, 210, 140))
     if 'rueckenwind' in S and p.moving:
         for b in bullets:
             b.vx *= 1.3; b.vy *= 1.3; b.dmg *= 1.15
@@ -278,6 +306,10 @@ def on_fire(p, run, bullets):
             sp = math.hypot(b.vx, b.vy)
             b.vx, b.vy = math.cos(a) * sp, math.sin(a) * sp
             b.dmg *= 1.6 if 'oni_rausch' in S else 1.3
+            if 'oni_rausch' in S:
+                b.col = (255, 150, 130)
+        if 'oni_rausch' in S:
+            _syn(run, 'oni_rausch', p.x, p.y, (255, 110, 90))
     if g.get('hannya', 0) > 0:
         for b in bullets:
             b.fl = dict(b.fl); b.fl['burn'] = 1
@@ -331,9 +363,11 @@ def on_fire(p, run, bullets):
         if 'tempelfest' in S:
             g['glocke'] = 3.0
         if 'oni_tanz' in S:
+            _syn(run, 'oni_tanz', p.x, p.y, (255, 140, 100))
             for i in range(8):
                 run.fire_player_bullet(p.x, p.y - 3, i / 8 * math.tau, dmg * 0.9, spd, size, 0.8, {'pierce': 1})
     if 'tempelmusik' in S and any(b.big for b in bullets):
+        _syn(run, 'tempelmusik', p.x, p.y, (230, 200, 140))
         _ring(run, p.x, p.y, (230, 200, 140), 60)
         for e in run.enemies:
             if e.active() and math.hypot(e.x - p.x, e.y - p.y) < 60 + e.r:
@@ -355,6 +389,7 @@ def on_fire(p, run, bullets):
         if tgt:
             run.lightning(tgt.x, tgt.y, dmg * 2 + 4)
             if 'sturmgott' in S:
+                _syn(run, 'sturmgott', tgt.x, tgt.y, (200, 220, 255))
                 _chain_strikes(run, tgt, 3, dmg * 1.5 + 3)
     if 'klingen' in S and n % (4 if 'yamabushi' in S else 8) == 0:
         from . import audio
@@ -425,6 +460,9 @@ def bullet_tick(b, run, dt):
 def bullet_end(run, b):
     """Ein Spieler-Talisman verschwindet (Treffer, Wand oder Reichweite)."""
     if b.fl.get('explode') and not b.fl.get('_split') and 'feuerwerk' in run.player.sgs:
+        hanabi = ((255, 120, 160), (255, 220, 120), (140, 220, 255))
+        _syn(run, 'feuerwerk', b.x, b.y, (255, 150, 190))
+        _sparks(run, b.x, b.y, hanabi, 14, 130)
         for i in range(5):
             nb = run.fire_player_bullet(b.x, b.y, i / 5 * math.tau + random.uniform(0, 1.2), b.dmg * 0.4, 170, 2, 0.4, {'burn': 1})
             nb.col = random.choice(((255, 120, 160), (255, 220, 120), (140, 220, 255)))
@@ -479,6 +517,7 @@ def hit_pre(run, e, b, dmg):
         dmg *= 1.4
     if 'kyudo' in S and b is not None and b.t > 0.45:
         dmg *= 1.6
+        _syn(run, 'kyudo', e.x, e.y, (200, 230, 160))
     if getattr(e, 'sg_oil', 0) > 0 and (b is None or b.fl.get('burn') or b.fl.get('explode')):
         dmg *= 1.6
     if 'schlagfolge' in S:
@@ -511,6 +550,7 @@ def hit_post(run, e, b, dmg):
             e.sg_thunder = 0
             run.lightning(e.x, e.y, p.damage() * 1.6 + 3)
             if 'blitzschlag' in S:
+                _syn(run, 'blitzschlag', e.x, e.y, (255, 240, 120))
                 _chain_strikes(run, e, 1, p.damage() * 1.6 + 3)
     if b is not None and b.fl.get('_urteil'):
         e.sg_curse = 6.0
@@ -520,10 +560,16 @@ def hit_post(run, e, b, dmg):
             e.sg_pent = 0
             _ring(run, e.x, e.y, (255, 230, 120), 34)
             run.explode(e.x, e.y, 28, p.damage() * 2.4, 'p')
+            if 'seimei' in S:
+                _syn(run, 'seimei', e.x, e.y, (255, 230, 120))
             if 'onmyodo' in S:
+                _syn(run, 'onmyodo', e.x, e.y, (240, 240, 240))
                 for i in range(3):
-                    sb = run.fire_player_bullet(e.x, e.y, i / 3 * math.tau, p.damage() * 0.7, 160, 2.5, 1.4, {'homing': 1})
+                    a = i / 3 * math.tau
+                    ox, oy = math.cos(a) * (e.r + 8), math.sin(a) * (e.r + 8)   # außerhalb starten, damit man sie fliegen sieht
+                    sb = run.fire_player_bullet(e.x + ox, e.y + oy, a, p.damage() * 0.7, 160, 2.5, 1.4, {'homing': 1})
                     sb.col = (240, 240, 240)
+                    sb.kind = 'shiki'
     if 'schnitt' in S or 'drei_wiesel' in S:
         deep = 'mondschnitt' in S and b is not None and b.curve
         e.sg_bleed = min(6 if deep else 3, getattr(e, 'sg_bleed', 0) + (2 if deep else 1))
@@ -536,6 +582,7 @@ def hit_post(run, e, b, dmg):
             audio.play('heal', 0.4)
     if 'ewiger_winter' in S and e.slowed > 0 and random.random() < 0.15:
         e.frozen = max(e.frozen, 0.3 if e.is_boss else 1.0)
+        _syn(run, 'ewiger_winter', e.x, e.y, (180, 230, 255))
     if 'rattenschwarm' in S and b is not None and b.fl.get('pierce') and not b.fl.get('_rat') and random.random() < 0.3:
         tgt = _nearest(run, e.x, e.y, 160, lambda o: o is not e)
         a = math.atan2(tgt.y - e.y, tgt.x - e.x) if tgt else random.uniform(0, math.tau)
@@ -603,6 +650,7 @@ def on_kill(run, e):
             tgt.burn_dps = max(tgt.burn_dps, e.burn_dps)
             run.zap(e.x, e.y, tgt.x, tgt.y)
     if 'oelfeuer' in S and getattr(e, 'sg_oil', 0) > 0:
+        _syn(run, 'oelfeuer', e.x, e.y, (255, 150, 60))
         from .entities import Hazard
         run.explode(e.x, e.y, 30, p.damage() * 1.6, 'p')
         run.hazards.append(Hazard(e.x, e.y + 4, 14, 0.0, 2.5, max(0.8, p.damage() * 0.4), 'p', 'fire'))
@@ -619,6 +667,7 @@ def on_kill(run, e):
     if 'parade' in S:
         g['parade'] = min(20 if 'maskenzug' in S else 15, g.get('parade', 0) + 1)
     if 'wirbelklingen' in S and getattr(e, 'sg_bleed', 0) > 0:
+        _syn(run, 'wirbelklingen', e.x, e.y, (230, 230, 240))
         for i in range(3):
             b = run.fire_player_bullet(e.x, e.y, i / 3 * math.tau + random.uniform(0, 2), p.damage() * 0.7, 180, 2.5, 0.7, {'pierce': 1})
             b.curve = 2.0
@@ -649,6 +698,7 @@ def on_hurt(p, run):
     g['ts'] = 0
     if 'hannya_zorn' in S:
         g['hannya'] = 6.0
+        _syn(run, 'hannya_zorn', p.x, p.y, (255, 90, 60))
     if 'zwischenwelt' in S:
         p.iframes += 0.8
     if 'aufstehen' in S:
@@ -812,6 +862,7 @@ def on_room_enter(run):
         return
     g = st(p)
     g['tiger'] = 0
+    g['syn_seen'] = []
     if 'maskenzug' not in S:
         g['parade'] = 0
     g['room_hit'] = False
@@ -1059,6 +1110,7 @@ def tick(p, run, dt):
                     break
         elif key == 'jingi':
             for e in sorted((e for e in run.enemies if e.active()), key=lambda e: -e.hp)[:3]:
+                _syn(run, 'jingi', p.x, p.y, (255, 220, 120))
                 run.lightning(e.x, e.y, dmg * 2.5 + 4)
         elif key == 'tintenpanzer':
             if g.get('still', 0) > 1.0:

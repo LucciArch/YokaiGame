@@ -232,6 +232,10 @@ class Bullet:
             if self.big:
                 gfx.draw_glow(s, x, y, int(r * 3), (255, 120, 120), 70)
             col = self.col
+            if gfx.HI_MODE and self.delay <= 0 and self.kind == 'shiki':
+                img = props.hitogata(math.sin(self.t * 14) * 25)
+                gfx.hi_blit(img, x, y + img.get_height() / 4)
+                return
             if gfx.HI_MODE and self.delay <= 0 and (getattr(self, 'arrow', False) or getattr(self, 'crescent', False)):
                 img = props.arrow(ang) if getattr(self, 'arrow', False) else props.crescent(ang)
                 gfx.hi_blit(img, x, y + img.get_height() / 4)
