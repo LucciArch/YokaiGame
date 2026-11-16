@@ -7,12 +7,12 @@
   kopieren, floor/wall-PNGs per `git checkout` zurücksetzen.
 - Runde 57: Lexikon-Ereignisseite Omikuji zeigt die gezogenen Lose (`App.KUJI`, `kuji_seen`); uiflow2 zeichnet sie.
 
-# Nächster Schritt: Ama-no-Iwato Teil 2 – Pforte und Endbossin Amaterasu
-Biom `iwato` existiert, ist aber nicht erreichbar. Als Nächstes: Iwato-Pforte nach dem ersten Wahren Sieg
-(analog zur Yomi-Pforte in `Run.oku`), Raumfolge in Kapitel VII, Endbossin **Amaterasu** (Hi-Res-Figur, Phasen:
-verborgen im Fels → Spiegel-Lichtstrahlen → Sonnenscheibe), Lexikon-Eintrag, Erfolg und Epilog.
-Warum: Der Inhalt ist halb fertig im Spiel und bringt den zweiten Weg mit echtem Endkampf.
-Achtung: Eine zweite Sitzung arbeitet evtl. parallel daran – vorher `git log` prüfen.
+# Ama-no-Iwato: in Arbeit in einer anderen Sitzung (NICHT anfassen)
+- Runde 58 (andere Sitzung): Iwato-Pforte, `Run.oku`, Endbossin Amaterasu (`bosses.Amaterasu`, Sprite
+  `art_src/fable/bosses_3/boss_amaterasu.py`), Sieg-/Epilogtext, Lexikon. Teil 3 (Erfolg, Item-Belohnung) folgt dort.
+
+# Nächster Schritt: Requisiten Teil 6 – Enma-chō, Tsukiyomi und Yomi no Oku
+Gleiches Vorgehen wie Runde 56. Warum: letzte Biome mit Grundformen-Requisiten.
 
 # Weitere Ideen
 - Requisiten Teil 6: Enma-chō, Tsukiyomi und Yomi no Oku noch in Grundformen – gleiches Vorgehen wie Runde 56
