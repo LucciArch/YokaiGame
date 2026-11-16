@@ -2280,9 +2280,10 @@ class Run:
             floor = gfx.make_floor(self.biome if not room.kind.startswith('shrine') else
                                    dict(self.biome, floor=(60, 20, 30) if room.kind == 'shrine_oni' else (200, 190, 150),
                                         floor_pat='stone'), rng)
-            walls = gfx.make_walls(self.biome, rng)
-            room._bgcache = (self.biome_id, floor, walls, gfx.scale2x(walls))
-        _, floor, walls, self.walls_hi = room._bgcache
+            wl = []
+            walls = gfx.make_walls(self.biome, rng, wl)
+            room._bgcache = (self.biome_id, floor, walls, gfx.scale2x(walls), wl)
+        _, floor, walls, self.walls_hi, self.wall_lights = room._bgcache
         bg = pygame.Surface((W, H))
         bg.fill((12, 8, 16))
         bg.blit(floor, (RX, RY))
@@ -2318,16 +2319,59 @@ class Run:
                 return '2 / 3 für ' + TRANSFORMS[tg]['name']
         return ''
 
-    def draw_lantern_light(self, s, t):
-        """Warmer, leicht flackernder Lichtkreis der Steinlaternen auf dem Boden."""
-        tiles = self.room.tiles
+    _HAZ_LIGHT = {'strike': (255, 240, 140), 'fire': (255, 130, 40), 'meteor': (200, 140, 255)}
+    _PART_LIGHT = {'wave': 2.0, 'soul': 0, 'ring': 2.5}
+
+    def collect_lights(self):
+        """Alle Lichtquellen dieses Bildes als (x, y, Radius, Farbe oder None). Das Licht der Spielerin steht vorn."""
+        p = self.player
+        out = [(p.x, p.y, 90, None)]
+        tiles, bid = self.room.tiles, self.biome_id
         for ty in range(ROWS):
-            row = tiles[ty]
             for tx in range(COLS):
-                if row[tx] == T_LANTERN:
-                    x, y = RX + tx * TILE + 16, RY + ty * TILE + 20
-                    fl = 0.85 + 0.15 * math.sin(t * 7.3 + tx * 1.7) * math.sin(t * 3.1 + ty)
-                    gfx.draw_glow(s, x, y, 30, (255, 170, 80), int(46 * fl) // 2 * 2)
+                tt = tiles[ty][tx]
+                if tt == T_LANTERN:
+                    out.append((RX + tx * TILE + 16, RY + ty * TILE + 14, 46, (255, 170, 80)))
+                elif tt == T_ROCK:
+                    pl = gfx.prop_light(bid, RX + tx * TILE, RY + ty * TILE)
+                    if pl:
+                        out.append(pl)
+        out += getattr(self, 'wall_lights', ())
+        for e in self.enemies:
+            g = e.d.get('glow')
+            if (g or e.is_boss) and e.active():
+                out.append((e.x, e.y, 46, g))
+        for pd in self.pedestals:
+            out.append((pd.x, pd.y, 45, None))
+        for h in self.hazards:
+            c = self._HAZ_LIGHT.get(h.kind)
+            if c and h.t >= h.warn:
+                out.append((h.x, h.y, int(h.r * 2.5) + 12, c))
+        dyn = []
+        for b in self.ebullets:                       # Feuerbälle, Geisterlichter: nur helle Geschosse leuchten
+            if b.delay <= 0 and max(b.col) >= 150:
+                dyn.append((b.x, b.y, 12 + int(b.r * 3), tuple(b.col)))
+        for b in self.pbullets:                       # Papier-Ofuda leuchten nicht, Feuer und Blitz schon
+            fl = b.fl
+            if fl.get('burn') or fl.get('chain') or b.big:
+                dyn.append((b.x, b.y, 26, (255, 140, 50) if fl.get('burn') else (255, 240, 140) if fl.get('chain') else (255, 120, 120)))
+        for pt in self.particles:
+            k = self._PART_LIGHT.get(pt.kind)
+            if k is not None:
+                f = pt.life / pt.max
+                dyn.append((pt.x, pt.y, int((pt.size * k + 14) * f) + 4, pt.col))
+        return out + dyn[:40]                         # shortcut: höchstens 40 bewegte Lichter, reicht für Bullet-Hell-Räume
+
+    def draw_light_tint(self, s, t, dark):
+        """Farbiger, leicht flackernder Lichtschein aller größeren Lichtquellen – nach der Dunkelheit, damit er färbt."""
+        base = 60 + dark // 3
+        clip = s.get_clip()
+        s.set_clip((RX, RY, RW, RH))
+        for i, (x, y, r, col) in enumerate(self._lights):
+            if col is not None and r >= 30:
+                fl = 0.85 + 0.15 * math.sin(t * 7.3 + i * 1.7) * math.sin(t * 3.1 + i)
+                gfx.draw_glow(s, int(x), int(y) + 6, int(r * 0.75), col, int(base * fl) // 2 * 2)
+        s.set_clip(clip)
 
     def draw_pits(self, s, t):
         kind = self.biome.get('pit', 'void')
@@ -2416,8 +2460,9 @@ class Run:
         if y < RY or dark <= 0 or self.room.kind.startswith('shrine'):
             return 1.0
         a = min(215, dark) / 255
-        d = math.hypot(x - self.player.x, y - 8 - self.player.y)
-        rr = min(1.0, d / 90)
+        rr = 1.0
+        for lx, ly, r, _ in getattr(self, '_lights', ()):
+            rr = min(rr, math.hypot(x - lx, y - 8 - ly) / r)
         return 1 - a * rr ** 1.5
 
     def draw(self, s, t):
@@ -2427,7 +2472,7 @@ class Run:
             self.render_bg()
         s.blit(self.bg, (0, 0))
         self.draw_pits(s, t)
-        self.draw_lantern_light(s, t)
+        self._lights = self.collect_lights()
         wh = getattr(self, 'walls_hi', None)
         if wh is not None and self.slide is None:
             gfx.HI.append((wh, W / 2, H, 255, 1.0, True))     # Wände in Hi-Res, ohne Lichtabfall
@@ -2516,6 +2561,7 @@ class Run:
         dark = self.dark_level()
         if dark > 0 and not self.room.kind.startswith('shrine'):
             self.draw_dark(s, min(215, dark))
+        self.draw_light_tint(s, t, max(0, min(215, dark)))
         gfx.color_grade(s, self.biome.get('grade', _GRADE.get(self.biome_id, (0, 0, 0))), 18)
         if self.timestop > 0:
             ov = pygame.Surface((RW, RH), pygame.SRCALPHA)
@@ -2612,22 +2658,15 @@ class Run:
                 al = int(a * (r / R) ** 1.5)
                 pygame.draw.circle(L, (0, 0, 0, al), (R, R), r)
             self._light[key] = L
-        ov = pygame.Surface((RW, RH), pygame.SRCALPHA)
+        ov = pygame.Surface((W, H), pygame.SRCALPHA)       # ganzer Schirm, damit Licht von Wanddekos in den Raum fällt
         ov.fill((0, 0, 0, a))
-        p = self.player
-        R = L.get_width() // 2
-        ov.blit(L, (p.x - RX - R, p.y - RY - R), special_flags=pygame.BLEND_RGBA_MIN)
-        small = pygame.transform.smoothscale(L, (R, R))
-        for ty in range(ROWS):
-            for tx in range(COLS):
-                if self.room.tiles[ty][tx] == T_LANTERN:
-                    ov.blit(small, (tx * TILE + 16 - R // 2, ty * TILE + 12 - R // 2), special_flags=pygame.BLEND_RGBA_MIN)
-        for e in self.enemies:
-            if e.d.get('glow') or e.is_boss:
-                ov.blit(small, (e.x - RX - R // 2, e.y - RY - R // 2), special_flags=pygame.BLEND_RGBA_MIN)
-        for pd in self.pedestals:
-            ov.blit(small, (pd.x - RX - R // 2, pd.y - RY - R // 2), special_flags=pygame.BLEND_RGBA_MIN)
-        s.blit(ov, (RX, RY))
+        for x, y, r, _ in self._lights:
+            r = max(4, int(r) // 4 * 4)
+            m = self._light.get((a, r))
+            if m is None:
+                m = self._light[(a, r)] = pygame.transform.smoothscale(L, (r * 2, r * 2))
+            ov.blit(m, (int(x) - r, int(y) - r), special_flags=pygame.BLEND_RGBA_MIN)
+        s.blit(ov, (RX, RY), (RX, RY, RW, RH))
 
     def draw_hud(self, s, t):
         p = self.player

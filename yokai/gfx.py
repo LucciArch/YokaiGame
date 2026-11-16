@@ -633,7 +633,7 @@ def env_floor(biome, rng):
     return s
 
 
-def env_walls(biome, rng):
+def env_walls(biome, rng, lights=None):
     bid = biome['_id']
     s = pygame.Surface((W, H), pygame.SRCALPHA)
     top = env_img(bid, 'wall_h')[0]
@@ -645,7 +645,11 @@ def env_walls(biome, rng):
     for tx in range(RX, RX + RW, 32):
         t = top
         if deco and rng.random() < 0.18:
-            t = rng.choice(deco)
+            i = rng.randrange(len(deco))
+            t = deco[i]
+            wl = WALL_LIGHT.get((bid, i))
+            if wl and lights is not None:
+                lights.append((tx + wl[0], y0 + wl[1], wl[3], wl[2]))
         s.blit(t, (tx, y0))
         s.blit(bot, (tx, RY + RH))
     rside = pygame.transform.flip(side, True, False)
@@ -680,6 +684,42 @@ def scale2x(surf):
     pygame.surfarray.pixels3d(res)[:] = out[:, :, :3].transpose(1, 0, 2)
     pygame.surfarray.pixels_alpha(res)[:] = out[:, :, 3].T
     return res
+
+
+# Leuchtende Requisiten: (Biom, Variante) -> (x, y in der 32x32-Kachel, Farbe, Lichtradius)
+FIRE, ONIBI_C, SEA = (255, 150, 60), (170, 110, 255), (90, 230, 210)
+PROP_LIGHT = {
+    ('hakaba', 0): (16, 18, FIRE, 30),                     # Räucherstäbchen
+    ('iwato', 0): (16, 13, (255, 220, 130), 48),           # Yata-Spiegel
+    ('yukiyama', 0): (15, 16, (150, 200, 255), 30),        # Eiskristall
+    ('ryugu', 1): (16, 20, (220, 230, 255), 32),           # Perle
+    ('jigoku', 0): (15, 21, (255, 90, 30), 40),            # Lavaadern
+    ('jigoku', 2): (16, 14, (255, 110, 30), 48),           # Kessel mit Glut
+    ('takamagahara', 2): (17, 13, (255, 210, 110), 44),    # Magatama
+    ('kawabe', 1): (27, 8, (200, 240, 110), 24),           # Glühwürmchen
+    ('yashiki', 1): (16, 17, ONIBI_C, 56),                 # Andon mit Totenlicht
+    ('shinkai', 0): (16, 21, SEA, 36),                     # Perle der Hamaguri
+    ('shinkai', 1): (16, 14, SEA, 26),                     # Leuchtfische
+    ('shinkai', 2): (16, 14, SEA, 52),                     # versunkene Tōrō
+    ('enma_cho', 0): (14, 8, FIRE, 56),                    # Kohlebecken
+    ('yomi_oku', 0): (15, 8, ONIBI_C, 44),                 # Säule mit Totenfeuer
+    ('yomi_oku', 1): (16, 26, ONIBI_C, 44),                # Herd der Unterwelt
+}
+# Leuchtende Wanddekos: (Biom, Index) -> (x, y im 32x16-Stück, Farbe, Lichtradius)
+WALL_LIGHT = {
+    ('chikurin', 1): (16, 10, (255, 200, 110), 34), ('hakaba', 1): (16, 10, FIRE, 32),
+    ('uminobe', 1): (16, 10, (190, 230, 255), 38), ('jigoku', 0): (16, 12, (255, 90, 30), 44),
+    ('takamagahara', 0): (16, 8, (255, 220, 130), 40), ('yashiki', 1): (12, 9, (255, 190, 110), 36),
+    ('iwato', 1): (15, 6, FIRE, 48), ('shinkai', 1): (16, 9, SEA, 36), ('enma_cho', 1): (16, 7, FIRE, 48),
+    ('tsukiyomi', 0): (16, 9, (200, 215, 255), 38), ('yomi_oku', 1): (15, 9, ONIBI_C, 40),
+}
+
+
+def prop_light(bid, x, y):
+    """Licht der Fels-Variante an (x, y) als (Welt-x, Welt-y, Radius, Farbe) oder None."""
+    r = env_img(bid, 'rock_hi', 64)
+    pl = r and PROP_LIGHT.get((bid, (x * 7 + y * 13) // 32 % len(r)))
+    return (x + pl[0], y + pl[1], pl[3], pl[2]) if pl else None
 
 
 def hi_tile(t, x, y, biome):
@@ -863,10 +903,10 @@ def _decor(s, kind, base, rng):
             D.circle(s, (250, 240, 210), (x, y), rng.randint(3, 6))
 
 
-def make_walls(biome, rng):
-    """Wandrahmen (ganzer Bildschirm, transparent in der Mitte)."""
+def make_walls(biome, rng, lights=None):
+    """Wandrahmen (ganzer Bildschirm, transparent in der Mitte); leuchtende Dekos landen in lights."""
     if env_ok(biome):
-        return env_walls(biome, rng)
+        return env_walls(biome, rng, lights)
     s = pygame.Surface((W, H), pygame.SRCALPHA)
     wc = biome['wall']
     D = pygame.draw
