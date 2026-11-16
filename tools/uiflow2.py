@@ -18,6 +18,10 @@ try:
         menu(i); s=g.state
         for k in (pygame.K_RIGHT, pygame.K_DOWN, pygame.K_LEFT, pygame.K_UP): step([K(k)], 3)
         step([K(pygame.K_ESCAPE)], 3); print(s, '->', g.state)
+    g.state = 'lexicon'; g.lex_tab = 3; g.lex_sel = 0; g.save['synergies_seen'].append('jingi'); step([], 2)
+    for k in (pygame.K_DOWN, pygame.K_UP, pygame.K_RIGHT): step([K(k)], 2)
+    assert g.lex_tab == 0, 'Lexikon-Seite Synergien blättert nicht weiter'
+    g.save['synergies_seen'].remove('jingi')
     menu(0); print('chars', g.state); step([K(pygame.K_RETURN)], 200); print('play', g.state)
     for k in (pygame.K_e, pygame.K_q, pygame.K_SPACE): step([K(k)], 20)
     step([K(pygame.K_ESCAPE)], 5); print('pause', g.state)

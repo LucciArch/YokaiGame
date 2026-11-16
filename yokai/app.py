@@ -10,6 +10,7 @@ from . import gfx, audio, sheets, art, bestiary, props
 from .save import Save
 from .data import (ITEMS, ITEM_IDS, CHARS, CHAR_ORDER, ACHIEVEMENTS, ACTIVES, SYNERGIES, TRANSFORMS, BOSSES,
                    BIOMES, CHALLENGES, ENEMIES)
+SYN_BY_ID = {sy['id']: sy for sy in SYNERGIES}
 from .run import Run
 
 from .texts import FX_NAMES, TAG_NAMES, fx_lines, star
@@ -797,7 +798,21 @@ class Game:
                 T.add(it['desc'] + '  –  ' + ', '.join(fx_lines(it['fx'])), 140, 219, 7, (230, 225, 210))
         y = 236
         if p.synergies:
-            y = self._wrap('Synergien: ' + ', '.join(sy['name'] for sy in SYNERGIES if sy['id'] in p.synergies), 30, y, W - 70, 7, (255, 220, 120))
+            # Namen einzeln setzen, damit die Maus einen Namen treffen und seine Fähigkeit zeigen kann
+            x = 30
+            T.add('Synergien:', x, y, 7, (255, 220, 120))
+            x += gfx.text_w('Synergien: ', 7)
+            for sy in [sy for sy in SYNERGIES if sy['id'] in p.synergies]:
+                w = gfx.text_w(sy['name'], 7)
+                if x + w > W - 40:
+                    x, y = 30, y + 11
+                hov = x <= mx < x + w and y - 2 <= my < y + 10
+                T.add(sy['name'], x, y, 7, (255, 255, 200) if hov else (255, 220, 120))
+                if hov:
+                    T.add(sy['name'], 140, 194, 9, (255, 220, 120))
+                    self._wrap(sy['desc'] + '  –  ' + ', '.join(fx_lines(sy['fx'])), 140, 208, W - 170, 7, (230, 225, 210))
+                x += w + gfx.text_w(', ', 7)
+            y += 13
         if p.transforms:
             self._wrap('Transformationen: ' + ', '.join(TRANSFORMS[t]['name'] for t in p.transforms), 30, y, W - 70, 7, (180, 220, 255))
 
@@ -1074,6 +1089,8 @@ class Game:
     }
 
     def _lex_entries(self):
+        if self.lex_tab == 3:
+            return [sy['id'] for sy in SYNERGIES], set(self.save['synergies_seen'])
         if self.lex_tab == 2:
             return list(self.LEX_EVENTS), set(self.save.data.get('events_seen', []))
         if self.lex_tab == 0:
@@ -1109,11 +1126,11 @@ class Game:
         ids, seen = self._lex_entries()
         n_seen = len([i for i in ids if i in seen])
         T.add('Yōkai-Lexikon', W // 2, 5, 13, (255, 230, 170), 'c')
-        for k, name in enumerate(('Yōkai', 'Bosse', 'Ereignisse')):
-            x = W // 2 - 110 + k * 110
+        for k, name in enumerate(('Yōkai', 'Bosse', 'Ereignisse', 'Synergien')):
+            x = W // 2 - 165 + k * 110
             on = k == self.lex_tab
             T.add(('‹ %s ›' if on else '%s') % name, x, 24, 9, (255, 215, 130) if on else (150, 140, 150), 'c')
-        T.add('%d / %d begegnet' % (n_seen, len(ids)), W - 16, 8, 7, (190, 180, 170), 'r')
+        T.add('%d / %d %s' % (n_seen, len(ids), 'entdeckt' if self.lex_tab == 3 else 'begegnet'), W - 16, 8, 7, (190, 180, 170), 'r')
         self.lex_sel = max(0, min(self.lex_sel, len(ids) - 1))
         # Liste links
         gfx.panel(s, (10, 38, 128, 252), 200)
@@ -1129,13 +1146,35 @@ class Game:
             if sel:
                 pygame.draw.rect(s, (70, 48, 60), (13, int(y) - 1, 122, 13))
             nm = (ENEMIES[eid]['name'] if self.lex_tab == 0 else BOSSES[eid]['name'] if self.lex_tab == 1
-                  else self.LEX_EVENTS[eid]['name']) if eid in seen else '? ? ?'
+                  else self.LEX_EVENTS[eid]['name'] if self.lex_tab == 2 else SYN_BY_ID[eid]['name']) if eid in seen else '? ? ?'
             T.add('%2d  %s' % (i + 1, nm), 18, y, 7, (255, 225, 160) if sel else ((225, 215, 200) if eid in seen else (110, 100, 115)))
         # Detail rechts
         gfx.panel(s, (146, 38, W - 156, 252), 200)
         eid = ids[self.lex_sel]
         cx = 146 + (W - 156) // 2
-        if eid in seen and self.lex_tab == 2:
+        if self.lex_tab == 3:
+            sy = SYN_BY_ID[eid]
+            known = eid in seen
+            T.add(sy['name'] if known else '? ? ?', cx, 44, 12, (255, 220, 120) if known else (150, 140, 160), 'c')
+            if known:
+                T.add('„%s“' % sy['desc'], cx, 62, 8, (230, 225, 210), 'c')
+            n = len(sy['items'])
+            for k, iid in enumerate(sy['items']):
+                it = ITEMS[iid]
+                ix = cx + (k - (n - 1) / 2) * 80
+                pygame.draw.rect(s, (34, 26, 40), (int(ix) - 12, 80, 24, 22))
+                if known or iid in self.save['seen']:
+                    gfx.draw_icon(s, it['icon'], it['col'], int(ix), 91)
+                    T.add(it['name'], ix, 106, 7, it['col'], 'c')
+                else:
+                    T.add('?', ix, 85, 9, (120, 110, 130), 'c')
+                    T.add('? ? ?', ix, 106, 7, (120, 110, 130), 'c')
+            if known:
+                self._wrap('Fähigkeit: ' + ', '.join(fx_lines(sy['fx'])), 154, 126, W - 172, 8, (170, 205, 240))
+            else:
+                self._wrap('Noch nicht entdeckt. Trage alle %d Items zugleich, um diese Synergie zu wecken.' % n,
+                           154, 126, W - 172, 8, (180, 170, 170))
+        elif eid in seen and self.lex_tab == 2:
             ev = self.LEX_EVENTS[eid]
             T.add(ev['name'], cx, 44, 12, (255, 220, 170), 'c')
             if ev['spr'] and sheets.has(ev['spr']):
@@ -1215,7 +1254,7 @@ class Game:
             if nv == 'up': self.lex_sel = (self.lex_sel - 1) % len(ids)
             elif nv == 'down': self.lex_sel = (self.lex_sel + 1) % len(ids)
             elif nv in ('left', 'right'):
-                self.lex_tab = (self.lex_tab + (1 if nv == 'right' else -1)) % 3; self.lex_sel = 0
+                self.lex_tab = (self.lex_tab + (1 if nv == 'right' else -1)) % 4; self.lex_sel = 0
             elif nv == 'back': self.state = 'title'
             elif isinstance(nv, tuple):
                 mx, my = nv[1]
@@ -1224,7 +1263,7 @@ class Game:
                     if 0 <= i < len(ids):
                         self.lex_sel = i
                 elif my < 34:
-                    self.lex_tab = min(2, max(0, int((mx - (W // 2 - 165)) // 110))); self.lex_sel = 0
+                    self.lex_tab = min(3, max(0, int((mx - (W // 2 - 220)) // 110))); self.lex_sel = 0
             if nv in ('left', 'right', 'up', 'down'):
                 audio.play('move')
 
