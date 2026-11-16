@@ -1,23 +1,21 @@
 # Nächster Schritt
 
-**Weitere Synergien für ungebundene Items** – Runden 15–17 haben alle auslösbaren Synergien sichtbar gemacht
-(Schriftzug + Welle beim ersten Auslösen pro Raum), `tools/synbalance.py --tod` misst Überlebenszeit
-(Bericht `design/balance/balance-check-15-ueberleben.md`) und drei neue Synergien gebracht
-(Hara-tsuzumi, Gelächter der Nacht, Enenra). Noch 12 Items gehören zu keiner Synergie:
-fuchsschrein, hitogata, shiro_kimono, gashadokuro_knochen, omamori_gokaku, karakasa, kiyome_sack, ema,
-jinmen_frucht, shoji_papier, daruma_otoshi, geheimkarte.
+**Raum-Synergien messbar machen und nachbalancieren** – Runden 18–19 haben die letzten 12 ungebundenen Items
+in 6 neue Synergien gebracht (Gashadokuro, Tsukumogami, Shinsen, Nanakorobi Yaoki, Jinmenju, Mokumokuren);
+jetzt gehört jedes Item zu mindestens einer Synergie (96 insgesamt).
 
-1. 3–4 folkloretreue Paare bilden (z. B. Gashadokuro-Knochen + Weißes Totengewand, Karakasa + Hitogata,
-   Kiyome-Salz + Kleiner Fuchsschrein, Daruma-otoshi + Omamori: Erfolg) und je eine eigene Fähigkeit
-   geben, die die Signaturen der Items verstärkt, mit `_syn(...)`-Ausruf.
-2. Mit `tools/synbalance.py` (Kampfzeit) und `--tod` (Überleben) messen.
+1. `tools/synbalance.py` um einen Messmodus in einem normalen Gegnerraum (statt nur gegen Shuten-dōji)
+   erweitern, damit Raum-Synergien vergleichbar werden (Gelächter der Nacht, Enenra, Hara-tsuzumi,
+   Gashadokuro, Mokumokuren, Tsukumogami).
+2. Ausreißer (deutlich schneller/langsamer als der Median) angleichen, Bericht unter `design/balance/`.
 
-Warum: Jedes Item soll mindestens eine Kombination haben – das erhöht den Wiederspielwert.
+Warum: Die neuen Synergien wirken vor allem gegen viele Normalgegner – die Boss-Messung erreicht mit
+2 Zufalls-Items das Zeitlimit und sagt über sie nichts aus. Besonders Gashadokuro (Zerbrechen unter 25 %
+plus Splitter) und Mokumokuren (zielsuchende große Talismane) könnten zu stark sein.
 
 ## Weitere Ideen
-- Die Messung gegen Shuten-dōji erreicht mit 2 Zufalls-Items das Zeitlimit (180 s) – Messung zusätzlich
-  in einem Raum mit normalen Gegnern, damit Raum-Synergien (Gelächter, Enenra, Hara-tsuzumi) vergleichbar werden
-- Doppeltes Katzenglück ist im Bot-Test nicht messbar (Bot weicht nicht aus) – Bot mit Ausweichen für `--tod`
-- Weitere Ereignisräume (z. B. Tanuki-Bauchtrommel-Wettstreit)
-- Eigene Grafik für Ratten (Tessos Schwarm) und Windsicheln statt eingefärbter Talismane
+- Bot mit Ausweichen für `synbalance.py --tod`, damit Doppeltes Katzenglück und Tsukumogami (Rolle) messbar werden
+- Eigene Grafik für Ratten (Tessos Schwarm), Windsicheln und Gashadokuro-Knochensplitter statt eingefärbter Talismane
 - Eigenes Geschoss-Sprite für Fūjins Windklingen und Blätter (jetzt runde Kugeln)
+- Weitere Ereignisräume (z. B. Tanuki-Bauchtrommel-Wettstreit)
+- Synergien mit drei Items (z. B. die drei Kaiserinsignien als „große“ Kombination mit Fanfare)
