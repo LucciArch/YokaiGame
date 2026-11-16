@@ -51,5 +51,18 @@ for i in range(200):
     o = Obj('omikuji', 100, 100); g.run.player.coins = 99; g.run.player.iframes = 1; g.run.interact(o)
 if len(g.save['kuji_seen']) != 5 or 'alle_lose' not in g.save['achievements']:
     print('FEHLER Omikuji', g.save['kuji_seen']); bad += 1
+# Uzumes Kagura-Suzu + Yata-Spiegel: die Rolle löscht nahe Geschosse und wirft sie als Sonnenstrahlen zurück
+from yokai import sigs
+from yokai.entities import ebullet
+g.start_run('hana', 12); run = g.run; p = run.player
+for iid in ('uzume_suzu', 'yata_kagami'):
+    p.gain_item(iid, silent=True)
+run.ebullets = []
+for k in range(5):
+    ebullet(run, p.x + 20, p.y + k, 0, 0)
+ebullet(run, p.x + 150, p.y, 0, 0)
+sigs.on_dash(p, run)
+if len(run.ebullets) != 1 or 'iwato' not in p.sgs:
+    print('FEHLER Kagura-Suzu', len(run.ebullets), sorted(p.sgs)); bad += 1
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)

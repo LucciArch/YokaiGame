@@ -129,6 +129,8 @@ TEXT = {
     'augen_ueberall': 'Das Handauge trifft markierte Feinde auf jede Entfernung',
     'mondteich': 'Mondsichel-Talismane lassen Feinde erstarren',
     'leben_tod': 'Kills schenken manchmal ½ Geisterherz',
+    'suzu': 'Nach der Rolle läuten die Glöckchen (alle 4 s): feindliche Geschosse in der Nähe verlöschen, nahe Feinde fliehen lachend 2 s',
+    'iwato': 'Verlöschte Geschosse kehren als Sonnenstrahlen (120 %) zu den Feinden zurück, die Glöckchen läuten schon nach 2,5 s',
     'izanagis_flucht': 'Auch die Rolle wirft Pfirsiche (alle 3 s), Feinde fliehen doppelt so weit und lang',
     'onmyo_spiegel': 'Der Spiegel wirft jedes 2. Geschoss als Siegel-Explosion zurück',
     'seimei': 'Siegel-Explosion schon nach 3 Treffern, Bann öfter',
@@ -948,6 +950,8 @@ def on_dash(p, run):
     if not S:
         return
     g = st(p)
+    if 'suzu' in S and run.time - g.get('suzu', -9) >= (2.5 if 'iwato' in S else 4.0):
+        _suzu(p, run)
     if 'izanagis_flucht' in S and run.time - g.get('momo', -9) >= 3.0:
         _syn(run, 'izanagis_flucht', p.x, p.y, (255, 170, 140))
         _momo(p, run)
@@ -1004,6 +1008,26 @@ def on_dash(p, run):
         for i in range(n):
             a = i / n * math.tau + math.pi / 4
             run.fire_player_bullet(p.x, p.y - 3, a, p.damage() * 0.7, p.s['shotspd'], 2.5, 1.1 if 'sommerwind' in S else 0.7, {})
+
+
+def _suzu(p, run):
+    """Uzumes Kagura-Suzu: der Klang löscht nahe Geschosse, die Yokai lachen und fliehen."""
+    from . import audio
+    st(p)['suzu'] = run.time
+    near = [b for b in run.ebullets if math.hypot(b.x - p.x, b.y - p.y) < 55]
+    run.ebullets = [b for b in run.ebullets if math.hypot(b.x - p.x, b.y - p.y) >= 55]
+    for e in run.enemies:
+        if e.active() and not e.is_boss and math.hypot(e.x - p.x, e.y - p.y) < 70 + e.r:
+            e.sg_fear = max(getattr(e, 'sg_fear', 0), 2.0)
+    _ring(run, p.x, p.y, (255, 214, 90), 55)
+    audio.play('bell', 0.5)
+    if 'iwato' in p.sgs and near:
+        _syn(run, 'iwato', p.x, p.y, (255, 230, 140))
+        for k, b in enumerate(near[:8]):
+            e = _nearest(run, b.x, b.y)
+            a = math.atan2(e.y - b.y, e.x - b.x) if e else k * math.tau / 8
+            sb = run.fire_player_bullet(b.x, b.y, a, p.damage() * 1.2, 240, 3, 1.0, {'pierce': 1})
+            sb.col = (255, 230, 140)
 
 
 def on_coin(p, run, v):

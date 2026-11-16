@@ -258,6 +258,7 @@ I('hagoromo', 'Hagoromo', 'Das Federgewand einer Himmelsjungfrau', 'cloth', (230
 I('izanami_schleier', 'Izanamis Schleier', 'Leben und Tod in einem Gewand', 'cloth', (120, 60, 120), 'B', ['yurei', 'kami'], 4, True, revive=1, spirit=4)
 I('kaze_bukuro', 'Kaze-bukuro', 'Fūjins Windsack', 'cloud', (150, 220, 180), 'B', ['kami', 'tengu'], 4, True, spd=10, rate=0.3, sig_windsack=1)
 I('yomi_momo', 'Pfirsich von Yomotsu Hirasaka', 'Izanagis Wurf gegen die Verfolger aus Yomi', 'yomi_momo', (255, 170, 140), 'B', ['kami'], 4, True, hp=1, sig_momo=1)
+I('uzume_suzu', 'Uzumes Kagura-Suzu', 'Ihr Tanz lockte die Sonne aus der Höhle', 'uzume_suzu', (255, 214, 90), 'B', ['kami'], 4, True, spd=5, sig_suzu=1)
 I('kagutsuchi_glut', 'Glut des Kagutsuchi', 'Das erste Feuer der Welt', 'flame', (255, 90, 30), 'B', ['kami', 'oni'], 4, True, burn=1, dmgm=1.2, sig_erstes_feuer=1)
 I('geheimkarte', 'Karte des Diebes', 'Wo sind die verborgenen Räume?', 'scroll', (190, 160, 110), 'TS', [], 2, True, map=1, salts=2)
 
@@ -379,6 +380,7 @@ SYNERGIES = [
     dict(id='maskenzug', name='Maskenzug', desc='Die Parade der hundert Gesichter', items=['hyakki_rolle', 'noh_maske'], fx=dict(crit=0.05, sig_maskenzug=1)),
     dict(id='fujin_raijin', name='Fūjin-Raijin-zu', desc='Wind und Donner wie auf dem Wandschirm', items=['kaze_bukuro', 'raijin_trommel'], fx=dict(sig_fujin_raijin=1)),
     dict(id='izanagis_flucht', name='Izanagis Flucht', desc='Kamm und Pfirsich hielten die Verfolger auf', items=['yomi_momo', 'izanami_kamm'], fx=dict(spd=10, sig_izanagis_flucht=1)),
+    dict(id='ama_no_iwato', name='Ama-no-Iwato', desc='Spiegel und Tanz lockten die Sonne hervor', items=['uzume_suzu', 'yata_kagami'], fx=dict(dmg=0.5, sig_iwato=1)),
     dict(id='verfluchte_sterne', name='Verfluchte Sterne', desc='Fuchs und Stern leuchten gemeinsam', items=['hoshi_splitter', 'kyubi_juwel'], fx=dict(crit=0.1, sig_verfluchte_sterne=1)),
     dict(id='hara_tsuzumi', name='Hara-tsuzumi', desc='Der Tanuki trommelt auf seinen Bauch', items=['tanuki_beutel', 'tanuki_blatt_p'], fx=dict(sig_hara_tsuzumi=1)),
     dict(id='gelaechter', name='Gelächter der Nacht', desc='Kerakera-onna und Hyōsube lachen im Chor', items=['kerakera_faecher', 'hyosube_haar'], fx=dict(sig_gelaechter=1)),
@@ -627,6 +629,7 @@ ACHIEVEMENTS = [
     ('secret', 'Verborgene Pfade', 'Finde einen Geheimraum (Reinigungssalz an Wänden!)', ('item', 'geheimkarte')),
     ('secret10', 'Schatzjäger', 'Finde 10 Geheimräume', None),
     ('yomi', 'Rückkehr aus Yomi', 'Besiege Izanami in ihrem Totenpalast', ('item', 'yomi_momo')),
+    ('iwato', 'Die Sonne kehrt zurück', 'Besiege Amaterasu in Ama-no-Iwato', ('item', 'uzume_suzu')),
     ('all_bosses', 'Bezwinger der Nachtparade', 'Besiege alle 24 Bosse', None),
     ('teahouse', 'Teezeremonie', 'Trinke im Teehaus', None),
     ('slots', 'Glücksspieler', 'Spiele am Tanuki-Automaten', None),

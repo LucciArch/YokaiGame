@@ -1,4 +1,4 @@
-"""Item-Symbole v1.5: Belohnungen aus Yomi no Kuni."""
+"""Item-Symbole v1.5: Belohnungen aus Yomi no Kuni und Ama-no-Iwato."""
 from ihelp import *
 
 
@@ -20,7 +20,30 @@ def yomi_momo():
     return c
 
 
-NAMES = ['yomi_momo']
+def uzume_suzu():
+    """Kagura-Suzu der Ame-no-Uzume: Glöckchen in drei Rängen (1-3-5) am Stiel, fünffarbige Bänder."""
+    c = Cv()
+    for i, (ch, x0, x1) in enumerate((('r', 17, 27), ('w', 17, 25), ('G', 17, 23), ('y', 17, 21), ('a', 17, 19))):
+        c.line([(x0, 21), (x0 + (x1 - x0) * .6, 25), (x1, 29 - i // 2)], ch, 1)      # Goshiki-Bänder wehen nach rechts
+    c.form(R(14, 18, 17, 29), 'jdD', 1, 1, ring='K')                     # Stiel, rot umwickelt
+    for y in (21, 24, 27):
+        c.line([(14, y), (17, y)], 'R', 1)
+    tiers = ((5, (15.5,)), (10, (11.5, 15.5, 19.5)), (15, (7.5, 11.5, 15.5, 19.5, 23.5)))
+    for y, xs in tiers:
+        c.line([(15.5, 17), (xs[0], y)], '2', 1)
+        c.line([(15.5, 17), (xs[-1], y)], '2', 1)
+    for y, xs in tiers:
+        for x in xs:
+            b = E(x, y, 2.3, 2.3)
+            c.form(b, 'ogy', 1, 1, ring='K')
+            c.fill(E(x, y + 1.2, 1.2, 0.6), 'o')
+            c.a[int(y - 1), int(x - 1)] = 'Y'
+    sparkle(c, 25, 6, 'W', 'Y')
+    sparkle(c, 5, 8, 'W', 'Y')
+    return c
+
+
+NAMES = ['yomi_momo', 'uzume_suzu']
 
 
 def build():
@@ -31,7 +54,7 @@ def build():
 if __name__ == '__main__':
     build()
     from PIL import Image
-    im = Image.open(os.path.join(HERE, 'icons', 'yomi_momo.png')).convert('RGBA')
+    im = Image.open(os.path.join(HERE, 'icons', 'uzume_suzu.png')).convert('RGBA')
     out = Image.new('RGBA', (im.width * 8 + 32, im.height * 8 + 32), (30, 24, 40, 255))
     out.alpha_composite(im.resize((im.width * 8, im.height * 8), Image.NEAREST), (16, 16))
     out.save(sys.argv[1] if len(sys.argv) > 1 else '/tmp/momo.png')

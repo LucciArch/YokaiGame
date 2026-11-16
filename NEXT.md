@@ -7,9 +7,12 @@
   kopieren, floor/wall-PNGs per `git checkout` zurücksetzen.
 - Runde 57: Lexikon-Ereignisseite Omikuji zeigt die gezogenen Lose (`App.KUJI`, `kuji_seen`); uiflow2 zeichnet sie.
 
-# Ama-no-Iwato: in Arbeit in einer anderen Sitzung (NICHT anfassen)
-- Runde 58 (andere Sitzung): Iwato-Pforte, `Run.oku`, Endbossin Amaterasu (`bosses.Amaterasu`, Sprite
-  `art_src/fable/bosses_3/boss_amaterasu.py`), Sieg-/Epilogtext, Lexikon. Teil 3 (Erfolg, Item-Belohnung) folgt dort.
+# Ama-no-Iwato: fertig (Runden 55, 58, 59)
+- Biom `iwato`, Iwato-Pforte nach dem Wahren Sieg (`Run.oku`), Endbossin `bosses.Amaterasu` (3 Phasen, Sprite
+  `art_src/fable/bosses_3/boss_amaterasu.py`, Import über `art_src/import_fable.py <ordner>`), Erfolg `iwato`,
+  Item `uzume_suzu` (sig `suzu`), Synergie `ama_no_iwato` (sig `iwato`). bosstest/sigtest prüfen alles.
+- Offen/Ideen: Titelbild-Stimmung nach Iwato-Sieg (wie 'yomi' in `app.py`), Amaterasu-Bossmusik, Boss-Balance
+  (bosstest: ~80 Treffer gegen ~30 bei Izanami – etwas schwerer gewollt, beobachten).
 
 # Nächster Schritt: Requisiten Teil 6 – Enma-chō, Tsukiyomi und Yomi no Oku
 Gleiches Vorgehen wie Runde 56. Warum: letzte Biome mit Grundformen-Requisiten.

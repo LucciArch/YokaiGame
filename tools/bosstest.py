@@ -78,6 +78,11 @@ assert (run.depth, run.biome_id, run.boss_id) == (7, 'iwato', 'amaterasu'), (run
 assert run.state_dict()['oku'] == 'iwato'
 b = make_boss(run, 'amaterasu'); run.enemies = [b]; run.boss = b
 assert b.extra_dark > 0 and b.phase == 1
+run.save['achievements'] = [x for x in run.save['achievements'] if x != 'iwato']
+run.end_run(True)
+assert 'iwato' in run.save['achievements'] and 'uzume_suzu' in run.save['items']
+from yokai.epilogue import Epilogue, STORY_IWATO
+assert Epilogue(g, run).blocks[0] == STORY_IWATO[0]
 print('Iwato-Pforte OK')
 
 # Rückkehr aus Yomi: der erste Sieg über Izanami schaltet den Pfirsich frei

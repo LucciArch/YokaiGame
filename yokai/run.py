@@ -2198,6 +2198,7 @@ class Run:
                 s.stat('true_wins')
             if self.depth == 7 and self.biome_id == 'iwato':
                 s.stat('iwato_wins')
+                self.achieve('iwato')
             elif self.depth == 7:
                 s.stat('yomi_wins')
                 self.achieve('yomi')
