@@ -152,6 +152,15 @@ TEXT = {
     'omamori_set': 'Kenkō rettet zweimal pro Ebene, Truhen geben doppelt mehr',
     'tempelmusik': 'Jeder vierte Schlag hallt als Klangwelle um dich',
     'bushi': 'Ehre wiegt schwerer: +45 % statt +25 %',
+    'feuerwerk': 'Explodierende Talismane zerplatzen in fünf brennende Funken',
+    'oelfeuer': 'Geölte Feinde gehen beim Tod in einer Feuerexplosion auf',
+    'feuerkind': 'Die Rolle schleudert brennendes Öl auf Feinde in der Nähe',
+    'feuerwagen': 'Die Rolle lässt zwei Feuerräder in Rollrichtung losrollen',
+    'gericht': 'Zurückgeworfene Geschosse verfluchen: doppelter Schaden',
+    'sturmfaecher': 'Blitze entfesseln Böen, die Feinde wegschleudern',
+    'sturmgott': 'Statik lädt doppelt so schnell, ihr Blitz springt auf drei Feinde',
+    'blitzschlag': 'Das Donnerbiest erwacht schon nach 2 Treffern und springt weiter',
+    'orochi': 'Das Grasmäher-Schwert trifft Vergiftete 40 % härter',
 }
 
 BULLET_SIGS = ('sichel', 'kammzinken', 'seidenfaden', 'stromauf', 'gross', 'schweben', 'windstoss', 'koi_drache')
@@ -184,6 +193,19 @@ def _nearest(run, x, y, maxd=9999, cond=None):
 def _ring(run, x, y, col, r=40):
     from .entities import Particle
     run.particles.append(Particle(x, y, 0, 0, 0.3, col, r, kind='ring'))
+
+
+def _chain_strikes(run, src, n, dmg):
+    """Blitz springt von src auf bis zu n weitere nahe Feinde."""
+    done = {id(src)}
+    for _ in range(n):
+        nxt = _nearest(run, src.x, src.y, 110, lambda o: id(o) not in done)
+        if not nxt:
+            return
+        done.add(id(nxt))
+        run.zap(src.x, src.y, nxt.x, nxt.y)
+        run.lightning(nxt.x, nxt.y, dmg)
+        src = nxt
 
 
 def _float(run, e, txt, col):
@@ -294,6 +316,8 @@ def on_fire(p, run, bullets):
         tgt = run.nearest_enemy(p.x, p.y, 400)
         if tgt:
             run.lightning(tgt.x, tgt.y, dmg * 2 + 4)
+            if 'sturmgott' in S:
+                _chain_strikes(run, tgt, 3, dmg * 1.5 + 3)
     if 'klingen' in S and n % 8 == 0:
         from . import audio
         audio.play('bell', 0.4)
@@ -359,6 +383,10 @@ def bullet_tick(b, run, dt):
 
 def bullet_end(run, b):
     """Ein Spieler-Talisman verschwindet (Treffer, Wand oder Reichweite)."""
+    if b.fl.get('explode') and not b.fl.get('_split') and 'feuerwerk' in run.player.sgs:
+        for i in range(5):
+            nb = run.fire_player_bullet(b.x, b.y, i / 5 * math.tau + random.uniform(0, 1.2), b.dmg * 0.4, 170, 2, 0.4, {'burn': 1})
+            nb.col = random.choice(((255, 120, 160), (255, 220, 120), (140, 220, 255)))
     if b.fl.get('_sw') and 'sternenstaub' in run.player.sgs:
         for i in range(4):
             a = i / 4 * math.tau + 0.4
@@ -401,6 +429,8 @@ def hit_pre(run, e, b, dmg):
         dmg *= 1.3 if 'allsehend' in S else 1.15
     if 'ewiger_winter' in S and e.frozen > 0:
         dmg *= 1.5
+    if 'orochi' in S and e.poison > 0:
+        dmg *= 1.4
     if 'kyudo' in S and b is not None and b.t > 0.45:
         dmg *= 1.6
     if getattr(e, 'sg_oil', 0) > 0 and (b is None or b.fl.get('burn') or b.fl.get('explode')):
@@ -430,9 +460,13 @@ def hit_post(run, e, b, dmg):
         run.spawn_pickup('coin', e.x, e.y)
     if 'donnerbiest' in S:
         e.sg_thunder = getattr(e, 'sg_thunder', 0) + 1
-        if e.sg_thunder >= 3:
+        if e.sg_thunder >= (2 if 'blitzschlag' in S else 3):
             e.sg_thunder = 0
             run.lightning(e.x, e.y, p.damage() * 1.6 + 3)
+            if 'blitzschlag' in S:
+                _chain_strikes(run, e, 1, p.damage() * 1.6 + 3)
+    if b is not None and b.fl.get('_urteil'):
+        e.sg_curse = 6.0
     if 'pentagramm' in S:
         e.sg_pent = getattr(e, 'sg_pent', 0) + 1
         if e.sg_pent >= (3 if 'seimei' in S else 5):
@@ -521,6 +555,10 @@ def on_kill(run, e):
             tgt.burn = max(tgt.burn, 3.0)
             tgt.burn_dps = max(tgt.burn_dps, e.burn_dps)
             run.zap(e.x, e.y, tgt.x, tgt.y)
+    if 'oelfeuer' in S and getattr(e, 'sg_oil', 0) > 0:
+        from .entities import Hazard
+        run.explode(e.x, e.y, 30, p.damage() * 1.6, 'p')
+        run.hazards.append(Hazard(e.x, e.y + 4, 14, 0.0, 2.5, max(0.8, p.damage() * 0.4), 'p', 'fire'))
     if 'erstes_feuer' in S and e.burn > 0:
         run.explode(e.x, e.y, 26, p.damage() * 1.4, 'p')
     if 'parade' in S:
@@ -604,10 +642,13 @@ def block(p, run, b):
             nb = run.fire_player_bullet(b.x, b.y, a, p.damage() * 1.5, 260, 3.5, 1.0,
                                         {'homing': 1, 'explode': 1} if 'onmyo_spiegel' in S else {'homing': 1})
             nb.col = (255, 230, 150)
+            if 'gericht' in S:
+                nb.fl['_urteil'] = 1
             if 'sonnenspiegel' in S:
                 nb.fl['burn'] = 1
                 for da in (-0.3, 0.3):
-                    sb = run.fire_player_bullet(b.x, b.y, a + da, p.damage() * 1.2, 260, 3, 1.0, {'homing': 1, 'burn': 1})
+                    sb = run.fire_player_bullet(b.x, b.y, a + da, p.damage() * 1.2, 260, 3, 1.0,
+                                                {'homing': 1, 'burn': 1, '_urteil': 1} if 'gericht' in S else {'homing': 1, 'burn': 1})
                     sb.col = (255, 190, 90)
             return True
     if 'schuppenpanzer' in S and random.random() < 0.25:
@@ -657,6 +698,18 @@ def on_dash(p, run):
                 if not e.is_boss:
                     e.kx += (e.x - p.x) / max(d, 1) * 360
                     e.ky += (e.y - p.y) / max(d, 1) * 360
+    if 'feuerkind' in S:
+        _ring(run, p.x, p.y, (240, 170, 60), 60)
+        for e in run.enemies:
+            if e.active() and math.hypot(e.x - p.x, e.y - p.y) < 60 + e.r:
+                e.sg_oil = 3.0
+                e.burn = 3.0
+                e.burn_dps = max(e.burn_dps, max(1.0, p.damage() * 0.4))
+    if 'feuerwagen' in S:
+        a = math.atan2(p.dash_dir[1], p.dash_dir[0])
+        for da in (-0.25, 0.25):
+            b = run.fire_player_bullet(p.x, p.y, a + da, p.damage() * 1.1, 150, 5, 1.2, {'pierce': 1, 'burn': 1})
+            b.col = (255, 110, 40)
     if 'flatter' in S:
         for i in range(4):
             a = i / 4 * math.tau + math.pi / 4
@@ -857,7 +910,7 @@ def tick(p, run, dt):
         g['still'] = g.get('still', 0) + dt
     if 'statik' in S and p.moving:
         before = g.get('statik', 0)
-        g['statik'] = min(3.0, before + dt)
+        g['statik'] = min(3.0, before + dt * (2 if 'sturmgott' in S else 1))
         if g['statik'] >= 3.0 and random.random() < 0.3:
             from .entities import Particle
             run.particles.append(Particle(p.x + random.uniform(-6, 6), p.y - 6, 0, 0, 0.15, (255, 250, 160), 1))
@@ -1038,3 +1091,13 @@ def stat_bonus(p, f):
         f[k] += v
     if f.get('sig_anmut'):
         f['rate'] += p.sg.get('anmut', 0)
+
+
+def on_lightning(run, x, y):
+    if 'sturmfaecher' in run.player.sgs:
+        _ring(run, x, y, (200, 240, 220), 45)
+        for e in run.enemies:
+            d = math.hypot(e.x - x, e.y - y)
+            if e.active() and d < 45 + e.r and not e.is_boss:
+                e.kx += (e.x - x) / max(d, 1) * 380
+                e.ky += (e.y - y) / max(d, 1) * 380

@@ -1037,6 +1037,7 @@ class Run:
     def lightning(self, x, y, dmg):
         self.hazards.append(Hazard(x, y, 14, 0.0, 0.14, dmg, 'p', 'strike'))
         self.flash_white = max(self.flash_white, 0.06)
+        sigs.on_lightning(self, x, y)
 
     # ======================================================================  Schaden
     def damage_enemy(self, e, dmg, b, burn=False):
