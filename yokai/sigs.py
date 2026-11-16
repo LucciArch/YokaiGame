@@ -154,7 +154,7 @@ TEXT = {
     'ewiger_winter': 'Erstarrte Feinde nehmen +50 % Schaden, Gebremste erstarren öfter',
     'tengu_flug': 'Die Rolle entfesselt einen schneidenden Windwirbel',
     'oni_rausch': 'Torkelnde Talismane treffen +60 % statt +30 %',
-    'oni_krieger': 'Tigerhieb: die ersten drei Treffer jedes Raums',
+    'oni_krieger': 'Tigerhieb: die ersten drei Treffer jedes Raums und der erste Treffer auf jeden unverletzten Feind',
     'gluecksgoetter': 'Goldene Treffer lassen manchmal Mon fallen',
     'onmyodo': 'Siegel-Explosionen entlassen drei Papierdiener',
     'hanami': 'Die Blüte hält länger: 15 s lang bis +60 % Schaden',
@@ -298,8 +298,13 @@ def on_fire(p, run, bullets):
             b.fl = dict(b.fl); b.fl['sg'] = tags
     if 'sichel' in S:
         g['sichel'] = -g.get('sichel', 1)
+        tgt = run.nearest_enemy(p.x, p.y)
         for b in bullets:
             b.curve = 1.7 * g['sichel']
+            # schräg ansetzen, damit der Bogen die Ziellinie beim nächsten Feind wieder kreuzt
+            th = b.curve * min(b.life, math.hypot(tgt.x - p.x, tgt.y - p.y) / max(1, math.hypot(b.vx, b.vy)) if tgt else b.life) / 2
+            c, s_ = math.cos(-th), math.sin(-th)
+            b.vx, b.vy = b.vx * c - b.vy * s_, b.vx * s_ + b.vy * c
             if 'mondteich' in S:
                 _syn(run, 'mondteich', p.x, p.y, (170, 230, 255))
                 b.fl = dict(b.fl); b.fl['slow'] = 1; b.fl['_frost'] = 1
@@ -565,7 +570,8 @@ def hit_pre(run, e, b, dmg):
         dmg *= 1.5
     if 'hochmut' in S:
         dmg *= 1 + min(0.5, math.hypot(e.x - p.x, e.y - p.y) / 300)
-    if 'tigerfell' in S and g.get('tiger', 0) < (3 if 'oni_krieger' in S else 1):
+    fresh = 'oni_krieger' in S and not e.is_boss and e.hp >= e.maxhp   # Oni-Krieger: jeder unverletzte Feind
+    if 'tigerfell' in S and (fresh or g.get('tiger', 0) < (3 if 'oni_krieger' in S else 1)):
         g['tiger'] = g.get('tiger', 0) + 1
         dmg *= 3
         _float(run, e, 'Tigerhieb!', (255, 190, 80))
