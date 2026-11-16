@@ -1,21 +1,13 @@
+# Erledigt (Runden 22–23)
+Ausweich-Rolle animiert: Runde 22 drehte/stauchte das Sprite (Luca fand das „blöd“), Runde 23 ersetzt das durch
+eigene gepixelte Roll-Bilder für alle 10 Figuren (`art_src/fable/heroes/roll.py` → `yokai/assets/sprites/<name>_roll.png`:
+geduckt + 4 Ball-Bilder), Nachbilder als Ball-Silhouette, Staub in Bodenfarbe. Offen dabei: Ball-Bilder ggf. pro Figur
+nachschärfen, wenn Luca Feedback gibt (z. B. Waffe sichtbar halten, größere Schweife); neue Figuren brauchen einen
+SPEC-Eintrag in `roll.py`.
+
 # Nächster Schritt
 
-**Ausweich-Rolle animieren (Wunsch von Luca, hat Vorrang)** – Die Rolle mit der Leertaste ist heute nur
-eine halbtransparente Figur, die nach vorn gleitet, plus graue Punkte (`Player.update`/`Player.draw` in
-`yokai/entities.py`, `dash_t` = 0,24 s). Sie soll für alle Figuren richtig aussehen:
-
-1. Echte Rolle: Die Figur dreht sich in Rollrichtung um sich selbst (Hi-Res-Sprite in 4–6 Schritten drehen,
-   bei Bewegung nach oben/unten eher stauchen/strecken), kurz geduckt beim Absprung und beim Aufkommen
-   (Squash & Stretch), Schatten bleibt flach am Boden.
-2. Nachbilder: 2–3 verblassende Silhouetten in Figurenfarbe statt grauer Punkte, dazu Staubwölkchen beim
-   Absprung und Aufkommen (Gras/Schnee/Wasser je nach Gebiet eingefärbt).
-3. Rollen-Synergien (Tengu-Flug, Hara-tsuzumi, Sommerwind, Feuerkind usw.) behalten ihre Effekte;
-   Kostüme (`costume.draw`) müssen mitdrehen oder während der Rolle ausgeblendet werden.
-4. Mit einem Screenshot-Streifen (mehrere Bilder der Rolle) prüfen, für mindestens zwei Figuren.
-
-Warum: Die Rolle drückt man ständig – eine gute Animation verbessert das Spielgefühl in jedem Raum.
-
-## Danach (ebenfalls Wunsch von Luca): Geheime Endkapitel mit echten Endbossen
+**Geheime Endkapitel mit echten Endbossen (Wunsch von Luca)** – mit Teil 1 beginnen: Schadensobergrenze + Pforten-Wahl nach Kapitel VI
 Heute endet der Lauf nach Kapitel VI (Takamagahara/Tsukiyomi) mit einem Boss aus einem Pool von vier
 (Mikaboshi, Izanami, Kagutsuchi, Fūjin). Diese Bosse fühlen sich nicht wie Endbosse an und lassen sich mit starken
 Builds sehr schnell besiegen. Geplant, über mehrere Runden verteilt:
