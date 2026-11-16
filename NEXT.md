@@ -15,6 +15,30 @@ eine halbtransparente Figur, die nach vorn gleitet, plus graue Punkte (`Player.u
 
 Warum: Die Rolle drückt man ständig – eine gute Animation verbessert das Spielgefühl in jedem Raum.
 
+## Danach (ebenfalls Wunsch von Luca): Geheime Endkapitel mit echten Endbossen
+Heute endet der Lauf nach Kapitel VI (Takamagahara/Tsukiyomi) mit einem Boss aus einem Pool von vier
+(Mikaboshi, Izanami, Kagutsuchi, Fūjin). Diese Bosse fühlen sich nicht wie Endbosse an und lassen sich mit starken
+Builds sehr schnell besiegen. Geplant, über mehrere Runden verteilt:
+
+1. **Weg wählen:** Nach dem Boss von Kapitel VI öffnen sich (wenn freigeschaltet) zwei Pforten, eine zu
+   **Yomi no Kuni** (Unterwelt: Endboss Izanami in ihrer verwesten Gestalt mit den acht Donnergöttern) und eine zu
+   **Takamagahara no Oku** (Endboss Amaterasu, die sich aus der Felsenhöhle Ama-no-Iwato erhebt, oder Susanoo).
+   Jeder Weg hat 2–3 Ebenen mit eigener Gegend, Musik und eigenen späten Gegnern.
+2. **Geheime Ebene:** Sie wird durch etwas Besonderes ausgelöst, z. B. alle drei Kaiserinsignien tragen, oder
+   Reinigungssalz an einer Wand auf Ebene 11 ohne einen Treffer im Kapitel. Dahinter wartet ein verborgener
+   letzter Gegner, etwa Ame-no-Minakanushi oder der „Nue der Leere“.
+3. **Endboss-Regeln:**
+   - **Schadensobergrenze:** höchstens ~2 % der Max-HP pro Treffer und ~8 % pro Sekunde, damit niemand den Boss
+     mit einem Treffer erledigt. Das HUD zeigt dann z. B. „Göttlicher Schutz“.
+   - Drei Phasen mit Zwischensequenz/Schriftzug, Arena-Veränderung (z. B. die Arena wird kleiner, Licht geht aus)
+     und eigene Hi-Res-Figur, deutlich größer als normale Bosse.
+   - Kein Itemdrop vor dem Kampf, dafür eigene Belohnungen: Erfolg, neue Figur oder neues Item freischalten,
+     ein eigener Abspann.
+4. **Testen:** Ein Boss-Test für jeden Endboss (`tools/bosstest.py`), dazu prüfen, dass die Schadensobergrenze greift
+   (z. B. Obon-Fest/Onmyōdō-Build braucht > 60 s).
+
+Warum: Der Abschluss eines Laufs soll ein Höhepunkt sein, und geheime Wege erhöhen den Wiederspielwert.
+
 ## Danach
 
 **Ausweichender Mess-Bot für Dash- und Nahkampf-Synergien** – Runde 20 hat `tools/synbalance.py --raum`
