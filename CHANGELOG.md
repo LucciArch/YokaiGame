@@ -90,6 +90,7 @@
 - Runde 66 – **Gefolge, Kreisschilde und Aura mit Item-Wirkungen:** Das Gefolge (Familiars) wirft mit allen Wurf-Eigenschaften deiner Items (Feuer, Gift, Frost, Kettenblitz, Abprall, Durchschlag …) statt nur zielsuchend; Kreisschilde setzen Feuer, Gift, Frost, Kettenblitz und Rückstoß, die Aura brennt, vergiftet und verlangsamt. `tools/waffentest.py` prüft auch das
 - Runde 67 – **Alle Geschosse tragen Feuer, Gift und Frost:** Auch die Würfe aktiver Items und Item-Fähigkeiten (Rattenschwarm, Papierdiener, Rückstrahlen, Wurfsterne, Federn, Splitter …) übernehmen jetzt Brand, Gift und Verlangsamung deiner Items. Kettenblitz bleibt bewusst beim Talisman, damit keine Kettenreaktionen entstehen
 - Runde 68 – Requisiten am Hof des Enma neu in Hi-Res: bronzenes Kohlebecken auf Krallenfüßen mit Oni-Fratze und Funkenflug, der **Jōhari no Kagami** (Enmas Spiegel, der alle Taten der Toten zeigt) im Flammenkranz – er glimmt rot –, und der **Nintōjō**, Enmas Stab mit den Köpfen Miru-me und Kagu-hana, die jede Sünde sehen und riechen
+- Runde 69 – Requisiten Teil 6: Im Mondpalast steht jetzt **Tsuki no Katsura**, der silberne Baum auf dem Mond, mit mondhellen Herzblättern; daneben ein Sanbō mit Tsukimi-Dango-Pyramide und Susuki-Gras sowie Usu und Kine des Mondhasen mit dampfendem Mochi. Im Totenpalast ersetzt der **Ōkamuzumi**-Pfirsichbaum die Lacksäule – mit drei leuchtenden Götterpfirsichen, wie sie Izanagi den Yomotsu-shikome entgegenwarf. Baum und Pfirsiche werfen Licht
 
 ## 1.4.0 – „Hyakki-Update“ (enthält 1.3 „Kapitel-Update“)
 

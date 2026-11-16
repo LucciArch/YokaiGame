@@ -1027,30 +1027,91 @@ def rocks(name):
         out.append(fin(cv, P))
 
     elif name == 'tsukiyomi':
-        cv, rng, m = plain_boulder(0)                        # moon rock with craters
-        for (cx, cy, rx, ry) in ((13, 17, 3, 2), (20, 22, 2.4, 1.6), (11, 24, 1.8, 1.2)):
-            c = cv.E(cx, cy, rx, ry) & m
-            cv.fill(c, k[0])
-            cv.fill(c & sh(c, -1, -1), k[1])
-            cv.fill(sh(c, 1, 1) & ~c & m & (cv.Y > cy), k[3])
+        cv, rng, m = plain_boulder(0, rx=8, ry=3.5, by=29)  # Tsuki no Katsura: der silberne Baum auf dem Mond
+        trunk = (capsule(cv, 16, 27, 2, 15, 15, 1.1) | capsule(cv, 15.5, 18, .7, 9, 12, .45) | capsule(cv, 15.5, 17, .7, 22, 10.5, .45)
+                 | capsule(cv, 15, 15, .6, 14, 7, .4) | capsule(cv, 16.5, 27, .6, 21, 28, .4) | capsule(cv, 15, 27, .6, 10.5, 28.2, .4))
+        cv.fill(dil(trunk), K)
+        cv.form(trunk, SILVER[:3], 1, 1)
+        cv.hline([(16.6, 26), (16, 18)], SILVER[0])
+        crown = np.zeros_like(cv.m)
+        for (cx, cy, r) in ((7.5, 10.5, 2.6), (11.5, 7, 3), (16, 4.8, 3.2), (20.5, 6.8, 3), (24.5, 10, 2.6), (14, 10.5, 2.2), (19, 11, 2.2)):
+            crown |= cv.E(cx, cy, r, r * .75)
+        crown &= ~(cv.E(16, 13.5, 4, 2) & ~trunk)
+        cv.fill(dil(crown), K)
+        cv.form(crown, ('#3a4870', '#6a7cb0', '#a8b8e0'), 2, 1)
+        for i in range(18):                                  # herzförmige Katsura-Blätter, mondhell
+            x, y = 5 + rng.random() * 22, 2 + rng.random() * 10
+            if crown[int(y * cv.ss), int(x * cv.ss)]:
+                cv.hpx(x, y, '#e0e8ff'); cv.hpx(x + .5, y, '#e0e8ff'); cv.hpx(x + .25, y + .5, '#c8d4f4')
+        for (x, y) in ((6, 15), (24, 16), (13, 19)):         # fallende Blätter
+            cv.hpx(x, y, '#c8d4f4')
         out.append(fin(cv, P))
-        out.append(fin(pillar(1, SILVER, bands=WHITE), P))
-        cv, rng = new(2)                                     # usu mortar with mochi and mallet
+
+        cv, rng = new(1)                                     # Tsukimi: Sanbō mit Dango-Pyramide und Susuki-Gras
+        for (x0, y0, x1, y1) in ((22, 27, 20, 6), (23, 27, 25, 8), (22, 27, 27.5, 12)):
+            g = capsule(cv, x0, y0, .45, x1, y1, .3)
+            cv.fill(dil(g), K)
+            cv.fill(g, STRAW[2])
+            plume = capsule(cv, x1, y1, .9, x1 + (x1 - x0) * .15, y1 + 4.5, .5)
+            cv.fill(dil(plume), K)
+            cv.form(plume, (STRAW[2], '#d8ccb0', '#f0ecdc'), 1, 1)
+        box(cv, ('#3a2a20', '#7a5a38', '#a8844c', '#d0b070'), 6, 21, 20, 28, top=2)
+        win = cv.E(13, 25.5, 2.2, 1.8) & (cv.Y <= 26.5)        # Fenster im Sanbō-Sockel
+        cv.fill(win, K)
+        tray = cv.R(5, 19, 21, 21)
+        cv.fill(dil(tray), K)
+        cv.form(tray, ('#7a5a38', '#a8844c', '#d0b070'), 1, 1)
+        for (row, n) in ((17, 4), (13.5, 3), (10, 2), (6.5, 1)):
+            for i in range(n):
+                cx = 13 - (n - 1) * 1.85 + i * 3.7
+                d = cv.E(cx, row, 1.9, 1.75)
+                cv.fill(dil(d), K)
+                cv.form(d, ('#a8acc8', '#e0e0ea', '#ffffff'), 1, 1)
+        out.append(fin(cv, P))
+
+        cv, rng = new(2)                                     # Usu und Kine des Mondhasen, Mochi dampft noch
         w = ('#1e1a2c', '#3a3448', '#585268', '#7a7488')
         m, t = cyl(cv, w, 14, 28, 8, 12, top=(w[0], w[1], w[2]))
-        cv.fill(cv.E(14, 15.5, 5, 2.2), WHITE[2])
-        cv.fill(cv.E(13, 15, 3, 1.2), WHITE[3])
-        cv.line([(21, 27), (27, 9)], w[2])
-        cv.line([(22, 27), (28, 9)], w[1])
-        hm = capsule(cv, 23, 7, 2.6, 30, 10, 2.6)
+        side = m & ~t
+        for x in range(8, 21, 3):                            # Holzmaserung und Eisenband
+            cv.fill(side & (cv.X >= x) & (cv.X < x + .5) & (cv.Y > 19), w[0])
+        band = side & (cv.Y >= 22) & (cv.Y < 23.5)
+        cv.fill(band, IRON[2]); cv.fill(band & (cv.Y >= 23), IRON[1])
+        cv.fill(cv.E(14, 16, 6, 2.6), K)
+        mochi = cv.E(14, 15.3, 4.8, 2.2)
+        cv.form(mochi, ('#b0b4cc', '#e4e6f0', '#ffffff'), 1, 1)
+        cv.hpx(12, 14.5, '#ffffff')
+        for (x, y) in ((12, 11), (15, 9.5), (13, 8)):        # Dampf
+            cv.hpx(x, y, WHITE[2])
+        kine = capsule(cv, 22, 27.5, .7, 26.5, 10, .7)
+        cv.fill(dil(kine), K)
+        cv.form(kine, WOOD[1:], 1, 1)
+        hm = capsule(cv, 23, 7.5, 2.4, 30, 10.5, 2.4)
         cv.fill(dil(hm), K)
-        cv.form(hm, (w[1], w[2], w[3]), 1, 1)
+        cv.form(hm, ('#3a2a20', '#7a5a38', '#a8844c'), 1, 1)
+        cv.fill(cv.E(23, 7.5, 1.6, 1.6) & hm, '#c8a870')     # Hirnholz
         out.append(fin(cv, P))
 
     elif name == 'yomi_oku':
-        cv = pillar(0, VIOLET, bands=(GOLD[0], mix(GOLD[1], VIOLET[1], .5), GOLD[1]), broken=True)
-        cv.line([(13, 18), (12, 22), (14, 26)], VIOLET[0])          # Lack platzt ab
-        cv.grid(13, 6, "..a..\n.ab..\n.abb.\nabcba\n.bcb.", dict(a=ONIBI[1], b=ONIBI[2], c=ONIBI[3]))
+        cv, rng = new(0)                                     # Ōkamuzumi: der Pfirsichbaum, dessen Früchte die Shikome vertrieben
+        root = cv.E(16, 27.5, 7, 2) & (cv.Y <= 28.5)
+        cv.fill(dil(root), K)
+        cv.form(root, VIOLET[:3], 1, 1)
+        tr = (capsule(cv, 16, 27, 2, 14.5, 17, 1.2) | capsule(cv, 14.5, 18, .9, 8, 10, .5) | capsule(cv, 15, 17, .9, 22, 9, .5)
+              | capsule(cv, 14.6, 17, .7, 15.5, 6, .4) | capsule(cv, 10, 12.5, .4, 6, 13, .3) | capsule(cv, 20, 11.5, .4, 25, 13.5, .3)
+              | capsule(cv, 15.4, 9, .35, 12, 4.5, .25) | capsule(cv, 21, 10, .35, 23.5, 5, .25))
+        cv.fill(dil(tr), K)
+        cv.form(tr, ('#140a14', '#2a1824', '#46303a'), 1, 1)
+        for (x, y) in ((9, 10), (12.5, 5), (22.5, 6), (24.5, 13), (17, 7.5)):   # verdorrte Blüten
+            cv.hpx(x, y, '#8a5a78'); cv.hpx(x + .5, y + .5, '#5a3a58')
+        for (x, y) in ((7, 14.5), (18, 10.5), (23, 15)):                         # drei leuchtende Götterpfirsiche
+            p = cv.E(x, y, 1.9, 1.8)
+            cv.fill(dil(p), K)
+            cv.form(p, ('#a0405a', '#f08a8a', '#ffd0b8'), 1, 1)
+            cv.hline([(x, y - 1.6), (x + .3, y + 1)], '#c05a6a')
+            cv.hpx(x + 1, y - 2, '#3a6a3a'); cv.hpx(x + 1.5, y - 2.2, '#5a8a4a')
+        for (x, y) in ((11, 22), (21, 24)):                  # Totenfeuer am Wurzelwerk
+            cv.grid(x, y, ".a\nab", dict(a=ONIBI[1], b=ONIBI[2]))
         out.append(fin(cv, P))
         cv, rng = new(1)                                     # Yomotsu-hegui: Herd der Unterwelt mit Eisentopf
         clay = ('#1e1018', '#3a2228', '#56362e', '#74503c')

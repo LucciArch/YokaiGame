@@ -703,7 +703,8 @@ PROP_LIGHT = {
     ('shinkai', 2): (16, 14, SEA, 52),                     # versunkene Tōrō
     ('enma_cho', 0): (15, 7, FIRE, 56),                    # Kohlebecken
     ('enma_cho', 1): (16, 12, (255, 120, 90), 28),         # Jōhari-Spiegel
-    ('yomi_oku', 0): (15, 8, ONIBI_C, 44),                 # Säule mit Totenfeuer
+    ('yomi_oku', 0): (16, 12, (255, 170, 150), 36),        # Götterpfirsiche am Ōkamuzumi
+    ('tsukiyomi', 0): (16, 8, (200, 215, 255), 30),        # Tsuki no Katsura
     ('yomi_oku', 1): (16, 26, ONIBI_C, 44),                # Herd der Unterwelt
 }
 # Leuchtende Wanddekos: (Biom, Index) -> (x, y im 32x16-Stück, Farbe, Lichtradius)
