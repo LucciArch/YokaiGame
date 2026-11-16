@@ -1,19 +1,21 @@
 # Nächster Schritt
 
-**Sichtbare Effekte für Synergie-Fähigkeiten** – Runde 7 hat Synergien im Lexikon und Pausebildschirm
-nachlesbar gemacht, Runde 8 die Kettenreaktion aus Folgeschaden behoben. Im Kampf sehen viele der 86
-Synergie-Fähigkeiten aber noch gleich aus (Standard-Ring `_ring`, weiße/graue Geschosse). Darum:
+**Neuer Boss für Kapitel V oder VI mit eigener Hi-Res-Figur** – Runden 9–11 haben Synergien im Kampf
+sichtbar gemacht (Schriftzug + Welle beim ersten Auslösen pro Raum für 41 Kampf-Synergien, Papierdiener als
+Hitogata, Hanabi-Funken) und Onmyōdō nachgemessen (jetzt 46 s gegen Shuten-dōji, gleichauf mit Feuerwerk).
+Das Synergie-System ist damit rund. Am meisten Wiederspielwert bringt jetzt neuer Inhalt am Ende eines Laufs:
 
-1. Die 10–15 stärksten/häufigsten Synergien (siehe `design/balance/balance-check-8-synergien.md`, oben in der Liste:
-   Onmyōdō, Feuerwerk, Oni-Rausch, Blitz & Klaue, Abe no Seimei, Hannya-Zorn, Sanshu no Jingi, Kyūdō …)
-   bekommen eigene Partikel/Farben in `yokai/sigs.py` (Papierdiener als kleine Shikigami-Form, Funken in Hanabi-Farben usw.).
-2. Kurzer Schriftzug beim ersten Auslösen pro Raum (wie „Tigerhieb!“), damit der Spieler die Synergie erkennt.
+1. In `yokai/data.py` (BOSSES) prüfen, welches späte Kapitel die wenigsten Bosse hat.
+2. Folkloretreuen Yōkai wählen (z. B. Ōmukade – Riesentausendfüßler vom Mikami-Berg, Gegner von Tawara Tōda;
+   oder Nue – Chimäre im schwarzen Gewitterwolkenkleid, von Minamoto no Yorimasa erlegt).
+3. Hi-Res-Figur in `yokai/bosses.py` (wie die übrigen Bosse, `gfx.hi_blit`), zwei Phasen mit zur Sage passenden
+   Angriffen, Lexikon-Eintrag in `yokai/bestiary.py`, `tools/bosstest.py` muss ihn besiegen.
 
-Warum: Eine Synergie, die man im Kampf nicht wahrnimmt, fühlt sich nicht nach Belohnung an – das Lesen allein reicht nicht.
+Warum: Synergien und Items sind jetzt reichlich; Bosse sind das, was einen Lauf im Gedächtnis hält.
 
 ## Weitere Ideen
-- Onmyōdō und Feuerwerk beobachten (~26 s gegen Shuten-dōji, stärkste Angriffs-Synergien); ggf. Papierdiener-Schaden 0,7 → 0,5
+- Ausrufe für Schutz-/Glücks-Synergien (z. B. Kenkō-Rettung, Omamori-Sammler) – diese lösen im Bot selten aus
 - `tools/synbalance.py` um Schutz-Synergien erweitern (Messung „Treffer bis Tod“ statt Kampfzeit)
-- Neuer Boss für Kapitel V/VI mit eigener Hi-Res-Figur
 - Weitere Ereignisräume (z. B. Tanuki-Bauchtrommel-Wettstreit)
 - Neue Synergien für Items, die noch an keiner beteiligt sind
+- Eigene Grafik für Ratten (Tessos Schwarm) und Windsicheln (Wirbelwind-Klingen) statt eingefärbter Talismane
