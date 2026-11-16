@@ -68,6 +68,7 @@
 - Runde 44 – Transformations-Fanfare: Werden drei Items desselben Themas zur **Transformation**, fliegen ihre drei Symbole über dem Banner zusammen – wie bei Synergien. Die kurze Zeitlupe setzt jetzt genau ein, wenn das Fanfare-Banner erscheint, statt schon während der vorherigen Item-Meldung zu verstreichen
 - Runde 45 – Endbildschirm im Titelstil: Statt des Kastens liegt die Laufübersicht auf einem weichen **Nachtschleier**, und neben der Überschrift prangt ein rotes Hanko-Siegel wie ein Omikuji-Los – **吉** (Glück) nach einem Sieg, **凶** (Unglück) nach dem Fall
 - Runde 46 – Kapitel VII hat ein eigenes Gesicht: Izanamis **Totenpalast** nutzt nicht mehr die Kacheln der Unterwelt, sondern eigene – violett-schwarze Palastplatten, Mauern mit Schwarzlack-Band und Knochennieten, zerschlissene Misu-Jalousien und Tōrō mit kaltem Totenfeuer. Neue Requisiten: geborstene Lacksäule mit Irrlicht, der **Herd von Yomi** (wer von seiner Speise isst, kehrt nie zurück) und **Chibiki-iwa**, der Fels mit Shimenawa, mit dem Izanagi den Weg nach Yomi verschloss; am Boden liegen umgestürzte Lackschalen mit Totenreis und Risse voller Totenfeuer
+- Runde 47 – Gräber auf dem Hakaba: Das Familiengrab trägt jetzt eine eingemeißelte Inschrift **家之墓** auf poliertem Stein, daneben Blumenvasen mit Shikimi und einer Higanbana, davor ein Räuchergefäß mit drei glimmenden Stäbchen und feinem Rauch sowie eine Wasserschale; vor der bemoosten Stele liegen eine Mikan und ein Sake-Schälchen als Opfergabe
 
 ## 1.4.0 – „Hyakki-Update“ (enthält 1.3 „Kapitel-Update“)
 

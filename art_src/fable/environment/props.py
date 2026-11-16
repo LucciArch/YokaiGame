@@ -37,6 +37,13 @@ def fin(cv, P, shadow=True):
     return cv
 
 
+GLYPHS = [                                               # 家 之 墓, 7x7 Hi-Res-Pixel
+    ["...x...", "xxxxxxx", "x.....x", ".xxxxx.", "..xx.x.", ".x.xx..", "x.x..xx"],
+    ["...x...", "....x..", ".xxxxx.", "....x..", "...x...", ".xx....", "x.xxxxx"],
+    [".x...x.", "xxxxxxx", ".xxxxx.", ".x...x.", ".xxxxx.", "xxxxxxx", ".x.x.x."],
+]
+
+
 # ------------------------------------------------------------------ shared motifs
 def boulder(cv, rng, ramp, cx=16, by=28, rx=11, ry=9):
     """Felsbrocken mit drei Facetten (Licht oben links), Rissen, Körnung und Kieseln am Fuß."""
@@ -309,12 +316,38 @@ def rocks(name):
         out.append(fin(cv, P))
 
     elif name == 'hakaba':
-        cv, rng = new(0)                                     # family grave pillar
-        box(cv, k, 7, 24, 25, 28, top=2)
-        box(cv, k, 10, 19, 22, 23, top=2)
-        box(cv, k, 12, 4, 20, 18, top=2)
-        for y in (8, 11, 14):
-            cv.rect(15, y, 16, y + 1, k[0])
+        cv, rng = new(0)                                     # Familiengrab: 家之墓, Blumenvasen, Räucherstäbchen
+        box(cv, k, 5, 24, 27, 28, top=2)
+        box(cv, k, 8, 19, 24, 23, top=2)
+        cv.rect(11, 4, 21, 18, k[2])                         # polierter Saoishi
+        cv.rect(20, 4, 21, 18, k[1])
+        cv.vl(11, 4, 18, k[3])
+        cv.hl(11, 20, 3, k[3])
+        cv.hl(12, 19, 18, k[1])
+        for i, g in enumerate(GLYPHS):                       # eingemeißelte Inschrift, Kerbe mit Lichtkante
+            for j, row in enumerate(g):
+                for i2, ch in enumerate(row):
+                    if ch == 'x':
+                        x, y = 14 + i2 * .5, 5.5 + i * 4 + j * .5
+                        cv.hpx(x + .5, y + .5, k[3])
+                        cv.hpx(x, y, k[0])
+        for x in (9, 23):                                    # Hanatate mit Shikimi
+            cv.rect(x - 1, 16, x + 1, 19, STONE[2])
+            cv.vl(x + 1, 16, 19, STONE[1])
+            cv.hl(x - 1, x + 1, 16, STONE[3])
+            cv.grid(x - 2, 12, ".a.a.\naaba.\n.aaa.\n..a..", dict(a=MOSS[2], b=MOSS[3]))
+        cv.grid(7, 11, "r.r\n.R.", dict(r=RED[2], R=RED[3]))      # Higanbana
+        cv.rect(13, 21, 19, 24, IRON[1])                     # Kōro mit drei Räucherstäbchen
+        cv.hl(13, 19, 21, IRON[2])
+        cv.vl(19, 21, 24, IRON[0])
+        for x in (15, 16, 17):                               # dünne Stäbchen auf der Hi-Res-Ebene
+            for y in (18.5, 19, 19.5, 20, 20.5):
+                cv.hpx(x + .5, y, '#6a4a2a')
+            cv.hpx(x + .5, 18, LAVA[3])
+        for (x, y) in ((16, 17), (16.5, 16.5), (17, 16), (17, 15.5), (16.5, 15), (16, 14.5), (16, 14), (16.5, 13.5)):
+            cv.hpx(x, y, PAPER[3])
+        cv.rect(21, 23, 22, 24, PAPER[2])                    # Wasserschale
+        cv.hl(21, 22, 23, PAPER[3])
         out.append(fin(cv, P))
         cv, rng = new(1)                                     # round-top stele, mossy, cracked
         m = cv.R(10, 12, 22, 28) | cv.E(16, 12, 6.4, 6)
@@ -323,6 +356,13 @@ def rocks(name):
         cover(cv, m, MOSS, 4, rng)
         cv.rect(13, 16, 14, 22, k[0])
         cv.fill(m & (cv.Y >= 26) & (cv.X < 15), MOSS[1])
+        mk = cv.E(19.5, 26, 2.2, 1.9)                         # Opfergabe: Mikan mit Blatt und Sake-Schälchen
+        cv.fill(dil(mk), K)
+        cv.form(mk, (LAVA[1], LAVA[2], LAVA[3]), 1, 1)
+        cv.px(20, 24, MOSS[2])
+        cv.rect(23, 26, 25, 27, PAPER[2])
+        cv.hl(23, 25, 26, PAPER[3])
+        cv.px(24, 26, RED[1])
         out.append(fin(cv, P))
         cv, rng = new(2)                                     # gorinto five-ring tower
         box(cv, k, 10, 21, 22, 28, top=2)
