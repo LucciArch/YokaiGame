@@ -1303,11 +1303,14 @@ class Run:
         p.charge = 0
         audio.play('item', 0.6)
         dmg = p.damage()
+        # Salven tragen die Wurf-Eigenschaften der Items; ohne Kettenblitz/Teilen/Sprengsiegel (Kettenreaktion bei 48 Geschossen)
+        salvo = {k: v for k, v in weapons.shot_flags(p).items() if k not in ('chain', 'split', 'explode')}
+        ms = int(p.f['multishot'])
         if a == 'ofuda_sturm':
-            for w in range(3):
+            for w in range(3 + ms):                    # Mehrfachwurf: eine Welle mehr je Stufe
                 for i in range(16):
                     self.fire_player_bullet(p.x, p.y, i / 16 * math.tau + w * 0.2, dmg * 1.2, 220, p.s['size'], 1.0,
-                                            {'pierce': 1}, delay=w * 0.2)
+                                            dict(salvo, pierce=1), delay=w * 0.2)
         elif a == 'kagura_suzu':
             p.kagura = 4.0
             audio.play('bell')
@@ -1351,8 +1354,9 @@ class Run:
             p.room_dmg_buff = 999
             audio.play('heal')
         elif a == 'shikigami_ruf':
-            for i in range(6):
-                self.fire_player_bullet(p.x, p.y, i / 6 * math.tau, dmg * 2.5, 150, 5, 2.5, {'homing': 1, 'pierce': 1})
+            n = 6 + 2 * ms
+            for i in range(n):
+                self.fire_player_bullet(p.x, p.y, i / n * math.tau, dmg * 2.5, 150, 5, 2.5, dict(salvo, homing=1, pierce=1))
         elif a == 'onryo_kerze':
             for e in self.enemies:
                 if e.active():
@@ -1363,7 +1367,7 @@ class Run:
             for b in self.ebullets:
                 tgt = self.nearest_enemy(b.x, b.y)
                 ang = math.atan2(tgt.y - b.y, tgt.x - b.x) if tgt else random.uniform(0, math.tau)
-                self.fire_player_bullet(b.x, b.y, ang, dmg, 220, 3, 1.5, {'homing': 1})
+                self.fire_player_bullet(b.x, b.y, ang, dmg, 220, 3, 1.5, dict(salvo, homing=1))
             self.ebullets.clear()
         elif a == 'oni_trommel':
             p.temp.append([{'dmgm': 1.8}, 6.0])
