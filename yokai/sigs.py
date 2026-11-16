@@ -178,6 +178,17 @@ TEXT = {
     'riesenmoench': 'Die Gebetsperlen kreisen weiter und treffen doppelt',
     'totenfaehre': 'Nach 40 Kills liegt wieder eine Münze für den Fährmann bereit',
     'hyakki_herr': 'Dein Gefolge wirft doppelt so oft und zielt selbst',
+    'gluecksheim': 'Die ersten zwei Krüge jedes Raums geben immer etwas her',
+    'winkekatze': 'Das Glöckchen bremst Geschosse im doppelten Umkreis',
+    'fuchsgeld': 'Münzen sind doppelt so oft fünf wert',
+    'wunsch': 'Nach gesäuberten Räumen fallen dreimal so oft Sternschnuppen',
+    'tennyo': 'Jeder Kill lässt die Blüte 2 s länger blühen',
+    'kappa_fest': 'Abprallende Talismane spritzen Wasser und bremsen Feinde',
+    'hanami_picknick': 'Bei vollen Herzen +40 % statt +20 %',
+    'shogatsu': 'Klebende Feinde sind verflucht: doppelter Schaden',
+    'pilger': '+10 % Schaden pro Ebene statt +5 %',
+    'sommerwind': 'Die Rolle wirft acht Federn, die weiter fliegen',
+    'fest_der_laternen': 'Treffer entzünden doppelt so oft den Boden, die Flammen brennen länger',
     'kaufmann': 'Der Hammer zählt jede Münze doppelt, Reichtum schon ab 25 Mon (+25 %)',
 }
 
@@ -425,6 +436,11 @@ def bullet_end(run, b):
 
 
 def bullet_bounce(run, b):
+    if 'kappa_fest' in run.player.sgs:
+        _ring(run, b.x, b.y, (120, 200, 240), 26)
+        for e in run.enemies:
+            if e.active() and math.hypot(e.x - b.x, e.y - b.y) < 26 + e.r:
+                e.slowed = max(e.slowed, 2.0)
     if 'brandung' in run.player.sgs and not b.fl.get('_br'):
         b.fl = dict(b.fl); b.fl['_br'] = 1
         a = math.atan2(b.vy, b.vx)
@@ -532,9 +548,9 @@ def hit_post(run, e, b, dmg):
     if 'knochenbruch' in S and not e.is_boss and 0 < e.hp < e.maxhp * 0.15:
         e.hp = 0
         _float(run, e, 'Zerbrochen!', (240, 230, 210))
-    if 'springfeuer' in S and random.random() < 0.2:
+    if 'springfeuer' in S and random.random() < (0.4 if 'fest_der_laternen' in S else 0.2):
         from .entities import Hazard
-        run.hazards.append(Hazard(e.x, e.y + 4, 10, 0.0, 2.0, max(0.6, p.damage() * 0.3), 'p', 'fire'))
+        run.hazards.append(Hazard(e.x, e.y + 4, 10, 0.0, 3.5 if 'fest_der_laternen' in S else 2.0, max(0.6, p.damage() * 0.3), 'p', 'fire'))
     if 'spinnennetz' in S and random.random() < 0.3:
         webs = g.setdefault('webs', [])
         if len(webs) < 6:
@@ -591,6 +607,8 @@ def on_kill(run, e):
         run.hazards.append(Hazard(e.x, e.y + 4, 14, 0.0, 2.5, max(0.8, p.damage() * 0.4), 'p', 'fire'))
     if 'erstes_feuer' in S and e.burn > 0:
         run.explode(e.x, e.y, 26, p.damage() * 1.4, 'p')
+    if 'tennyo' in S:
+        g['bluete'] = min(g.get('bluete', 0) + 2, run.time - getattr(run, 'room_enter_time', run.time))
     if 'totenfaehre' in S and p.revives == 0:
         g['faehre'] = g.get('faehre', 0) + 1
         if g['faehre'] >= 40:
@@ -721,7 +739,7 @@ def shield_break(p, run):
 
 
 def ebullet_dt(p, b, dt):
-    if 'klingeling' in p.sgs and (b.x - p.x) ** 2 + (b.y - p.y) ** 2 < 40 ** 2:
+    if 'klingeling' in p.sgs and (b.x - p.x) ** 2 + (b.y - p.y) ** 2 < (80 if 'winkekatze' in p.sgs else 40) ** 2:
         return dt * 0.55
     return dt
 
@@ -763,9 +781,10 @@ def on_dash(p, run):
             b = run.fire_player_bullet(p.x, p.y, a + da, p.damage() * 1.1, 150, 5, 1.2, {'pierce': 1, 'burn': 1})
             b.col = (255, 110, 40)
     if 'flatter' in S:
-        for i in range(4):
-            a = i / 4 * math.tau + math.pi / 4
-            run.fire_player_bullet(p.x, p.y - 3, a, p.damage() * 0.7, p.s['shotspd'], 2.5, 0.7, {})
+        n = 8 if 'sommerwind' in S else 4
+        for i in range(n):
+            a = i / n * math.tau + math.pi / 4
+            run.fire_player_bullet(p.x, p.y - 3, a, p.damage() * 0.7, p.s['shotspd'], 2.5, 1.1 if 'sommerwind' in S else 0.7, {})
 
 
 def on_coin(p, run, v):
@@ -775,7 +794,7 @@ def on_coin(p, run, v):
         return 0
     g = st(p)
     extra = 0
-    if 'fuchsglueck' in S and v == 1 and random.random() < 0.2:
+    if 'fuchsglueck' in S and v == 1 and random.random() < (0.4 if 'fuchsgeld' in S else 0.2):
         extra = 4
     if 'tanuki_bauch' in S:
         g['bauch'] = g.get('bauch', 0) + v + extra
@@ -795,6 +814,7 @@ def on_room_enter(run):
     if 'maskenzug' not in S:
         g['parade'] = 0
     g['room_hit'] = False
+    g['bluete'] = 0
     g['webs'] = []
     g['clouds'] = []
     g['rooms'] = g.get('rooms', 0) + 1
@@ -820,7 +840,7 @@ def on_room_clear(run):
             p.heal(1)
     if 'opfergabe' in S and random.random() < 0.1 + 0.01 * luck:
         run.spawn_pickup('key', p.x, p.y - 20)
-    if 'sternschnuppe' in S and random.random() < 0.08 + 0.006 * luck:
+    if 'sternschnuppe' in S and random.random() < (0.08 + 0.006 * luck) * (3 if 'wunsch' in S else 1):
         run.random_drop(p.x + random.uniform(-30, 30), p.y - 24)
     if 'kraniche' in S and g.get('cranes', 0) < 10:
         g['cranes'] = g.get('cranes', 0) + 1
@@ -867,8 +887,8 @@ def on_salt(p, run):
 def on_pot(run, x, y):
     """True: dieser Krug lässt sicher etwas fallen."""
     p = run.player
-    if 'hausglueck' in p.sgs and not st(p).get('pot'):
-        st(p)['pot'] = 1
+    if 'hausglueck' in p.sgs and st(p).get('pot', 0) < (2 if 'gluecksheim' in p.sgs else 1):
+        st(p)['pot'] = st(p).get('pot', 0) + 1
         return True
     return False
 
@@ -885,6 +905,8 @@ def contact(p, run, e):
     if cd <= 0:
         if 'klebrig' in S and not e.is_boss:
             e.frozen = max(e.frozen, 1.0)
+            if 'shogatsu' in S:
+                e.sg_curse = max(getattr(e, 'sg_curse', 0), 3.0)
             e.sg_touch = 1.5
         if 'oni_koenig' in S:
             run.damage_enemy(e, p.damage() * (3.0 if 'oeyama_bande' in S else 1.5), None)
@@ -1120,16 +1142,16 @@ def dmg_mult(p):
     run = p.run
     m = 1.0
     if 'vergaenglich' in S:
-        t = run.time - getattr(run, 'room_enter_time', run.time)
+        t = run.time - getattr(run, 'room_enter_time', run.time) - g.get('bluete', 0)
         dur, top = (15, 0.6) if 'hanami' in S else (10, 0.4)
         if t < dur and not run.room.cleared:
             m *= 1 + top * (1 - t / dur)
     if 'satt' in S and p.hp >= p.maxhp and p.maxhp > 0:
-        m *= 1.2
+        m *= 1.4 if 'hanami_picknick' in S else 1.2
     if 'ehre' in S and not getattr(p, 'hit_this_floor', False):
         m *= 1.45 if 'bushi' in S else 1.25
     if 'lange_reise' in S:
-        m *= 1 + 0.05 * max(0, run.depth - 1)
+        m *= 1 + (0.1 if 'pilger' in S else 0.05) * max(0, run.depth - 1)
     if 'parade' in S:
         m *= 1 + 0.03 * g.get('parade', 0)
     if g.get('hannya', 0) > 0:
