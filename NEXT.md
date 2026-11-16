@@ -1,20 +1,21 @@
-# Erledigt (Runden 43–45)
-- Runde 43: Codex → Enter springt zur Synergie des Items auf der Lexikon-Seite **Synergien** (mehrfach drücken blättert,
-  `Game.codex_syn`), Esc führt über `Game.lex_back` zurück in den Codex. Synergie-Zeile bricht per `_wrap` um.
-  Behoben: KeyError 'Y' im Codex bei entdeckten Ereignis-Items. uiflow2 prüft den Sprung.
-- Runde 44: Transformationen zeigen die Fanfare mit ihren drei Item-Symbolen. `Run.slowmo` wird jetzt beim **Anzeigen**
-  eines Banners mit `icons` gesetzt (run.py, Banner-Warteschlange), nicht mehr beim Aufheben – sonst verpuffte die
-  Zeitlupe während der vorherigen Item-Meldung.
-- Runde 45: Endbildschirm mit `veil` statt `gfx.panel` und Omikuji-Siegel `seal_kichi` (吉) / `seal_kyo` (凶)
-  aus `art_src/title/charsel.py` (SEALS).
+# Erledigt (Runden 46–47)
+- Runde 46: `yomi_oku` (Kapitel VII) hat eigene Kacheln – neues Biom in `art_src/fable/environment/biomes.py`
+  (Paletten `VIOLET`, `ONIBI`), Boden-Deko in `floors.py`, Lackband in `walls.py`, Requisiten + Wanddeko in `props.py`.
+  Der Shortcut `BIOMES['yomi_oku']['_id'] = 'yomi'` in `yokai/data.py` ist entfernt.
+  Achtung: `build.py <biom>` schreibt nach `art_src/fable/environment/<biom>/` → von Hand nach `yokai/assets/env/` kopieren;
+  `hi.py` schreibt `rock_hi.png` direkt. PNGs, deren Pixel gleich bleiben, mit `git checkout` zurücksetzen (nur Kodierung anders).
+- Runde 47: Hakaba-Familiengrab mit Inschrift 家之墓 (`GLYPHS` in props.py, Hi-Res per `hpx`), Vasen, Kōro, Opfergaben.
 
-# Nächster Schritt: Requisiten Teil 3
-Eigene Requisiten für `yomi_oku` (Kapitel VII) und Grabsteine in Hakaba mit Inschrift und Opfergaben (Hi-Res, `art_src/`).
-Warum: Die Menüs und Fanfaren sind jetzt einheitlich; die späten Biome sehen noch am meisten nach Baukasten aus.
+# Nächster Schritt: Omikuji-Ereignisraum
+Ein Schreinmädchen (oder Losschrein-Kasten) lässt dich ein Los ziehen: 大吉 / 吉 / 小吉 / 凶 / 大凶 mit Segen oder Fluch
+für die aktuelle Ebene (z. B. +Glück, Bonusherz – oder Fluch: mehr Gegner, dafür mehr Mon). Ein 凶-Los kann man an
+einen Baum knoten, um den Fluch gegen ein Opfer (Mon) abzulegen. Siegel `seal_kichi`/`seal_kyo` aus
+`art_src/title/charsel.py` wiederverwenden; Muster: Ereignisse in `design/ereignisse.md` und `run.py`.
+Warum: Ereignisräume bringen viel Wiederspielwert, und das Omikuji passt zur Folklore und den neuen Siegeln.
 
 # Weitere Ideen
 - Zweiter Weg: Pforte nach **Takamagahara no Oku** mit Amaterasu (Ama-no-Iwato) als Endbossin
-- Gesten beim Laufstart: Figur macht ihre Geste im ersten Raum (ohne Steuerung zu sperren; `pose_fx` ist auf doppelte
-  Podestgröße ausgelegt → Versätze halbieren)
-- Omikuji als Ereignisraum: Los ziehen (大吉 … 凶) mit Segen oder Fluch für die Ebene – die neuen Siegel passen dazu
+- Gesten beim Laufstart: Figur macht ihre Geste im ersten Raum (`pose_fx` auf doppelte Podestgröße ausgelegt → Versätze halbieren)
 - Lexikon-Synergieseite: von der Synergie zurück zu den beteiligten Items im Codex springen
+- Totenpalast-Ambiente: eigene Wetter-/Partikel-Eigenheit (Maden-Glühwürmchen? Izanamis acht Donnergötter als Blitze im Hintergrund)
+- Requisiten Teil 4: Yashiki und Kawabe (noch einfache Grundformen) neu modellieren
