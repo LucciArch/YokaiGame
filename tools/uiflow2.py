@@ -22,6 +22,12 @@ try:
     for k in (pygame.K_DOWN, pygame.K_UP, pygame.K_RIGHT): step([K(k)], 2)
     assert g.lex_tab == 0, 'Lexikon-Seite Synergien blättert nicht weiter'
     g.save['synergies_seen'].remove('jingi')
+    from yokai.data import ITEM_IDS, SYNERGIES
+    jiid = SYNERGIES[0]['items'][0]; g.save['seen'].append(jiid)
+    g.state = 'codex'; g.codex_sel = ITEM_IDS.index(jiid); step([K(pygame.K_RETURN)], 2)
+    assert g.state == 'lexicon' and g.lex_tab == 3 and jiid in SYNERGIES[g.lex_sel]['items'], 'Codex springt nicht zur Synergie'
+    step([K(pygame.K_ESCAPE)], 2); assert g.state == 'codex', 'Lexikon führt nicht zurück in den Codex'
+    g.save['seen'].remove(jiid)
     menu(0); print('chars', g.state); step([K(pygame.K_RETURN)], 200); print('play', g.state)
     for k in (pygame.K_e, pygame.K_q, pygame.K_SPACE): step([K(k)], 20)
     step([K(pygame.K_ESCAPE)], 5); print('pause', g.state)

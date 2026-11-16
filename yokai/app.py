@@ -660,7 +660,7 @@ class Game:
         elif m == 'Codex der Items':
             self.state = 'codex'
         elif m == 'Yōkai-Lexikon':
-            self.state = 'lexicon'; self.lex_sel = 0; self.lex_tab = 0
+            self.state = 'lexicon'; self.lex_sel = 0; self.lex_tab = 0; self.lex_back = 'title'
         elif m == 'Erfolge':
             self.state = 'achievements'; self.scroll = 0
         elif m == 'Statistik':
@@ -1171,16 +1171,16 @@ class Game:
                     T.add('?', x + 11, y + 3, 9, (120, 110, 130), 'c')
         iid = ids[self.codex_sel]
         it = ITEMS[iid]
+        syn = [sy for sy in SYNERGIES if iid in sy['items']] if iid in seen else []
         self.veil(s, (12, 198, W - 24, 96), 190)
         if iid in seen:
             T.add(it['name'], 28, 206, 11, it['col'])
             T.add('„%s“' % it['desc'], 28, 222, 8, (230, 225, 210))
             T.add(', '.join(fx_lines(it['fx'])), 28, 236, 7, (180, 210, 240))
             tags = ', '.join(TAG_NAMES[t] for t in it['tags'])
-            pools = {'T': 'Schatz', 'S': 'Laden', 'B': 'Boss', 'K': 'Kami', 'O': 'Oni'}
+            pools = {'T': 'Schatz', 'S': 'Laden', 'B': 'Boss', 'K': 'Kami', 'O': 'Oni', 'Y': 'Ereignis'}
             T.add('Thema: %s     Fundort: %s     Qualität: %s' % (tags or '–', ', '.join(pools[p] for p in it['pools']), '%d/5' % (it['q'] + 1)),
                   28, 250, 7, (200, 190, 170))
-            syn = [sy for sy in SYNERGIES if iid in sy['items']]
             if syn:
                 txt = []
                 for sy in syn:
@@ -1188,7 +1188,7 @@ class Game:
                         txt.append(sy['name'] + ' (' + ' + '.join(ITEMS[x]['name'] for x in sy['items']) + ')')
                     else:
                         txt.append('??? (unentdeckte Synergie)')
-                T.add('Synergien: ' + '; '.join(txt), 28, 264, 7, (255, 220, 120))
+                self._wrap('Synergien: ' + '; '.join(txt), 28, 264, W - 56, 7, (255, 220, 120))
         elif it['locked'] and iid not in unlocked:
             T.add('Gesperrt', 28, 206, 11, (200, 150, 150))
             T.add('Wird durch einen Erfolg oder Boss-Sieg freigeschaltet.', 28, 224, 8, (210, 200, 190))
@@ -1200,9 +1200,17 @@ class Game:
             places = [where[c] for c in it['pools'] if c in where]
             if places:
                 T.add('Fundort: ' + ', '.join(places), 28, 240, 7, (190, 180, 150))
-        T.add('Esc – Zurück', W - 24, 280, 6, (150, 140, 140), 'r')
+        T.add(('Enter – Synergie im Lexikon    ' if syn else '') + 'Esc – Zurück', W - 24, 286, 6, (150, 140, 140), 'r')
         for n in nav:
-            if n == 'left': self.codex_sel = (self.codex_sel - 1) % len(ids)
+            if n == 'ok' and syn:
+                # Mehrfaches Drücken blättert durch die Synergien dieses Items
+                k = getattr(self, 'codex_syn', (None, -1))
+                k = (iid, (k[1] + 1) % len(syn) if k[0] == iid else 0)
+                self.codex_syn = k
+                self.state = 'lexicon'; self.lex_tab = 3; self.lex_back = 'codex'
+                self.lex_sel = [sy['id'] for sy in SYNERGIES].index(syn[k[1]]['id'])
+                audio.play('select')
+            elif n == 'left': self.codex_sel = (self.codex_sel - 1) % len(ids)
             elif n == 'right': self.codex_sel = (self.codex_sel + 1) % len(ids)
             elif n == 'up': self.codex_sel = (self.codex_sel - cols) % len(ids)
             elif n == 'down': self.codex_sel = (self.codex_sel + cols) % len(ids)
@@ -1406,7 +1414,7 @@ class Game:
             elif nv == 'down': self.lex_sel = (self.lex_sel + 1) % len(ids)
             elif nv in ('left', 'right'):
                 self.lex_tab = (self.lex_tab + (1 if nv == 'right' else -1)) % 4; self.lex_sel = 0
-            elif nv == 'back': self.state = 'title'
+            elif nv == 'back': self.state = getattr(self, 'lex_back', 'title')
             elif isinstance(nv, tuple):
                 mx, my = nv[1]
                 if 10 <= mx <= 138 and my >= 44:
