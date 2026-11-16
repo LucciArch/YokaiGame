@@ -738,30 +738,24 @@ class Player:
         run = self.run
         self.shot_count += 1
         wk = weapons.weapon_of(self)
-        if wk and weapons.fire(self, d, wk):
-            sigs.on_fire(self, run, [])
+        made = weapons.fire(self, d, wk) if wk else None
+        if made is not None:
+            sigs.on_fire(self, run, made)
             rc = self.f['raijin_chance']
             if rc and random.random() < rc * (1 + self.s['luck'] * 0.08):
                 tgt = run.nearest_enemy(self.x, self.y, 400)
                 if tgt:
                     run.lightning(tgt.x, tgt.y, self.damage() * 2 + 4)
             return
-        n = 1 + int(self.f['multishot'])
         base = math.atan2(d[1], d[0])
-        spread = 0.16 if n <= 3 else 0.5 / (n - 1) * 1.6
         dmg = self.damage()
         size = self.s['size']
         big = False
         be = int(self.f['big_every'])
         if be and self.shot_count % be == 0:
             dmg *= 3; size *= 1.8; big = True
-        fl = {k: self.f[k] for k in ('homing', 'pierce', 'bounce', 'spectral', 'explode', 'burn', 'slow', 'poison',
-                                     'chain', 'split', 'boomerang', 'wave', 'knock') if self.f[k]}
-        angs = [base + (i - (n - 1) / 2) * spread for i in range(n)]
-        for _ in range(int(self.f['back'])):
-            angs.append(base + math.pi)
-        for _ in range(int(self.f['side'])):
-            angs += [base + math.pi / 2, base - math.pi / 2]
+        fl = weapons.shot_flags(self)
+        angs = weapons.shot_angles(self, base)
         made = []
         for a in angs:
             b = run.fire_player_bullet(self.x, self.y - 3, a, dmg, self.s['shotspd'], size, self.s['range'] / self.s['shotspd'], fl)

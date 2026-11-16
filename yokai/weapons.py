@@ -20,12 +20,59 @@ def weapon_of(p):
     return None
 
 
+FLAGS = ('homing', 'pierce', 'bounce', 'spectral', 'explode', 'burn', 'slow', 'poison', 'chain', 'split',
+         'boomerang', 'wave', 'knock')
+
+
+def shot_flags(p):
+    """Wurf-Eigenschaften der Items (Feuer, Gift, Zielsuche ...) – gelten für Talismane und Waffen gleichermaßen."""
+    return {k: p.f[k] for k in FLAGS if p.f[k]}
+
+
+def _carrier(x, y, ang, dmg, fl):
+    """Unsichtbares Geschoss, über das Hieb und Strahl die Wurf-Eigenschaften an damage_enemy weitergeben."""
+    from .entities import Bullet
+    return Bullet(x, y, math.cos(ang) * 200, math.sin(ang) * 200, dmg, 3, 0.1, 'p', (255, 255, 255), fl)
+
+
+def _hit(run, e, hx, hy, dmg, ang, fl):
+    if fl:
+        b = _carrier(hx, hy, ang, dmg, fl)
+        run.damage_enemy(e, dmg, b)
+        if fl.get('explode') and e.hp <= dmg * 3:          # Sprengsiegel: Treffer zerplatzen
+            run.explode(hx, hy, 22, dmg * 0.7, 'p')
+    else:
+        run.damage_enemy(e, dmg, None)
+
+
+def _aim(run, x, y, ang, cone, reach, taken=None):
+    """Zielsuche für Hieb und Strahl: zur nächsten Feindin im Kegel drehen; schon gewählte Ziele (taken) zählen
+    als weiter entfernt, damit mehrere Strahlen sich auf verschiedene Feinde verteilen."""
+    best, bd = None, reach * 2
+    for e in run.enemies:
+        if not e.active():
+            continue
+        d = math.hypot(e.x - x, e.y - y)
+        if d > reach:
+            continue
+        if taken is not None and id(e) in taken:
+            d += reach
+        da = abs((math.atan2(e.y - y, e.x - x) - ang + math.pi) % math.tau - math.pi)
+        if da <= cone and d < bd:
+            best, bd = e, d
+    if best is None:
+        return ang
+    if taken is not None:
+        taken.add(id(best))
+    return math.atan2(best.y - y, best.x - x)
+
+
 def _hitboxes(e):
     hb = getattr(e, 'hitboxes', None)
     return hb() if hb else [(e.x, e.y, e.r)]
 
 
-def melee(run, x, y, ang, radius, arc, dmg, knock=180, kind='w_sword', col=(230, 240, 255)):
+def melee(run, x, y, ang, radius, arc, dmg, knock=180, kind='w_sword', col=(230, 240, 255), fl=None):
     """Trifft alle Gegner in einem Kreissektor und zerschlägt feindliche Geschosse darin."""
     hit = False
     for e in list(run.enemies):
@@ -39,7 +86,7 @@ def melee(run, x, y, ang, radius, arc, dmg, knock=180, kind='w_sword', col=(230,
             da = (math.atan2(dy, dx) - ang + math.pi) % math.tau - math.pi
             if arc < math.tau and abs(da) > arc / 2 + math.atan2(hr, max(1, d)):
                 continue
-            run.damage_enemy(e, dmg, None)
+            _hit(run, e, hx, hy, dmg, ang, fl)
             kb = knock * (0.15 if e.is_boss else 1)
             nx, ny = (dx / d, dy / d) if d > 0 else (math.cos(ang), math.sin(ang))
             e.kx += nx * kb; e.ky += ny * kb
@@ -59,17 +106,25 @@ def melee(run, x, y, ang, radius, arc, dmg, knock=180, kind='w_sword', col=(230,
     return hit
 
 
-def beam(run, x, y, ang, dmg, width=4, col=(255, 236, 150)):
-    """Lichtstrahl bis zur nächsten Wand; trifft alles auf der Linie."""
+def beam(run, x, y, ang, dmg, width=4, col=(255, 236, 150), fl=None, bounces=None):
+    """Lichtstrahl bis zur nächsten Wand; trifft alles auf der Linie. Geisterhaft: durch Felsen,
+    Abprall: wird an Wand und Fels gespiegelt."""
     from .entities import solid_hit
+    fl = fl or {}
+    if bounces is None:
+        bounces = int(fl.get('bounce', 0))
     dx, dy = math.cos(ang), math.sin(ang)
     L = 0
+    wall = None
     while L < 460:
         L += 4
         tx, ty = x + dx * L, y + dy * L
         if tx < RX or tx > RX + RW or ty < RY or ty > RY + RH:
+            wall = (tx < RX or tx > RX + RW, ty < RY or ty > RY + RH)
             break
-        if solid_hit(run.room, tx, ty):
+        if not fl.get('spectral') and solid_hit(run.room, tx, ty):
+            px_, py_ = tx - dx * 4, ty - dy * 4
+            wall = (bool(solid_hit(run.room, tx, py_)), bool(solid_hit(run.room, px_, ty)))
             break
     for e in list(run.enemies):
         if not e.active():
@@ -81,56 +136,102 @@ def beam(run, x, y, ang, dmg, width=4, col=(255, 236, 150)):
                 continue
             perp = abs(px_ * dy - py_ * dx)
             if perp <= hr + width:
-                run.damage_enemy(e, dmg, None)
+                _hit(run, e, hx, hy, dmg, ang, fl)
                 break
     run.slashes.append(dict(kind='w_laser', x=x, y=y, ang=ang, r=L, arc=0, t=0.0, life=0.12, col=col, w=width))
+    if wall and bounces > 0:                                # Spiegelung: Einfallswinkel = Ausfallswinkel
+        ex, ey = x + dx * (L - 4), y + dy * (L - 4)
+        beam(run, ex, ey, math.atan2(-dy if wall[1] else dy, -dx if wall[0] else dx), dmg * 0.8, width, col, fl, bounces - 1)
+
+
+def shot_angles(p, base):
+    """Wurfrichtungen wie beim Talisman: Mehrfachwurf fächert auf, dazu Rück- und Seitenwürfe."""
+    n = 1 + int(p.f['multishot'])
+    spread = 0.16 if n <= 3 else 0.5 / (n - 1) * 1.6
+    angs = [base + (i - (n - 1) / 2) * spread for i in range(n)]
+    angs += [base + math.pi] * int(p.f['back'])
+    for _ in range(int(p.f['side'])):
+        angs += [base + math.pi / 2, base - math.pi / 2]
+    return angs
 
 
 def fire(p, d, wk):
-    """Führt den Angriff der Waffe aus. Gibt True zurück, wenn der normale Talisman entfällt."""
+    """Führt den Angriff der Waffe aus und gibt die erzeugten Geschosse zurück (None: normaler Talisman).
+    Alle Wurf-Items wirken mit: Mehrfachwurf, Rück-/Seitenwurf, Zielsuche, Feuer, Gift, Frost, Kettenblitz,
+    Sprengsiegel, Teilen, Abprall und Geisterwurf."""
     run = p.run
-    ang = math.atan2(d[1], d[0])
+    if wk not in RATE:
+        return None
+    base = math.atan2(d[1], d[0])
     dmg = p.damage()
+    be = int(p.f['big_every'])
+    big = bool(be and p.shot_count % be == 0)
+    if big:
+        dmg *= 3
     x, y = p.x, p.y - 4
-    if wk == 'w_sword':
-        melee(run, x + d[0] * 6, y + d[1] * 6, ang, 30 + 4 * p.s['size'], math.radians(130), dmg * 2.2, kind=wk)
-        if p.f['sword_wave']:
-            b = run.fire_player_bullet(x, y, ang, dmg * 0.9, p.s['shotspd'] * 1.1, p.s['size'] * 1.6, 0.6, {'pierce': 1})
-            b.crescent = True
-        audio.play('slash', 0.8)
-    elif wk == 'w_club':
-        melee(run, x + d[0] * 5, y + d[1] * 5, ang, 26 + 3 * p.s['size'], math.radians(110), dmg * 2.8, knock=320, kind=wk, col=(255, 200, 160))
-        audio.play('ehit', 1.0)
-    elif wk == 'w_scythe':
-        melee(run, x, y, ang, 36 + 4 * p.s['size'], math.tau, dmg * 2.6, kind=wk, col=(200, 170, 255))
-        audio.play('slash', 1.0)
-    elif wk == 'w_spear':
-        melee(run, x + d[0] * 4, y + d[1] * 4, ang, 54 + 4 * p.s['size'], math.radians(26), dmg * 2.0, knock=120, kind=wk, col=(255, 230, 160))
-        audio.play('slash', 0.6)
+    fl = shot_flags(p)
+    col = run.shot_col(fl)
+    angs = shot_angles(p, base)
+    homing = bool(fl.get('homing'))
+    made = []
+
+    def wave(a, f=0.6):                                     # zusätzliche Klingenwelle eines Hiebs (Mehrfachwurf)
+        nf = dict(fl); nf['pierce'] = 1
+        b = run.fire_player_bullet(x, y, a, dmg * f, p.s['shotspd'] * 1.1, p.s['size'] * 1.6, 0.6, nf)
+        b.crescent = True
+        made.append(b)
+
+    if wk in ('w_sword', 'w_club', 'w_scythe', 'w_spear'):
+        reach = {'w_sword': 30, 'w_club': 26, 'w_scythe': 36, 'w_spear': 54}[wk] + 4 * p.s['size']
+        n = 1 + int(p.f['multishot'])
+        for i, a in enumerate([base] + angs[n:]):               # Hiebe nach vorn, hinten, zur Seite
+            if homing:
+                a = _aim(run, x, y, a, 0.8, reach * 1.8)
+            if wk == 'w_sword':
+                melee(run, x + math.cos(a) * 6, y + math.sin(a) * 6, a, reach, math.radians(130), dmg * 2.2, kind=wk, col=col if fl else (230, 240, 255), fl=fl)
+                if p.f['sword_wave'] and i == 0:
+                    wave(a, 0.9)
+            elif wk == 'w_club':
+                melee(run, x + math.cos(a) * 5, y + math.sin(a) * 5, a, reach, math.radians(110), dmg * 2.8, knock=320, kind=wk, col=col if fl else (255, 200, 160), fl=fl)
+            elif wk == 'w_scythe':
+                if i == 0:
+                    melee(run, x, y, a, reach, math.tau, dmg * 2.6, kind=wk, col=col if fl else (200, 170, 255), fl=fl)
+            else:
+                melee(run, x + math.cos(a) * 4, y + math.sin(a) * 4, a, reach, math.radians(26), dmg * 2.0, knock=120, kind=wk, col=col if fl else (255, 230, 160), fl=fl)
+        for a in angs[:n] if n > 1 else ():                 # Mehrfachwurf: jeder weitere Wurf wird zur Klingenwelle
+            wave(a)
+        audio.play('ehit' if wk == 'w_club' else 'slash', 1.0 if wk in ('w_club', 'w_scythe') else 0.7)
     elif wk == 'w_laser':
-        beam(run, x, y, ang, dmg * 1.35, 3 + p.s['size'])
+        w = 3 + p.s['size'] + (3 if big else 0)
+        taken = set()
+        for a in angs:
+            if homing:
+                a = _aim(run, x, y, a, 0.55, 420, taken)
+            beam(run, x, y, a, dmg * 1.35, w, col if fl else (255, 236, 150), fl)
         audio.play('laser', 0.6)
     elif wk == 'w_bow':
-        fl = {'pierce': 1}
-        for k in ('homing', 'burn', 'poison', 'slow', 'explode'):
-            if p.f[k]:
-                fl[k] = p.f[k]
-        n = 1 + int(p.f['multishot'])
-        for i in range(n):
-            b = run.fire_player_bullet(x, y, ang + (i - (n - 1) / 2) * 0.12, dmg * 1.6, p.s['shotspd'] * 1.7,
-                                       max(2, p.s['size'] * 0.8), p.s['range'] * 1.4 / (p.s['shotspd'] * 1.7), fl)
+        bf = dict(fl); bf['pierce'] = 1
+        for a in angs:
+            b = run.fire_player_bullet(x, y, a, dmg * 1.6, p.s['shotspd'] * 1.7, max(2, p.s['size'] * 0.8),
+                                       p.s['range'] * 1.4 / (p.s['shotspd'] * 1.7), bf)
             b.arrow = True
+            made.append(b)
         audio.play('bow', 0.7)
     elif wk == 'w_fan':
-        for i in range(5):
-            a = ang + (i - 2) * 0.22
-            b = run.fire_player_bullet(x, y, a, dmg * 0.5, p.s['shotspd'] * 1.1, p.s['size'] * 1.2, 0.42, {'knock': 2, 'pierce': 1})
-            b.wind = True
-            b.col = (190, 240, 210)
+        wf = dict(fl); wf['knock'] = max(2, fl.get('knock', 0)); wf['pierce'] = 1
+        k = 5 + 2 * int(p.f['multishot'])
+        for base_a in [base] + angs[1 + int(p.f['multishot']):]:
+            for i in range(k):
+                b = run.fire_player_bullet(x, y, base_a + (i - (k - 1) / 2) * min(0.22, 1.1 / k), dmg * 0.5,
+                                           p.s['shotspd'] * 1.1, p.s['size'] * 1.2, 0.42, wf)
+                b.wind = True
+                if not fl:
+                    b.col = (190, 240, 210)
+                made.append(b)
         audio.play('gust', 0.5)
-    else:
-        return False
-    return True
+    for b in made:
+        b.big = big
+    return made
 
 
 # ------------------------------------------------------------------ Zeichnen

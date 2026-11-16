@@ -927,6 +927,12 @@ class Run:
         return best
 
     def fire_player_bullet(self, x, y, ang, dmg, spd, size, life, fl, delay=0.0):
+        b = Bullet(x, y, math.cos(ang) * spd, math.sin(ang) * spd, dmg, size, life, 'p', self.shot_col(fl), fl, delay=delay)
+        self.pbullets.append(b)
+        return b
+
+    @staticmethod
+    def shot_col(fl):
         col = (250, 246, 232)
         if fl.get('burn'):
             col = (255, 170, 80)
@@ -940,9 +946,7 @@ class Run:
             col = (220, 180, 255)
         elif fl.get('spectral'):
             col = (210, 230, 255)
-        b = Bullet(x, y, math.cos(ang) * spd, math.sin(ang) * spd, dmg, size, life, 'p', col, fl, delay=delay)
-        self.pbullets.append(b)
-        return b
+        return col
 
     def clear_ebullets(self):
         for b in self.ebullets:
