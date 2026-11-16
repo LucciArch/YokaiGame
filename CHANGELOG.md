@@ -31,6 +31,7 @@
 - Runde 7 – Synergien nachlesen: neue Lexikon-Seite **Synergien** (entdeckte mit Spruch, Items und Fähigkeit, unentdeckte als ??? mit Hinweis), im Pausebildschirm „Items & Werte“ zeigt das Überfahren eines Synergie-Namens ihre Fähigkeit
 - Runde 8 – Balance: Bodenfeuer, Blitze und Explosionen lösen nicht mehr selbst neues Bodenfeuer, Donnerbiest oder Siegel aus – die Kettenreaktion machte Chōchin-Feuer, Obon-Fest, Ölfeuer und Blitz & Klaue übermächtig (Obon-Fest besiegte Shuten-dōji in 5 s). Neues Messwerkzeug `tools/synbalance.py`, Bericht unter `design/balance/balance-check-8-synergien.md`
 - Runde 9 – Synergien sichtbar: Beim ersten Auslösen pro Raum erscheint der Name der Synergie mit farbiger Welle (Onmyōdō, Abe no Seimei, Feuerwerk über Edo, Oni-Rausch, Oni-Tanz, Sonne & Mond, Sanshu no Jingi, Kyūdō, Blitz & Klaue, Zorn des Sturmgottes, Hannya-Zorn, Tempelmusik, Ölfeuer, Ewiger Winter, Wirbelwind-Klingen); Onmyōdō-Papierdiener fliegen jetzt als flatternde Hitogata-Papierpuppen aus der Siegel-Explosion, Feuerwerk zerstiebt in Hanabi-Funken, Oni-Rausch-Talismane leuchten sakerot; Ausrufe wie „Tigerhieb!“ sind größer
+- Runde 10 – 26 weitere Synergien zeigen beim ersten Auslösen pro Raum ihren Namen mit Welle, u. a. Koi-Drache, Brandung, Kappa-Festmahl, Rattenschwarm, Mondsichel-Klinge, Göttliches Gericht, Sonnenspiegel, Drachenpanzer, Yomotsu Hirasaka, Ōeyama-Bande, Tengu-Flug, Kind des Feuers, Feuerwagen, Sturmfächer und Schreinwächter – jetzt sind 41 Kampf-Synergien im Spiel erkennbar
 
 ## 1.4.0 – „Hyakki-Update“ (enthält 1.3 „Kapitel-Update“)
 

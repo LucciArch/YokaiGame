@@ -290,6 +290,7 @@ def on_fire(p, run, bullets):
         for b in bullets:
             b.curve = 1.7 * g['sichel']
             if 'mondteich' in S:
+                _syn(run, 'mondteich', p.x, p.y, (170, 230, 255))
                 b.fl = dict(b.fl); b.fl['slow'] = 1; b.fl['_frost'] = 1
     if 'sonne_mond' in S:
         sun = n % 2 == 0
@@ -373,6 +374,7 @@ def on_fire(p, run, bullets):
             if e.active() and math.hypot(e.x - p.x, e.y - p.y) < 60 + e.r:
                 run.damage_enemy(e, dmg * 0.8, None)
     if 'tengu_sturm' in S and n % 6 == 0:
+        _syn(run, 'tengu_sturm', p.x, p.y, (220, 240, 255))
         _ring(run, p.x, p.y, (220, 240, 255), 70)
         for eb in run.ebullets:
             if (eb.x - p.x) ** 2 + (eb.y - p.y) ** 2 < 70 ** 2:
@@ -399,6 +401,7 @@ def on_fire(p, run, bullets):
             if e.active() and math.hypot(e.x - p.x, e.y - p.y) < 64:
                 e.frozen = max(e.frozen, 0.25 if e.is_boss else 0.7)
                 if 'yamabushi' in S and not e.is_boss:
+                    _syn(run, 'yamabushi', p.x, p.y, (255, 230, 150))
                     d = math.hypot(e.x - p.x, e.y - p.y) or 1
                     e.kx += (e.x - p.x) / d * 320; e.ky += (e.y - p.y) / d * 320
     if 'boeser_stern' in S and n % 3 == 0:
@@ -442,6 +445,7 @@ def bullet_tick(b, run, dt):
             k = 2 if 'drachenkoenig' in run.player.sgs else 1
             run.hazards.append(Hazard(b.x, b.y, 4, 0.0, 0.5, max(0.5, b.dmg * 0.18 * k), 'p', 'silk'))
     if 'koi_drache' in tags and b.t > 0.35 and not b.fl.get('pierce'):
+        _syn(run, 'koi_drache', b.x, b.y, (255, 150, 90))
         b.fl = dict(b.fl); b.fl['pierce'] = 1
         b.r *= 1.5; b.col = (255, 150, 90)
     if 'windstoss' in tags:
@@ -467,6 +471,7 @@ def bullet_end(run, b):
             nb = run.fire_player_bullet(b.x, b.y, i / 5 * math.tau + random.uniform(0, 1.2), b.dmg * 0.4, 170, 2, 0.4, {'burn': 1})
             nb.col = random.choice(((255, 120, 160), (255, 220, 120), (140, 220, 255)))
     if b.fl.get('_sw') and 'sternenstaub' in run.player.sgs:
+        _syn(run, 'sternenstaub', b.x, b.y, (255, 240, 170))
         for i in range(4):
             a = i / 4 * math.tau + 0.4
             nb = run.fire_player_bullet(b.x, b.y, a, b.dmg * 0.5, 200, 2, 0.35, {})
@@ -475,11 +480,13 @@ def bullet_end(run, b):
 
 def bullet_bounce(run, b):
     if 'kappa_fest' in run.player.sgs:
+        _syn(run, 'kappa_fest', b.x, b.y, (120, 200, 240))
         _ring(run, b.x, b.y, (120, 200, 240), 26)
         for e in run.enemies:
             if e.active() and math.hypot(e.x - b.x, e.y - b.y) < 26 + e.r:
                 e.slowed = max(e.slowed, 2.0)
     if 'brandung' in run.player.sgs and not b.fl.get('_br'):
+        _syn(run, 'brandung', b.x, b.y, (110, 190, 255))
         b.fl = dict(b.fl); b.fl['_br'] = 1
         a = math.atan2(b.vy, b.vx)
         for da in (-0.35, 0.35):
@@ -498,6 +505,8 @@ def hit_pre(run, e, b, dmg):
     if 'iaido' in S and g.get('iaido', 0) > 0:
         g['iaido'] = 0
         dmg *= 3 if 'strassenkatze' in S else 2
+        if 'strassenkatze' in S:
+            _syn(run, 'strassenkatze', e.x, e.y, (230, 220, 200))
         _float(run, e, 'Iai!', (230, 230, 255))
     if 'daemonenbrecher' in S and (e.is_boss or e.champ):
         dmg *= 1.5
@@ -514,6 +523,7 @@ def hit_pre(run, e, b, dmg):
     if 'ewiger_winter' in S and e.frozen > 0:
         dmg *= 1.5
     if 'orochi' in S and e.poison > 0:
+        _syn(run, 'orochi', e.x, e.y, (150, 235, 110))
         dmg *= 1.4
     if 'kyudo' in S and b is not None and b.t > 0.45:
         dmg *= 1.6
@@ -572,6 +582,8 @@ def hit_post(run, e, b, dmg):
                     sb.kind = 'shiki'
     if 'schnitt' in S or 'drei_wiesel' in S:
         deep = 'mondschnitt' in S and b is not None and b.curve
+        if deep:
+            _syn(run, 'mondschnitt', e.x, e.y, (220, 80, 90))
         e.sg_bleed = min(6 if deep else 3, getattr(e, 'sg_bleed', 0) + (2 if deep else 1))
         e.sg_bleed_t = 3.0
     if 'drei_wiesel' in S:
@@ -584,6 +596,7 @@ def hit_post(run, e, b, dmg):
         e.frozen = max(e.frozen, 0.3 if e.is_boss else 1.0)
         _syn(run, 'ewiger_winter', e.x, e.y, (180, 230, 255))
     if 'rattenschwarm' in S and b is not None and b.fl.get('pierce') and not b.fl.get('_rat') and random.random() < 0.3:
+        _syn(run, 'rattenschwarm', e.x, e.y, (160, 170, 190))
         tgt = _nearest(run, e.x, e.y, 160, lambda o: o is not e)
         a = math.atan2(tgt.y - e.y, tgt.x - e.x) if tgt else random.uniform(0, math.tau)
         rb = run.fire_player_bullet(e.x, e.y, a, dmg * 0.5, 190, 2, 0.8, {'homing': 1, '_rat': 1})
@@ -710,6 +723,7 @@ def on_hurt(p, run):
                 e.kx += (e.x - p.x) / max(d, 1) * 420
                 e.ky += (e.y - p.y) / max(d, 1) * 420
         if 'daruma_geist' in S:
+            _syn(run, 'daruma_geist', p.x, p.y, (255, 210, 90))
             for i in range(8):
                 b = run.fire_player_bullet(p.x, p.y - 3, i / 8 * math.tau, p.damage() * 1.2, 220, 3, 0.8, {'pierce': 1})
                 b.col = (255, 210, 90)
@@ -754,13 +768,17 @@ def block(p, run, b):
     if 'spiegel' in S:
         g['mirror'] = g.get('mirror', 0) + 1
         if g['mirror'] % (2 if 'onmyo_spiegel' in S else 3) == 0:
+            if 'onmyo_spiegel' in S:
+                _syn(run, 'onmyo_spiegel', p.x, p.y, (255, 230, 150))
             a = math.atan2(-b.vy, -b.vx)
             nb = run.fire_player_bullet(b.x, b.y, a, p.damage() * 1.5, 260, 3.5, 1.0,
                                         {'homing': 1, 'explode': 1} if 'onmyo_spiegel' in S else {'homing': 1})
             nb.col = (255, 230, 150)
             if 'gericht' in S:
+                _syn(run, 'gericht', p.x, p.y, (200, 120, 255))
                 nb.fl['_urteil'] = 1
             if 'sonnenspiegel' in S:
+                _syn(run, 'sonnenspiegel', p.x, p.y, (255, 190, 90))
                 nb.fl['burn'] = 1
                 for da in (-0.3, 0.3):
                     sb = run.fire_player_bullet(b.x, b.y, a + da, p.damage() * 1.2, 260, 3, 1.0,
@@ -769,6 +787,7 @@ def block(p, run, b):
             return True
     if 'schuppenpanzer' in S and random.random() < (0.35 if 'drachenschuppen' in S else 0.25):
         if 'drachenschuppen' in S:
+            _syn(run, 'drachenschuppen', p.x, p.y, (120, 200, 255))
             nb = run.fire_player_bullet(b.x, b.y, math.atan2(b.y - p.y, b.x - p.x), p.damage() * 1.3, 200, 3.5, 1.2, {'homing': 1})
             nb.col = (120, 200, 255)
         return True
@@ -779,6 +798,7 @@ def block(p, run, b):
 
 def shield_break(p, run):
     if 'unbeweglich' in p.sgs:
+        _syn(run, 'unbeweglich', p.x, p.y, (200, 200, 220))
         st(p)['wand'] = 8.0
     if has(p, 'wandbruch'):
         _ring(run, p.x, p.y, (200, 200, 220), 80)
@@ -811,6 +831,7 @@ def on_dash(p, run):
         clouds.append([p.x, p.y, 1.6])
         del clouds[:-4]
     if 'tengu_flug' in S:
+        _syn(run, 'tengu_flug', p.x, p.y, (200, 230, 210))
         _ring(run, p.x, p.y, (200, 230, 210), 55)
         for e in run.enemies:
             d = math.hypot(e.x - p.x, e.y - p.y)
@@ -820,6 +841,7 @@ def on_dash(p, run):
                     e.kx += (e.x - p.x) / max(d, 1) * 360
                     e.ky += (e.y - p.y) / max(d, 1) * 360
     if 'feuerkind' in S:
+        _syn(run, 'feuerkind', p.x, p.y, (240, 170, 60))
         _ring(run, p.x, p.y, (240, 170, 60), 60)
         for e in run.enemies:
             if e.active() and math.hypot(e.x - p.x, e.y - p.y) < 60 + e.r:
@@ -827,6 +849,7 @@ def on_dash(p, run):
                 e.burn = 3.0
                 e.burn_dps = max(e.burn_dps, max(1.0, p.damage() * 0.4))
     if 'feuerwagen' in S:
+        _syn(run, 'feuerwagen', p.x, p.y, (255, 110, 40))
         a = math.atan2(p.dash_dir[1], p.dash_dir[0])
         for da in (-0.25, 0.25):
             b = run.fire_player_bullet(p.x, p.y, a + da, p.damage() * 1.1, 150, 5, 1.2, {'pierce': 1, 'burn': 1})
@@ -958,12 +981,14 @@ def contact(p, run, e):
         if 'klebrig' in S and not e.is_boss:
             e.frozen = max(e.frozen, 1.0)
             if 'shogatsu' in S:
+                _syn(run, 'shogatsu', e.x, e.y, (255, 220, 200))
                 e.sg_curse = max(getattr(e, 'sg_curse', 0), 3.0)
             e.sg_touch = 1.5
         if 'oni_koenig' in S:
             run.damage_enemy(e, p.damage() * (3.0 if 'oeyama_bande' in S else 1.5), None)
             e.sg_touch = 0.5
             if 'oeyama_bande' in S and not e.is_boss:
+                _syn(run, 'oeyama_bande', e.x, e.y, (255, 110, 90))
                 e.sg_conf = max(getattr(e, 'sg_conf', 0), 1.0)
         if 'felsblock' in S and not e.is_boss:
             d = math.hypot(e.x - p.x, e.y - p.y) or 1
@@ -971,6 +996,7 @@ def contact(p, run, e):
             e.ky += (e.y - p.y) / d * 380
             e.sg_touch = 0.4
             if 'yomotsu' in S:
+                _syn(run, 'yomotsu', e.x, e.y, (200, 180, 255))
                 e.frozen = max(e.frozen, 1.5)
                 e.sg_curse = 3.0
     return False
@@ -1105,6 +1131,7 @@ def tick(p, run, dt):
                     e.poison = max(e.poison, 2.5)
                     e.poison_dps = max(e.poison_dps, 1.0)
                     if 'unterweltgift' in S:
+                        _syn(run, 'unterweltgift', e.x, e.y, (170, 110, 220))
                         e.sg_curse = 4.0
                     run.zap(bx, by, e.x, e.y)
                     break
@@ -1148,6 +1175,7 @@ def tick(p, run, dt):
         if g['schrein'] >= 8:
             g['schrein'] = 0
             g['agyo'] = 0.01
+            _syn(run, 'schreinwaechter', p.x, p.y, (255, 200, 120))
     if g.get('wand', 0) > 0:
         g['wand'] -= dt
         if g['wand'] <= 0 and 'unbeweglich' in S and p.f['shield']:
@@ -1243,6 +1271,7 @@ def stat_bonus(p, f):
 
 def on_lightning(run, x, y):
     if 'sturmfaecher' in run.player.sgs:
+        _syn(run, 'sturmfaecher', x, y, (200, 240, 220))
         _ring(run, x, y, (200, 240, 220), 45)
         for e in run.enemies:
             d = math.hypot(e.x - x, e.y - y)
