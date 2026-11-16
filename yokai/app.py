@@ -411,15 +411,17 @@ class Game:
         """Titel-Panorama aus art_src/title/panorama.py: Ebenen mit sanfter Parallaxe, Glitzern und Blüten."""
         t = self.t
         sway = math.sin(t * 0.11)
-        # Die Nacht wandelt sich mit dem Fortschritt: nach dem Wahren Sieg Herbst (roter Mond, Ahorn), nach Yomi Totennacht
-        mood = 'yomi' if 'yomi' in self.save['achievements'] else 'aki' if self.save['stats'].get('true_wins', 0) else None
-        tint = {'aki': (255, 196, 160), 'yomi': (200, 168, 255)}.get(mood)
+        # Die Nacht wandelt sich mit dem Fortschritt: nach dem Wahren Sieg Herbst (roter Mond, Ahorn),
+        # nach einem Sieg im Oni-Modus Winter (Schnee), nach Yomi Totennacht
+        st = self.save['stats']
+        mood = 'yomi' if 'yomi' in self.save['achievements'] else 'yuki' if st.get('wins_hard', 0) else 'aki' if st.get('true_wins', 0) else None
+        tint = {'aki': (255, 196, 160), 'yuki': (196, 214, 255), 'yomi': (200, 168, 255)}.get(mood)
         for name, par in (('sky', 0), ('far', 8), ('mid', 16), ('fog', 24), ('near', 32)):
             im = gfx.env_img('_title', name)
             if tint and name in ('sky', 'fog'):
                 im = [gfx.tinted_mult(im[0], tint)]
-            elif mood == 'aki' and name == 'near':
-                im = [self._maple(im[0])]
+            elif mood in ('aki', 'yuki') and name == 'near':
+                im = [self._branch(im[0], mood)]
             drift = math.sin(t * 0.07) if name == 'fog' else sway    # Nebel zieht gegen die Berge
             s.blit(im[0], (-par + int(round(drift * par)), 0))
             if name == 'sky':
@@ -434,17 +436,29 @@ class Game:
                     x = 388 + int(3 * math.sin(t * 1.7 + k * 0.4) + sway * 8) - w_ // 2
                     s.fill((236, 222, 176) if k < 24 else (150, 140, 150), (x, y, w_, 1))
                 if mood:
-                    gfx.draw_glow(s, 388, 64, 54 + 3 * math.sin(t * 0.8), (230, 70, 40) if mood == 'aki' else (150, 80, 220), 70)
+                    gfx.draw_glow(s, 388, 64, 54 + 3 * math.sin(t * 0.8), {'aki': (230, 70, 40), 'yuki': (170, 200, 255)}.get(mood, (150, 80, 220)), 70)
         lx = 480 - 70 + 32 + int(round(sway * 32))       # Tōrō aus der Vordergrund-Ebene (dort bei Breite-70)
         gfx.draw_glow(s, lx, 273, 22 + 2 * math.sin(t * 5), (255, 170, 80), 60)
-        for i in range(22):                              # fallende Kirschblüten vom Zweig oben links
+        if mood == 'yuki':                               # Schneefall über das ganze Bild, nah und fern
+            for i in range(120):
+                rr = random.Random(700 + i)
+                near = i % 4 == 0                        # nahe Flocken größer, schneller, schwanken weiter
+                ph = (t * rr.uniform(0.03, 0.05) * (1.8 if near else 1) + rr.random()) % 1
+                x = int((rr.uniform(0, W) + math.sin(t * rr.uniform(0.5, 1.1) + i) * (12 if near else 5)) % W)
+                y = int(ph * H)
+                if near:                                 # kleines Kreuz mit hellem Kern
+                    s.fill((150, 166, 210), (x - 1, y, 3, 1)); s.fill((150, 166, 210), (x, y - 1, 1, 3))
+                    s.fill((248, 250, 255), (x, y, 1, 1))
+                else:
+                    s.fill((226, 234, 255) if i % 2 else (160, 174, 214), (x, y, 1, 1))
+        for i in range(22 if mood != 'yuki' else 0):     # fallende Kirschblüten vom Zweig oben links
             rr = random.Random(100 + i)
             ph = (t * rr.uniform(0.04, 0.09) + rr.random()) % 1
             px = (rr.uniform(0, 160) + ph * 200 + math.sin(t * 1.3 + i) * 8) % W
             py = 20 + ph * (H - 20)
             pc = {'aki': ((214, 70, 34), (240, 140, 50)), 'yomi': ((170, 140, 220), (120, 100, 170))}.get(mood, ((250, 190, 215),) * 2)[i % 2]
             s.fill(pc, (int(px), int(py), 2 + (mood == 'aki'), 1 + (i % 2)))   # Ahornblätter etwas breiter
-        for i in range(14):                              # Glühwürmchen über dem Schilf
+        for i in range(14 if mood != 'yuki' else 0):     # Glühwürmchen über dem Schilf (nicht im Winter)
             rr = random.Random(300 + i)
             x = (rr.uniform(0, W) + 18 * math.sin(t * rr.uniform(0.2, 0.5) + i)) % W
             y = rr.uniform(236, 300) + 8 * math.sin(t * rr.uniform(0.3, 0.7) + i * 2)
@@ -467,14 +481,17 @@ class Game:
             s.fill((150, 205, 255), (int(x) - 2, int(y) - 1, 5, 5))
             s.fill((235, 248, 255), (int(x) - 1, int(y), 3, 3))
 
-    def _maple(self, near):
-        """Vordergrund mit Ahorn statt Kirschblüte: Blütenpalette des Zweigs oben links auf Herbstrot tauschen."""
-        im = self.__dict__.get('_maple_im')
+    BRANCH = {'aki': ((92, 24, 20), (168, 42, 26), (222, 92, 36), (250, 166, 70)),       # Ahorn
+              'yuki': ((70, 80, 120), (130, 146, 186), (200, 212, 240), (248, 250, 255))}  # Schnee auf dem Zweig
+
+    def _branch(self, near, mood):
+        """Vordergrund mit Ahorn oder Schnee statt Kirschblüte: Blütenpalette des Zweigs oben links tauschen."""
+        cache = self.__dict__.setdefault('_branch_im', {})
+        im = cache.get(mood)
         if im is None:
-            im = self._maple_im = near.copy()
+            im = cache[mood] = near.copy()
             pa = pygame.PixelArray(im.subsurface((0, 0, 180, 160)))
-            for old, new in (((106, 40, 72), (92, 24, 20)), ((168, 64, 106), (168, 42, 26)),
-                             ((224, 126, 164), (222, 92, 36)), ((255, 192, 216), (250, 166, 70))):
+            for old, new in zip(((106, 40, 72), (168, 64, 106), (224, 126, 164), (255, 192, 216)), self.BRANCH[mood]):
                 pa.replace(old, new)
             del pa
         return im
