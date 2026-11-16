@@ -360,6 +360,27 @@ class Game:
             px = (rr.uniform(0, 160) + ph * 200 + math.sin(t * 1.3 + i) * 8) % W
             py = 20 + ph * (H - 20)
             s.fill((250, 190, 215), (int(px), int(py), 2, 1 + (i % 2)))
+        for i in range(14):                              # Glühwürmchen über dem Schilf
+            rr = random.Random(300 + i)
+            x = (rr.uniform(0, W) + 18 * math.sin(t * rr.uniform(0.2, 0.5) + i)) % W
+            y = rr.uniform(236, 300) + 8 * math.sin(t * rr.uniform(0.3, 0.7) + i * 2)
+            b = math.sin(t * rr.uniform(1.2, 2.2) + i * 1.7)
+            if b > 0.2:
+                gfx.draw_glow(s, int(x), int(y), 5, (200, 240, 110), int(70 * b))
+                s.fill((236, 255, 150) if b > 0.7 else (170, 200, 90), (int(x), int(y), 1, 1))
+        for i in range(3):                               # Hitodama: Seelenflammen schweben über dem See
+            rr = random.Random(500 + i)
+            ph = (t * 0.035 + i / 3) % 1
+            x = 150 + ph * 220 + 6 * math.sin(t * 0.9 + i)
+            y = 214 + 10 * math.sin(t * 0.7 + i * 2) - 6
+            a_ = math.sin(ph * math.pi)                  # taucht auf und vergeht wieder
+            if a_ < 0.15:
+                continue
+            gfx.draw_glow(s, int(x), int(y), 16, (110, 170, 255), int(90 * a_))
+            for k in range(6):                           # Schweif nach hinten oben, flackernd
+                s.fill((70, 120, 220) if k > 2 else (130, 190, 255), (int(x - 2 - k * 2), int(y - 1 - k + math.sin(t * 7 + k) * 1.2), 4 - k // 2, 3 - k // 3))
+            s.fill((150, 205, 255), (int(x) - 2, int(y) - 1, 5, 5))
+            s.fill((235, 248, 255), (int(x) - 1, int(y), 3, 3))
 
     # ================================================================  Zustände
     MENU = ['Neuer Lauf', 'Tägliche Prüfung', 'Herausforderungen', 'Codex der Items', 'Yōkai-Lexikon', 'Erfolge', 'Statistik', 'Steuerung', 'Optionen', 'Beenden']
@@ -369,19 +390,43 @@ class Game:
         gfx.HI_MODE = True
         self.draw_night(s)
         T = gfx.TEXT
-        gfx.hi_blit(gfx.env_img('_title', 'logo')[0], W // 2, 56)
-        T.add('– Hyakki Yagyō –', W // 2, 60, 9, (230, 140, 130), 'c')
+        # Einblendung beim Start: erst die Nacht, dann das Logo, dann das Menü; jede Taste kürzt ab
+        it = self._intro = self.__dict__.get('_intro', 0) + dt
+        if nav:
+            it = self._intro = max(it, 2.1)
+        if it < 1.4:
+            ov = pygame.Surface((W, H)); ov.set_alpha(int(255 * (1 - it / 1.4)))
+            s.blit(ov, (0, 0))
+        fa = lambda t0, d: max(0.0, min(1.0, (it - t0) / d))
+        la = int(255 * fa(0.9, 0.9))
+        if la:
+            gfx.hi_blit(gfx.env_img('_title', 'logo')[0], W // 2, 56 + int(6 * (1 - fa(0.9, 0.9)) ** 2), la)
+        ma = int(255 * fa(1.5, 0.6))
+        T.add('– Hyakki Yagyō –', W // 2, 60, 9, (230, 140, 130), 'c', alpha=la)
         items = self.menu_items()
         step = 14 if len(items) <= 10 else 13
         show_news = self.save.data.get('news_seen') != VERSION and not self.headless
+        if self.__dict__.get('_bsel') != self.sel:      # Pinselstrich wird bei jeder Auswahl neu gezogen
+            self._bsel, self._bt = self.sel, 0.0
+        self._bt += dt
+        if ma and not show_news:                         # dunkler Schleier hinter dem Menü, an den Seiten auslaufend
+            sc_ = self.__dict__.get('_scrim')
+            if sc_ is None:
+                sc_ = self._scrim = pygame.Surface((200, 160), pygame.SRCALPHA)
+                for x in range(200):
+                    sc_.fill((8, 6, 18, int(120 * min(1, (100 - abs(x - 100)) / 45))), (x, 0, 1, 160))
+            sc_.set_alpha(ma)
+            s.blit(sc_, (W // 2 - 100, 78))
         for i, m in enumerate(items if not show_news else []):
             y = 84 + i * step
             sel = i == self.sel
-            col = (255, 230, 150) if sel else (210, 200, 190)
-            if sel:
-                gfx.panel(s, (W // 2 - 70, y - 2, 140, min(15, step + 1)), 170, (200, 120, 90))
-            T.add(m, W // 2, y, 10, col, 'c')
-        T.add('v' + VERSION + '   •   F11 / Alt+Enter Vollbild', W - 6, H - 12, 6, (140, 130, 150), 'r')
+            col = (255, 236, 200) if sel else (205, 196, 200)
+            if sel and ma:
+                br = gfx.env_img('_title', 'brush')[0]
+                bw = max(2, int(br.get_width() * min(1.0, self._bt / 0.14)))
+                gfx.hi_blit(br.subsurface((0, 0, bw, br.get_height())), W // 2 - br.get_width() // 4 + bw // 4, y + 11, ma, transient=True)
+            T.add(m, W // 2, y, 10, col, 'c', alpha=ma)
+        T.add('v' + VERSION + '   •   F11 / Alt+Enter Vollbild', W - 6, H - 12, 6, (140, 130, 150), 'r', alpha=ma)
         if items and items[self.sel % len(items)] == 'Fortsetzen' and not show_news:
             info = getattr(self, '_cont_info', None)
             if info is None:
