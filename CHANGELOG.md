@@ -92,6 +92,7 @@
 - Runde 68 – Requisiten am Hof des Enma neu in Hi-Res: bronzenes Kohlebecken auf Krallenfüßen mit Oni-Fratze und Funkenflug, der **Jōhari no Kagami** (Enmas Spiegel, der alle Taten der Toten zeigt) im Flammenkranz – er glimmt rot –, und der **Nintōjō**, Enmas Stab mit den Köpfen Miru-me und Kagu-hana, die jede Sünde sehen und riechen
 - Runde 69 – Requisiten Teil 6: Im Mondpalast steht jetzt **Tsuki no Katsura**, der silberne Baum auf dem Mond, mit mondhellen Herzblättern; daneben ein Sanbō mit Tsukimi-Dango-Pyramide und Susuki-Gras sowie Usu und Kine des Mondhasen mit dampfendem Mochi. Im Totenpalast ersetzt der **Ōkamuzumi**-Pfirsichbaum die Lacksäule – mit drei leuchtenden Götterpfirsichen, wie sie Izanagi den Yomotsu-shikome entgegenwarf. Baum und Pfirsiche werfen Licht
 - Runde 70 – **Aktive Salven mit allen Wurf-Items:** Ofuda-Sturm, Shikigami-Ruf und Hyōtan-Sauger übernehmen Zielsuche, Abprall, Geisterwurf, Rückkehr, Wellenflug und Rückstoß deiner Items. Mehrfachwurf gibt dem Ofuda-Sturm eine Welle mehr je Stufe und ruft zwei Shikigami mehr. Kettenblitz, Teilen und Sprengsiegel bleiben bei den Salven außen vor (Kettenreaktion bei bis zu 80 Geschossen)
+- Runde 71 – **Explosionen und Bodeneffekte mit Elementen:** Sprengsiegel, Meteore, Blitzeinschläge, Bodenfeuer, Bodenschläge, Wasserfontänen und Seidenfäden deiner Items setzen jetzt auch Feuer, Gift und Frost deiner Items – Sprengsiegel + Giftitem hinterlässt vergiftete Feinde, Frost verlangsamt alles im Explosionsradius
 
 ## 1.4.0 – „Hyakki-Update“ (enthält 1.3 „Kapitel-Update“)
 

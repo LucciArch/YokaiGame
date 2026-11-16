@@ -1082,6 +1082,13 @@ class Run:
                 self.particles.append(Particle(b.x, b.y, math.cos(a) * v, math.sin(a) * v, 0.18, (255, 250, 220), 1, kind='spark'))
         if self.save['settings'].get('dmgnums', True) and dmg >= 0.5:
             self.floats.append([e.x + random.uniform(-4, 4), e.y - 10, '%d' % round(dmg) if dmg >= 1 else '%.1f' % dmg, (255, 255, 255), 0.45])
+        if b is None and getattr(self, '_echo', False):   # Explosionen/Bodenfeuer der Spielerin tragen Feuer/Gift/Frost
+            burn = burn or bool(p.f['burn'])
+            if p.f['poison']:
+                e.poison = 4.0
+                e.poison_dps = max(e.poison_dps, max(1.2, dmg * 0.4))
+            if p.f['slow']:
+                e.slowed = 2.5
         if burn:
             e.burn = 3.0
             e.burn_dps = max(e.burn_dps, max(1.0, dmg * 0.4))
