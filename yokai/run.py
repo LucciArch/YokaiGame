@@ -926,7 +926,12 @@ class Run:
                     best, bd = e, d
         return best
 
+    INHERIT = ('burn', 'poison', 'slow')
+
     def fire_player_bullet(self, x, y, ang, dmg, spd, size, life, fl, delay=0.0):
+        pf = self.player.f                             # jedes Geschoss der Spielerin trägt Feuer/Gift/Frost der Items
+        if any(pf[k] and k not in fl for k in self.INHERIT):
+            fl = dict(fl, **{k: pf[k] for k in self.INHERIT if pf[k] and k not in fl})
         b = Bullet(x, y, math.cos(ang) * spd, math.sin(ang) * spd, dmg, size, life, 'p', self.shot_col(fl), fl, delay=delay)
         self.pbullets.append(b)
         return b

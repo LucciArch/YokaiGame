@@ -88,6 +88,7 @@
 - Runde 64 – Auch im Epilog steht jetzt das neue Hi-Res-Torii auf dem Hügel
 - Runde 65 – **Waffen wirken mit allen Wurf-Items zusammen:** Lichtstrahl, Schwert, Keule, Sense, Speer, Bogen und Windfächer übernehmen jetzt Mehrfachwurf (mehrere Strahlen; Hiebwaffen schleudern Klingenwellen), Rück- und Seitenwürfe, Zielsuche (Strahlen und Hiebe drehen sich zum Feind, mehrere Strahlen verteilen sich auf verschiedene Ziele), Feuer, Gift, Frost, Kettenblitz, Teilen, Rückstoß, Sprengsiegel, Abprall (der Strahl wird an Wänden gespiegelt), Geisterwurf (der Strahl geht durch Felsen) und den großen Wurf jedes n-ten Mal; Strahlen und Hiebe nehmen die Farbe ihres Elements an. Neuer Test `tools/waffentest.py`
 - Runde 66 – **Gefolge, Kreisschilde und Aura mit Item-Wirkungen:** Das Gefolge (Familiars) wirft mit allen Wurf-Eigenschaften deiner Items (Feuer, Gift, Frost, Kettenblitz, Abprall, Durchschlag …) statt nur zielsuchend; Kreisschilde setzen Feuer, Gift, Frost, Kettenblitz und Rückstoß, die Aura brennt, vergiftet und verlangsamt. `tools/waffentest.py` prüft auch das
+- Runde 67 – **Alle Geschosse tragen Feuer, Gift und Frost:** Auch die Würfe aktiver Items und Item-Fähigkeiten (Rattenschwarm, Papierdiener, Rückstrahlen, Wurfsterne, Federn, Splitter …) übernehmen jetzt Brand, Gift und Verlangsamung deiner Items. Kettenblitz bleibt bewusst beim Talisman, damit keine Kettenreaktionen entstehen
 
 ## 1.4.0 – „Hyakki-Update“ (enthält 1.3 „Kapitel-Update“)
 

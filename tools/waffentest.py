@@ -84,5 +84,9 @@ p.familiars.append(Familiar(0))
 for _ in range(60):
     r.update(1 / 60, dict(NOIN, shoot=[1, 0]))
 check(any(b.fl.get('slow') for b in r.pbullets), 'Gefolge wirft ohne Frost')
+# Fähigkeits-Geschosse (aktive Items, Signaturen) erben Feuer/Gift/Frost
+r, p = setup(poison=1)
+b = r.fire_player_bullet(p.x, p.y, 0, 3, 200, 3, 1, {'homing': 1})
+check(b.fl.get('poison') and b.fl.get('homing'), 'Fähigkeits-Geschoss erbt kein Gift')
 print('Waffen-Synergien geprüft, Fehler:', bad)
 sys.exit(1 if bad else 0)
