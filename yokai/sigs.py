@@ -97,6 +97,7 @@ TEXT = {
     'sonnenkraehe': 'Die dreibeinige Krähe stößt auf Feinde herab',
     'schweiss': 'Nach einer Rolle: der nächste Wurf +40 %',
     'schweben': 'Talismane bleiben am Ende ihrer Bahn schweben',
+    'windsack': 'Alle 4 s öffnet sich der Windsack: ein Sturm in Wurfrichtung fegt Geschosse fort und schneidet Feinde',
     'erstes_feuer': 'Brennende Feinde explodieren beim Tod',
     'fuchsregen': 'Ein Sonnenregen fällt auf deine Feinde',
     'hausglueck': 'Der erste Krug in jedem Raum gibt immer etwas her',
@@ -413,6 +414,26 @@ def on_fire(p, run, bullets):
         h = Hazard(tx, ty, 16, 0.45, 0.12, dmg * 2.2, 'p', 'meteor')
         h.sg_conf = 'verfluchte_sterne' in S
         run.hazards.append(h)
+    if 'windsack' in S and run.time - g.get('windsack', -9) >= 4.0:
+        g['windsack'] = run.time
+        from .entities import Particle
+        from . import audio
+        audio.play('dash', 0.6)
+        for i in range(14):                                   # sichtbare Windstreifen im Kegel
+            a = base + random.uniform(-0.5, 0.5)
+            v = random.uniform(160, 260)
+            run.particles.append(Particle(p.x, p.y, math.cos(a) * v, math.sin(a) * v, 0.45, (200, 240, 225), 2))
+        for eb in run.ebullets:
+            dx, dy = eb.x - p.x, eb.y - p.y
+            if dx * dx + dy * dy < 130 ** 2 and abs((math.atan2(dy, dx) - base + math.pi) % math.tau - math.pi) < 0.6:
+                eb.dead = True
+        for e in run.enemies:
+            dx, dy = e.x - p.x, e.y - p.y
+            d = math.hypot(dx, dy)
+            if e.active() and d < 130 + e.r and abs((math.atan2(dy, dx) - base + math.pi) % math.tau - math.pi) < 0.6:
+                run.damage_enemy(e, dmg * 1.5, None)
+                if not e.is_boss:
+                    e.kx += dx / max(d, 1) * 380; e.ky += dy / max(d, 1) * 380
 
 
 def bullet_tick(b, run, dt):

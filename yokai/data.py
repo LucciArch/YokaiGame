@@ -256,6 +256,7 @@ I('yatagarasu', 'Yatagarasu', 'Die dreibeinige Krähe weist den Weg', 'feather',
 I('tenugui', 'Tenugui', 'Ein Handtuch für alle Fälle', 'cloth', (90, 130, 200), 'TS', [], 1, spd=12, sig_schweiss=1)
 I('hagoromo', 'Hagoromo', 'Das Federgewand einer Himmelsjungfrau', 'cloth', (230, 240, 255), 'K', ['kami'], 3, fly=1, spirit=4)
 I('izanami_schleier', 'Izanamis Schleier', 'Leben und Tod in einem Gewand', 'cloth', (120, 60, 120), 'B', ['yurei', 'kami'], 4, True, revive=1, spirit=4)
+I('kaze_bukuro', 'Kaze-bukuro', 'Fūjins Windsack', 'cloud', (150, 220, 180), 'B', ['kami', 'tengu'], 4, True, spd=10, rate=0.3, sig_windsack=1)
 I('kagutsuchi_glut', 'Glut des Kagutsuchi', 'Das erste Feuer der Welt', 'flame', (255, 90, 30), 'B', ['kami', 'oni'], 4, True, burn=1, dmgm=1.2, sig_erstes_feuer=1)
 I('geheimkarte', 'Karte des Diebes', 'Wo sind die verborgenen Räume?', 'scroll', (190, 160, 110), 'TS', [], 2, True, map=1, salts=2)
 
@@ -551,7 +552,7 @@ BOSS_REWARD = {  # Freischaltung beim ersten Sieg
     'yuki_onna': 'yasakani', 'umibozu': None, 'ryujin': None, 'bake_kujira': None,
     'oonyudo': 'onyudo_kette', 'nurarihyon': 'nurarihyon_pfeife', 'kamaitachi_trio': 'kamaitachi_klingen',
     'akkorokamui': 'akkoro_tinte', 'enma': 'enma_spiegel', 'izanami': 'izanami_schleier', 'kagutsuchi': 'kagutsuchi_glut',
-    'fujin': None, 'orochi': 'yamata_zahn', 'shuten_doji': 'shuten_schale', 'tamamo': 'kyubi_juwel', 'mikaboshi': 'hoshi_splitter',
+    'fujin': 'kaze_bukuro', 'orochi': 'yamata_zahn', 'shuten_doji': 'shuten_schale', 'tamamo': 'kyubi_juwel', 'mikaboshi': 'hoshi_splitter',
 }
 
 # =====================================================================  PRÜFUNGEN (Herausforderungen)
