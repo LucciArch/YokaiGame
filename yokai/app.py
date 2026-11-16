@@ -467,16 +467,39 @@ class Game:
 
     def brush_sel(self, key, cx, y, w, dt, alpha=255):
         """Zinnober-Pinselstrich (w Weltpixel breit) unter einem gewählten Menüpunkt; wird bei jeder Auswahl neu gezogen."""
-        if self.__dict__.get('_bsel') != key:
-            self._bsel, self._bt = key, 0.0
-        self._bt += dt
+        slots = self.__dict__.setdefault('_bsel', {})   # je Auswahlreihe (key[0]) ein eigener Strich, z. B. Reiter + Liste
+        sl = slots.get(key[0])
+        if sl is None or sl[0] != key:
+            sl = slots[key[0]] = [key, 0.0]
+        sl[1] += dt
         cache = self.__dict__.setdefault('_brushes', {})
         br = cache.get(w)
         if br is None:
             br = gfx.env_img('_title', 'brush')[0]
             br = cache[w] = br if br.get_width() == w * 2 else pygame.transform.scale(br, (w * 2, br.get_height()))
-        bw = max(2, int(br.get_width() * min(1.0, self._bt / 0.14)))
+        bw = max(2, int(br.get_width() * min(1.0, sl[1] / 0.14)))
         gfx.hi_blit(br.subsurface((0, 0, bw, br.get_height())), cx - w / 2 + bw / 4, y + 11, alpha, transient=True)
+
+    def veil(self, s, rect, a=185):
+        """Weicher Nachtschleier statt Kasten-Tafel: die Ränder laufen in die Nacht aus (wie der Titel-Schleier)."""
+        r = pygame.Rect(rect)
+        cache = self.__dict__.setdefault('_veils', {})
+        v = cache.get((r.size, a))
+        if v is None:
+            v = cache[(r.size, a)] = pygame.Surface(r.size, pygame.SRCALPHA)
+            e = min(12, r.w // 2, r.h // 2)
+            for k in range(e + 1):                       # jede Füllung überschreibt das Innere: Alpha steigt zur Mitte
+                v.fill((8, 6, 18, int(a * (k + 1) / (e + 1))), (k, k, r.w - 2 * k, r.h - 2 * k))
+        s.blit(v, r.topleft)
+
+    def page_head(self, title, seal, sub=''):
+        """Seitenüberschrift der Untermenüs: große Schrift, rotes Hanko-Siegel links daneben, Zähler darunter."""
+        T = gfx.TEXT
+        T.add(title, W // 2 + 8, 4, 13, (255, 236, 200), 'c')
+        x = W // 2 + 8 - gfx.text_w(title, 13) / 2 - 12
+        gfx.hi_blit(gfx.mini(gfx.env_img('_title', seal)[0], 30), x, 22)
+        if sub:
+            T.add(sub, W // 2, 22, 7, (214, 190, 150), 'c')
 
     def menu_items(self):
         from .run import run_file
@@ -557,11 +580,13 @@ class Game:
         self.menu_bg(s)
         T = gfx.TEXT
         done = set(self.save['challenges_done'])
-        T.add('Herausforderungen  (%d / %d bestanden)' % (len(done), len(CHALLENGES)), W // 2, 8, 12, (255, 230, 170), 'c')
+        self.page_head('Herausforderungen', 'seal_chal', '%d / %d bestanden' % (len(done), len(CHALLENGES)))
+        self.veil(s, (22, 32, W - 44, len(CHALLENGES) * 26 + 6))
         for i, c in enumerate(CHALLENGES):
-            y = 32 + i * 26
+            y = 34 + i * 26
             sel = i == self.ch_sel
-            gfx.panel(s, (30, y, W - 60, 23), 210 if sel else 150, (255, 210, 120) if sel else (90, 80, 90))
+            if sel:
+                self.brush_sel(('chal', i), W // 2 + 16, y + 10, W - 120, dt)
             spr = gfx.mini(sheets.frame(c['char'], 0, 0, 1), 19)
             s.blit(spr, (46 - spr.get_width() // 2, y + 2))
             T.add(c['name'], 58, y + 2, 9, (255, 230, 150) if sel else (220, 210, 200))
@@ -972,7 +997,7 @@ class Game:
                     return
 
     # ---------------------------------------------------------------- Codex
-    def menu_bg(self, s, a=185):
+    def menu_bg(self, s, a=150):
         """Hintergrund für Menüseiten: Nachthimmel mit Torii, abgedunkelt."""
         # Hintergrund bewusst auf der niedrigen Ebene: Die Menütafeln liegen darüber.
         gfx.HI_MODE = False
@@ -1000,8 +1025,8 @@ class Game:
         unlocked = set(self.save['items'])
         ids = ITEM_IDS
         cols = 16
-        gfx.panel(s, (18, 24, W - 36, 172), 200)
-        T.add('Codex der Items  (%d / %d entdeckt)' % (len([i for i in ids if i in seen]), len(ids)), W // 2, 6, 11, (255, 230, 170), 'c')
+        self.veil(s, (14, 22, W - 28, 176))
+        self.page_head('Codex der Items', 'seal_codex', '%d / %d entdeckt' % (len([i for i in ids if i in seen]), len(ids)))
         rows_vis = 7
         sel_row = self.codex_sel // cols
         top = max(0, min(sel_row - 3, (len(ids) - 1) // cols - rows_vis + 1))
@@ -1009,7 +1034,7 @@ class Game:
             r, c = divmod(i, cols)
             if r < top or r >= top + rows_vis:
                 continue
-            x, y = 24 + c * 27, 28 + (r - top) * 24
+            x, y = 24 + c * 27, 32 + (r - top) * 23
             sel = i == self.codex_sel
             pygame.draw.rect(s, (60, 44, 60) if sel else (34, 26, 40), (x - 1, y - 1, 24, 22))
             if sel:
@@ -1028,7 +1053,7 @@ class Game:
                     T.add('?', x + 11, y + 3, 9, (120, 110, 130), 'c')
         iid = ids[self.codex_sel]
         it = ITEMS[iid]
-        gfx.panel(s, (16, 200, W - 32, 92), 220)
+        self.veil(s, (12, 198, W - 24, 96), 190)
         if iid in seen:
             T.add(it['name'], 28, 206, 11, it['col'])
             T.add('„%s“' % it['desc'], 28, 222, 8, (230, 225, 210))
@@ -1067,7 +1092,7 @@ class Game:
             elif isinstance(n, tuple):
                 mx, my = n[1]
                 c = int((mx - 23) // 27)
-                r = int((my - 27) // 24) + top
+                r = int((my - 31) // 23) + top
                 i = r * cols + c
                 if 0 <= c < cols and 0 <= i < len(ids):
                     self.codex_sel = i
@@ -1131,15 +1156,17 @@ class Game:
         T = gfx.TEXT
         ids, seen = self._lex_entries()
         n_seen = len([i for i in ids if i in seen])
-        T.add('Yōkai-Lexikon', W // 2, 5, 13, (255, 230, 170), 'c')
+        self.page_head('Yōkai-Lexikon', 'seal_lex')
         for k, name in enumerate(('Yōkai', 'Bosse', 'Ereignisse', 'Synergien')):
             x = W // 2 - 165 + k * 110
             on = k == self.lex_tab
-            T.add(('‹ %s ›' if on else '%s') % name, x, 24, 9, (255, 215, 130) if on else (150, 140, 150), 'c')
+            if on:
+                self.brush_sel(('lextab', k), x, 23, 70, dt)
+            T.add(name, x, 24, 9, (255, 236, 200) if on else (150, 140, 150), 'c')
         T.add('%d / %d %s' % (n_seen, len(ids), 'entdeckt' if self.lex_tab == 3 else 'begegnet'), W - 16, 8, 7, (190, 180, 170), 'r')
         self.lex_sel = max(0, min(self.lex_sel, len(ids) - 1))
         # Liste links
-        gfx.panel(s, (10, 38, 128, 252), 200)
+        self.veil(s, (6, 38, 136, 254))
         rows = 18
         top = max(0, min(self.lex_sel - rows // 2, len(ids) - rows))
         for r in range(rows):
@@ -1150,12 +1177,12 @@ class Game:
             y = 44 + r * 13.5
             sel = i == self.lex_sel
             if sel:
-                pygame.draw.rect(s, (70, 48, 60), (13, int(y) - 1, 122, 13))
+                self.brush_sel(('lex', self.lex_tab, i), 72, y - 1, 124, dt)
             nm = (ENEMIES[eid]['name'] if self.lex_tab == 0 else BOSSES[eid]['name'] if self.lex_tab == 1
                   else self.LEX_EVENTS[eid]['name'] if self.lex_tab == 2 else SYN_BY_ID[eid]['name']) if eid in seen else '? ? ?'
             T.add('%2d  %s' % (i + 1, nm), 18, y, 7, (255, 225, 160) if sel else ((225, 215, 200) if eid in seen else (110, 100, 115)))
         # Detail rechts
-        gfx.panel(s, (146, 38, W - 156, 252), 200)
+        self.veil(s, (144, 38, W - 150, 254))
         eid = ids[self.lex_sel]
         cx = 146 + (W - 156) // 2
         if self.lex_tab == 3:
@@ -1295,14 +1322,14 @@ class Game:
         self.menu_bg(s)
         T = gfx.TEXT
         got = set(self.save['achievements'])
-        T.add('Erfolge  (%d / %d)' % (len(got), len(ACHIEVEMENTS)), W // 2, 6, 11, (255, 230, 170), 'c')
+        self.page_head('Erfolge', 'seal_ach', '%d / %d' % (len(got), len(ACHIEVEMENTS)))
         per = 11
         self.scroll = max(0, min(self.scroll, len(ACHIEVEMENTS) - per))
         order = [a for a in ACHIEVEMENTS if a[0] in got] + [a for a in ACHIEVEMENTS if a[0] not in got]
         for i, (aid, name, desc, reward) in enumerate(order[self.scroll:self.scroll + per]):
-            y = 28 + i * 23
+            y = 32 + i * 23
             ok = aid in got
-            gfx.panel(s, (24, y, W - 48, 20), 180, (230, 190, 90) if ok else (80, 70, 80))
+            self.veil(s, (18, y - 1, W - 36, 22), 150 if ok else 110)
             if ok:
                 star(s, 32, y + 10, (255, 220, 100))
             T.add(name, 40, y + 2, 8, (255, 230, 150) if ok else (170, 160, 170))
@@ -1342,7 +1369,9 @@ class Game:
         self.menu_bg(s)
         T = gfx.TEXT
         st = self.save['stats']
-        T.add('Statistik', W // 2, 6, 12, (255, 230, 170), 'c')
+        self.page_head('Statistik', 'seal_stats')
+        self.veil(s, (24, 30, W - 48, 132))
+        self.veil(s, (24, 166, W - 48, 100))
         pt = st.get('playtime', 0)
         rows = [('Läufe', st['runs']), ('Siege', st['wins']), ('Wahre Siege (Takamagahara)', st.get('true_wins', 0)),
                 ('Siege im Oni-Modus', st.get('wins_hard', 0)), ('Tode', st['deaths']), ('Besiegte Yokai', st['kills']),
@@ -1411,7 +1440,7 @@ class Game:
         s = self.screen
         self.menu_bg(s)
         T = gfx.TEXT
-        T.add('Steuerung', W // 2, 8, 14, (255, 230, 170), 'c')
+        self.page_head('Steuerung', 'seal_ctrl')
         rows = [('Bewegen', 'W A S D', 'Linker Stick'), ('Ofuda werfen', 'Pfeiltasten / linke Maustaste', 'Rechter Stick'),
                 ('Ausweichrolle', 'Leertaste / Shift / rechte Maustaste', 'A / RB'), ('Aktives Item', 'E', 'Y / LB'),
                 ('Reinigungssalz', 'Q', 'X'), ('Items & Werte', 'Tab (halten)', '–'), ('Pause', 'Esc / P', 'Start'), ('Nochmal (nach dem Tod)', 'R', 'Y'),
@@ -1420,7 +1449,7 @@ class Game:
         T.add('Aktion', 40, 34, 8, (200, 180, 150)); T.add('Tastatur / Maus', 150, 34, 8, (200, 180, 150)); T.add('Controller', 360, 34, 8, (200, 180, 150))
         for i, (a, k, c) in enumerate(rows):
             y = 50 + i * 16
-            gfx.panel(s, (32, y - 3, W - 64, 15), 140, (80, 70, 90))
+            self.veil(s, (28, y - 3, W - 56, 15), 120)
             T.add(a, 40, y, 8, (250, 240, 220)); T.add(k, 150, y, 8, (220, 220, 240)); T.add(c, 360, y, 8, (220, 220, 240))
         tips = ['Die Rolle macht dich kurz unverwundbar.', 'Salz löscht alle Geschosse und öffnet Geheimräume an rissigen Wänden.',
                 'Rot aufleuchtende Yokai greifen gleich an.']

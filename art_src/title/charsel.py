@@ -1,6 +1,7 @@
 """Charakterauswahl im Titelstil (Hi-Res-Ebene, doppelte Dichte):
 pedestal – zweistufiges Steinpodest am Seeufer, Mondlicht von rechts, Moos und Risse
 lock     – rotes Hanko-Siegel 封 („versiegelt“) für gesperrte Figuren
+seal_*   – Hanko-Siegel neben den Seitenüberschriften der Untermenüs (力 玉 妖 功 史 手)
 ink      – Goldtusche-Strich für die Wertebalken (schwarze Tusche verschwände in der Nacht)
 usage: python3 charsel.py"""
 import math
@@ -61,11 +62,8 @@ def pedestal():
     c.save('pedestal')
 
 
-def lock():
-    """封: links zwei 土 übereinander (圭), rechts 寸 – als weiße Striche im roten Stein."""
-    strokes = [[(3, 0), (3, 6)], [(1, 3), (5, 3)], [(0, 6), (6, 6)],
-               [(3, 8), (3, 14)], [(1, 10), (5, 10)], [(0, 14), (6, 13)],
-               [(8, 4), (15, 4)], [(13, 0), (13, 15), (11, 14)], [(9, 8), (10, 10)]]
+def seal(name, strokes):
+    """Kanji aus Strichen (16×16-Raster) als weiße Linien im roten Hanko-Stein, doppelte Dichte."""
     im = Image.new('1', (16, 16), 0)
     d = ImageDraw.Draw(im)
     for st in strokes:
@@ -78,12 +76,30 @@ def lock():
     a[-2:, :] = logo.Vd; a[:, -2:] = logo.Vd
     a[:2, :-2] = logo.Vl; a[:-2, :2] = logo.Vl
     for y, x in ((0, 0), (0, w - 1), (w - 1, 0), (w - 1, w - 1), (0, 13), (w - 1, 27), (20, w - 1)):
-        a[y, x] = 0
+        a[y, x] = 0                                      # ausgebrochene Kanten wie bei einem alten Stempel
     a[pad:pad + n, pad:pad + n][g] = logo.PAPER
-    Image.fromarray(a, 'RGBA').save(f'{logo.DST}/lock.png')
+    Image.fromarray(a, 'RGBA').save(f'{logo.DST}/{name}.png')
+
+
+SEALS = {
+    'lock': [[(3, 0), (3, 6)], [(1, 3), (5, 3)], [(0, 6), (6, 6)],          # 封: 圭 links, 寸 rechts
+             [(3, 8), (3, 14)], [(1, 10), (5, 10)], [(0, 14), (6, 13)],
+             [(8, 4), (15, 4)], [(13, 0), (13, 15), (11, 14)], [(9, 8), (10, 10)]],
+    'seal_chal': [[(2, 5), (13, 5), (13, 13), (10, 15)], [(7, 0), (7, 6), (5, 11), (1, 15)]],          # 力 Kraft
+    'seal_codex': [[(2, 1), (13, 1)], [(7, 1), (7, 14)], [(3, 7), (12, 7)], [(1, 14), (14, 14)],       # 玉 Juwel
+                   [(10, 10), (11, 12)]],
+    'seal_lex': [[(3, 0), (1, 6), (5, 12)], [(5, 4), (4, 9), (0, 14)], [(0, 7), (6, 7)],              # 妖 Yōkai
+                 [(14, 1), (9, 3)], [(8, 7), (15, 7)], [(12, 3), (12, 8), (8, 14)], [(12, 9), (15, 14)]],
+    'seal_ach': [[(0, 3), (6, 3)], [(3, 3), (3, 12)], [(0, 13), (6, 12)],                             # 功 Verdienst
+                 [(8, 6), (15, 6), (15, 14), (13, 15)], [(11, 1), (11, 7), (9, 15)]],
+    'seal_stats': [[(3, 2), (12, 2), (12, 8), (3, 8), (3, 2)], [(7, 0), (7, 8), (5, 12), (1, 15)],    # 史 Chronik
+                   [(4, 10), (15, 15)]],
+    'seal_ctrl': [[(11, 0), (3, 2)], [(2, 5), (13, 5)], [(1, 9), (14, 9)], [(8, 1), (8, 15), (6, 14)]],  # 手 Hand
+}
 
 
 if __name__ == '__main__':
     pedestal()
-    lock()
+    for k, v in SEALS.items():
+        seal(k, v)
     logo.brush('ink', [hx(c) + (255,) for c in ('#3a2418', '#7a5430', '#b8904c', '#e8c47a')])
