@@ -1,37 +1,34 @@
-# Erledigt (Runden 22–23)
-Ausweich-Rolle animiert: Runde 22 drehte/stauchte das Sprite (Luca fand das „blöd“), Runde 23 ersetzt das durch
-eigene gepixelte Roll-Bilder für alle 10 Figuren (`art_src/fable/heroes/roll.py` → `yokai/assets/sprites/<name>_roll.png`:
-geduckt + 4 Ball-Bilder), Nachbilder als Ball-Silhouette, Staub in Bodenfarbe. Offen dabei: Ball-Bilder ggf. pro Figur
-nachschärfen, wenn Luca Feedback gibt (z. B. Waffe sichtbar halten, größere Schweife); neue Figuren brauchen einen
-SPEC-Eintrag in `roll.py`.
+# Erledigt (Runden 24–25)
+- Runde 24: **Göttlicher Schutz** – Bosse ab Kapitel VI (`Boss.divine`, `run.depth >= 6`) nehmen höchstens 2 % Max-HP
+  pro Treffer und 8 % pro Sekunde (Property `Boss.hp` in `yokai/bosses.py`, gilt auch für Brand/Gift/Ketten).
+  HUD-Schriftzug über dem Lebensbalken, Boss-Test prüft die Grenze. Normale Builds sind weit unter der Grenze
+  (Bosstest unverändert), sie fängt nur übermächtige Builds ab.
+- Runde 25: **Kapitel VII Yomi no Kuni** – nach dem ersten Wahren Sieg (`stats.true_wins`) erscheint nach dem
+  Kapitel-VI-Boss eine Yomi-Pforte (`Obj('yomi')`). Biom `yomi_oku` (Totenpalast, Tiefe 7) nutzt vorerst die
+  Kacheln von `yomi` (`_id`-Shortcut in `data.py`), Boss-Pool 7 = Izanami (aus Pool 6 entfernt). Endlos-Modus
+  läuft weiter in die Schleife. Boss-Test prüft die Pforte.
 
 # Nächster Schritt
 
-**Geheime Endkapitel mit echten Endbossen (Wunsch von Luca)** – mit Teil 1 beginnen: Schadensobergrenze + Pforten-Wahl nach Kapitel VI
-Heute endet der Lauf nach Kapitel VI (Takamagahara/Tsukiyomi) mit einem Boss aus einem Pool von vier
-(Mikaboshi, Izanami, Kagutsuchi, Fūjin). Diese Bosse fühlen sich nicht wie Endbosse an und lassen sich mit starken
-Builds sehr schnell besiegen. Geplant, über mehrere Runden verteilt:
+**Izanami als echte Endbossin (Endkapitel Teil 2)** – heute ist sie in Kapitel VII noch der normale Kapitel-VI-Boss
+(Bosstest: 49,6 s, schneller als in VI, weil der Spieler mehr Items hat).
+1. Eigene Endboss-Variante, wenn `run.depth == 7`: deutlich mehr HP (~×1,8), **drei Phasen** mit Schriftzug
+   (z. B. „Izanami zeigt ihr wahres Gesicht“ bei 66 %, „Die acht Donnergötter erwachen“ bei 33 %), Arena-Wechsel
+   (Licht geht aus / Arena wird enger), in Phase 3 die acht Ikazuchi-no-Kami als Blitz-Angriffe aus ihrem
+   verwesten Körper, Shikome-Beschwörung.
+2. Größere Hi-Res-Figur „Izanami, die Verweste“ (handgesetzte Pixel, `art_src/`), nicht nur die Kapitel-VI-Figur.
+3. Belohnung beim ersten Sieg: Erfolg „Rückkehr aus Yomi“, ein neues Item freischalten (z. B. „Pfirsich von
+   Yomotsu Hirasaka“ – Izanagi warf Pfirsiche gegen die Verfolger), eigener Abspann-Text im Epilog.
+4. Bosstest: Izanami (Tiefe 7) soll mit Test-Build > 90 s brauchen.
 
-1. **Weg wählen:** Nach dem Boss von Kapitel VI öffnen sich (wenn freigeschaltet) zwei Pforten, eine zu
-   **Yomi no Kuni** (Unterwelt: Endboss Izanami in ihrer verwesten Gestalt mit den acht Donnergöttern) und eine zu
-   **Takamagahara no Oku** (Endboss Amaterasu, die sich aus der Felsenhöhle Ama-no-Iwato erhebt, oder Susanoo).
-   Jeder Weg hat 2–3 Ebenen mit eigener Gegend, Musik und eigenen späten Gegnern.
-2. **Geheime Ebene:** Sie wird durch etwas Besonderes ausgelöst, z. B. alle drei Kaiserinsignien tragen, oder
-   Reinigungssalz an einer Wand auf Ebene 11 ohne einen Treffer im Kapitel. Dahinter wartet ein verborgener
-   letzter Gegner, etwa Ame-no-Minakanushi oder der „Nue der Leere“.
-3. **Endboss-Regeln:**
-   - **Schadensobergrenze:** höchstens ~2 % der Max-HP pro Treffer und ~8 % pro Sekunde, damit niemand den Boss
-     mit einem Treffer erledigt. Das HUD zeigt dann z. B. „Göttlicher Schutz“.
-   - Drei Phasen mit Zwischensequenz/Schriftzug, Arena-Veränderung (z. B. die Arena wird kleiner, Licht geht aus)
-     und eigene Hi-Res-Figur, deutlich größer als normale Bosse.
-   - Kein Itemdrop vor dem Kampf, dafür eigene Belohnungen: Erfolg, neue Figur oder neues Item freischalten,
-     ein eigener Abspann.
-4. **Testen:** Ein Boss-Test für jeden Endboss (`tools/bosstest.py`), dazu prüfen, dass die Schadensobergrenze greift
-   (z. B. Obon-Fest/Onmyōdō-Build braucht > 60 s).
+Warum: Die Pforte steht, aber das Ziel dahinter fühlt sich noch nicht wie ein Endboss an.
 
-Warum: Der Abschluss eines Laufs soll ein Höhepunkt sein, und geheime Wege erhöhen den Wiederspielwert.
+## Danach (Endkapitel Teil 3+)
+- Zweiter Weg: Pforte nach **Takamagahara no Oku** mit Amaterasu (Ama-no-Iwato) oder Susanoo als Endboss
+- Eigene Kacheln/Requisiten für `yomi_oku` in `art_src/fable/environment` (Shortcut in `data.py` entfernen)
+- Geheime Ebene (z. B. alle drei Kaiserinsignien) mit verborgenem letztem Gegner
 
-## Danach
+## Ebenfalls offen
 
 **Ausweichender Mess-Bot für Dash- und Nahkampf-Synergien** – Runde 20 hat `tools/synbalance.py --raum`
 (drei Gegnerwellen) gebracht und Tsukuyomis Sichelbögen repariert (Mondschein-Teich lief ins Zeitlimit),
