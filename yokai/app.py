@@ -369,8 +369,8 @@ class Game:
         gfx.HI_MODE = True
         self.draw_night(s)
         T = gfx.TEXT
-        T.add('Yōkai no Michi', W // 2, 30, 28, (255, 240, 220), 'c')
-        T.add('– Hyakki Yagyō –', W // 2, 66, 11, (230, 140, 130), 'c')
+        gfx.hi_blit(gfx.env_img('_title', 'logo')[0], W // 2, 56)
+        T.add('– Hyakki Yagyō –', W // 2, 60, 9, (230, 140, 130), 'c')
         items = self.menu_items()
         step = 14 if len(items) <= 10 else 13
         show_news = self.save.data.get('news_seen') != VERSION and not self.headless

@@ -54,6 +54,7 @@
 - Runde 30 – Grundfläche je Requisit: Jede Fels-Variante blockt nur so breit, wie sie gezeichnet ist (aus ihrem Sprite abgeleitet) – schmale Pfeiler, Takenoko, Grabsteine und Totenpfähle lassen dich jetzt dicht vorbei
 - Runde 31 – Requisiten Teil 2: Takamagahara hat jetzt Wolkenfelsen mit eingerollten Kumo-Spiralen und ein goldenes Magatama auf seinem Wolkenkissen; auf dem Schneeberg liegen facettierte Eisbrocken mit Rissen, Luftblasen und Schneekappe, die Eiszapfen stehen in einer Schneewehe
 - Runde 32 – Neuer Titelbildschirm, Teil 1: **gemaltes Mondnacht-Panorama** statt Farbverlauf und herumlaufender Sprites – ein Torii steht im See, dahinter der verschneite Fuji, ein Zedernkamm mit beleuchteter Pagode, Nebelbänder, Schilf, eine glimmende Steinlaterne und ein Kirschzweig, von dem Blüten fallen. Fünf Ebenen verschieben sich sanft gegeneinander (Parallaxe), Berge und Torii spiegeln sich im Wasser, der Mond glitzert auf den Wellen. Auch alle Menüseiten nutzen das neue Bild. Quelle: `art_src/title/panorama.py`
+- Runde 33 – Neuer Titelbildschirm, Teil 2: **handgesetztes Logo** – der Schriftzug „Yōkai no Michi“ in der eigenen Pinselschrift, in Goldstufen mit Lichtfase oben links, dunklem Umriss und Schlagschatten, daneben ein rotes Hanko-Siegel mit den Kanji 妖怪の道, Strich für Strich gepixelt (rechte Spalte zuerst, wie ein echter Stempel). Quelle: `art_src/title/logo.py`
 
 ## 1.4.0 – „Hyakki-Update“ (enthält 1.3 „Kapitel-Update“)
 
