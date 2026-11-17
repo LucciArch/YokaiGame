@@ -2301,9 +2301,9 @@ class Run:
             floor = gfx.make_floor(self.biome if not room.kind.startswith('shrine') else
                                    dict(self.biome, floor=(60, 20, 30) if room.kind == 'shrine_oni' else (200, 190, 150),
                                         floor_pat='stone'), rng)
-            wl = []
-            walls = gfx.make_walls(self.biome, rng, wl)
-            room._bgcache = (self.biome_id, floor, walls, gfx.scale2x(walls), wl)
+            wl, wd = [], []
+            walls = gfx.make_walls(self.biome, rng, wl, wd)
+            room._bgcache = (self.biome_id, floor, walls, gfx.walls_hi(walls, self.biome.get('_id', ''), wd), wl)
         _, floor, walls, self.walls_hi, self.wall_lights = room._bgcache
         bg = pygame.Surface((W, H))
         bg.fill((12, 8, 16))

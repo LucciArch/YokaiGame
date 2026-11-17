@@ -633,7 +633,7 @@ def env_floor(biome, rng):
     return s
 
 
-def env_walls(biome, rng, lights=None):
+def env_walls(biome, rng, lights=None, decos=None):
     bid = biome['_id']
     s = pygame.Surface((W, H), pygame.SRCALPHA)
     top = env_img(bid, 'wall_h')[0]
@@ -647,6 +647,8 @@ def env_walls(biome, rng, lights=None):
         if deco and rng.random() < 0.18:
             i = rng.randrange(len(deco))
             t = deco[i]
+            if decos is not None:
+                decos.append((i, tx, y0))
             wl = WALL_LIGHT.get((bid, i))
             if wl and lights is not None:
                 lights.append((tx + wl[0], y0 + wl[1], wl[3], wl[2]))
@@ -661,6 +663,18 @@ def env_walls(biome, rng, lights=None):
     s.blit(pygame.transform.flip(corner, False, True), (x0, RY + RH))
     s.blit(pygame.transform.flip(corner, True, True), (RX + RW, RY + RH))
     return s
+
+
+def walls_hi(walls, bid, decos):
+    """Wände in doppelter Dichte: Scale2x, Wanddekos aus wall_deco_hi.png in echter Hi-Res darüber."""
+    hi = scale2x(walls)
+    dh = env_img(bid, 'wall_deco_hi', 64)
+    if dh and decos:
+        plain = scale2x(env_img(bid, 'wall_h')[0])       # ohne die alte Deko darunter
+        for i, x, y in decos:
+            hi.blit(plain, (x * 2, y * 2))
+            hi.blit(dh[i % len(dh)], (x * 2, y * 2))
+    return hi
 
 
 def scale2x(surf):
@@ -905,10 +919,11 @@ def _decor(s, kind, base, rng):
             D.circle(s, (250, 240, 210), (x, y), rng.randint(3, 6))
 
 
-def make_walls(biome, rng, lights=None):
-    """Wandrahmen (ganzer Bildschirm, transparent in der Mitte); leuchtende Dekos landen in lights."""
+def make_walls(biome, rng, lights=None, decos=None):
+    """Wandrahmen (ganzer Bildschirm, transparent in der Mitte); leuchtende Dekos landen in lights,
+    gesetzte Wanddekos als (Index, x, y) in decos."""
     if env_ok(biome):
-        return env_walls(biome, rng, lights)
+        return env_walls(biome, rng, lights, decos)
     s = pygame.Surface((W, H), pygame.SRCALPHA)
     wc = biome['wall']
     D = pygame.draw
