@@ -252,14 +252,23 @@ für Talismane greifen (z. B. `bullet_tick`) – sollen sie auch für Strahl/Hie
   Jede Figur hat jetzt eine Prüfung (10). Menüzeilen 24 px statt 26 – für eine 11. Prüfung muss das Menü scrollen.
 - Balance der neuen Items nicht gemessen (moderat gewählt, Stufe 3).
 
-# Nächster Schritt: „Quests“ – Meilenstein-Erfolge mit aktiven Items als Belohnung
-Warum: Siegel und Prüfungen sind komplett; Isaac-artige Langzeitziele fehlen noch für die Ereignisräume und Bosse.
-Vorschläge (je Erfolg ein neues **aktives** Item, `ACTIVES` in data.py, Symbol in einer neuen `icons_v18.py`):
-3× Mochitsuki-Erfolg (Zähler in `save['stats']`) → Kine (Hammerschlag-Aktiv); alle Ereignisse in einem Lauf →
-Matsuri-Uchiwa; 5 Bosse ohne Treffer (Zähler zu 'nohit') → Kagami-mochi; 10 Prüfungen bestanden → ein starkes
-Abschluss-Item. Vorher prüfen, wie aktive Items Ladung/Wirkung definieren (`ACTIVES`, `entities.use_active`).
+# Erledigt (Runden 121–122): Quests mit aktiven Items
+- Neue Belohnungsart `('active', id)` in `ACHIEVEMENTS`; `ACTIVES[...]['locked']=True` hält ein aktives Item aus
+  `Run.active_pool`, bis der Erfolg da ist (Freischaltung landet in `save['items']`). validate prüft das.
+- q_mochi (3× Mochitsuki mit ≥5 Teigen, `stats['mochi_good']`) → `mondkine` (Schlag r 80 + Betäubung);
+  q_nohit5 (`stats['nohit_bosses']` ≥ 5) → `shiomitsu_tama` (Geschosse weg, Treffer + Verlangsamung im ganzen Raum);
+  q_feste4 (4 verschiedene Ereignisse in einem Lauf, `p.sg['feste_lauf']`) → `matsuri_uchiwa` (5 Hanabi mit Brand);
+  q_pruefungen (alle Prüfungen, geprüft in `check_meister`, auch rückwirkend) → `totsuka` (Schnitt auf alle Feinde).
+- Symbole: `art_src/fable/items/icons_v18.py` (Muster wie v17). sigtest prüft Sperre, Freischaltung und Wirkung.
+- Balance nicht gemessen (Ladungen 3/4/3/5, moderat).
+
+# Nächster Schritt: Codex-Seite „Aktive Items“
+Warum: Aktive Items erscheinen nirgends im Lexikon/Codex (nur Items); mit den gesperrten Quest-Aktiven sieht man
+nicht, was es freizuschalten gibt. Eine Seite mit allen `ACTIVES` (Symbol, Name, Ladung, Text; gesperrte mit
+„Freischalten: <Erfolg>“) im bestehenden Codex-Muster (`app.py`, Suche nach „Freischalten:“) ergänzen, uiflow2 prüfen.
 
 # Danach
+- Weitere Quests: 3 Geheimräume in einem Lauf, 50 Kami-Segen gesamt, Endlose Nacht Schleife 3 – je ein aktives Item
 - Balance der Siegel- und Prüfungs-Items mit `tools/synbalance.py` gegenprüfen (Ichi-no-tachi, Ohabari, Miidera, Keppan)
 - Lucas Rückmeldung zur Schwierigkeit weiter beachten (Meister-Startitem macht Läufe leichter – ggf. nur im normalen
   Modus oder dafür Boss-HP leicht anheben)
