@@ -102,7 +102,7 @@ TEXT = {
     'gelaechter': 'Das Lachen hallt weit: Kills verscheuchen Feinde im doppelten Umkreis, Verängstigte nehmen +30 % Schaden',
     'enenra': 'Der Rauch glimmt: Feinde im Rauch brennen, explodierende Feinde hinterlassen Rauch',
     'gashadokuro': 'Feinde unter 25 % Leben zerbrechen in vier Knochensplitter, die weiterfliegen',
-    'tsukumogami': 'Die Rolle wirft Geschosse als zielsuchende Papierpuppen zurück, +1 Papierschild',
+    'tsukumogami': 'Jede Rolle wirft zwei zielsuchende Papierpuppen, Geschosse werden als Puppen zurückgeworfen, +1 Papierschild',
     'shinsen': 'Gesäuberte Räume geben dreimal so oft Schlüssel, Reinigungssalz heilt ein ganzes Herz',
     'nanakorobi': 'Schlagfolge bis +80 %, Erfolg zählt Räume unter 15 s und stapelt bis 8×',
     'jinmenju': 'Jeder Boss erfüllt zwei Wünsche und heilt dich ganz',
@@ -125,7 +125,7 @@ TEXT = {
     'himmelsbote': 'Im Laufen stößt die Krähe doppelt so oft herab',
     'kyudo': 'Weit geflogene Talismane treffen 60 % stärker',
     'tengu_sturm': 'Jeder 6. Wurf entfesselt einen Sturmring um dich',
-    'allsehend': 'Markierte Feinde nehmen +30 % Schaden, der Blick lenkt weiter',
+    'allsehend': 'Jeder Treffer öffnet ein Auge: markierte Feinde nehmen +20 % bis +56 % Schaden, der Blick lenkt weiter',
     'augen_ueberall': 'Das Handauge trifft markierte Feinde auf jede Entfernung',
     'mondteich': 'Mondsichel-Talismane lassen Feinde erstarren und treffen Gebremste 40 % stärker',
     'leben_tod': 'Kills schenken manchmal ½ Geisterherz',
@@ -142,7 +142,7 @@ TEXT = {
     'ninja_flug': 'Im Laufen fliegt jeder 3. Wurf auch nach hinten',
     'tintenpanzer': 'Im Schneckenhaus blendet Tinte Feinde in der Nähe',
     'tiefsee_blick': 'Der starre Blick verletzt Feinde',
-    'brandung': 'Talismane teilen sich beim Abprallen',
+    'brandung': 'Abprallende Talismane teilen sich und rollen als Rückflut zum Feind',
     'a_un': 'Wirst du getroffen, brüllt der Wächter alle zurück',
     'sonne_mond': 'Würfe wechseln: Sonne (Feuer) und Mond (Frost)',
     'taifun': 'Talismane wehen Geschosse in weitem Umkreis weg und schicken sie als Windklinge zurück',
@@ -156,7 +156,7 @@ TEXT = {
     'geisterlicht': 'Zwei Irrlichter pro Kill, sie fliegen durch Wände',
     'faehrmann': 'Jeder 12. Kill: der Fährmann zahlt ½ Geisterherz',
     'ewiger_winter': 'Erstarrte Feinde nehmen +50 % Schaden, Gebremste erstarren öfter',
-    'tengu_flug': 'Die Rolle entfesselt einen schneidenden Windwirbel',
+    'tengu_flug': 'Die Rolle entfesselt einen Windwirbel, die nächsten vier Würfe fliegen als durchbohrende Krähenfedern (200 %)',
     'oni_rausch': 'Torkelnde Talismane treffen +45 % statt +30 %',
     'oni_krieger': 'Tigerhieb: die ersten drei Treffer jedes Raums und der erste Treffer auf jeden unverletzten Feind',
     'gluecksgoetter': 'Goldene Treffer lassen manchmal Mon fallen',
@@ -357,6 +357,11 @@ def on_fire(p, run, bullets):
                 if 'sushi' in S:
                     b.fl = dict(b.fl); b.fl['poison'] = 1; b.fl['explode'] = 1
                     _syn(run, 'sushi', p.x, p.y, (170, 255, 120))
+    if 'tengu_flug' in S and g.get('tengu_f', 0) > 0:
+        g['tengu_f'] -= 1
+        for b in bullets:
+            b.dmg *= 2.4; b.col = (90, 90, 120)
+            b.fl = dict(b.fl, pierce=1)
     if 'schweiss' in S and g.get('schweiss', 0) > 0:
         g['schweiss'] = 0
         for b in bullets:
@@ -571,10 +576,10 @@ def bullet_bounce(run, b):
             b.dmg *= 1.5; b.col = (120, 200, 240)
     if 'brandung' in run.player.sgs and not b.fl.get('_br'):
         _syn(run, 'brandung', b.x, b.y, (110, 190, 255))
-        b.fl = dict(b.fl); b.fl['_br'] = 1
+        b.fl = dict(b.fl, _br=1, homing=1)   # Rückflut: die Welle rollt zum Feind zurück
         a = math.atan2(b.vy, b.vx)
         for da in (-0.35, 0.35):
-            run.fire_player_bullet(b.x, b.y, a + da, b.dmg * 0.6, math.hypot(b.vx, b.vy), max(1.5, b.r * 0.8), 0.5, {'_br': 1})
+            run.fire_player_bullet(b.x, b.y, a + da, b.dmg * 0.7, math.hypot(b.vx, b.vy), max(1.5, b.r * 0.8), 0.6, {'_br': 1, 'homing': 1})
 
 
 def hit_pre(run, e, b, dmg):
@@ -606,7 +611,7 @@ def hit_pre(run, e, b, dmg):
     if getattr(e, 'sg_curse', 0) > 0:
         dmg *= 2
     if 'hundert_augen' in S and getattr(e, 'sg_mark', False):
-        dmg *= 1.3 if 'allsehend' in S else 1.15
+        dmg *= 1.2 + 0.06 * getattr(e, 'sg_eyes', 0) if 'allsehend' in S else 1.15
         if 'allsehend' in S:
             _syn(run, 'allsehend', e.x, e.y, (255, 120, 160))
     if 'ewiger_winter' in S and e.frozen > 0:
@@ -653,6 +658,8 @@ def hit_post(run, e, b, dmg):
             _syn(run, 'goetter_arsenal', e.x, e.y, (255, 220, 150))
     if 'hundert_augen' in S:
         e.sg_mark = True
+        if 'allsehend' in S:   # hundert Augen: jeder Treffer öffnet ein weiteres
+            e.sg_eyes = min(6, getattr(e, 'sg_eyes', 0) + 1)
     if 'gluecksgoetter' in S and b is not None and b.gold and random.random() < 0.15:
         run.spawn_pickup('coin', e.x, e.y)
         _syn(run, 'gluecksgoetter', e.x, e.y, (255, 220, 110))
@@ -984,6 +991,14 @@ def on_dash(p, run):
     if 'izanagis_flucht' in S and run.time - g.get('momo', -9) >= 3.0:
         _syn(run, 'izanagis_flucht', p.x, p.y, (255, 170, 140))
         _momo(p, run, 1.5)
+    if 'tsukumogami' in S:   # Schirm und Hitogata erwachen: zwei Papierpuppen suchen ihr Ziel
+        tgt = _nearest(run, p.x, p.y, 300)
+        if tgt:
+            _syn(run, 'tsukumogami', p.x, p.y, (220, 80, 60))
+            a = math.atan2(tgt.y - p.y, tgt.x - p.x)
+            for da in (-0.6, 0.6):
+                b = run.fire_player_bullet(p.x, p.y - 4, a + da, p.damage() * 1.0, 190, 3.0, 1.4, {'homing': 1})
+                b.col = (180, 200, 250)
     if 'tarnung' in S:
         g['invis'] = 2.6 if 'hara_tsuzumi' in S else 1.3
     if 'hara_tsuzumi' in S:
@@ -1007,6 +1022,7 @@ def on_dash(p, run):
         clouds.append([p.x, p.y, 1.6])
         del clouds[:-4]
     if 'tengu_flug' in S:
+        g['tengu_f'] = 4   # die nächsten vier Würfe fliegen als Krähenfedern
         _syn(run, 'tengu_flug', p.x, p.y, (200, 230, 210))
         _ring(run, p.x, p.y, (200, 230, 210), 55)
         for e in run.enemies:

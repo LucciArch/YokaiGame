@@ -125,5 +125,28 @@ for _ in range(10):
     sigs.bullet_tick(b, run, 0.05)
 if not b.fl.get('homing') or abs(b.dmg - 14) > 0.01:
     print('FEHLER Mokumokuren', b.dmg, b.r); bad += 1
+# Hundert Augen: jeder Treffer öffnet ein Auge (+20 % bis +56 %); Tsunami: Rückflut sucht; Tengu-Flug: vier Federn;
+# Tsukumogami: die Rolle wirft zwei Papierpuppen (Runde 97)
+g.start_run('hana', 19); run = g.run; p = run.player
+for iid in ('mokumoku_auge', 'tengu_auge', 'kanagawa', 'kappa_teller', 'karasu_feder', 'tengu_geta', 'karakasa', 'hitogata'):
+    p.gain_item(iid, silent=True)
+e = make_boss(run, 'shuten_doji'); e.spawn_t = 0; run.enemies = [e]
+for _ in range(8):
+    sigs.hit_post(run, e, None, 1)
+if abs(sigs.hit_pre(run, e, None, 10) - 15.6) > 0.01:
+    print('FEHLER Hundert Augen', e.sg_eyes); bad += 1
+b = Bullet(100, 100, 50, 0, 10, 3, 1, 'p', (255, 255, 255), {}); n0 = len(run.pbullets)
+sigs.bullet_bounce(run, b)
+if not b.fl.get('homing') or len(run.pbullets) - n0 != 2 or not all(x.fl.get('homing') for x in run.pbullets[n0:]):
+    print('FEHLER Tsunami-Rückflut'); bad += 1
+n0 = len(run.pbullets)
+sigs.on_dash(p, run)
+if len(run.pbullets) - n0 != 2:
+    print('FEHLER Tsukumogami-Puppen', len(run.pbullets) - n0); bad += 1
+fs = []
+for _ in range(5):
+    b = Bullet(100, 100, 50, 0, 10, 3, 1, 'p', (255, 255, 255), {}); sigs.on_fire(p, run, [b]); fs.append(b.dmg)
+if [d >= 20 for d in fs] != [True] * 4 + [False]:
+    print('FEHLER Tengu-Federn', fs); bad += 1
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)
