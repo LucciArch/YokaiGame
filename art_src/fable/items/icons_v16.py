@@ -536,12 +536,173 @@ def murakumo():
         c.line([(x, y), (x - 1, y + 3)], 'a', 1)
     return c
 
+
+def kotodama():
+    """Kotodama-Norito: gefaltetes Gebetsblatt (Hōsho) mit Schriftzeilen, aus dem Lichtwellen strömen."""
+    c = Cv()
+    for r in (12, 9):                                                  # Klangwellen des Gebets
+        c.line([(16 + r * math.cos(t / 10), 16 + r * math.sin(t / 10)) for t in range(-30, -3)], 'y' if r > 10 else 'Y', 1)
+    c.form(PG([(9, 9), (23, 9), (24, 29), (8, 29)]), 'cCs', 1, 1, ring='K')
+    c.form(R(8, 13, 24, 15), 'qrR', 0, 1, ring='K')                    # Mizuhiki-Band
+    c.line([(8, 14), (24, 14)], 'W', 1)
+    for x in (11, 14, 17, 20):                                         # Schriftspalten
+        for y in range(17, 28, 2):
+            if (x + y) % 3:
+                c.a[y, x] = 'k'
+    return c
+
+
+def tsubame_gaeshi():
+    """Tsubame-gaeshi: eine Schwalbe im Wendeflug, dahinter die geschwungene Spur einer Klinge."""
+    c = Cv()
+    arc = [(4 + t, 26 - 18 * math.sin(t / 26 * math.pi)) for t in range(0, 27, 2)]
+    c.line(arc, '2', 2)
+    c.line(arc, 'W', 1)
+    body = REL(17, 14, 6, 3, -20)
+    wings = PG([(14, 13), (5, 5), (9, 13)]) | PG([(19, 13), (27, 4), (23, 14)])
+    tail = PG([(22, 16), (30, 22), (25, 17), (29, 26), (21, 18)])
+    c.form(wings | tail, 'IJO', 1, 1, ring='K')
+    c.form(body, 'IJO', 1, 1, ring='K')
+    c.fill(E(15, 16, 3, 1.4), 'W')                                     # weiße Brust
+    c.fill(E(12, 13, 1.2, 1), 'q')                                     # rote Kehle
+    c.a[12, 13] = 'K'
+    return c
+
+
+def shinoda_blatt():
+    """Blatt aus dem Shinoda-Wald: welkes Kuzu-Blatt im Herbstton, daneben ein weißer Fuchsschwanz im Nebel."""
+    c = Cv()
+    c.form(E(16, 26, 13, 3), 'nvw', 0, 1)                              # Nebel
+    tail = REL(9, 17, 8, 3.6, -60)
+    c.form(tail, 'nvW', 2, 1, ring='K')
+    c.form(REL(5, 24, 2.4, 2, -60), '789', 0, 1, ring='K')
+    leaf = REL(20, 13, 7.5, 5.5, 25)
+    c.form(leaf, '789', 2, 1, ring='K')
+    c.line([(14, 9), (26, 17)], 'N', 1)
+    for x, y in ((18, 11), (22, 14)):
+        c.line([(x, y), (x - 1, y + 4)], 'N', 1)
+        c.line([(x, y), (x + 3, y - 2)], 'N', 1)
+    c.line([(26, 17), (28, 22)], 'j', 1)
+    return c
+
+
+def tanuki_tokkuri():
+    """Tokkuri des Tanuki: bauchige Sakeflasche aus Ton mit Schnur und Strohhut-Deckel, Tropfen am Hals."""
+    c = Cv()
+    body = E(16, 21, 9, 8.5) | R(13, 6, 19, 14)
+    c.form(body, 'jdD', 2, 1, ring='K')
+    c.fill(E(16, 22, 6.5, 6) & ~E(16, 22, 5.5, 5), 'd')
+    c.form(R(9, 18, 23, 26) & E(16, 22, 9, 8.5), 'nvW', 1, 1)          # Papieretikett
+    for y in (20, 22, 24):
+        c.line([(14, y), (18, y)], 'k', 1)
+    c.form(PG([(9, 6), (16, 1), (23, 6), (16, 8)]), 'cCs', 1, 1, ring='K')   # Strohhut-Stopfen
+    c.line([(12, 11), (6, 15), (5, 22)], 'q', 1)                       # Trageschnur
+    c.form(E(24, 6, 1.2, 1.6), 'aAW', 0, 1, ring='K')
+    return c
+
+
+def nanatsu_dogu():
+    """Benkeis sieben Waffen: im Fächer gekreuzt – Naginata, Kanabō, Sichel, Säge, Axt, Hammer, Rechen."""
+    c = Cv()
+    tips = [(3, 6), (8, 2), (14, 1), (20, 2), (26, 4), (30, 9)]
+    for k, (x, y) in enumerate(tips):
+        c.line([(16, 29), (x, y + 3)], 'jdD'[k % 2 + 1], 2)
+    c.form(PG([(1, 9), (3, 2), (6, 7)]), '23W', 0, 1, ring='K')        # Naginata
+    c.form(E(8, 4, 2.2, 3), '012', 1, 1, ring='K')                     # Kanabō
+    c.form(E(14, 3, 3, 1.6) & ~E(14, 4.5, 2.4, 1.6), '23W', 0, 1, ring='K')   # Sichel
+    c.form(R(19, 1, 23, 5), '123', 0, 1, ring='K')                     # Hammer
+    c.form(E(27, 6, 3, 2.6) & (px.X > 25), '23W', 0, 1, ring='K')      # Axt
+    for x in (28, 30):                                                 # Rechen
+        c.a[9, x] = '2'
+    c.form(E(16, 28, 4, 2.4), 'qrR', 1, 1, ring='K')                   # Bündelschnur
+    return c
+
+
+def zehnter_teller():
+    """Der zehnte Teller: blau bemalter Porzellanteller, ganz – darunter die Scherben der neun anderen."""
+    c = Cv()
+    for x, y, d in ((5, 25, 1), (11, 28, -1), (22, 28, 1), (27, 24, -1)):
+        c.form(PG([(x, y), (x + 3 * d, y - 2), (x + 2 * d, y + 2)]), 'nvW', 0, 1, ring='K')
+    plate = E(16, 14, 11.5, 9.5)
+    c.form(plate, 'nvW', 2, 1, ring='K')
+    c.fill(E(16, 15, 7.5, 5.8) & ~E(16, 15, 6.5, 4.8), 'J')
+    c.fill(E(16, 15, 3, 2.2), 'O')
+    for k in range(10):                                                # zehn Punkte am Rand
+        a = k * math.tau / 10
+        c.a[int(round(14 + 8.6 * math.sin(a))), int(round(16 + 10.4 * math.cos(a)))] = 'J'
+    sparkle(c, 26, 5, 'W', 'A')
+    return c
+
+
+def hanadaka_men():
+    """Hanadaka-Maske: rotes Tengu-Gesicht mit langer Nase, buschigen weißen Brauen, goldenen Augen."""
+    c = Cv()
+    face = E(13, 16, 9, 11)
+    c.form(face, 'qrR', 2, 1, ring='K')
+    c.form(L(14, 16, 2.6, 29, 9, 1.6), 'qrR', 1, 1, ring='K')          # Nase
+    for x0 in (7, 14):                                                 # Brauen
+        c.form(E(x0 + 2, 11, 3.6, 1.6), 'vwW', 0, 1, ring='K')
+    for x in (9, 16):
+        c.form(E(x, 14, 1.6, 1.2), 'gyY', 0, 1, ring='K')
+        c.a[14, x] = 'K'
+    c.line([(8, 23), (11, 25), (16, 24)], 'U', 1)                      # Mund
+    c.line([(5, 18), (2, 22), (3, 28)], 'k', 1)                        # Maskenschnur
+    c.form(E(13, 6, 3, 1.6), 'khH', 0, 1, ring='K')                    # Tokin
+    return c
+
+
+def kikyo_mon():
+    """Kikyō-Mon: violette Glockenblume als fünfzackiges Wappen auf schwarzem Lackgrund, Pentagramm in Gold."""
+    c = Cv()
+    c.form(E(16, 16, 13, 13), 'khH', 1, 1, ring='K')
+    for k in range(5):                                                 # fünf Blütenblätter
+        a = -math.pi / 2 + k * math.tau / 5
+        c.form(E(16 + 6.5 * math.cos(a), 16 + 6.5 * math.sin(a), 4, 4), 'xpP', 1, 1, ring='K')
+    c.fill(E(16, 16, 4, 4), 'p')
+    star = [(16 + 8 * math.cos(-math.pi / 2 + k * 4 * math.pi / 5), 16 + 8 * math.sin(-math.pi / 2 + k * 4 * math.pi / 5)) for k in range(6)]
+    c.line(star, 'y', 1)
+    c.fill(E(16, 16, 1.2, 1.2), 'Y')
+    return c
+
+
+def oni_tsuno():
+    """Abgebrochenes Oni-Horn: gekrümmtes, beinfarbenes Horn mit Rillen, rote Bruchkante, darüber ein Zornesfunke."""
+    c = Cv()
+    horn = L(9, 27, 5, 16, 14, 3.8) | L(16, 14, 3.8, 21, 7, 2.6) | L(21, 7, 2.6, 26, 3, 0.8)
+    c.form(horn, 'ubB', 2, 1, ring='K')
+    for t in (0.2, 0.4, 0.6):                                          # Rillen
+        x, y = 9 + 14 * t, 27 - 18 * t
+        c.line([(x - 4, y - 2), (x + 3, y + 3)], 'u', 1)
+    c.form(E(9, 27, 5, 2.6), 'UVR', 1, 1, ring='K')                    # Bruchkante
+    c.fill(E(9, 27, 2.6, 1.2), 'U')
+    sparkle(c, 26, 18, 'R', 'q')
+    return c
+
+
+def kushinada_kushi():
+    """Kushinadas Kamm: roter Lackkamm mit Goldranke und Kirschblüte, ein Wassertropfen wie eine Träne."""
+    c = Cv()
+    back = E(16, 13, 12, 7) & (px.Y < 16)
+    c.form(back, 'UVR', 2, 1, ring='K')
+    c.form(R(4, 15, 28, 17), 'UVR', 1, 1, ring='K')
+    for x in range(5, 28, 2):                                          # Zinken
+        c.line([(x, 17), (x, 26)], 'U' if x % 4 else 'V', 1)
+    c.line([(8, 11), (12, 8), (16, 10), (20, 8), (24, 11)], 'y', 1)    # Goldranke
+    for k in range(5):
+        a = -math.pi / 2 + k * math.tau / 5
+        c.form(E(16 + 2.4 * math.cos(a), 11 + 2.4 * math.sin(a), 1.6, 1.6), 'mST', 0, 1)
+    c.fill(E(16, 11, 1, 1), 'y')
+    c.form(E(27, 27, 1.6, 2.2) | PG([(26, 26), (27, 22), (28, 26)]), 'aAW', 0, 1, ring='K')
+    return c
+
 NAMES = ['haraegushi', 'zanshin_tsuba', 'kuzu_blatt', 'bunbuku_kessel', 'tausendstes_schwert', 'neunter_teller',
          'tengu_tsubute', 'taizan_fukun', 'ibaraki_arm', 'yashiori_sake',
          'hi_ogi', 'muramasa', 'fuchs_trugbild', 'shigaraki_tanuki', 'tachi_ojo', 'tsurube', 'kakuremino', 'hoki_naiden',
          'masakari', 'habakiri',
          'tamagushi', 'kesagiri', 'hoshi_tama', 'tanuki_bayashi', 'gojo_giboshi', 'ido_kagami', 'sojobo_hane',
-         'juni_shinsho', 'setsubun_mame', 'murakumo']
+         'juni_shinsho', 'setsubun_mame', 'murakumo',
+         'kotodama', 'tsubame_gaeshi', 'shinoda_blatt', 'tanuki_tokkuri', 'nanatsu_dogu', 'zehnter_teller', 'hanadaka_men',
+         'kikyo_mon', 'oni_tsuno', 'kushinada_kushi']
 
 
 def build():

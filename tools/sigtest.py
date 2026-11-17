@@ -219,5 +219,32 @@ for _ in range(3):
     sigs.on_room_clear(run)
 if p.hp != 3:
     print('FEHLER Tamagushi', p.hp); bad += 1
+# Welle „Yomi / Iwato“: Sieben Waffen, Kikyō, Tokkuri, Kushinada, Oni-Horn
+g.start_run('benkei', 24); run = g.run; p = run.player
+for iid in ('nanatsu_dogu', 'kikyo_mon', 'tanuki_tokkuri', 'kushinada_kushi', 'oni_tsuno'):
+    p.gain_item(iid, silent=True)
+big = []
+for _ in range(7):
+    b = Bullet(100, 100, 50, 0, 10, 3, 1, 'p', (255, 255, 255), {}); sigs.on_fire(p, run, [b]); big.append(b.dmg > 15)
+if big != [False] * 6 + [True]:
+    print('FEHLER Sieben Waffen', big); bad += 1
+e = make_boss(run, 'shuten_doji'); e.spawn_t = 0; e.invuln = False; run.enemies = [e]
+hs = []
+for _ in range(5):
+    h0 = e.hp; sigs.hit_post(run, e, None, 1); hs.append(h0 - e.hp)
+if not (hs[4] > 0 and hs[:4] == [0] * 4):
+    print('FEHLER Kikyo', hs); bad += 1
+r0 = sigs.rate_mult(p)
+for _ in range(8):
+    sigs.on_coin(p, run, 1)
+if not sigs.rate_mult(p) > r0 * 1.29:
+    print('FEHLER Tokkuri'); bad += 1
+p.hp = 6; p.spirit = 0; m0 = sigs.dmg_mult(p)
+sigs.on_room_clear(run); sigs.on_room_clear(run)
+if abs(sigs.dmg_mult(p) / m0 - 1.08) > 0.01:
+    print('FEHLER Kushinada', sigs.dmg_mult(p) / m0); bad += 1
+m0 = sigs.dmg_mult(p); p.hp = 2
+if abs(sigs.dmg_mult(p) / m0 - 1.3) > 0.01:
+    print('FEHLER Oni-Horn'); bad += 1
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)

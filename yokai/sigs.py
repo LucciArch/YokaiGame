@@ -236,6 +236,16 @@ TEXT = {
     'juni': 'Jeder 12. Wurf: die zwölf Himmelsgeneräle – zwölf Talismane im Kreis (je 60 %)',
     'mame': 'Jeder 3. Wurf streut drei geröstete Bohnen (40 %); getroffene Yokai fliehen 1 s',
     'murakumo': 'Eine Gewitterwolke folgt dir: alle 2 s ein Blitz auf den nächsten Feind (100 %)',
+    'kotodama': 'Jeder 16. Wurf spricht ein Norito: alle Feindgeschosse im Raum vergehen',
+    'tsubame': 'Treffer: 12 % Chance auf einen Schwalbenschnitt – ein Talisman schnellt zum nächsten Feind (100 %)',
+    'shinoda': 'Nach einem Raum ohne Treffer liegt im nächsten 3 s Fuchsnebel: Yokai verwirrt',
+    'tokkuri': 'Jede 8. Münze: ein Schluck Sake – 4 s +30 % Feuerrate',
+    'nanatsu': 'Jeder 7. Wurf ist eine von Benkeis Waffen: groß, durchbohrend, 200 %',
+    'zehnter': 'Jeder 10. Kill: der zehnte Teller zerspringt – 10 Scherben (60 %), nahe Yokai fliehen 2 s',
+    'hanadaka': 'Nach der Rolle sind die nächsten 3 Würfe Windklingen: durchbohrend, +40 %',
+    'kikyo': 'Jeder 5. Treffer am selben Feind schließt das Pentagramm: 250 % Zusatzschaden',
+    'oni_tsuno': 'Unter 2 Herzen: +30 % Schaden und deine Würfe durchbohren',
+    'kushinada': 'Jeder geräumte Raum: +4 % Schaden bis zur nächsten Ebene (höchstens +32 %)',
 }
 
 BULLET_SIGS = ('sichel', 'kammzinken', 'seidenfaden', 'stromauf', 'gross', 'schweben', 'windstoss', 'koi_drache')
@@ -666,6 +676,24 @@ def _siegel_fire(p, run, bullets, g, n, base, dmg, spd, life, size):
             nb = run.fire_player_bullet(p.x, p.y - 3, base + random.uniform(-0.45, 0.45), dmg * 0.4,
                                         spd * random.uniform(0.75, 1.0), 1.5, life * 0.7, {'mame': 1})
             nb.col = (210, 170, 110)
+    if 'kotodama' in S and n % 16 == 0 and run.ebullets:  # Norito
+        run.clear_ebullets()
+        _ring(run, p.x, p.y, (240, 230, 200), 70)
+    if 'nanatsu' in S and n % 7 == 0 and bullets:        # eine der sieben Waffen
+        b = bullets[0]
+        b.dmg *= 2.0
+        b.r *= 1.5
+        b.col = (170, 170, 190)
+        b.fl = dict(b.fl, pierce=1)
+    if g.get('hd', 0) > 0:                               # Hanadaka: Windklingen nach der Rolle
+        g['hd'] -= 1
+        for b in bullets:
+            b.dmg *= 1.4
+            b.col = (200, 230, 220)
+            b.fl = dict(b.fl, pierce=1)
+    if 'oni_tsuno' in S and p.total_hp() < 4:
+        for b in bullets:
+            b.fl = dict(b.fl, pierce=1)
 
 
 def bullet_end(run, b):
@@ -784,6 +812,18 @@ def hit_post(run, e, b, dmg):
     echo = getattr(run, '_echo', False)   # Schaden von Bodenfeuer, Blitz oder Explosion
     if b is not None and b.fl.get('mame') and not e.is_boss:
         e.sg_fear = max(getattr(e, 'sg_fear', 0), 1.0)
+    if 'tsubame' in S and b is not None and not echo and random.random() < 0.12:
+        o = _nearest(run, e.x, e.y, 160, lambda o: o is not e)
+        if o:                                            # Schwalbenschnitt
+            nb = run.fire_player_bullet(e.x, e.y, math.atan2(o.y - e.y, o.x - e.x), p.damage(), 260, 2.5, 0.8, {})
+            nb.col = (90, 110, 160)
+            nb.hit.add(e)
+    if 'kikyo' in S and not echo:
+        e.sg_kk = getattr(e, 'sg_kk', 0) + 1
+        if e.sg_kk >= 5:
+            e.sg_kk = 0
+            _sparks(run, e.x, e.y, ((140, 120, 220), (230, 220, 255)), 8, 90)
+            run.damage_enemy(e, p.damage() * 2.5, None)
     if 'treffsicher' in S:
         hi = 'goetter_arsenal' in S
         g['ts'] = min(0.35 if hi else 0.2, g.get('ts', 0) + (0.04 if hi else 0.02))
@@ -928,6 +968,17 @@ def on_kill(run, e):
         for k in range(8):                               # Fuchsfeuer-Ring
             nb = run.fire_player_bullet(e.x, e.y, k * math.pi / 4, p.damage() * 0.6, 120, 3, 0.9, {'burn': 1})
             nb.col = (120, 200, 255)
+    if 'zehnter' in S:
+        g['zt'] = g.get('zt', 0) + 1
+        if g['zt'] % 10 == 0:                            # der zehnte Teller
+            _sparks(run, e.x, e.y, ((235, 240, 255), (120, 150, 220)), 10, 100)
+            seen = set()
+            for k in range(10):
+                nb = run.fire_player_bullet(e.x, e.y, k * math.tau / 10, p.damage() * 0.6, 200, 2, 0.45, {})
+                nb.hit = seen; nb.col = (220, 230, 255)
+            for o in run.enemies:
+                if o.active() and not o.is_boss and math.hypot(o.x - e.x, o.y - e.y) < 80:
+                    o.sg_fear = max(getattr(o, 'sg_fear', 0), 2.0)
     if 'zanshin' in S:
         g['zs'] = min(5, g.get('zs', 0) + 1) if run.time - g.get('zs_t', -9) < 2.0 else 1
         g['zs_t'] = run.time
@@ -1180,7 +1231,9 @@ def on_dash(p, run):
     g = st(p)
     if 'doppelgaenger' in S:                             # Kuzunohas Spiegelbild bleibt stehen
         g['trug'] = [p.x, p.y, 3.0]
-    if 'tengu_wirbel' in S:                              # Sōjōbōs Feder: Wirbelsturm
+    if 'hanadaka' in S:
+        g['hd'] = 3
+    if 'tengu_wirbel' in S:
         _blast(run, p.x, p.y, 45, p.damage() * 1.2, (180, 190, 210), 260)
         run.ebullets[:] = [b for b in run.ebullets if math.hypot(b.x - p.x, b.y - p.y) > 45]
     if 'chagama' in S:                                   # Bunbuku-Chagama: kurz ein heißer Teekessel
@@ -1286,6 +1339,11 @@ def on_coin(p, run, v):
     if 'gluecksstraehne' in S and random.random() < 0.08 and run.time >= g.get('gold_t', 0):
         g['gold_t'] = run.time + 5
         run.floats.append([p.x, p.y - 20, 'Glückssträhne!', (255, 220, 110), 0.8])
+    if 'tokkuri' in S:
+        g['tk'] = g.get('tk', 0) + 1
+        if g['tk'] % 8 == 0:
+            g['sake_t'] = run.time + 4
+            run.floats.append([p.x, p.y - 20, 'Kanpai!', (230, 210, 160), 0.8])
     if 'fuchsglueck' in S and v == 1 and random.random() < (0.4 if 'fuchsgeld' in S else 0.2):
         extra = 4
         if 'fuchsgeld' in S:
@@ -1309,6 +1367,12 @@ def on_room_enter(run):
     g['syn_seen'] = []
     if 'maskenzug' not in S:
         g['parade'] = 0
+    if 'shinoda' in S and g.get('shinoda') and not run.room.cleared:
+        g['shinoda'] = False                             # Fuchsnebel aus dem Shinoda-Wald
+        for e in run.enemies:
+            if not e.is_boss:
+                e.sg_conf = max(getattr(e, 'sg_conf', 0), 3.0)
+        _ring(run, p.x, p.y, (200, 150, 70), 90)
     g['room_hit'] = False
     g['bluete'] = 0
     g['webs'] = []
@@ -1341,6 +1405,9 @@ def on_room_clear(run):
         g['tama'] = g.get('tama', 0) + 1
         if g['tama'] % 3 == 0 and p.heal(1):
             run.floats.append([p.x, p.y - 20, 'Tamagushi', (110, 180, 90), 0.8])
+    if 'kushinada' in S:
+        g['kushi'] = min(8, g.get('kushi', 0) + 1)
+    g['shinoda'] = not g.get('room_hit')
     if 'opfergabe' in S and random.random() < (0.1 + 0.01 * luck) * (3 if 'shinsen' in S else 1):
         run.spawn_pickup('key', p.x, p.y - 20)
         if 'shinsen' in S:
@@ -1370,6 +1437,7 @@ def on_floor(run):
     g = st(p)
     g['kenko_used'] = 0
     g['taizan_used'] = g['taizan_pen'] = 0
+    g['kushi'] = 0
     g['parade'] = 0
     g['anmut'] = 0
     g['gokaku'] = 0
@@ -1798,6 +1866,10 @@ def dmg_mult(p):
         m *= 0.8
     if g.get('ojo', 0) > 0:
         m *= 1.5
+    if 'kushinada' in S:
+        m *= 1 + 0.04 * g.get('kushi', 0)
+    if 'oni_tsuno' in S and p.total_hp() < 4:
+        m *= 1.3
     if 'gokaku' in S:
         m *= 1 + 0.1 * g.get('gokaku', 0)
     if 'maskenwechsel' in S and g.get('rooms', 0) % 2 == 0:
@@ -1814,6 +1886,8 @@ def rate_mult(p):
     if 'wach' in S:
         m *= 1 + g.get('wach', 0)
     if 'blutdurst' in S and p.run.time < g.get('bd_t', 0):
+        m *= 1.3
+    if 'tokkuri' in S and p.run.time < g.get('sake_t', 0):
         m *= 1.3
     if 'maskenwechsel' in S and g.get('rooms', 0) % 2 == 1:
         m *= 1.35
