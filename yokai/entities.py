@@ -567,6 +567,8 @@ class Player:
             audio.play('bell')
             burst(run, self.x, self.y, (140, 200, 255), 16, 90)
             return False
+        if sigs.jizo(self, run):
+            return False
         self.hit_this_floor = True
         if src:
             self.last_src = src

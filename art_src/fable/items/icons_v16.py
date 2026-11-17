@@ -695,6 +695,173 @@ def kushinada_kushi():
     c.form(E(27, 27, 1.6, 2.2) | PG([(26, 26), (27, 22), (28, 26)]), 'aAW', 0, 1, ring='K')
     return c
 
+
+def onusa():
+    """Ōnusa: großer Reinigungsstab aus Sakaki-Holz, dichte Papierschleppe aus Shide und Hanf, schräg geschwungen."""
+    c = Cv()
+    c.form(L(4, 29, 1.8, 14, 11, 1.6), 'jdD', 1, 1, ring='K')
+    for k in range(6):                                                 # breite Papierschleppe
+        x0 = 13 + k * 2.4
+        pts = [(x0, 8 + k * 0.6), (x0 + 4, 12 + k), (x0 + 1, 16 + k), (x0 + 5, 20 + k), (x0 + 2, 25 + k * 0.6)]
+        c.line(pts, 'W' if k % 2 else 'w', 2)
+        c.line(pts[3:], 'v', 1)
+    for x in (10, 12, 14):                                             # Asa-Hanf
+        c.line([(15, 9), (x - 3, 19), (x - 5, 25)], 'C', 1)
+    c.form(E(15, 9, 3.4, 2.6), 'qrR', 1, 1, ring='K')                  # roter Knoten
+    c.fill(E(15, 9, 1.2, 1), 'e')
+    sparkle(c, 6, 6, 'W', 'Y')
+    sparkle(c, 28, 4, 'w', 'W')
+    return c
+
+
+def ichi_no_tachi():
+    """Ichi-no-tachi: Tachi frisch aus der Saya gerissen, ein einziger weißer Schnitt quer über das Feld."""
+    c = Cv()
+    c.line([(2, 6), (30, 26)], 'v', 1)                                 # der Schnitt
+    c.line([(4, 7), (28, 24)], 'W', 1)
+    c.form(L(7, 25, 1.6, 27, 5, 1.0), '23W', 0, 1, ring='K')           # Klinge
+    c.line([(9, 23), (26, 6)], 'W', 1)
+    c.form(E(7, 25, 3, 3), '012', 1, 1, ring='K')                      # Tsuba
+    c.fill(E(7, 25, 1.4, 1.4), 'g')
+    c.form(L(6, 26, 1.7, 2, 30, 1.6), 'khH', 0, 1, ring='K')           # Griff mit Wicklung
+    for t in (0.3, 0.7):
+        c.a[int(26 + 4 * t), int(6 - 4 * t)] = 'W'
+    sparkle(c, 27, 4, 'W', 'Y')
+    return c
+
+
+def kitsune_chochin():
+    """Kitsune-Chōchin: gerippte Papierlaterne mit Fuchswappen, glühend orange, an einem Bambusstab, Fuchsfeuer drum."""
+    c = Cv()
+    c.line([(16, 1), (16, 6)], 'd', 1)
+    c.form(R(11, 5, 21, 7), 'khH', 0, 1, ring='K')
+    c.form(R(11, 25, 21, 27), 'khH', 0, 1, ring='K')
+    lamp = E(16, 16, 8.5, 9.5)
+    c.form(lamp, '789', 2, 1, ring='K')
+    for y in (11, 14, 17, 20, 23):                                     # Rippen
+        c.fill(lamp & (px.Y >= y) & (px.Y < y + 1), '8')
+    c.form(PG([(12, 19), (13, 12), (15, 16), (17, 16), (19, 12), (20, 19), (16, 22)]), 'nvW', 0, 1, ring='K')
+    c.a[17, 14] = 'K'; c.a[17, 18] = 'K'
+    for x, y in ((4, 12), (28, 9), (27, 24)):                          # Fuchsfeuer
+        c.form(E(x, y, 1.8, 2.4) | PG([(x - 1, y), (x, y - 5), (x + 1, y)]), 'aAW', 0, 1, ring='K')
+    return c
+
+
+def tanuki_kesa():
+    """Tanuki-Kesa: ein steinerner Jizō mit rotem Lätzchen und Ocker-Kesa – hinten verrät ihn ein gestreifter Tanuki-Schwanz."""
+    c = Cv()
+    tail = REL(24, 24, 7, 3.4, -40)
+    c.form(tail, '789', 1, 1, ring='K')
+    for d in (-2, 2):                                                  # Schwanzringe
+        c.fill(REL(24 + d, 24 - d, 1, 3.4, -40) & tail, 'j')
+    c.form(E(15, 22, 8, 8) & (px.Y < 29), '123', 2, 1, ring='K')       # Steinleib
+    c.form(PG([(8, 16), (22, 16), (15, 28)]), 'jdD', 1, 1, ring='K')    # Kesa schräg über der Brust
+    c.line([(9, 17), (15, 27)], 'g', 1)
+    c.form(PG([(10, 14), (20, 14), (15, 20)]), 'qrR', 1, 1, ring='K')  # rotes Lätzchen
+    c.form(E(15, 9, 5.5, 5.5), '123', 2, 1, ring='K')                  # kahler Kopf
+    c.line([(12, 9), (13, 10)], 'K', 1)                                # geschlossene Augen
+    c.line([(17, 10), (18, 9)], 'K', 1)
+    c.a[12, 15] = '1'
+    c.form(R(4, 28, 27, 31), '012', 1, 1, ring='K')                    # Sockel
+    return c
+
+
+def kanjincho():
+    """Kanjinchō: aufgerollte, leere Spendenrolle, die Benkei als Liste vorlas – mit Holzstab und Kordel."""
+    c = Cv()
+    c.form(R(5, 9, 27, 23), 'nvW', 1, 1, ring='K')
+    for y in range(12, 22, 2):                                         # nur angedeutete Zeilen (die Liste ist leer)
+        c.line([(9, y), (9 + (y * 7) % 11 + 6, y)], 'n', 1)
+    c.form(R(3, 7, 7, 25), 'jdD', 1, 1, ring='K')                      # Rollstab links
+    c.form(R(25, 7, 29, 25), 'cCs', 1, 1, ring='K')                    # aufgerollter Rest
+    c.line([(27, 8), (27, 24)], 'C', 1)
+    c.line([(5, 25), (8, 29), (12, 28)], 'q', 1)                       # Kordel
+    c.form(E(12, 28, 1.4, 1.4), 'qrR', 0, 1, ring='K')
+    c.form(E(21, 17, 2.6, 2.6), 'qrR', 0, 1, ring='K')                 # Siegel
+    return c
+
+
+def okiku_ido():
+    """Brunnen von Banchō Sarayashiki: steinerner Brunnenrand in der Nacht, aus dem eine bleiche Hand einen Teller hebt."""
+    c = Cv()
+    c.form(R(4, 18, 28, 29), '012', 2, 1, ring='K')
+    for x, y in ((4, 22), (12, 18), (20, 22), (12, 25), (24, 25)):    # Steinfugen
+        c.line([(x, y), (x + 8, y)], '0', 1)
+    c.form(E(16, 18, 12, 3), 'IJO', 1, 1, ring='K')                    # Brunnenöffnung
+    c.fill(E(16, 18, 10, 2), 'k')
+    c.form(L(16, 18, 1.6, 15, 10, 1.4), 'nvW', 0, 1, ring='K')         # Arm
+    plate = E(15, 7, 7, 3)
+    c.form(plate, 'nvW', 1, 1, ring='K')
+    c.fill(E(15, 7, 4, 1.4) & ~E(15, 7, 3, 0.6), 'J')
+    for x, y in ((5, 6), (27, 10)):                                    # Hitodama
+        c.form(E(x, y, 1.6, 1.8), 'aAW', 0, 1, ring='K')
+    return c
+
+
+def ushiwaka_fue():
+    """Ushiwakas Flöte: Ryūteki aus geschwärztem Bambus mit roten Wicklungen, Klangnoten und ein Tengu-Federchen."""
+    c = Cv()
+    c.form(L(4, 26, 2, 27, 6, 2), 'khH', 1, 1, ring='K')
+    for t in (0.12, 0.45, 0.88):                                       # Kabaki-Wicklungen
+        x, y = 4 + 23 * t, 26 - 20 * t
+        c.form(E(x, y, 2.4, 2.4) & L(4, 26, 2, 27, 6, 2), 'qrR', 0, 1)
+    for t in (0.55, 0.63, 0.71, 0.79):                                 # Grifflöcher
+        c.a[int(round(26 - 20 * t)), int(round(4 + 23 * t))] = 'K'
+    c.form(L(6, 24, 1.4, 10, 31, 0.6), 'vwW', 0, 1, ring='K')          # Feder
+    for x, y in ((8, 9), (14, 4), (24, 20)):                           # Klangnoten
+        c.form(E(x, y, 1.6, 1.3), 'FfG', 0, 1, ring='K')
+        c.line([(x + 1, y), (x + 1, y - 4)], 'K', 1)
+    return c
+
+
+def seimei_ido():
+    """Seimei-Brunnen: hölzerner Brunnenrahmen, im Wasser spiegelt sich der fünfzackige Stern, Funken steigen auf."""
+    c = Cv()
+    c.form(R(4, 15, 28, 28), 'jdD', 2, 1, ring='K')
+    c.line([(4, 21), (28, 21)], 'j', 1)
+    c.form(R(2, 13, 30, 16), 'jdD', 1, 1, ring='K')                    # Rahmen oben
+    c.form(E(16, 14, 11, 2.4), 'IJO', 0, 1)
+    star = [(16 + 7 * math.cos(-math.pi / 2 + k * 4 * math.pi / 5), 9 + 6 * math.sin(-math.pi / 2 + k * 4 * math.pi / 5)) for k in range(6)]
+    c.line(star, 'P', 1)                                               # aufsteigender Stern
+    c.fill(E(16, 9, 1.2, 1.2), 'X')
+    for x, y in ((6, 6), (26, 4), (25, 11)):
+        sparkle(c, x, y, 'X', 'P')
+    c.form(R(13, 22, 19, 26), 'xpP', 0, 1, ring='K')                   # Kikyō-Täfelchen
+    c.a[24, 16] = 'X'
+    return c
+
+
+def kodomo_kanabo():
+    """Kinder-Kanabō: kurzer, dicker Eisenknüppel mit Nieten, rote Bänder am Griff, ein Kinder-Handabdruck."""
+    c = Cv()
+    club = L(8, 26, 2.2, 22, 9, 5.2)
+    c.form(club, '012', 2, 1, ring='K')
+    for t in (0.35, 0.55, 0.75, 0.92):                                 # Nieten
+        x, y = 8 + 14 * t, 26 - 17 * t
+        for d in (-2.5, 2.5):
+            c.form(E(x + d * 0.7, y + d * 0.6, 1, 1), '23W', 0, 1, ring='K')
+    c.form(L(8, 26, 2.6, 4, 30, 2.4), 'qrR', 0, 1, ring='K')           # Griffbänder
+    c.line([(5, 27), (2, 24)], 'R', 1)
+    c.form(E(25, 25, 3, 2.6), 'UVR', 0, 1)                             # Handabdruck
+    for k in range(4):
+        c.a[22, 23 + k] = 'V'
+    return c
+
+
+def ohabari():
+    """Ama-no-Ōhabari: gerades Götterschwert mit Doppelschneide und Goldgriff, von Blitzketten umzuckt."""
+    c = Cv()
+    c.line([(3, 10), (8, 13), (5, 17), (10, 20)], 'Y', 1)            # Blitzketten
+    c.line([(29, 12), (24, 15), (27, 19), (22, 22)], 'Y', 1)
+    c.form(R(14, 2, 18, 22) | PG([(14, 2), (16, 0), (18, 2)]), '23W', 0, 1, ring='K')
+    c.line([(16, 2), (16, 21)], 'W', 1)
+    c.form(R(9, 21, 23, 24), 'ogy', 1, 1, ring='K')                    # Stichblatt
+    c.form(R(14, 24, 18, 30), 'ogy', 1, 1, ring='K')                   # Goldgriff
+    c.form(E(16, 30, 2.4, 1.6), 'ogY', 0, 1, ring='K')
+    c.line([(16, 25), (16, 29)], 'o', 1)
+    sparkle(c, 16, 6, 'W', 'Y')
+    return c
+
 NAMES = ['haraegushi', 'zanshin_tsuba', 'kuzu_blatt', 'bunbuku_kessel', 'tausendstes_schwert', 'neunter_teller',
          'tengu_tsubute', 'taizan_fukun', 'ibaraki_arm', 'yashiori_sake',
          'hi_ogi', 'muramasa', 'fuchs_trugbild', 'shigaraki_tanuki', 'tachi_ojo', 'tsurube', 'kakuremino', 'hoki_naiden',
@@ -702,7 +869,9 @@ NAMES = ['haraegushi', 'zanshin_tsuba', 'kuzu_blatt', 'bunbuku_kessel', 'tausend
          'tamagushi', 'kesagiri', 'hoshi_tama', 'tanuki_bayashi', 'gojo_giboshi', 'ido_kagami', 'sojobo_hane',
          'juni_shinsho', 'setsubun_mame', 'murakumo',
          'kotodama', 'tsubame_gaeshi', 'shinoda_blatt', 'tanuki_tokkuri', 'nanatsu_dogu', 'zehnter_teller', 'hanadaka_men',
-         'kikyo_mon', 'oni_tsuno', 'kushinada_kushi']
+         'kikyo_mon', 'oni_tsuno', 'kushinada_kushi',
+         'onusa', 'ichi_no_tachi', 'kitsune_chochin', 'tanuki_kesa', 'kanjincho', 'okiku_ido', 'ushiwaka_fue',
+         'seimei_ido', 'kodomo_kanabo', 'ohabari']
 
 
 def build():

@@ -634,7 +634,7 @@ class Run:
             else:
                 self.pedestals.append(Pedestal(self.pick_item('T', 0.14), cx, cy))
         elif k == 'shop':
-            disc = (0.66 if self.player.f['discount'] else 1.0) * (0.7 if self.blessing == 'fuchs' else 1.0)
+            disc = (0.66 if self.player.f['discount'] else 1.0) * (0.7 if self.blessing == 'fuchs' else 1.0) * (0.85 if sigs.has(self.player, 'kanjin') else 1.0)
             xs = [-120, -60, 0, 60, 120]
             for i, dx in enumerate(xs[:4] if random.random() < 0.6 else xs):
                 if i < 2:

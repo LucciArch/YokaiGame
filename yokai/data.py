@@ -313,6 +313,16 @@ I('hanadaka_men', 'Hanadaka-Maske', 'Das lange Nasengesicht des Tengu', 'hanadak
 I('kikyo_mon', 'Kikyō-Mon', 'Der Glockenblumen-Stern, Seimeis Wappen', 'kikyo_mon', (140, 120, 220), 'T', ['shikigami'], 3, True, dmg=0.2, sig_kikyo=1)
 I('oni_tsuno', 'Abgebrochenes Oni-Horn', 'Wer es trägt, spürt den Zorn des Oni', 'oni_tsuno', (230, 210, 170), 'T', ['oni'], 3, True, dmg=0.3, sig_oni_tsuno=1)
 I('kushinada_kushi', 'Kushinadas Kamm', 'Susanoo verwandelte die Braut in einen Kamm und trug sie im Haar', 'kushinada_kushi', (230, 120, 140), 'T', ['raijin'], 3, True, hp=1, sig_kushinada=1)
+I('onusa', 'Ōnusa', 'Der große Reinigungsstab der Shintō-Priester', 'onusa', (245, 245, 235), 'T', ['kami'], 3, True, spirit=1, sig_onusa=1)
+I('ichi_no_tachi', 'Ichi-no-tachi', 'Der erste Hieb entscheidet den Kampf', 'ichi_no_tachi', (200, 200, 215), 'T', [], 3, True, dmg=0.2, sig_ichi=1)
+I('kitsune_chochin', 'Kitsune-Chōchin', 'Die Laterne der Fuchshochzeit', 'kitsune_chochin', (255, 170, 90), 'T', ['kitsune'], 3, True, luck=1, sig_chochin=1)
+I('tanuki_kesa', 'Tanuki-Kesa', 'In der Mönchsrobe wird der Tanuki zum steinernen Jizō', 'tanuki_kesa', (190, 150, 90), 'T', ['tanuki'], 3, True, hp=1, sig_jizo=1)
+I('kanjincho', 'Kanjinchō', 'Die leere Spendenliste, die Benkei am Ataka-Tor vorlas', 'kanjincho', (230, 220, 190), 'T', [], 3, True, coins=8, sig_kanjin=1)
+I('okiku_ido', 'Brunnen von Banchō Sarayashiki', 'Aus der Tiefe zählt eine Stimme Teller', 'okiku_ido', (120, 170, 220), 'T', ['yurei'], 3, True, spirit=1, sig_reikon=1)
+I('ushiwaka_fue', 'Ushiwakas Flöte', 'Auf der Gojō-Brücke spielte der junge Yoshitsune', 'ushiwaka_fue', (110, 150, 90), 'T', ['tengu'], 3, True, spd=6, sig_fue=1)
+I('seimei_ido', 'Seimei-Brunnen', 'Die Quelle, die Seimei mit dem Glockenblumen-Stern öffnete', 'seimei_ido', (140, 120, 220), 'T', ['shikigami'], 3, True, luck=1, sig_seimei_ido=1)
+I('kodomo_kanabo', 'Kinder-Kanabō', 'Klein, aber aus echtem Oni-Eisen', 'kodomo_kanabo', (90, 90, 105), 'T', ['oni'], 3, True, dmg=0.3, sig_kodomo_kanabo=1)
+I('ohabari', 'Ama-no-Ōhabari', 'Das Götterschwert, mit dem Izanagi den Feuergott erschlug', 'ohabari', (255, 240, 150), 'T', ['raijin'], 3, True, dmg=0.2, sig_ohabari=1)
 
 ITEM_IDS = ORDER
 
@@ -702,10 +712,10 @@ MARKS = [('boss3', 'Kapitel III', 'Besiege einen Boss in Kapitel III'),
          ('oku', 'Yomi / Iwato', 'Besiege Izanami oder Amaterasu'),
          ('oni', 'Oni-Modus', 'Gewinne im Oni-Modus')]
 CHAR_UNLOCKS = {
-    'hana': {'boss3': 'haraegushi', 'sieg': 'hi_ogi', 'himmel': 'tamagushi', 'oku': 'kotodama'}, 'kenji': {'boss3': 'zanshin_tsuba', 'sieg': 'muramasa', 'himmel': 'kesagiri', 'oku': 'tsubame_gaeshi'}, 'kuzunoha': {'boss3': 'kuzu_blatt', 'sieg': 'fuchs_trugbild', 'himmel': 'hoshi_tama', 'oku': 'shinoda_blatt'},
-    'ponpoko': {'boss3': 'bunbuku_kessel', 'sieg': 'shigaraki_tanuki', 'himmel': 'tanuki_bayashi', 'oku': 'tanuki_tokkuri'}, 'benkei': {'boss3': 'tausendstes_schwert', 'sieg': 'tachi_ojo', 'himmel': 'gojo_giboshi', 'oku': 'nanatsu_dogu'}, 'okiku': {'boss3': 'neunter_teller', 'sieg': 'tsurube', 'himmel': 'ido_kagami', 'oku': 'zehnter_teller'},
-    'kotaro': {'boss3': 'tengu_tsubute', 'sieg': 'kakuremino', 'himmel': 'sojobo_hane', 'oku': 'hanadaka_men'}, 'seimei': {'boss3': 'taizan_fukun', 'sieg': 'hoki_naiden', 'himmel': 'juni_shinsho', 'oku': 'kikyo_mon'}, 'akago': {'boss3': 'ibaraki_arm', 'sieg': 'masakari', 'himmel': 'setsubun_mame', 'oku': 'oni_tsuno'},
-    'susanoo': {'boss3': 'yashiori_sake', 'sieg': 'habakiri', 'himmel': 'murakumo', 'oku': 'kushinada_kushi'},
+    'hana': {'boss3': 'haraegushi', 'sieg': 'hi_ogi', 'himmel': 'tamagushi', 'oku': 'kotodama', 'oni': 'onusa'}, 'kenji': {'boss3': 'zanshin_tsuba', 'sieg': 'muramasa', 'himmel': 'kesagiri', 'oku': 'tsubame_gaeshi', 'oni': 'ichi_no_tachi'}, 'kuzunoha': {'boss3': 'kuzu_blatt', 'sieg': 'fuchs_trugbild', 'himmel': 'hoshi_tama', 'oku': 'shinoda_blatt', 'oni': 'kitsune_chochin'},
+    'ponpoko': {'boss3': 'bunbuku_kessel', 'sieg': 'shigaraki_tanuki', 'himmel': 'tanuki_bayashi', 'oku': 'tanuki_tokkuri', 'oni': 'tanuki_kesa'}, 'benkei': {'boss3': 'tausendstes_schwert', 'sieg': 'tachi_ojo', 'himmel': 'gojo_giboshi', 'oku': 'nanatsu_dogu', 'oni': 'kanjincho'}, 'okiku': {'boss3': 'neunter_teller', 'sieg': 'tsurube', 'himmel': 'ido_kagami', 'oku': 'zehnter_teller', 'oni': 'okiku_ido'},
+    'kotaro': {'boss3': 'tengu_tsubute', 'sieg': 'kakuremino', 'himmel': 'sojobo_hane', 'oku': 'hanadaka_men', 'oni': 'ushiwaka_fue'}, 'seimei': {'boss3': 'taizan_fukun', 'sieg': 'hoki_naiden', 'himmel': 'juni_shinsho', 'oku': 'kikyo_mon', 'oni': 'seimei_ido'}, 'akago': {'boss3': 'ibaraki_arm', 'sieg': 'masakari', 'himmel': 'setsubun_mame', 'oku': 'oni_tsuno', 'oni': 'kodomo_kanabo'},
+    'susanoo': {'boss3': 'yashiori_sake', 'sieg': 'habakiri', 'himmel': 'murakumo', 'oku': 'kushinada_kushi', 'oni': 'ohabari'},
 }
 for _c, _ms in CHAR_UNLOCKS.items():
     for _m, _n, _d in MARKS:

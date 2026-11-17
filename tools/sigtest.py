@@ -246,5 +246,31 @@ if abs(sigs.dmg_mult(p) / m0 - 1.08) > 0.01:
 m0 = sigs.dmg_mult(p); p.hp = 2
 if abs(sigs.dmg_mult(p) / m0 - 1.3) > 0.01:
     print('FEHLER Oni-Horn'); bad += 1
+# Welle „Oni-Modus“: Ichi-no-tachi, Jizō, Sarayashiki-Brunnen, Ōnusa
+g.start_run('kenji', 25); run = g.run; p = run.player
+for iid in ('ichi_no_tachi', 'tanuki_kesa', 'okiku_ido', 'onusa'):
+    p.gain_item(iid, silent=True)
+run.room.cleared = False; sigs.on_room_enter(run)
+e = make_boss(run, 'shuten_doji'); e.spawn_t = 0; e.invuln = False; run.enemies = [e]
+b = Bullet(100, 100, 50, 0, 10, 3, 1, 'p', (255, 255, 255), {})
+hs = []
+for _ in range(2):
+    h0 = e.hp; sigs.hit_post(run, e, b, 10); hs.append(h0 - e.hp)
+if not (hs[0] >= 30 and hs[1] == 0):
+    print('FEHLER Ichi-no-tachi', hs); bad += 1
+p.iframes = 0; p.dash_t = 0; hp0 = p.total_hp()
+p.hurt(1)
+if p.total_hp() != hp0 or p.iframes < 1.9:
+    print('FEHLER Jizo'); bad += 1
+p.iframes = 0; p.hurt(1)
+if p.total_hp() != hp0 - 1:
+    print('FEHLER Jizo 2. Treffer'); bad += 1
+p.spirit = 0; m0 = sigs.dmg_mult(p); p.spirit = 2
+if abs(sigs.dmg_mult(p) / m0 - 1.24) > 0.01:
+    print('FEHLER Reikon'); bad += 1
+run.ebullets[:] = [Bullet(p.x + 20, p.y, -50, 0, 1, 3, 3, 'e', (255, 0, 0), {})]
+nb0 = len(run.pbullets); sigs.on_dash(p, run)
+if run.ebullets or len(run.pbullets) != nb0 + 1:
+    print('FEHLER Onusa'); bad += 1
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)

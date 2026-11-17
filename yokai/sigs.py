@@ -246,6 +246,16 @@ TEXT = {
     'kikyo': 'Jeder 5. Treffer am selben Feind schließt das Pentagramm: 250 % Zusatzschaden',
     'oni_tsuno': 'Unter 2 Herzen: +30 % Schaden und deine Würfe durchbohren',
     'kushinada': 'Jeder geräumte Raum: +4 % Schaden bis zur nächsten Ebene (höchstens +32 %)',
+    'onusa': 'Die Rolle reinigt: nahe Feindgeschosse werden zu Shide-Streifen, die zurückfliegen (40 %, höchstens 6)',
+    'ichi': 'Der erste Treffer in jedem Raum ist der erste Hieb: +300 % Zusatzschaden',
+    'chochin': 'Betrittst du einen Kampfraum, schwärmen 4 Fuchsfeuer aus (+1 je 2 Glück, je 80 %, brennen)',
+    'jizo': 'Der erste Treffer in jedem Raum: du erstarrst zum steinernen Jizō – kein Schaden, 2 s unverwundbar',
+    'kanjin': 'Die Spendenliste: alles im Laden kostet 15 % weniger',
+    'reikon': 'Je Geisterherz +12 % Schaden (höchstens +48 %)',
+    'fue': 'Jeder 6. Wurf ist ein Flötenton: getroffene Yokai sind 2 s verwirrt',
+    'seimei_ido': 'Raum ohne Treffer geräumt: 25 % Chance auf ein Geisterherz',
+    'kodomo_kanabo': 'Jeder 8. Treffer ist ein Keulenschlag: 200 % im Umkreis, schleudert Yokai weg',
+    'ohabari': 'Treffer: 12 % Chance, dass ein Blitz auf bis zu 3 weitere Feinde springt (80 %)',
 }
 
 BULLET_SIGS = ('sichel', 'kammzinken', 'seidenfaden', 'stromauf', 'gross', 'schweben', 'windstoss', 'koi_drache')
@@ -694,6 +704,9 @@ def _siegel_fire(p, run, bullets, g, n, base, dmg, spd, life, size):
     if 'oni_tsuno' in S and p.total_hp() < 4:
         for b in bullets:
             b.fl = dict(b.fl, pierce=1)
+    if 'fue' in S and n % 6 == 0 and bullets:           # Ushiwakas Flötenton
+        bullets[0].fl = dict(bullets[0].fl, fue=1)
+        bullets[0].col = (150, 210, 130)
 
 
 def bullet_end(run, b):
@@ -812,6 +825,19 @@ def hit_post(run, e, b, dmg):
     echo = getattr(run, '_echo', False)   # Schaden von Bodenfeuer, Blitz oder Explosion
     if b is not None and b.fl.get('mame') and not e.is_boss:
         e.sg_fear = max(getattr(e, 'sg_fear', 0), 1.0)
+    if b is not None and b.fl.get('fue') and not e.is_boss:
+        e.sg_conf = max(getattr(e, 'sg_conf', 0), 2.0)
+    if 'ichi' in S and b is not None and not echo and g.get('ichi'):
+        g['ichi'] = False                                # Ichi-no-tachi: der erste Hieb
+        _float(run, e, 'Ichi-no-tachi!', (220, 220, 235))
+        _sparks(run, e.x, e.y, ((235, 235, 250), (160, 160, 180)), 8, 100)
+        run.damage_enemy(e, dmg * 3, None)
+    if 'ohabari' in S and b is not None and not echo and random.random() < 0.12:
+        _chain_strikes(run, e, 3, p.damage() * 0.8)
+    if 'kodomo_kanabo' in S and b is not None and not echo:
+        g['kk'] = g.get('kk', 0) + 1
+        if g['kk'] % 8 == 0:                             # Keulenschlag
+            _blast(run, e.x, e.y, 40, p.damage() * 2, (110, 110, 125), 320)
     if 'tsubame' in S and b is not None and not echo and random.random() < 0.12:
         o = _nearest(run, e.x, e.y, 160, lambda o: o is not e)
         if o:                                            # Schwalbenschnitt
@@ -1189,6 +1215,18 @@ def block(p, run, b):
     return False
 
 
+def jizo(p, run):
+    """Tanuki-Kesa: True, wenn der Treffer an der Jizō-Statue abprallt."""
+    g = st(p)
+    if not has(p, 'jizo') or not g.get('jizo'):
+        return False
+    g['jizo'] = False
+    p.iframes = 2.0
+    _ring(run, p.x, p.y, (150, 150, 140), 30)
+    run.floats.append([p.x, p.y - 20, 'Jizō!', (190, 190, 175), 0.8])
+    return True
+
+
 def shield_break(p, run):
     if 'unbeweglich' in p.sgs:
         _syn(run, 'unbeweglich', p.x, p.y, (200, 200, 220))
@@ -1233,6 +1271,16 @@ def on_dash(p, run):
         g['trug'] = [p.x, p.y, 3.0]
     if 'hanadaka' in S:
         g['hd'] = 3
+    if 'onusa' in S:                                     # Ōnusa: Geschosse werden zu Shide
+        near = [b for b in run.ebullets if math.hypot(b.x - p.x, b.y - p.y) < 60]
+        run.ebullets[:] = [b for b in run.ebullets if b not in near]
+        for b in near[:6]:
+            tgt = _nearest(run, b.x, b.y, 300)
+            a = math.atan2(tgt.y - b.y, tgt.x - b.x) if tgt else math.atan2(-b.vy, -b.vx)
+            nb = run.fire_player_bullet(b.x, b.y, a, p.damage() * 0.4, 220, 2.5, 1.0, {})
+            nb.col = (245, 245, 235)
+        if near:
+            _ring(run, p.x, p.y, (245, 245, 235), 60)
     if 'tengu_wirbel' in S:
         _blast(run, p.x, p.y, 45, p.damage() * 1.2, (180, 190, 210), 260)
         run.ebullets[:] = [b for b in run.ebullets if math.hypot(b.x - p.x, b.y - p.y) > 45]
@@ -1387,6 +1435,12 @@ def on_room_enter(run):
     g['harae'] = g['tsurube'] = 0 if run.room.cleared else 1
     g['ojo_room'] = 0
     g['trug'] = None
+    g['ichi'] = g['jizo'] = not run.room.cleared
+    if 'chochin' in S and not run.room.cleared and any(not e.dead for e in run.enemies):
+        n = min(10, 4 + int(p.s['luck']) // 2)          # Fuchsfeuer der Laterne
+        for k in range(n):
+            nb = run.fire_player_bullet(p.x, p.y, k * math.tau / n, p.damage() * 0.8, 110, 3, 2.5, {'homing': 1, 'burn': 1})
+            nb.col = (255, 170, 90)
 
 
 def on_room_clear(run):
@@ -1408,6 +1462,8 @@ def on_room_clear(run):
     if 'kushinada' in S:
         g['kushi'] = min(8, g.get('kushi', 0) + 1)
     g['shinoda'] = not g.get('room_hit')
+    if 'seimei_ido' in S and not g.get('room_hit') and random.random() < 0.25:
+        run.spawn_pickup('spirit', p.x, p.y - 20)
     if 'opfergabe' in S and random.random() < (0.1 + 0.01 * luck) * (3 if 'shinsen' in S else 1):
         run.spawn_pickup('key', p.x, p.y - 20)
         if 'shinsen' in S:
@@ -1870,6 +1926,8 @@ def dmg_mult(p):
         m *= 1 + 0.04 * g.get('kushi', 0)
     if 'oni_tsuno' in S and p.total_hp() < 4:
         m *= 1.3
+    if 'reikon' in S:
+        m *= 1 + 0.12 * min(4, p.spirit)
     if 'gokaku' in S:
         m *= 1 + 0.1 * g.get('gokaku', 0)
     if 'maskenwechsel' in S and g.get('rooms', 0) % 2 == 0:
