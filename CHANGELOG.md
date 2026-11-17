@@ -109,6 +109,7 @@
 - Runde 85 – **Synergien finden:** Im Pausenmenü unter „Items & Werte“ steht jetzt, welche Synergien nur noch **ein** Item entfernt sind – mit dem Namen des fehlenden Items (noch unentdeckte Synergien als „???“)
 - Runde 86 – **Feine Wanddekos in der Hölle, am Himmelsfelsen und tief im Yomi:** Im Jigoku stürzt ein Lavafall mit Glutstreifen aus einer Felsspalte in ein brodelndes Becken, daneben hängen Fußfesseln an Ketten und eine Eisenegge mit blutigen Zinken; vor Ama-no-Iwato spannt sich ein gedrehtes Shimenawa mit Shide und Strohquasten, und in einer Felsnische lodert ein Kagaribi-Feuerkorb auf drei Beinen; in Yomi no Oku greift eine bleiche Hand durch den Riss einer zerschlissenen Misu, und eine hängende Tōrō brennt mit kaltem Totenfeuer
 - Runde 87 – **Balance Oni-Rausch und Onmyōdō:** Onmyōdōs Papierdiener laden das Pentagramm nicht mehr selbst nach – vorher löste jede Siegel-Explosion fast schon die nächste aus (Bossschaden bis zum Tod 71 % → 26 %). Oni-Rausch lässt torkelnde Talismane mit +45 % statt +60 % treffen und verliert den zusätzlichen Schadensbonus (73 % → 44 %, gleichauf mit Hannya-Zorn)
+- Runde 88 – **Balance Feuerwerk und Fūjin-Raijin:** Die fünf Hanabi-Funken treffen jeden Feind nur noch einmal (dafür doppelt so stark) – vorher prasselten alle fünf auf denselben Boss (61 % → 44 %). Fūjins Windsack mit Raijins Trommel öffnet sich alle 1,5 statt jede Sekunde (57 % → 33 %)
 
 ## 1.4.0 – „Hyakki-Update“ (enthält 1.3 „Kapitel-Update“)
 

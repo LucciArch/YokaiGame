@@ -77,5 +77,14 @@ for b in shiki:
     sigs.hit_post(run, e, b, 1)
 if len(shiki) != 3 or e.sg_pent != 0:
     print('FEHLER Onmyōdō-Kette', len(shiki), e.sg_pent); bad += 1
+# Feuerwerk über Edo: die fünf Funken teilen sich eine Trefferliste (Balance 88)
+from yokai.entities import Bullet
+g.start_run('hana', 14); run = g.run; p = run.player
+for iid in ('hanabi', 'chochin_feuer'):
+    p.gain_item(iid, silent=True)
+run.pbullets = []
+sigs.bullet_end(run, Bullet(100, 100, 0, 0, 1, 2, 1, 'p', (255, 255, 255), {'explode': 1}))
+if len(run.pbullets) != 5 or len({id(b.hit) for b in run.pbullets}) != 1:
+    print('FEHLER Feuerwerk-Funken', len(run.pbullets)); bad += 1
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)

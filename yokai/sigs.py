@@ -107,7 +107,7 @@ TEXT = {
     'nanakorobi': 'Schlagfolge bis +80 %, Erfolg zählt Räume unter 15 s und stapelt bis 8×',
     'jinmenju': 'Jeder Boss erfüllt zwei Wünsche und heilt dich ganz',
     'mokumokuren': 'Talismane wachsen weiter und suchen, sobald sie groß sind, ihr Ziel',
-    'fujin_raijin': 'Der Windsack öffnet sich jede Sekunde, und Raijin schlägt in jeden getroffenen Feind ein',
+    'fujin_raijin': 'Der Windsack öffnet sich alle 1,5 Sekunden, und Raijin schlägt in jeden getroffenen Feind ein',
     'erstes_feuer': 'Brennende Feinde explodieren beim Tod',
     'fuchsregen': 'Ein Sonnenregen fällt auf deine Feinde',
     'hausglueck': 'Der erste Krug in jedem Raum gibt immer etwas her',
@@ -443,7 +443,7 @@ def on_fire(p, run, bullets):
         h = Hazard(tx, ty, 16, 0.45, 0.12, dmg * 2.2, 'p', 'meteor')
         h.sg_conf = 'verfluchte_sterne' in S
         run.hazards.append(h)
-    if 'windsack' in S and run.time - g.get('windsack', -9) >= (1.0 if 'fujin_raijin' in S else 4.0):
+    if 'windsack' in S and run.time - g.get('windsack', -9) >= (1.5 if 'fujin_raijin' in S else 4.0):
         g['windsack'] = run.time
         from .entities import Particle
         from . import audio
@@ -529,8 +529,10 @@ def bullet_end(run, b):
         hanabi = ((255, 120, 160), (255, 220, 120), (140, 220, 255))
         _syn(run, 'feuerwerk', b.x, b.y, (255, 150, 190))
         _sparks(run, b.x, b.y, hanabi, 14, 130)
+        seen = set()   # die fünf Funken teilen sich eine Trefferliste: jeder Feind höchstens einmal
         for i in range(5):
-            nb = run.fire_player_bullet(b.x, b.y, i / 5 * math.tau + random.uniform(0, 1.2), b.dmg * 0.4, 170, 2, 0.4, {'burn': 1})
+            nb = run.fire_player_bullet(b.x, b.y, i / 5 * math.tau + random.uniform(0, 1.2), b.dmg * 0.8, 170, 2, 0.4, {'burn': 1})
+            nb.hit = seen
             nb.col = random.choice(((255, 120, 160), (255, 220, 120), (140, 220, 255)))
     if b.fl.get('_sw') and 'sternenstaub' in run.player.sgs:
         _syn(run, 'sternenstaub', b.x, b.y, (255, 240, 170))
