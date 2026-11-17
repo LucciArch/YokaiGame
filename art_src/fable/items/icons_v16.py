@@ -200,8 +200,181 @@ def yashiori_sake():
     return c
 
 
+
+# ---------------------------------------------------------------- Welle 2: Siegel „Sieg“
+def hi_ogi():
+    """Hi-ōgi: aufgefächerter Zypressenfächer mit Sonne und Kiefer, fünffarbige Schnüre hängen herab."""
+    c = Cv()
+    for i, (ch, x) in enumerate((('r', 4), ('W', 6), ('G', 25), ('y', 27), ('p', 29))):
+        c.line([(x, 18), (x - 1 + i % 2, 24), (x + 1, 30)], ch, 1)       # Schnüre
+    fan = E(16, 22, 14, 14) & (px.Y < 22) & ~E(16, 22, 4, 4)
+    c.form(fan, 'cCs', 1, 1, ring='K')
+    for k in range(9):                                                 # Lamellen
+        a = math.pi + (k + 0.5) * math.pi / 9
+        c.line([(16 + math.cos(a) * 5, 22 + math.sin(a) * 5), (16 + math.cos(a) * 13, 22 + math.sin(a) * 13)], 'c', 1)
+    c.form(E(16, 13, 3.2, 3.2), 'qrR', 0, 1)                           # rote Sonne
+    c.form(PG([(7, 19), (10, 14), (13, 19)]) | PG([(19, 19), (22, 15), (25, 19)]), 'FfG', 0, 1)   # Kiefern
+    c.form(E(16, 23, 2.4, 2.4), 'ogy', 0, 1, ring='K')                 # Niete
+    return c
+
+
+def muramasa():
+    """Muramasa: Katana mit welliger Härtelinie, rote Fluchaura, ein Blutstropfen fällt von der Spitze."""
+    c = Cv()
+    for x, y in ((8, 9), (12, 5), (24, 18), (20, 24), (27, 11), (5, 16)):  # Fluchfunken
+        c.form(E(x, y, 1.2, 1.2), 'UVe', 0, 1)
+    blade = L(9, 23, 1.9, 25, 6, 1.0)
+    c.form(blade, '23W', 0, 1, ring='K')
+    c.line([(10, 21), (13, 19), (15, 16), (18, 14), (20, 11), (23, 8)], 'W', 1, only=blade)   # Hamon
+    c.form(L(5, 28, 2.0, 8, 24, 2.0), 'UVe', 0, 1, ring='K')           # rot umwickelter Griff
+    c.a[27, 5] = 'k'; c.a[25, 7] = 'k'
+    c.form(REL(9, 23, 3.4, 1.7, -45), 'khH', 1, 1, ring='K')           # schwarze Tsuba
+    c.form(E(27, 9, 1.3, 1.8), 'qrR', 0, 1, ring='K')                  # Blutstropfen
+    return c
+
+
+def fuchs_trugbild():
+    """Fuchsgesicht und sein bläuliches Trugbild versetzt dahinter."""
+    c = Cv()
+
+    def fox(dx, dy, fam, muzzle):
+        head = PG([(6 + dx, 13 + dy), (16 + dx, 9 + dy), (26 + dx, 13 + dy), (16 + dx, 28 + dy)])
+        ears = PG([(7 + dx, 14 + dy), (8 + dx, 3 + dy), (14 + dx, 10 + dy)]) | PG([(25 + dx, 14 + dy), (24 + dx, 3 + dy), (18 + dx, 10 + dy)])
+        m = head | ears
+        c.form(m, fam, 1, 1, ring='K')
+        c.form(PG([(10 + dx, 18 + dy), (16 + dx, 28 + dy), (22 + dx, 18 + dy), (16 + dx, 16 + dy)]), muzzle, 0, 1)
+        return m
+    ghost = fox(4, -1, 'zaA', 'aAW')
+    c.fill(ghost & ((px.X + px.Y) % 2 == 0), 'z')                      # durchscheinend gerastert
+    fox(-2, 0, '789', 'vwW')
+    c.form(PG([(7, 8), (7, 5), (10, 9)]) | PG([(20, 9), (21, 5), (21, 8)]), 'qrR', 0, 0)   # Ohren innen
+    for x in (11, 19):                                                 # Augen
+        c.line([(x - 2, 16), (x + 1, 15)], 'k', 1)
+    c.fill(E(14, 26, 1.4, 1), 'k')
+    return c
+
+
+def shigaraki_tanuki():
+    """Shigaraki-Tonfigur: Strohhut, dicker Bauch, Sakeflasche rechts, Schuldbuch links."""
+    c = Cv()
+    c.form(E(16, 21, 9, 9), 'jdD', 2, 1, ring='K')                     # Körper
+    c.form(E(16, 23, 5.6, 5.6), 'cCs', 1, 1, ring='K')                 # Bauch
+    c.form(E(16, 11, 5.6, 5), 'jdD', 1, 1, ring='K')                   # Kopf
+    c.fill(E(16, 11, 4.2, 1.6), 'k')                                   # Augenmaske
+    c.a[11, 14] = 'W'; c.a[11, 18] = 'W'
+    c.form(E(16, 14, 1.6, 1.2), 'cCs', 0, 1)
+    c.form(E(16, 6.5, 9.5, 2.4) | E(16, 5, 4, 2.4), 'cCs', 1, 1, ring='K')   # Strohhut
+    c.form(R(25, 15, 29, 26) | E(27, 14, 1.4, 1.4), 'nvW', 1, 1, ring='K')   # Sakeflasche
+    c.line([(26, 20), (28, 20)], 'q', 1)
+    c.form(R(2, 17, 8, 26), 'IJO', 1, 1, ring='K')                     # Schuldbuch (Kayoi-chō)
+    c.fill(R(4, 18, 6, 25), 'w')
+    c.line([(5, 19), (5, 24)], 'k', 1)
+    for x in (12, 20):                                                 # Füße
+        c.form(E(x, 29, 2.6, 1.6), 'jdD', 0, 1, ring='K')
+    return c
+
+
+def tachi_ojo():
+    """Benkeis Naginata aufrecht, mit Pfeilen gespickt."""
+    c = Cv()
+    c.form(R(15, 9, 17, 30), 'jdD', 1, 1, ring='K')                    # Schaft
+    blade = PG([(14, 11), (13, 5), (17, 1), (20, 4), (18, 11)])
+    c.form(blade, '23W', 1, 1, ring='K')
+    c.form(R(13, 10, 19, 12), 'ogy', 0, 1, ring='K')                   # Habaki
+    for (x0, y0), (x1, y1) in (((17, 16), (28, 8)), ((15, 21), (4, 14)), ((17, 25), (28, 22))):
+        c.form(L(x0, y0, 0.8, x1, y1, 0.8), 'jdD', 0, 1, ring='K')    # Pfeilschäfte
+        dx, dy = (x1 - x0) / 11, (y1 - y0) / 11
+        nx, ny = -dy, dx
+        for sd in (1, -1):                                             # Federn öffnen sich nach außen
+            c.line([(x1 - dx * 3.5, y1 - dy * 3.5), (x1 + nx * sd * 2.2, y1 + ny * sd * 2.2)], 'W' if sd > 0 else 'w', 2)
+        c.a[int(round(y1 - dy * 2)), int(round(x1 - dx * 2))] = 'q'
+    return c
+
+
+def tsurube():
+    """Hölzerner Brunneneimer mit Eisenreifen und Seil, Wasser schwappt über."""
+    c = Cv()
+    c.line([(16, 2), (16, 9)], 'C', 1)                                 # Seil
+    c.line([(9, 12), (16, 7), (23, 12)], 'c', 1)                       # Bügel
+    bucket = PG([(8, 12), (24, 12), (22, 28), (10, 28)])
+    c.form(bucket, 'jdD', 2, 1, ring='K')
+    for y in (15, 24):
+        c.line([(8 + (y - 12) * 0.13, y), (24 - (y - 12) * 0.13, y)], '1', 2)
+    for x in (12, 16, 20):
+        c.line([(x, 13), (x, 27)], 'j', 1, only=bucket)
+    c.form(E(16, 12, 8, 2.2), 'zaA', 0, 1, ring='K')                   # Wasser
+    c.form(PG([(22, 12), (28, 14), (27, 21), (25, 16)]), 'zaA', 0, 1, ring='K')   # überschwappend
+    for x, y in ((27, 25), (5, 18)):
+        c.form(E(x, y, 1.2, 1.6), 'aAW', 0, 1, ring='K')
+    return c
+
+
+def kakuremino():
+    """Strohmantel der Tengu: gestufte Strohlagen, oben eine schwarze Feder."""
+    c = Cv()
+    for k, (y0, y1, w0, w1) in enumerate(((5, 14, 5, 9), (11, 20, 8, 11), (16, 27, 10, 13))):
+        m = PG([(16 - w0, y0), (16 + w0, y0), (16 + w1, y1), (16 - w1, y1)])
+        c.form(m, 'cCs', 1, 1, ring='K')
+        for x in range(16 - w1 + 1, 16 + w1, 2):                       # zottige Halmfransen
+            c.line([(x, y1 - 5), (x + (1 if x > 16 else -1), y1 + 1 + (x // 2) % 2)], 'C' if x % 4 else 'c', 1)
+    c.form(E(16, 4, 3.6, 2.6), 'khH', 1, 1, ring='K')                  # dunkle Kapuzenöffnung
+    c.form(E(16, 7, 4.6, 1.4), 'qrR', 0, 1, ring='K')                  # Kragen-Schnur
+    c.form(L(22, 4, 1.6, 28, 13, 0.6), 'khH', 0, 1, ring='K')          # Tengu-Feder
+    sparkle(c, 5, 6, 'W', 'w')
+    return c
+
+
+def hoki_naiden():
+    """Geheimbuch: indigo Umschlag mit Fadenbindung und Titelstreifen, ein Papiervogel fliegt heraus."""
+    c = Cv()
+    c.form(R(4, 9, 20, 29), 'IJO', 2, 1, ring='K')
+    c.fill(R(5, 28, 20, 29), 'w')                                      # Seitenkante
+    for y in (11, 15, 19, 23, 27):                                     # Bindung
+        c.a[y, 6] = 'W'
+    c.fill(R(12, 11, 16, 24), 'w')
+    for y in (13, 16, 19, 22):
+        c.line([(13, y), (15, y)], 'k', 1)
+    star = [(12 + 3 * math.cos(-math.pi / 2 + k * 4 * math.pi / 5), 6 + 3 * math.sin(-math.pi / 2 + k * 4 * math.pi / 5)) for k in range(6)]
+    c.form(PG([(19, 8), (29, 2), (26, 9)]) | PG([(19, 8), (30, 10), (25, 12)]), 'nvW', 0, 1, ring='K')   # Papiervogel
+    c.line([(19, 8), (17, 10)], 'v', 1)
+    c.line(star, 'q', 1)                                               # Seimei-Kikyō-Stern
+    return c
+
+
+def masakari():
+    """Kintarōs Axt: dicker Holzstiel, breiter Eisenkopf mit hellem Schliff, rote Kordel."""
+    c = Cv()
+    c.form(L(8, 28, 1.9, 22, 5, 1.7), 'jdD', 1, 1, ring='K')
+    head = E(22.5, 13, 7.5, 9) & ~E(12, 13, 6, 12) & (px.X > 15)
+    c.form(head, '123', 2, 1, ring='K')
+    c.fill(head & ~E(22, 13, 7, 8), 'W')                               # Schneide
+    c.form(R(16, 6, 20, 12), '012', 1, 1, ring='K')                    # Öhr
+    c.line([(11, 24), (8, 27), (9, 30)], 'q', 1)                       # Kordel
+    c.form(E(22, 13, 1.8, 1.8), 'qrR', 0, 1)                           # Kintarō-Raute
+    sparkle(c, 4, 6, 'W', 'Y')
+    return c
+
+
+def habakiri():
+    """Totsuka-Schwert mit gerader Doppelklinge über einem abgeschlagenen Orochi-Schwanz."""
+    c = Cv()
+    tail = L(5, 25, 2.6, 12, 27, 3.0) | L(12, 27, 3.0, 22, 25, 2.4) | L(22, 25, 2.4, 28, 21, 1.2)
+    c.form(tail, 'FfG', 2, 1, ring='K')
+    for x in (7, 12, 17, 22):
+        c.a[28 if x < 20 else 25, x] = 'l'
+    blade = PG([(14, 22), (14, 6), (16, 2), (18, 6), (18, 22)])
+    c.form(blade, '23W', 1, 1, ring='K')
+    c.line([(16, 4), (16, 21)], '1', 1)                                # Grat
+    c.form(R(11, 22, 21, 24), 'ogy', 1, 1, ring='K')                   # Parierstange
+    c.form(R(15, 24, 17, 28), 'jdD', 0, 1, ring='K')
+    c.form(E(16, 29, 2, 1.6) & ~E(16, 29, 0.8, 0.6), 'ogy', 0, 1, ring='K')
+    c.fill(E(26, 22, 1, 1), 'q')
+    return c
+
 NAMES = ['haraegushi', 'zanshin_tsuba', 'kuzu_blatt', 'bunbuku_kessel', 'tausendstes_schwert', 'neunter_teller',
-         'tengu_tsubute', 'taizan_fukun', 'ibaraki_arm', 'yashiori_sake']
+         'tengu_tsubute', 'taizan_fukun', 'ibaraki_arm', 'yashiori_sake',
+         'hi_ogi', 'muramasa', 'fuchs_trugbild', 'shigaraki_tanuki', 'tachi_ojo', 'tsurube', 'kakuremino', 'hoki_naiden',
+         'masakari', 'habakiri']
 
 
 def build():
@@ -215,9 +388,9 @@ def build():
 if __name__ == '__main__':
     build()
     from PIL import Image
-    out = Image.new('RGBA', (len(NAMES) * 36 * 6, 36 * 6), (30, 24, 40, 255))
+    out = Image.new('RGBA', (10 * 36 * 6, (len(NAMES) + 9) // 10 * 36 * 6), (30, 24, 40, 255))
     for i, nm in enumerate(NAMES):
         im = Image.open(os.path.join(HERE, 'icons', nm + '.png')).convert('RGBA')
-        out.alpha_composite(im.resize((im.width * 6, im.height * 6), Image.NEAREST), (i * 216 + 12, 12))
+        out.alpha_composite(im.resize((im.width * 6, im.height * 6), Image.NEAREST), (i % 10 * 216 + 12, i // 10 * 216 + 12))
     out.save(sys.argv[1] if len(sys.argv) > 1 else '/tmp/v16.png')
     print(WARN)

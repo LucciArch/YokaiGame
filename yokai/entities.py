@@ -935,6 +935,9 @@ class Player:
             if 'yurei' in self.transforms or self.char == 'okiku':
                 alpha_s = spr.copy()
                 alpha_s.set_alpha(190)
+            if (getattr(self, 'sg', None) or {}).get('invis', 0) > 0:   # Tarnung / Kakuremino: halb durchsichtig
+                alpha_s = spr.copy()
+                alpha_s.set_alpha(110)
             rx = int(-self.facing[0] * 1.5) if self.recoil > 0 else 0
             ry = int(-self.facing[1] * 1.5) if self.recoil > 0 else 0
             hi = sheets.has(self.char) and sheets.is_hi(self.char)

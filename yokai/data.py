@@ -283,6 +283,16 @@ I('tengu_tsubute', 'Tengu-Tsubute', 'Steine, die aus heiterem Himmel fallen', 't
 I('taizan_fukun', 'Taizan-Fukun-Ritual', 'Seimei tauschte vor dem Herrn des Berges ein Leben gegen ein anderes', 'taizan_fukun', (200, 60, 60), 'T', ['shikigami'], 3, True, sig_taizan=1)
 I('ibaraki_arm', 'Ibaraki-dōjis Arm', 'Watanabe no Tsuna schlug ihn ab – der Oni kam zurück, ihn zu holen', 'ibaraki_arm', (200, 80, 70), 'T', ['oni'], 3, True, dmg=0.3, sig_ibaraki=1)
 I('yashiori_sake', 'Yashiori no Sake', 'Achtmal gebraut – genug, um die Orochi zu berauschen', 'yashiori_sake', (230, 220, 180), 'T', ['raijin'], 3, True, hp=1, sig_yashiori=1)
+I('hi_ogi', 'Hi-ōgi der Miko', 'Der Zypressenfächer des Kagura-Tanzes', 'hi_ogi', (240, 90, 80), 'T', ['kami'], 3, True, rate=0.2, sig_kagura_mai=1)
+I('muramasa', 'Muramasa-Klinge', 'Ein verfluchtes Schwert, das nach Blut dürstet', 'muramasa', (200, 60, 70), 'T', ['oni'], 3, True, dmg=0.4, sig_blutdurst=1)
+I('fuchs_trugbild', 'Kuzunohas Spiegelbild', 'Was du siehst, ist nur ein Schatten der Füchsin', 'fuchs_trugbild', (255, 170, 90), 'T', ['kitsune'], 3, True, spd=8, sig_doppelgaenger=1)
+I('shigaraki_tanuki', 'Shigaraki-Tanuki', 'Die Tonfigur mit Sakeflasche und Schuldbuch bringt Kaufleuten Glück', 'shigaraki_tanuki', (190, 140, 90), 'T', ['tanuki'], 3, True, luck=1, coins=5, sig_gluecksstraehne=1)
+I('tachi_ojo', 'Tachi-ōjō', 'Benkei starb aufrecht, von tausend Pfeilen durchbohrt', 'tachi_ojo', (210, 200, 180), 'T', [], 3, True, hp=1, sig_tachi_ojo=1)
+I('tsurube', 'Brunneneimer von Banchō', 'Kaltes Wasser aus Okikus Brunnen', 'tsurube', (120, 170, 220), 'T', ['yurei'], 3, True, spirit=2, sig_tsurube=1)
+I('kakuremino', 'Kakuremino', 'Der Strohmantel der Tengu macht unsichtbar', 'kakuremino', (200, 180, 110), 'T', ['tengu'], 3, True, spd=6, sig_kakuremino=1)
+I('hoki_naiden', 'Hoki Naiden', 'Seimeis geheimes Buch der Yin-Yang-Kunst', 'hoki_naiden', (110, 130, 200), 'T', ['shikigami'], 3, True, shotspd=20, sig_hoki=1)
+I('masakari', 'Kintarōs Masakari', 'Die Axt des Bergkindes, das mit Bären rang', 'masakari', (220, 120, 60), 'T', ['oni'], 3, True, dmg=0.3, sig_masakari=1)
+I('habakiri', 'Ame-no-Habakiri', 'Das Zehn-Faust-Schwert, das die Orochi zerschnitt', 'habakiri', (190, 220, 255), 'T', ['raijin'], 3, True, dmg=0.4, sig_habakiri=1)
 
 ITEM_IDS = ORDER
 
@@ -672,10 +682,10 @@ MARKS = [('boss3', 'Kapitel III', 'Besiege einen Boss in Kapitel III'),
          ('oku', 'Yomi / Iwato', 'Besiege Izanami oder Amaterasu'),
          ('oni', 'Oni-Modus', 'Gewinne im Oni-Modus')]
 CHAR_UNLOCKS = {
-    'hana': {'boss3': 'haraegushi'}, 'kenji': {'boss3': 'zanshin_tsuba'}, 'kuzunoha': {'boss3': 'kuzu_blatt'},
-    'ponpoko': {'boss3': 'bunbuku_kessel'}, 'benkei': {'boss3': 'tausendstes_schwert'}, 'okiku': {'boss3': 'neunter_teller'},
-    'kotaro': {'boss3': 'tengu_tsubute'}, 'seimei': {'boss3': 'taizan_fukun'}, 'akago': {'boss3': 'ibaraki_arm'},
-    'susanoo': {'boss3': 'yashiori_sake'},
+    'hana': {'boss3': 'haraegushi', 'sieg': 'hi_ogi'}, 'kenji': {'boss3': 'zanshin_tsuba', 'sieg': 'muramasa'}, 'kuzunoha': {'boss3': 'kuzu_blatt', 'sieg': 'fuchs_trugbild'},
+    'ponpoko': {'boss3': 'bunbuku_kessel', 'sieg': 'shigaraki_tanuki'}, 'benkei': {'boss3': 'tausendstes_schwert', 'sieg': 'tachi_ojo'}, 'okiku': {'boss3': 'neunter_teller', 'sieg': 'tsurube'},
+    'kotaro': {'boss3': 'tengu_tsubute', 'sieg': 'kakuremino'}, 'seimei': {'boss3': 'taizan_fukun', 'sieg': 'hoki_naiden'}, 'akago': {'boss3': 'ibaraki_arm', 'sieg': 'masakari'},
+    'susanoo': {'boss3': 'yashiori_sake', 'sieg': 'habakiri'},
 }
 for _c, _ms in CHAR_UNLOCKS.items():
     for _m, _n, _d in MARKS:

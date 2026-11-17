@@ -177,5 +177,24 @@ for _ in range(60):
     sigs.on_kill(run, e)
 if sigs.st(p).get('jagd_b') != 0.4 or not p.s['dmg'] > d0:
     print('FEHLER Schwertjagd', sigs.st(p).get('jagd_b'), d0, p.s['dmg']); bad += 1
+# Welle „Sieg“: Tachi-ōjō, Masakari, Blutdurst, Fuchs-Trugbild
+g.start_run('hana', 22); run = g.run; p = run.player
+for iid in ('tachi_ojo', 'masakari', 'muramasa', 'fuchs_trugbild'):
+    p.gain_item(iid, silent=True)
+p.iframes = 0; p.hp = 2; p.spirit = 0; p.hurt(1)
+if p.iframes < 2.9 or sigs.dmg_mult(p) < 1.49:
+    print('FEHLER Tachi-ojo', p.iframes, sigs.dmg_mult(p)); bad += 1
+fs = []
+for _ in range(5):
+    b = Bullet(100, 100, 50, 0, 10, 3, 1, 'p', (255, 255, 255), {}); sigs.on_fire(p, run, [b]); fs.append(bool(b.fl.get('boomerang')))
+if fs != [False] * 4 + [True]:
+    print('FEHLER Masakari', fs); bad += 1
+r0 = sigs.rate_mult(p); e = make_boss(run, 'shuten_doji'); sigs.on_kill(run, e)
+if not sigs.rate_mult(p) > r0 * 1.29:
+    print('FEHLER Blutdurst'); bad += 1
+sigs.on_dash(p, run); n0 = len(run.pbullets)
+sigs.on_fire(p, run, [Bullet(100, 100, 50, 0, 10, 3, 1, 'p', (255, 255, 255), {})])
+if len(run.pbullets) - n0 != 1:
+    print('FEHLER Fuchs-Trugbild', len(run.pbullets) - n0); bad += 1
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)
