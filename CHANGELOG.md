@@ -97,6 +97,7 @@
 - Runde 73 – **Wurf-Fähigkeiten auch für Hieb und Strahl:** Nase brennt, Goldfächer, Rückenwind, Rausch, Sonne & Mond, Hannya-Zorn und Sushi-Platte verstärken jetzt den Schwerthieb, die Sense, den Speer, die Keule und den Lichtstrahl selbst statt nur die Klingenwellen; große Schläge wecken Oni-Tanz, Tempelmusik und Tempelfest auch mit Waffen; Goldwürfe gibt es jetzt mit jeder Waffe (goldener Hieb, goldene Pfeile)
 - Runde 74 – **Laternen leuchten:** Kitsune-bi, Yūrei-Laterne, Onibi-Ring, Feuer von Yomi, Chōchin-Feuer, Hōzuki-Laterne, Feuerrad des Kasha und Glut des Kagutsuchi machen dein Licht in dunklen Räumen größer (bis drei Stufen) und färben es in der Farbe der zuletzt gefundenen Flamme
 - Runde 75 – **Treffer-Fähigkeiten auch für Hieb und Strahl:** Mit Tsukuyomis Mondsichel zählen Schwert-, Sensen-, Speer- und Keulenhiebe als Sichelschnitte – die Mondsichel-Klinge lässt sie tief bluten (bis 6). Kyūdō verstärkt ferne Lichtstrahl-Treffer um 60 % wie weit geflogene Talismane. Shuriken lassen jetzt auch von Hieb und Strahl einen Wurfstern abprallen – einen pro Angriff, damit Hiebe in Gruppen nicht ausufern
+- Runde 76 – **Mehr Licht:** Kitsune-Laterne und Kerze der Onryō in der Hand sowie der Feuer-Anhänger machen dein Licht in dunklen Räumen größer, wie die Laternen-Items; ihre Farbe zeigt sich, solange du kein Laternen-Item trägst – die Onryō leuchtet jetzt von Anfang an violett
 
 ## 1.4.0 – „Hyakki-Update“ (enthält 1.3 „Kapitel-Update“)
 

@@ -148,5 +148,11 @@ r, p = setup()
 p.gain_item('chochin_feuer', silent=True)
 lx, ly, lr, lc = r.collect_lights()[0]
 check(lr > 90 and lc == (230, 70, 50), 'Chōchin-Feuer leuchtet nicht um die Spielerin')
+# Kitsune-Laterne (aktiv) und Feuer-Anhänger leuchten ebenfalls
+r, p = setup()
+base = r.collect_lights()[0][2]
+p.active, p.trinket = 'kitsune_laterne', 'am_hi'
+lx, ly, lr, lc = r.collect_lights()[0]
+check(lr == base + 32 and lc == (255, 140, 40), 'Kitsune-Laterne/Feuer-Anhänger leuchten nicht')
 print('Waffen-Synergien geprüft, Fehler:', bad)
 sys.exit(1 if bad else 0)

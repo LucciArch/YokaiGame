@@ -2345,11 +2345,16 @@ class Run:
 
     LAMP_ITEMS = ('kitsunebi', 'yurei_laterne', 'onibi_ring', 'yomi_feuer', 'chochin_feuer', 'hozuki', 'kasha_rad',
                   'kagutsuchi_glut')
+    LAMP_ACTIVES = ('kitsune_laterne', 'onryo_kerze')
+    LAMP_TRINKETS = ('am_hi',)
 
     def collect_lights(self):
         """Alle Lichtquellen dieses Bildes als (x, y, Radius, Farbe oder None). Das Licht der Spielerin steht vorn."""
         p = self.player
-        lamps = [ITEMS[i]['col'] for i in p.items if i in self.LAMP_ITEMS]
+        # Laterne/Kerze in der Hand und Feuer-Anhänger zählen mit; ihre Farbe nur, wenn kein Lampen-Item da ist
+        lamps = ([ACTIVES[p.active]['col']] if p.active in self.LAMP_ACTIVES else []) + \
+                ([TRINKETS[p.trinket]['col']] if p.trinket in self.LAMP_TRINKETS else []) + \
+                [ITEMS[i]['col'] for i in p.items if i in self.LAMP_ITEMS]
         # Laternen und Feuer-Items: größeres Licht in der Farbe der zuletzt aufgenommenen Flamme
         out = [(p.x, p.y, 90 + 16 * min(3, len(lamps)), lamps[-1] if lamps else None)]
         tiles, bid = self.room.tiles, self.biome_id
