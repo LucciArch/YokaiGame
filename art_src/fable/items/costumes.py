@@ -68,42 +68,79 @@ def fox_tails(ph, n=3, fam='orange', tip='white'):
     return c
 
 
-def wings(ph, fam='black', fam2='indigo'):
+def wings(ph, fam='black', fam2='indigo', tip=None):
+    """Krähenflügel des Karasu-Tengu (bzw. Kranichflügel): geschichtete Hand-, Arm- und Deckfedern, die sich beim
+    Schlag spreizen; tip = Farbfamilie der Schwungfeder-Spitzen (Kranich: schwarz)."""
     c = Cv(*BACK[:2])
     lift = math.sin(ph * math.tau) * 6
-    for side in (1, -1):
-        sh_ = (48 + side * 5, 42)
-        el = (48 + side * 20, 27 - lift)
-        tp = (48 + side * 40, 17 - lift * 1.6)
-        # Schwungfedern hängen von Arm und Hand nach unten-außen
-        for j in range(9):
-            t = j / 8
-            if t < 0.4:
-                f = t / 0.4
-                bx, by = sh_[0] + (el[0] - sh_[0]) * f, sh_[1] + (el[1] - sh_[1]) * f
-            else:
-                f = (t - 0.4) / 0.6
-                bx, by = el[0] + (tp[0] - el[0]) * f, el[1] + (tp[1] - el[1]) * f
-            ln = 12 + 12 * t
-            ang = math.radians(100 - 55 * t) if side > 0 else math.radians(80 + 55 * t)
-            ex, ey = bx + math.cos(ang) * ln, by + math.sin(ang) * ln
-            c.form(L(bx, by, 3.2, ex, ey, 1.2), RAMP3[fam], 1, 1)
-        arm = L(sh_[0], sh_[1], 4.2, el[0], el[1], 3.4) | L(el[0], el[1], 3.4, tp[0], tp[1], 1.4)
-        c.form(arm, RAMP3[fam2], 1, 1)
-        cov = L(sh_[0], sh_[1] + 4, 5, el[0], el[1] + 5, 4)
-        c.form(cov, RAMP3[fam2], 2, 1)
+    spread = 1 + math.cos(ph * math.tau) * 0.12
+    for s in (1, -1):
+        sh_ = (48 + s * 5, 41)
+        el = (48 + s * 15, 30 - lift)
+        wr = (48 + s * 26, 24 - lift * 1.5)
+        hd = (48 + s * 30, 22 - lift * 1.8)
+
+        def feather(bx, by, deg, ln, r0, ramp, tp=None, shaft=False):
+            a = math.radians(deg)
+            ex, ey = bx + s * math.cos(a) * ln, by + math.sin(a) * ln
+            m = L(bx, by, r0, ex, ey, 0.9) | L((bx + ex) / 2, (by + ey) / 2, r0 * 0.9, ex, ey, 0.9)
+            c.form(m, ramp, 1, 1, ring='K')
+            if tp:
+                c.form(m & E(ex, ey, ln * 0.35, ln * 0.35), RAMP3[tp], 1, 0)
+            if shaft:
+                c.line([(bx, by), (bx + s * math.cos(a) * ln * 0.7, by + math.sin(a) * ln * 0.7)], RAMP3[fam][0], only=m)
+        # Handschwingen: von der Hand aus nach außen gefächert (oberste zuerst, untere liegen darüber)
+        for k in range(5):
+            f = k / 4
+            bx, by = wr[0] + (hd[0] - wr[0]) * (1 - f), wr[1] + (hd[1] - wr[1]) * (1 - f) + 1
+            feather(bx, by, (12 + 50 * f) * spread, 17 - 3 * f, 3.4, RAMP3[fam], tip, True)
+        # Armschwingen: entlang Ellbogen–Handgelenk nach unten
+        for k in range(5):
+            f = k / 4
+            bx, by = wr[0] + (el[0] - wr[0]) * f, wr[1] + (el[1] - wr[1]) * f + 2
+            feather(bx, by, 68 + 22 * f * spread, 14 - 2 * f, 3.4, RAMP3[fam])
+        for k in range(2):                                           # Schirmfedern am Rücken
+            bx, by = el[0] + (sh_[0] - el[0]) * (0.4 + 0.4 * k), el[1] + (sh_[1] - el[1]) * (0.4 + 0.4 * k) + 2
+            feather(bx, by, 98, 10, 3.0, RAMP3[fam])
+        # Deckfedern: zwei geschuppte Reihen über dem Flügelbug
+        for row, (off, rr) in enumerate(((5, 3.4), (2, 3.0))):
+            for k in range(6 - row):
+                f = (k + 0.5) / (6 - row)
+                if f < 0.5:
+                    g = f / 0.5
+                    bx, by = sh_[0] + (el[0] - sh_[0]) * g, sh_[1] + (el[1] - sh_[1]) * g
+                else:
+                    g = (f - 0.5) / 0.5
+                    bx, by = el[0] + (wr[0] - el[0]) * g, el[1] + (wr[1] - el[1]) * g
+                c.form(E(bx + s * 1, by + off, rr, rr + 0.6), RAMP3[fam2 if row else fam], 1, 1, ring='K')
+        arm = L(sh_[0], sh_[1], 2.8, el[0], el[1], 2.3) | L(el[0], el[1], 2.3, wr[0], wr[1], 1.7) | L(wr[0], wr[1], 1.7, hd[0], hd[1], 1.0)
+        c.form(arm, RAMP3[fam2], 1, 1, ring='K')
     return c
 
 
 def halo(ph):
+    """Kaen-Kōhai: Flammen-Nimbus der Gottheiten – Goldreif mit Spiegelpunkten, außen züngelnde Flammen."""
     c = Cv(*HEAD[:2])
-    cx, cy = 32, 34 + 2
-    for k in range(16):
-        a = k * math.tau / 16 + ph * math.tau / 16
-        r1 = 19 if k % 2 == 0 else 16
-        c.form(L(cx + math.cos(a) * 12, cy + math.sin(a) * 12, 1.4, cx + math.cos(a) * r1, cy + math.sin(a) * r1, 0.4), 'gyY', 0, 1)
-    ring = E(cx, cy, 13, 13) & ~E(cx, cy, 10.6, 10.6)
-    c.form(ring, 'gyY', 1, 1)
+    cx, cy = 32, 36
+    n = 14
+    for k in range(n):
+        a = -math.pi / 2 + (k - (n - 1) / 2) * (math.tau * 0.8 / n)       # unten offen, dort sitzt der Kopf
+        fl = math.sin(ph * math.tau + k * 1.9)
+        ln = 6.5 + 1.5 * fl + (1.5 if k % 2 else 0)
+        bend = 0.25 + 0.12 * fl
+        bx, by = cx + math.cos(a) * 12, cy + math.sin(a) * 12
+        mx, my = cx + math.cos(a + bend * 0.5) * (12 + ln * 0.6), cy + math.sin(a + bend * 0.5) * (12 + ln * 0.6)
+        tx, ty = cx + math.cos(a + bend) * (12 + ln), cy + math.sin(a + bend) * (12 + ln)
+        m = L(bx, by, 2.4, mx, my, 1.5) | L(mx, my, 1.5, tx, ty, 0.3)
+        c.form(m, 'qrR', 0, 1, ring='K')
+        c.form(m & E(bx, by, 3.2, 3.2) | L(bx, by, 1.2, mx, my, 0.5), 'gyY', 0, 1)
+    ring = E(cx, cy, 13, 13) & ~E(cx, cy, 10.4, 10.4)
+    c.form(ring, 'ogy', 1, 1, ring='K')
+    c.fill(E(cx, cy, 11.7, 11.7) & ~E(cx, cy, 11.0, 11.0), 'Y')
+    for k in range(4):                                               # Spiegelpunkte (Yata no Kagami)
+        a = -math.pi / 2 + (k - 1.5) * 0.9 + ph * 0.0
+        x, y = cx + math.cos(a) * 11.7, cy + math.sin(a) * 11.7
+        c.fill(E(x, y, 1.3, 1.3), 'W')
     return c
 
 
@@ -313,7 +350,7 @@ def build():
     strip('kitsune_head', [fox_ears()], 'head', 'front')
     strip('tengu_back', [wings(p) for p in phases], 'back', 'back')
     strip('tengu_head', [tengu_cap()], 'head', 'front')
-    c = [wings(p, 'white', 'white') for p in phases]
+    c = [wings(p, 'white', 'white', 'black') for p in phases]
     strip('fly_back', c, 'back', 'back')
     strip('kami_head', [halo(p) for p in phases], 'head', 'back')
     strip('raijin_back', [drum_ring(i) for i in range(4)], 'back', 'back')
