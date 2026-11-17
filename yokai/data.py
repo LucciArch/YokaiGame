@@ -299,7 +299,7 @@ SYNERGIES = [
     dict(id='a_un', name='A und Un', desc='Zwei Wächter: Anfang und Ende', items=['komainu', 'komainu_glocke'], fx=dict(dmg=0.8, sig_a_un=1)),
     dict(id='sternenfall', name='Sternenfall', desc='Federn aus Licht, Staub aus Sternen', items=['tennin_feder', 'mikaboshi_staub'], fx=dict(crit=0.08, sig_sternenstaub=1)),
     dict(id='yomotsu', name='Yomotsu Hirasaka', desc='Der Pass zwischen den Welten ist versiegelt', items=['yomi_stein', 'shimenawa'], fx=dict(hp=1, sig_yomotsu=1)),
-    dict(id='jingi', name='Sanshu no Jingi', desc='Die drei Throninsignien vereint!', items=['kusanagi', 'yata_kagami', 'yasakani'], fx=dict(dmgm=1.4, sig_jingi=1)),
+    dict(id='jingi', name='Sanshu no Jingi', desc='Die drei Throninsignien vereint!', items=['kusanagi', 'yata_kagami', 'yasakani'], fx=dict(dmgm=1.2, sig_jingi=1)),
     dict(id='sonne_mond', name='Sonne & Mond', desc='Tag und Nacht in deiner Hand', items=['amaterasu', 'tsukuyomi'], fx=dict(dmgm=1.3, sig_sonne_mond=1)),
     dict(id='sturmgoetter', name='Sturmgötter', desc='Raijin und Fūjin kämpfen mit dir', items=['raijin_trommel', 'fujin_sack'], fx=dict(raijin_chance=0.15, sig_gewittersturm=1)),
     dict(id='fuchstanz', name='Fuchsfeuer-Tanz', desc='Neun Flammen tanzen', items=['kitsunebi', 'kyubi_schweif'], fx=dict(dmg=0.5, sig_neun_flammen=1)),

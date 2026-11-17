@@ -135,7 +135,7 @@ TEXT = {
     'onmyo_spiegel': 'Der Spiegel wirft jedes 2. Geschoss als Siegel-Explosion zurück',
     'seimei': 'Siegel-Explosion schon nach 3 Treffern, Bann öfter',
     'koi_drache': 'Beschleunigte Talismane werden zu durchbohrenden Drachen',
-    'drachenkoenig': 'Der Seidenfaden schneidet doppelt',
+    'drachenkoenig': 'Der Seidenfaden schneidet fast doppelt so tief',
     'verfluchte_sterne': 'Sternenfall verwirrt getroffene Feinde',
     'katzenreich': 'Doppelte Würfe kommen jedes zweite Mal',
     'ninja': 'Wurfsterne prallen bis zu dreimal ab',
@@ -499,8 +499,8 @@ def bullet_tick(b, run, dt):
         if b.fl['_sf'] > 0.07:
             b.fl['_sf'] = 0
             from .entities import Hazard
-            k = 2 if 'drachenkoenig' in run.player.sgs else 1
-            if k == 2:
+            k = 1.75 if 'drachenkoenig' in run.player.sgs else 1
+            if k > 1:
                 _syn(run, 'drachenkoenig', b.x, b.y, (140, 220, 200))
             run.hazards.append(Hazard(b.x, b.y, 4, 0.0, 0.5, max(0.5, b.dmg * 0.18 * k), 'p', 'silk'))
     if 'koi_drache' in tags and b.t > 0.35 and not b.fl.get('pierce'):
