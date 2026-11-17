@@ -23,6 +23,8 @@ class Boss(Enemy):
         self.title = info['title']
         self.x, self.y = x, y
         hpm = (1.3 if run.hard else 1.0) * (1 + 0.3 * (run.tier - 1) + 0.07 * (run.tier - 1) ** 2) * run.loop_mult * run.boss_mult
+        if 4 <= run.depth <= 5:           # Kapitel IV–V: Bosskämpfe dauerten nur 7–12 s (Runde 132)
+            hpm *= 1 + 0.25 * (run.tier - 3)
         self.maxhp = self.hp = info['hp'] * hpm
         self.speed = 60
         self.fly = True
