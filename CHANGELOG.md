@@ -227,3 +227,4 @@
 ## 1.0.0
 - Erste Veröffentlichung
 - Runde 123 – **Codex zeigt jetzt auch die aktiven Items.** Hinter den Items folgen alle aktiven Items mit eigenem Kupferrahmen: Name, Beschreibung und Ladedauer in Räumen. Noch gesperrte Quest-Belohnungen (Kine des Mondhasen, Shiomitsu-Tama, Matsuri-Uchiwa, Totsuka no Tsurugi) zeigen ein Schloss und verraten, mit welchem Erfolg man sie freischaltet.
+- Runde 124 – Werkzeug: Der Boss-Test nutzt einen eigenen leeren Spielstand, damit Freischaltungen aus anderen Tests den Amaterasu-Kampf nicht verfälschen.

@@ -1,5 +1,5 @@
 import os, sys, math, random, traceback, time
-os.environ['SDL_VIDEODRIVER']='dummy'; os.environ['SDL_AUDIODRIVER']='dummy'; os.environ['APPDATA']=os.path.join(os.environ.get('TEMP', '/tmp'), 'yokai_test')
+os.environ['SDL_VIDEODRIVER']='dummy'; os.environ['SDL_AUDIODRIVER']='dummy'; os.environ['APPDATA']=__import__('tempfile').mkdtemp(prefix='yokai_boss')  # eigener leerer Spielstand: Freischaltungen anderer Tests verfälschen Amaterasu
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 import pygame
 from yokai.app import Game
