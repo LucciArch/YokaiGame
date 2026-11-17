@@ -67,6 +67,25 @@ try:
     shinkiro(); p.x, p.y = RX + 30, RY + 30; step([], 60 * 16)   # Ecke: keine Tür, kein Sockel
     assert not [pd for pd in run.pedestals if pd.group], 'Muschel schließt sich nicht'
     assert 'shinkiro' in g.save.data['events_seen']; g.save.data['events_seen'].remove('shinkiro')
+    def mochitsuki(perfect):                            # Ereignis Mochitsuki: im Fenster ans Usu, vor dem Schlag weg
+        pos = next(q for q, r in run.rooms.items() if r.kind in ('normal', 'mochitsuki') and q != run.room.pos)
+        r = run.rooms[pos]; r.kind = 'mochitsuki'; r.cleared = True; r.populated = False; r.extra.clear()
+        run.enter_room(pos, 's'); step([], 5)
+        from yokai.yomeiri import mochi_zone
+        us = next(o for o in run.objs if o.kind == 'usagi'); zx, zy = mochi_zone(us)
+        for _ in range(60 * 20):
+            ph = us.data.get('ph')
+            if r.extra.get('mochi_done'): break
+            inn = not perfect or ph is None or 0.3 < ph < 0.7
+            p.x, p.y = (zx, zy) if inn else (zx, zy + 40); step([], 1)
+        assert r.extra.get('mochi_done'), 'Mochitsuki endet nicht'
+        return r.extra['mochi']
+    hp0 = p.maxhp; m = mochitsuki(True)
+    assert m['ok'] == 6 and p.maxhp == hp0 + 2 and 'mochitsuki' in g.save['achievements'], ('Mochitsuki perfekt', m)
+    hp0 = p.maxhp; m = mochitsuki(False)
+    assert m['ok'] == 0 and p.maxhp == hp0, ('Mochitsuki: am Usu stehen bleiben darf nicht zählen', m)
+    g.state = 'lexicon'; g.lex_tab = 2; step([], 2); g.state = 'play'
+    assert 'mochitsuki' in g.save.data['events_seen']; g.save.data['events_seen'].remove('mochitsuki'); g.save['achievements'].remove('mochitsuki')
     run.enter_room(start, 'n'); step([], 20); p.iframes = 0
     for k in (pygame.K_e, pygame.K_q, pygame.K_SPACE): step([K(k)], 20)
     step([K(pygame.K_ESCAPE)], 5); print('pause', g.state)

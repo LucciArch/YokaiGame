@@ -561,6 +561,15 @@ MAP_COL = {
     'D': (150, 100, 60), 'd': (90, 56, 34), 'k': (40, 32, 44), 'S': (240, 170, 200),
 }
 MAP_ICONS = {
+    'mochitsuki': """
+..yYYYYy..
+.yYWYWYYy.
+yYYWYWYYYy
+yYYWWWYYYy
+yYWWkWWYYy
+yYYWWWWYYy
+.yYYWWWYy.
+..yyyyyy..""",
     'shinkiro': """
 .W..w..W..
 ..w..W..w.

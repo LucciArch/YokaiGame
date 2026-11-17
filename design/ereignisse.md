@@ -12,6 +12,7 @@ und spielen die Nachtmarkt-Musik „Yomise“.
 | Omikuji-Schrein | alle | Sonderraum | Ein Los ziehen (5 Mon), Unglückslos am Musubi-Gestell anbinden (3 Mon) | Item, Ebenen-Segen, Schaden oder Drops / Ebenen-Fluch, bei Daikyō −1 Herz |
 | Hyakki Yagyō (Nachtparade) | ab II | ca. jede 9. Ebene | Den drei Reihen der Parade ausweichen | Eine Truhe, ohne Treffer zwei; Treffer kosten Herzen |
 | Shinkirō (Trugbild der Hamaguri) | alle | ca. jede 3. Ebene | Das echte von drei Items nehmen – nur es wirft einen Schatten; 15 s Zeit; ab Tiefe 4 zu 35 % zwei echte, das zweite kostet ein Herz | Ein Item / Trugbild zerfließt, nichts |
+| Mochitsuki (Mondhase, Tsukimi) | alle | ca. jede 3. Ebene | Im Takt des Kine ans Usu treten (goldener Ring) und vor dem Schlag zurück (roter Ring); 6 Schläge, der Takt wird schneller | 5–6 gewendet: +1 Herz (alle 6 ohne Treffer: Erfolg „Aitori“), 3–4: 1 Herz Heilung, 2: ½ Herz / Stehenbleiben: Treffer |
 
 Code: `yokai/yomeiri.py`, Raumverteilung in `yokai/rooms.py` (`extras`).
 

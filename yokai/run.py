@@ -11,11 +11,11 @@ from .rooms import generate_floor, build_room_tiles, Room
 from .entities import (Player, Bullet, Enemy, Pickup, Pedestal, Obj, Hazard, Particle, burst, clamp, norm,
                        tile_at, free_tile_pos, ebullet)
 from .bosses import make_boss, CX, CY
-from .yomeiri import Parade, Procession, Apparition, kakurenbo_start, kakurenbo_break, kakurenbo_update
+from .yomeiri import Parade, Procession, Apparition, kakurenbo_start, kakurenbo_break, kakurenbo_update, mochitsuki_start, mochitsuki_update
 
 ACH = {a[0]: a for a in ACHIEVEMENTS}
 MATSURI = ('yo', 60, 96, 'matsuri', 55)          # Nachtmarkt-Musik für Laden und Ereignisräume
-MATSURI_ROOMS = ('shop', 'yomeiri', 'kakurenbo', 'teahouse', 'slots', 'ema', 'shinkiro')
+MATSURI_ROOMS = ('shop', 'yomeiri', 'kakurenbo', 'teahouse', 'slots', 'ema', 'shinkiro', 'mochitsuki')
 TIPS = ['Esc → „Speichern & Hauptmenü“: Der Lauf geht später ab dieser Ebene weiter.',
         'Gesegnete Ebenen erkennst du am goldenen Banner – nutze den Segen, solange er gilt.',
         'Im Item-Tooltip steht, ob ein Fund eine Synergie vervollständigt.',
@@ -456,6 +456,8 @@ class Run:
             self.yomeiri = Procession(self, room)
         if room.kind == 'kakurenbo':
             kakurenbo_start(self, room)
+        if room.kind == 'mochitsuki':
+            mochitsuki_start(self, room)
         if room.kind == 'hyakki' and not room.extra.get('parade_done'):
             self.yomeiri = Parade(self, room)
         rh = {'shop': 'Laden: Mon gegen Items tauschen. Der Saisen-Kasten nimmt Spenden an – manchmal lohnt es sich.',
@@ -465,6 +467,7 @@ class Run:
               'omikuji': 'Omikuji: Für 5 Mon ein Los ziehen. Ein Unglückslos bindest du für 3 Mon ans Gestell.',
               'ema': 'Ema-Wand: Berühre eine Tafel – nur ein Wunsch geht in Erfüllung.',
               'hyakki': 'Hyakki Yagyō: Weiche der Parade aus. Ohne Treffer gibt es zwei Truhen.',
+              'mochitsuki': 'Tsukimi: Stell dich ans Usu, solange der Kine oben ist (goldener Ring) – und weg, bevor er fällt!',
               'shinkiro': 'Shinkirō: Nur ein Item ist echt – Trugbilder werfen keinen Schatten. Die Muschel schließt sich bald.',
               'challenge': 'Prüfungsraum: Mehrere Wellen überstehen, dann gibt es eine Belohnung.',
               'secret': 'Geheimraum! Rissige Wände lassen sich mit Salz aufsprengen.',
@@ -693,6 +696,10 @@ class Run:
             for i, (nm, desc, fx, col) in enumerate(wishes[:3]):
                 self.objs.append(Obj('ema', cx - 90 + i * 90, cy - 4, name=nm, desc=desc, fx=fx, col=col))
             self.banner('Ema-Wand', 'Schreib einen Wunsch auf – nur einer geht in Erfüllung', (230, 190, 140))
+        elif k == 'mochitsuki':
+            us = Obj('usagi', cx + 8, cy - 4, done=bool(room.extra.get('mochi_done')))
+            us.r = -100
+            self.objs.append(us)
         elif k == 'shinkiro':
             hm = Obj('hamaguri', cx, cy - 46)
             hm.r = -100
@@ -1545,6 +1552,8 @@ class Run:
             self.yomeiri = None
         if self.room.kind == 'kakurenbo':
             kakurenbo_update(self, dt)
+        if self.room.kind == 'mochitsuki':
+            mochitsuki_update(self, dt)
         ex = self.room.extra
         if ex.get('shinkiro_t', 0) > 0:
             ex['shinkiro_t'] -= dt
@@ -2160,7 +2169,7 @@ class Run:
         self.ambient = [pt for pt in self.ambient if pt.update(dt) and RY - 10 < pt.y < RY + RH + 10 and pt.x < RX + RW + 10][-260:]
 
     # ======================================================================  Erfolge & Ende
-    EVENT_KINDS = ('yomeiri', 'kakurenbo', 'ema', 'hyakki', 'shinkiro')
+    EVENT_KINDS = ('yomeiri', 'kakurenbo', 'ema', 'hyakki', 'shinkiro', 'mochitsuki')
 
     def event_done(self, kind):
         """Ein Ereignisraum wurde erlebt (für Statistik und Erfolg)."""
@@ -2508,7 +2517,7 @@ class Run:
             rect = pygame.Rect(0, 0, w, h)
             rect.center = (x, y + (-6 if d == 'n' else 6 if d == 's' else 0)) if horiz else (x + (-6 if d == 'w' else 6), y)
             frame = {'boss': (150, 30, 40), 'treasure': (230, 190, 70), 'shop': (90, 160, 90), 'curse': (110, 40, 120),
-                     'challenge': (200, 90, 50), 'omikuji': (210, 60, 50), 'onsen': (120, 190, 220), 'yomeiri': (240, 150, 80), 'kakurenbo': (220, 150, 190), 'ema': (200, 150, 100), 'hyakki': (160, 120, 230), 'shinkiro': (120, 180, 220),
+                     'challenge': (200, 90, 50), 'omikuji': (210, 60, 50), 'onsen': (120, 190, 220), 'yomeiri': (240, 150, 80), 'kakurenbo': (220, 150, 190), 'ema': (200, 150, 100), 'hyakki': (160, 120, 230), 'shinkiro': (120, 180, 220), 'mochitsuki': (200, 205, 240),
                      'library': (150, 120, 200), 'dojo': (230, 140, 60), 'secret': (160, 140, 110),
                      'teahouse': (110, 170, 90), 'slots': (230, 120, 70)}.get(other.kind, (110, 70, 45))
             if self.curse == 'verirrt' and not other.visited:
@@ -3018,7 +3027,7 @@ class Run:
         pygame.draw.rect(bg, (120, 96, 70, 170), bg.get_rect(), 1)
         s.blit(bg, (x0 - 2, y0 - 2))
         icons = {'secret': (200, 180, 140), 'boss': (230, 50, 50), 'treasure': (240, 200, 70), 'shop': (90, 200, 90), 'curse': (170, 80, 200),
-                 'challenge': (230, 120, 60), 'omikuji': (230, 80, 70), 'onsen': (120, 200, 230), 'yomeiri': (255, 170, 90), 'kakurenbo': (240, 170, 210), 'ema': (220, 170, 110), 'hyakki': (180, 140, 255), 'shinkiro': (140, 200, 240),
+                 'challenge': (230, 120, 60), 'omikuji': (230, 80, 70), 'onsen': (120, 200, 230), 'yomeiri': (255, 170, 90), 'kakurenbo': (240, 170, 210), 'ema': (220, 170, 110), 'hyakki': (180, 140, 255), 'shinkiro': (140, 200, 240), 'mochitsuki': (225, 230, 255),
                  'library': (170, 140, 230), 'dojo': (240, 160, 60), 'teahouse': (120, 190, 100), 'slots': (240, 140, 80)}
         for pos, r in rooms.items():
             if not (r.seen or show_all) or not r.revealed:

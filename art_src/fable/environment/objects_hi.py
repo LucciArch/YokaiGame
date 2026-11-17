@@ -423,7 +423,75 @@ def stairs_up():
     return finish(cv, 24, 42, 22)
 
 
+def _cap(cv, x0, y0, r0, x1, y1, r1):
+    dx, dy = x1 - x0, y1 - y0
+    t = np.clip(((cv.X - x0) * dx + (cv.Y - y0) * dy) / (dx * dx + dy * dy or 1), 0, 1)
+    r = r0 + (r1 - r0) * t
+    return (cv.X - x0 - t * dx) ** 2 + (cv.Y - y0 - t * dy) ** 2 <= r * r
+
+
+MOONFUR = ('#3a3a6c', '#7a80b4', '#c4c8e6', '#f4f4ff')
+USU = ('#1e1216', '#3e2620', '#62402c', '#8a6040')
+
+
+def usagi(f):
+    """Tsuki no Usagi stampft Mochi: f=0 Kine oben, 1 im Schwung, 2 Schlag ins Usu (Hase rechts, Mörser links)."""
+    cv = Cv(64, 60, ss=1)
+    # Usu: ausgehöhlter Baumstamm mit Eisenband, Mochi oben
+    side = cv.R(7, 42, 31, 56) | cv.E(19, 56, 12, 2.5)
+    cv.form(side, USU[:3], 3, 1)
+    for x in (11, 16, 22, 27):
+        cv.vl(x, 45, 55, USU[0])
+    cv.form(cv.R(7, 49, 31, 50), ('#16162e', '#2f3358', '#5a6490'), 0, 1)
+    cv.fill(cv.E(19, 42, 12, 3.5), USU[3])
+    cv.fill(cv.E(19, 42, 10, 2.6), USU[0])
+    mochi = cv.E(19, 41 if f < 2 else 42, 8, 2.6 if f < 2 else 2)
+    cv.form(mochi, ('#a8acc8', '#e4e6f0', '#ffffff'), 1, 1)
+    # Kine: Griff zu den Pfoten, Kopf quer zum Griff
+    paw, head = ((51, 21), (37, 7)) if f == 0 else ((42, 23), (24, 15)) if f == 1 else ((35, 27), (20, 38))
+    hx_, hy_ = head
+    dx, dy = paw[0] - hx_, paw[1] - hy_
+    n = (dx * dx + dy * dy) ** .5
+    px_, py_ = -dy / n * 6, dx / n * 6
+    kine_h = _cap(cv, hx_, hy_, 1.4, paw[0] + dx / n * 3, paw[1] + dy / n * 3, 1.4)
+    kine_k = _cap(cv, hx_ - px_, hy_ - py_, 3.4, hx_ + px_, hy_ + py_, 3.4)
+    # Hase: Hinterkeule, Leib, Kopf, Ohren (Licht oben links, kalter Schatten unten rechts)
+    far_ear = cv.PG([(46, 21), (50, 3), (53, 4), (50, 22)])
+    cv.form(far_ear, MOONFUR[:3], 1, 1)
+    body = cv.E(47, 43, 9, 11)
+    leg = cv.E(50, 49, 7, 6)
+    foot = cv.E(47, 56, 9, 2.5)
+    cv.fill(dil(body | leg | foot), K)
+    cv.form(body | leg, MOONFUR[:3], 3, 1)
+    cv.fill(leg & ~sh(leg, 0, 2) & body, MOONFUR[0])
+    cv.form(foot, MOONFUR[:3], 1, 1)
+    cv.fill(cv.E(44, 45, 4, 6) & body, MOONFUR[2])              # helle Brust
+    cv.fill(dil(kine_h | kine_k), K)
+    cv.form(kine_h, ('#33202a', '#653c2a', '#96663a'), 1, 1)
+    cv.form(kine_k, ('#3a2a20', '#7a5a38', '#a8844c'), 2, 1)
+    cv.fill(cv.E(hx_ - px_, hy_ - py_, 2, 2) & kine_k, '#c8a870')   # Hirnholz
+    # Arm vom Schulterbogen zu den Pfoten, vor dem Griff
+    arm = _cap(cv, 49, 36, 2.6, paw[0], paw[1], 2.4)
+    cv.fill(dil(arm), K)
+    cv.form(arm, MOONFUR[:3], 1, 1)
+    cv.fill(cv.E(paw[0], paw[1], 2.2, 2.2), MOONFUR[2])
+    hd = cv.E(43, 27, 7, 6) | cv.E(38, 29, 3.5, 3)
+    ear = cv.PG([(42, 23), (41, 2), (45, 1), (46, 23)])
+    cv.fill(dil(hd | ear), K)
+    cv.form(hd, MOONFUR[:3], 2, 1)
+    cv.form(ear, MOONFUR[:3], 1, 1)
+    cv.fill(cv.PG([(43, 19), (42.5, 5), (44, 5), (44.5, 19)]), '#b86a84')   # rosiges Ohrinneres
+    cv.px(41, 26, '#ff5a3c'); cv.px(40, 26, '#c81e2a'); cv.px(41, 25, '#fffbc0')
+    cv.px(35, 29, '#8a4650'); cv.px(35, 30, '#8a4650')
+    cv.hl(44, 46, 32, MOONFUR[0])                               # Kinnlinie
+    if f == 2:                                                  # Mochi spritzt beim Schlag
+        for (x, y) in ((8, 36), (6, 39), (30, 36), (32, 38), (12, 33)):
+            cv.fill(cv.E(x, y, 1.2, 1.2), '#ffffff')
+    return finish(cv, 32, 57, 26)
+
+
 def build(dst=DST):
+    strip([usagi(f) for f in range(3)], os.path.join(dst, 'usagi_hi.png'))
     strip([torii(k) for k in ORDER], os.path.join(dst, 'torii_hi.png'))
     strip([hokora(False), hokora(True)], os.path.join(dst, 'hokora_hi.png'))
     strip([slots()], os.path.join(dst, 'slots_hi.png'))

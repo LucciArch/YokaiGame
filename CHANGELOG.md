@@ -132,6 +132,7 @@
 - Runde 108 – **Flügel und Heiligenschein neu:** Tengu-Avatar mit schwarzen Krähenflügeln aus geschichteten Hand-, Arm- und Deckfedern, die sich beim Schlag spreizen; Flug-Items geben weiße Kranichflügel mit dunklen Schwungfedern; Kami-Avatar trägt einen Kaen-Kōhai – Goldreif mit Spiegelpunkten und züngelnden Flammen
 - Runde 109 – **Shinkirō ab Kapitel II:** Manchmal haucht die Muschel zwei echte Items aus – nimmst du eins, bleibt das zweite liegen und kostet ein Herz
 - Runde 110 – **Lauf-Statistik der Nutz-Synergien:** Der Endbildschirm zeigt, was Fuchsgeld, Glückliches Haus, Wunsch erfüllt, Shinsen, Kaufmann und Totenfähre im Lauf gebracht haben
+- Runde 111 – **Neues Ereignis Mochitsuki:** Der Mondhase stampft Mochi – tritt ans Usu, solange der Kine oben ist, und weg, bevor er fällt; sechs Schläge, immer schneller. Gut gewendet gibt es Mondmochi (+1 Herz), dazu der Erfolg „Aitori“ und ein Lexikon-Eintrag
 
 ## 1.4.0 – „Hyakki-Update“ (enthält 1.3 „Kapitel-Update“)
 

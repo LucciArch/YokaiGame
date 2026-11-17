@@ -333,3 +333,74 @@ class Parade:
             run.event_done('hyakki')
             return False
         return True
+
+
+# ---------------------------------------------------------------- Mochitsuki (Tsukimi)
+MOCHI_N = 6          # Schläge pro Runde
+
+
+def mochi_zone(o):
+    """Mitte des Usu (links vom Hasen) – hier wendet die Spielerin den Teig."""
+    return o.x - 26, o.y - 2
+
+
+def mochitsuki_start(run, room):
+    if room.extra.get('mochi_done'):
+        return
+    room.extra.setdefault('mochi', dict(t=0.0, n=0, ok=0, turned=False, on=False))
+    run.banner('Tsukimi', 'Der Mondhase stampft Mochi – wende den Teig, solange der Kine oben ist!', (220, 225, 255))
+
+
+def mochitsuki_update(run, dt):
+    """Der Takt: Kine hebt sich (Fenster 0,25–0,75), schlägt bei 1,0 zu. Im Fenster am Usu stehen = gewendet,
+    beim Schlag noch am Usu = getroffen. Der Takt wird mit jedem Schlag schneller."""
+    ex = run.room.extra
+    m = ex.get('mochi')
+    o = next((o for o in run.objs if o.kind == 'usagi'), None)
+    if not m or o is None or ex.get('mochi_done'):
+        return
+    p = run.player
+    zx, zy = mochi_zone(o)
+    inz = math.hypot(p.x - zx, p.y - zy) < 14
+    per = 1.3 - 0.07 * m['n']
+    if not m['on']:
+        if not inz:
+            return
+        m['on'], m['t'] = True, per * 0.3
+    m['t'] += dt
+    ph = m['t'] / per
+    o.data['ph'] = ph
+    if 0.25 < ph < 0.75 and inz:
+        m['turned'] = True
+    if ph < 1:
+        return
+    m['t'] -= per
+    m['n'] += 1
+    audio.play('drum', 0.5)
+    run.particles.extend(Particle(zx + random.uniform(-6, 6), zy - 4, random.uniform(-30, 30), random.uniform(-50, -20), 0.4,
+                                  (240, 240, 250), 2) for _ in range(6))
+    if inz and p.hurt(1, 'den Kine des Mondhasen'):
+        m['hits'] = m.get('hits', 0) + 1
+    elif m['turned'] and not inz:
+        m['ok'] += 1
+        audio.play('pickup', 0.4)
+    m['turned'] = False
+    if m['n'] < MOCHI_N:
+        return
+    ex['mochi_done'] = True
+    o.data['ph'] = None
+    o.data['done'] = True
+    ok = m['ok']
+    if ok >= 5:
+        p.apply_once({'hp': 1, 'heal': 1})
+        run.banner('Mondmochi!', '%d von %d gewendet – ein Herz mehr' % (ok, MOCHI_N), (240, 240, 255))
+        if ok == MOCHI_N and not m.get('hits'):
+            run.achieve('mochitsuki')
+    elif ok >= 2:
+        p.apply_once({'heal': 2 if ok >= 3 else 1})
+        run.banner('Tsukimi-Dango', '%d von %d gewendet – der Hase teilt mit dir' % (ok, MOCHI_N), (230, 230, 245))
+    else:
+        run.banner('Der Teig ist zäh geworden', 'Der Hase kehrt zum Mond zurück', (200, 200, 230))
+    p.recalc()
+    audio.play('bell', 0.5)
+    run.event_done('mochitsuki')

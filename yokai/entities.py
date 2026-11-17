@@ -1693,7 +1693,7 @@ class Pedestal:
 
 
 _OBJ_HI = {}
-_HI_W = dict(saisen=56, omikuji=40, musubi=76, onsen=116, teabench=56, teacup=20, stairs=48, ema=44)
+_HI_W = dict(saisen=56, omikuji=40, musubi=76, onsen=116, teabench=56, teacup=20, stairs=48, ema=44, usagi=64)
 
 
 class Obj:
@@ -1800,6 +1800,22 @@ class Obj:
             if im:
                 gfx.hi_blit(im[0], x, y + 12)
             gfx.draw_glow(s, x, y - 14, 30, (140, 190, 230), int(40 + 15 * math.sin(t * 1.5)))
+        elif k == 'usagi':                             # Mondhase am Usu (Mochitsuki); ph = Takt 0..1
+            ph = self.data.get('ph')
+            if not self.data.get('done'):
+                zx, zy = int(x - 26), int(y - 2)
+                safe = ph is None or 0.25 < ph < 0.75
+                col = (240, 210, 120) if safe else (230, 70, 60)
+                if ph is None:
+                    col = tuple(int(c * (0.6 + 0.4 * math.sin(t * 3))) for c in col)
+                D.ellipse(s, col, (zx - 14, zy - 6, 28, 12), 1)
+            f = 2 if ph is None or ph < 0.2 else 1 if ph < 0.45 or ph >= 0.8 else 0
+            if ph is None and not self.data.get('done'):
+                f = 0
+            im = hi('usagi', f)
+            if im:
+                gfx.hi_blit(im, x, y + 2)
+            gfx.draw_glow(s, x, y - 14, 26, (200, 210, 255), 30)
         elif k == 'ema':
             col = tuple(self.data['col'])
             if not self.used:
