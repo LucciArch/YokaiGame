@@ -1269,6 +1269,8 @@ class Run:
         if self.depth == 6:
             self.achieve('susanoo')
             self.achieve('endless')
+        if self.depth in (3, 6):
+            self.mark('boss3' if self.depth == 3 else 'himmel')
         if len(s['bosses']) >= len(BOSSES):
             self.achieve('all_bosses')
         if not self.boss_hit:
@@ -2180,6 +2182,11 @@ class Run:
         if all(k in seen for k in self.EVENT_KINDS):
             self.achieve('feste')
 
+    def mark(self, m):
+        """Figuren-Siegel (data.MARKS): in Prüfungen gelten eigene Regeln, dort gibt es keine Siegel."""
+        if not self.challenge:
+            self.achieve('m_%s_%s' % (self.char, m))
+
     def achieve(self, aid):
         s = self.save
         if aid in s['achievements'] or aid not in ACH:
@@ -2273,6 +2280,11 @@ class Run:
             elif self.depth == 7:
                 s.stat('yomi_wins')
                 self.achieve('yomi')
+            self.mark('sieg')
+            if self.depth == 7:
+                self.mark('oku')
+            if self.hard:
+                self.mark('oni')
             self.achieve('seimei')
             self.achieve('hard')
             self.achieve('heaven')

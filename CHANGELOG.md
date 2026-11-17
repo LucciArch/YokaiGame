@@ -133,6 +133,7 @@
 - Runde 109 – **Shinkirō ab Kapitel II:** Manchmal haucht die Muschel zwei echte Items aus – nimmst du eins, bleibt das zweite liegen und kostet ein Herz
 - Runde 110 – **Lauf-Statistik der Nutz-Synergien:** Der Endbildschirm zeigt, was Fuchsgeld, Glückliches Haus, Wunsch erfüllt, Shinsen, Kaufmann und Totenfähre im Lauf gebracht haben
 - Runde 111 – **Neues Ereignis Mochitsuki:** Der Mondhase stampft Mochi – tritt ans Usu, solange der Kine oben ist, und weg, bevor er fällt; sechs Schläge, immer schneller. Gut gewendet gibt es Mondmochi (+1 Herz), dazu der Erfolg „Aitori“ und ein Lexikon-Eintrag
+- Runde 112 – **Figuren-Siegel:** Jede Figur sammelt eigene Siegel (wie Abschlussmarken) und schaltet damit eigene Items frei – die Charakterwahl zeigt, welche schon errungen sind. Erste Welle: einen Boss in Kapitel III besiegen schaltet je Figur ein neues Item frei: Haraegushi (Hana, reinigt jeden neuen Raum), Tsuba des alten Meisters (Kenji, Kampfgeist aus schnellen Kills), Kuzu-Blatt (Kuzunoha, Fuchsfeuer und Fuchszauber), Bunbuku-Chagama (Ponpoko, die Rolle macht dich zum heißen Teekessel), Das tausendste Schwert (Benkei, jeder 30. Kill macht stärker), Der neunte Teller (Okiku, zerspringender Teller und Okikus Klage), Tengu-Tsubute (Kotarō, Steine aus heiterem Himmel), Taizan-Fukun-Ritual (Seimei, einmal pro Ebene vom Tod zurück), Ibaraki-dōjis Arm (Akago, ein Oni-Arm packt zu), Yashiori no Sake (Susanoo, berauscht Bosse). Gesperrte Items im Codex nennen jetzt genau, wie man sie freischaltet
 
 ## 1.4.0 – „Hyakki-Update“ (enthält 1.3 „Kapitel-Update“)
 

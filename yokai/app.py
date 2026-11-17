@@ -8,7 +8,7 @@ import pygame
 from .settings import *
 from . import gfx, audio, sheets, art, bestiary, props, sigs
 from .save import Save
-from .data import (ITEMS, ITEM_IDS, CHARS, CHAR_ORDER, ACHIEVEMENTS, ACTIVES, SYNERGIES, TRANSFORMS, BOSSES,
+from .data import (MARKS, CHAR_UNLOCKS, BOSS_REWARD, ITEMS, ITEM_IDS, CHARS, CHAR_ORDER, ACHIEVEMENTS, ACTIVES, SYNERGIES, TRANSFORMS, BOSSES,
                    BIOMES, CHALLENGES, ENEMIES)
 SYN_BY_ID = {sy['id']: sy for sy in SYNERGIES}
 from .run import Run
@@ -712,6 +712,19 @@ class Game:
             spr = gfx.tinted(sheets.frame(cid, sheets.RIGHT, 0, 2), 'shadow')
             gfx.hi_blit(spr, px, pby - 22 - lift, 200)
             gfx.hi_blit(img('lock'), px, pby - 48 + int(2 * math.sin(self.t * 2)))
+        if cid in unlocked:                          # Figuren-Siegel: welche Items diese Figur schon freigeschaltet hat
+            got = self.save['achievements']
+            mks = [mk for mk in MARKS if mk[0] in CHAR_UNLOCKS.get(cid, {})]
+            band = pygame.Surface((182, 14 + 10 * len(mks)), pygame.SRCALPHA)
+            band.fill((8, 6, 18, 170))
+            s.blit(band, (8, 22))
+            T.add('Siegel %d / %d' % (sum('m_%s_%s' % (cid, mk[0]) in got for mk in mks), len(mks)), 14, 24, 7, (240, 196, 120))
+            for k, (m, mn, md) in enumerate(mks):
+                done = 'm_%s_%s' % (cid, m) in got
+                y = 36 + k * 10
+                pygame.draw.polygon(s, (255, 214, 110) if done else (90, 86, 110), [(16, y), (19, y + 3), (16, y + 6), (13, y + 3)])
+                T.add('%s – %s' % (mn, ITEMS[CHAR_UNLOCKS[cid][m]]['name'] if done else '???'), 24, y - 1, 7,
+                      (240, 220, 170) if done else (150, 145, 165))
         # ---- Name als Pinselschrift-Banner, darunter Titel, Beschreibung und Werte als Tuschebalken
         x0, iw = 214, W - 214 - 36                   # text_w schätzt kleine Schrift etwas zu schmal
         br = img('brush')
@@ -1160,7 +1173,9 @@ class Game:
                 self._wrap('Synergien: ' + '; '.join(txt), 28, 264, W - 56, 7, (255, 220, 120))
         elif it['locked'] and iid not in unlocked:
             T.add('Gesperrt', 28, 206, 11, (200, 150, 150))
-            T.add('Wird durch einen Erfolg oder Boss-Sieg freigeschaltet.', 28, 224, 8, (210, 200, 190))
+            how = next((a[2] for a in ACHIEVEMENTS if a[3] == ('item', iid)), None) \
+                or next(('Besiege %s' % BOSSES[bid]['name'] for bid, r in BOSS_REWARD.items() if r == iid), None)
+            T.add('Freischalten: ' + (how or 'durch einen Erfolg oder Boss-Sieg'), 28, 224, 8, (210, 200, 190))
         else:
             T.add('???', 28, 206, 11, (160, 150, 170))
             T.add('Noch nicht entdeckt.', 28, 224, 8, (210, 200, 190))

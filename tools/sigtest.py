@@ -148,5 +148,34 @@ for _ in range(5):
     b = Bullet(100, 100, 50, 0, 10, 3, 1, 'p', (255, 255, 255), {}); sigs.on_fire(p, run, [b]); fs.append(b.dmg)
 if [d >= 20 for d in fs] != [True] * 4 + [False]:
     print('FEHLER Tengu-Federn', fs); bad += 1
+# Figuren-Siegel: Siegel schaltet das Item der Figur frei; Taizan rettet einmal pro Ebene; Haraegushi; Schwertjagd
+g.start_run('benkei', 21); run = g.run; p = run.player
+if 'tausendstes_schwert' in g.save['items']:
+    g.save['items'].remove('tausendstes_schwert')
+g.save['achievements'][:] = [a for a in g.save['achievements'] if a != 'm_benkei_boss3']
+run.mark('boss3')
+if 'tausendstes_schwert' not in g.save['items'] or 'tausendstes_schwert' not in run.pool:
+    print('FEHLER Siegel schaltet kein Item frei'); bad += 1
+run.challenge = 'bossrush'; g.save['achievements'].remove('m_benkei_boss3'); run.mark('boss3'); run.challenge = None
+if 'm_benkei_boss3' in g.save['achievements']:
+    print('FEHLER Siegel in Prüfung'); bad += 1
+for iid in ('taizan_fukun', 'haraegushi', 'tausendstes_schwert'):
+    p.gain_item(iid, silent=True)
+p.shield_ready = False; p.iframes = 0; p.hp = 1; p.spirit = 0; p.hurt(2)
+if p.dead or p.hp != 2 or not sigs.st(p).get('taizan_pen'):
+    print('FEHLER Taizan rettet nicht', p.hp, p.dead); bad += 1
+p.iframes = 0; p.hp = 1; p.hurt(2)
+if not (p.dead or p.hp <= 0):
+    print('FEHLER Taizan rettet zweimal pro Ebene'); bad += 1
+p.dead = False; p.hp = p.maxhp
+e = make_boss(run, 'shuten_doji'); e.spawn_t = 0; run.enemies = [e]; h0 = e.hp
+sigs.st(p)['harae'] = 1; sigs.tick(p, run, 1 / 60)
+if abs((h0 - e.hp) - e.maxhp * 0.05) > 0.01:
+    print('FEHLER Haraegushi', h0 - e.hp); bad += 1
+d0 = p.s['dmg']
+for _ in range(60):
+    sigs.on_kill(run, e)
+if sigs.st(p).get('jagd_b') != 0.4 or not p.s['dmg'] > d0:
+    print('FEHLER Schwertjagd', sigs.st(p).get('jagd_b'), d0, p.s['dmg']); bad += 1
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)

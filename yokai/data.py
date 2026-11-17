@@ -272,6 +272,18 @@ I('mikaboshi_staub', 'Sternenstaub', 'Ein Säckchen aus dem Gewand des bösen St
 I('brautschleier', 'Schleier der Fuchsbraut', 'Ein Dank für den ungestörten Hochzeitszug', 'brautschleier', (240, 240, 250), ['Y'], ['kitsune'], 3, luck=2, spd=8, sig_fuchsregen=1)
 I('zashiki_temari', 'Temari-Ball', 'Zashiki-warashis Spielball bringt Glück ins Haus', 'zashiki_temari', (220, 60, 70), ['Y'], [], 2, luck=1, coins=6, sig_hausglueck=1)
 
+# ---- Figuren-Siegel: jede Figur schaltet mit jedem Siegel ein eigenes Item frei (gesperrt bis dahin)
+I('haraegushi', 'Haraegushi', 'Der Reinigungsstab der Schreinmaid fegt das Unreine fort', 'haraegushi', (245, 245, 235), 'T', ['kami'], 3, True, salts=1, sig_harae=1)
+I('zanshin_tsuba', 'Tsuba des alten Meisters', 'Zanshin – der Geist bleibt nach dem Schnitt wach', 'zanshin_tsuba', (200, 170, 90), 'T', [], 3, True, dmg=0.3, sig_zanshin=1)
+I('kuzu_blatt', 'Kuzu-Blatt', 'Das Abschiedsgedicht der Fuchsfrau aus dem Shinoda-Wald', 'kuzu_blatt', (150, 200, 110), 'T', ['kitsune'], 3, True, luck=1, sig_fuchszauber=1)
+I('bunbuku_kessel', 'Bunbuku-Chagama', 'Der Teekessel, der eigentlich ein Tanuki war', 'bunbuku_kessel', (150, 120, 90), 'T', ['tanuki'], 3, True, hp=1, sig_chagama=1)
+I('tausendstes_schwert', 'Das tausendste Schwert', 'Benkei nahm 999 Kriegern die Klinge ab – eine fehlte ihm', 'tausendstes_schwert', (200, 210, 230), 'T', [], 3, True, dmg=0.3, sig_schwertjagd=1)
+I('neunter_teller', 'Der neunte Teller', 'Ichi-mai … ni-mai … – im Brunnen fehlt immer einer', 'neunter_teller', (230, 240, 255), 'T', ['yurei'], 3, True, spirit=2, sig_sarayashiki=1)
+I('tengu_tsubute', 'Tengu-Tsubute', 'Steine, die aus heiterem Himmel fallen', 'tengu_tsubute', (150, 140, 130), 'T', ['tengu'], 3, True, shotspd=20, sig_tsubute=1)
+I('taizan_fukun', 'Taizan-Fukun-Ritual', 'Seimei tauschte vor dem Herrn des Berges ein Leben gegen ein anderes', 'taizan_fukun', (200, 60, 60), 'T', ['shikigami'], 3, True, sig_taizan=1)
+I('ibaraki_arm', 'Ibaraki-dōjis Arm', 'Watanabe no Tsuna schlug ihn ab – der Oni kam zurück, ihn zu holen', 'ibaraki_arm', (200, 80, 70), 'T', ['oni'], 3, True, dmg=0.3, sig_ibaraki=1)
+I('yashiori_sake', 'Yashiori no Sake', 'Achtmal gebraut – genug, um die Orochi zu berauschen', 'yashiori_sake', (230, 220, 180), 'T', ['raijin'], 3, True, hp=1, sig_yashiori=1)
+
 ITEM_IDS = ORDER
 
 # ---- Omamori-Anhänger (ein Slot, tauschbar)
@@ -652,6 +664,23 @@ ACHIEVEMENTS = [
     ('synergy25', 'Meister der Harmonie', 'Entdecke 25 verschiedene Synergien', None),
 ]
 
+
+# Figuren-Siegel (wie die Abschlussmarken in Isaac): Siegel → Item je Figur
+MARKS = [('boss3', 'Kapitel III', 'Besiege einen Boss in Kapitel III'),
+         ('sieg', 'Sieg', 'Gewinne einen Lauf'),
+         ('himmel', 'Takamagahara', 'Besiege einen Boss in Takamagahara'),
+         ('oku', 'Yomi / Iwato', 'Besiege Izanami oder Amaterasu'),
+         ('oni', 'Oni-Modus', 'Gewinne im Oni-Modus')]
+CHAR_UNLOCKS = {
+    'hana': {'boss3': 'haraegushi'}, 'kenji': {'boss3': 'zanshin_tsuba'}, 'kuzunoha': {'boss3': 'kuzu_blatt'},
+    'ponpoko': {'boss3': 'bunbuku_kessel'}, 'benkei': {'boss3': 'tausendstes_schwert'}, 'okiku': {'boss3': 'neunter_teller'},
+    'kotaro': {'boss3': 'tengu_tsubute'}, 'seimei': {'boss3': 'taizan_fukun'}, 'akago': {'boss3': 'ibaraki_arm'},
+    'susanoo': {'boss3': 'yashiori_sake'},
+}
+for _c, _ms in CHAR_UNLOCKS.items():
+    for _m, _n, _d in MARKS:
+        if _m in _ms:
+            ACHIEVEMENTS.append(('m_%s_%s' % (_c, _m), '%s: %s' % (CHARS[_c]['name'], _n), '%s mit %s' % (_d, CHARS[_c]['name']), ('item', _ms[_m])))
 
 # Kapitel VII (geheim, nach dem ersten Wahren Sieg): Izanamis Totenpalast tief in Yomi no Kuni
 BIOMES['yomi_oku'] = dict(name='Totenpalast', jp='Yomi no Oku', depth=7, floor=(40, 26, 44), floor_pat='stone',

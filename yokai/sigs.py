@@ -205,6 +205,17 @@ TEXT = {
     'sommerwind': 'Die Rolle wirft acht Federn, die weiter fliegen',
     'fest_der_laternen': 'Treffer entzünden doppelt so oft den Boden, die Flammen brennen länger',
     'kaufmann': 'Der Hammer zählt jede Münze doppelt, Reichtum schon ab 25 Mon (+25 %)',
+    # Figuren-Siegel
+    'harae': 'Betrittst du einen Raum voller Yokai, verlieren alle 15 % ihres Lebens (Bosse 5 %)',
+    'zanshin': 'Kills kurz nacheinander stapeln Kampfgeist: +8 % Schaden je Stufe (bis 5)',
+    'fuchszauber': 'Jeder 4. Treffer entzündet Fuchsfeuer; brennende Feinde verfallen 2 s dem Fuchszauber',
+    'chagama': 'Die Rolle macht dich zum heißen Teekessel: kurz unverwundbar, wer dich berührt, verbrüht',
+    'schwertjagd': 'Jeder 30. Kill: +0,2 Schaden für den Rest des Laufs (bis +2)',
+    'sarayashiki': 'Jeder 9. Wurf ist ein Teller, der in Scherben zerspringt – danach lässt Okikus Klage nahe Feinde fliehen',
+    'tsubute': 'Alle 3 s fällt ein Stein auf einen Feind (150 % Schaden)',
+    'taizan': 'Einmal pro Ebene wird ein tödlicher Treffer abgewendet – dafür −20 % Schaden bis zur nächsten Ebene',
+    'ibaraki': 'Der Oni-Arm packt alle 2,5 s den nächsten Feind: 200 % Schaden, schleudert ihn weg',
+    'yashiori': 'Bosse und Champions torkeln berauscht: 3 s gebremst und +25 % Schaden (je Feind alle 8 s)',
 }
 
 BULLET_SIGS = ('sichel', 'kammzinken', 'seidenfaden', 'stromauf', 'gross', 'schweben', 'windstoss', 'koi_drache')
@@ -327,6 +338,16 @@ def on_fire(p, run, bullets):
     for b in bullets:
         if tags:
             b.fl = dict(b.fl); b.fl['sg'] = tags
+    if 'sarayashiki' in S:
+        if n % 9 == 0:                                   # der neunte Teller
+            for b in bullets:
+                b.dmg *= 1.5; b.r *= 1.3; b.col = (235, 240, 255)
+                b.fl = dict(b.fl, sara=1)
+        elif n % 9 == 1 and n > 1:                       # … und einer fehlt: Okikus Klage
+            _ring(run, p.x, p.y, (180, 200, 255), 70)
+            for e in run.enemies:
+                if e.active() and not e.is_boss and math.hypot(e.x - p.x, e.y - p.y) < 70 + e.r:
+                    e.sg_fear = max(getattr(e, 'sg_fear', 0), 1.5)
     if 'sichel' in S:
         g['sichel'] = -g.get('sichel', 1)
         tgt = run.nearest_enemy(p.x, p.y)
@@ -574,6 +595,12 @@ def bullet_tick(b, run, dt):
 
 def bullet_end(run, b):
     """Ein Spieler-Talisman verschwindet (Treffer, Wand oder Reichweite)."""
+    if b.fl.get('sara'):                                 # der Teller zerspringt in sechs Scherben
+        _sparks(run, b.x, b.y, ((235, 240, 255), (120, 150, 220)), 8, 90)
+        seen = set()
+        for i in range(6):
+            nb = run.fire_player_bullet(b.x, b.y, i / 6 * math.tau + random.uniform(0, 0.5), b.dmg * 0.4, 210, 2, 0.35, {})
+            nb.hit = seen; nb.col = (220, 230, 255)
     if b.fl.get('explode') and not b.fl.get('_split') and 'feuerwerk' in run.player.sgs:
         hanabi = ((255, 120, 160), (255, 220, 120), (140, 220, 255))
         _syn(run, 'feuerwerk', b.x, b.y, (255, 150, 190))
@@ -637,6 +664,8 @@ def hit_pre(run, e, b, dmg):
             _syn(run, 'oni_krieger', p.x, p.y, (255, 170, 60))
     if getattr(e, 'sg_curse', 0) > 0:
         dmg *= 2
+    if run.time < getattr(e, 'sg_drunk', 0):
+        dmg *= 1.25
     if 'hundert_augen' in S and getattr(e, 'sg_mark', False):
         dmg *= 1.2 + 0.06 * getattr(e, 'sg_eyes', 0) if 'allsehend' in S else 1.15
         if 'allsehend' in S:
@@ -683,6 +712,20 @@ def hit_post(run, e, b, dmg):
         g['ts'] = min(0.35 if hi else 0.2, g.get('ts', 0) + (0.04 if hi else 0.02))
         if hi and g['ts'] > 0.2:
             _syn(run, 'goetter_arsenal', e.x, e.y, (255, 220, 150))
+    if 'fuchszauber' in S and not echo:
+        g['kz'] = g.get('kz', 0) + 1
+        if g['kz'] >= 4:
+            g['kz'] = 0
+            e.burn = max(e.burn, 2.5)
+            e.burn_dps = max(e.burn_dps, max(1.0, p.damage() * 0.3))
+        elif e.burn > 0 and not e.is_boss and not e.champ and run.time >= getattr(e, 'sg_kz', -9):
+            e.sg_kz = run.time + 6
+            e.sg_conf = max(getattr(e, 'sg_conf', 0), 2.0)
+            _float(run, e, 'Verzaubert', (255, 170, 90))
+    if 'yashiori' in S and (e.is_boss or e.champ) and run.time >= getattr(e, 'sg_ys', -9):
+        e.sg_ys, e.sg_drunk = run.time + 8, run.time + 3
+        e.slowed = max(e.slowed, 3.0)
+        _float(run, e, 'Berauscht', (240, 220, 160))
     if 'hundert_augen' in S:
         e.sg_mark = True
         if 'allsehend' in S:   # hundert Augen: jeder Treffer öffnet ein weiteres
@@ -790,6 +833,15 @@ def on_kill(run, e):
     if not S:
         return
     g = st(p)
+    if 'zanshin' in S:
+        g['zs'] = min(5, g.get('zs', 0) + 1) if run.time - g.get('zs_t', -9) < 2.0 else 1
+        g['zs_t'] = run.time
+    if 'schwertjagd' in S:
+        g['jagd'] = g.get('jagd', 0) + 1
+        if g['jagd'] % 30 == 0 and g.get('jagd_b', 0) < 2.0:
+            g['jagd_b'] = round(g.get('jagd_b', 0) + 0.2, 2)
+            p.recalc()
+            _float(run, e, 'Klinge Nr. %d' % (g['jagd'] // 30), (210, 220, 240))
     if 'irrlicht' in S:
         tgt = _nearest(run, e.x, e.y, 200, lambda o: o is not e)
         a = math.atan2(tgt.y - e.y, tgt.x - e.x) if tgt else random.uniform(0, math.tau)
@@ -926,6 +978,14 @@ def on_hurt(p, run):
             p.spirit = max(p.spirit, 1)
         p.iframes = 2.0
         run.banner('Tausend Kraniche', 'Dein Wunsch hat dich gerettet', (250, 240, 230))
+    if 'taizan' in S and p.total_hp() <= 0 and not g.get('taizan_used'):
+        g['taizan_used'] = g['taizan_pen'] = 1
+        p.hp = max(p.hp, 2) if not p.spirit_only else p.hp
+        if p.spirit_only:
+            p.spirit = max(p.spirit, 2)
+        p.iframes = 2.0
+        _ring(run, p.x, p.y, (200, 60, 60), 60)
+        run.banner('Taizan-Fukun-Ritual', 'Ein Leben gegen ein anderes – −20 % Schaden bis zur nächsten Ebene', (220, 90, 80))
 
 
 def block(p, run, b):
@@ -1014,6 +1074,10 @@ def on_dash(p, run):
     if not S:
         return
     g = st(p)
+    if 'chagama' in S:                                   # Bunbuku-Chagama: kurz ein heißer Teekessel
+        p.iframes = max(p.iframes, 0.8)
+        g['kessel'] = 0.8
+        _ring(run, p.x, p.y, (220, 220, 210), 22)
     if 'suzu' in S and run.time - g.get('suzu', -9) >= (2.5 if 'iwato' in S else 4.0):
         _suzu(p, run)
     if 'izanagis_flucht' in S and run.time - g.get('momo', -9) >= 3.0:
@@ -1144,6 +1208,7 @@ def on_room_enter(run):
     if 'a_gyo' in S and not run.room.cleared:
         g['agyo'] = 0.75
     g['pot'] = 0
+    g['harae'] = 0 if run.room.cleared else 1
 
 
 def on_room_clear(run):
@@ -1186,6 +1251,7 @@ def on_floor(run):
         return
     g = st(p)
     g['kenko_used'] = 0
+    g['taizan_used'] = g['taizan_pen'] = 0
     g['parade'] = 0
     g['anmut'] = 0
     g['gokaku'] = 0
@@ -1236,6 +1302,12 @@ def contact(p, run, e):
     if 'kappa_freund' in S and e.id.startswith('kappa'):
         return True
     cd = getattr(e, 'sg_touch', 0)
+    if cd <= 0 and g.get('kessel', 0) > 0:
+        e.burn = max(e.burn, 3.0)
+        e.burn_dps = max(e.burn_dps, max(1.0, p.damage() * 0.5))
+        e.sg_touch = 0.5
+        _float(run, e, 'Verbrüht', (255, 200, 150))
+        return True
     if cd <= 0:
         if 'klebrig' in S and not e.is_boss:
             e.frozen = max(e.frozen, 1.0)
@@ -1319,9 +1391,10 @@ def tick(p, run, dt):
     if not S:
         return
     g = st(p)
-    for k in ('invis', 'iaido', 'hannya', 'glocke'):
+    for k in ('invis', 'iaido', 'hannya', 'glocke', 'kessel'):
         if g.get(k, 0) > 0:
             g[k] -= dt
+    _siegel_tick(p, run, dt, S, g)
     if p.moving:
         g['still'] = 0
     else:
@@ -1497,6 +1570,44 @@ def tick(p, run, dt):
         g['clouds'] = [c for c in clouds if c[2] > 0]
 
 
+def _siegel_tick(p, run, dt, S, g):
+    """Zeitgesteuerte Fähigkeiten der Figuren-Siegel-Items."""
+    if 'harae' in S and g.get('harae'):
+        en = [e for e in run.enemies if e.active()]
+        if en:                                           # Haraegushi: ein Schwung reinigt den ganzen Raum
+            g['harae'] = 0
+            _ring(run, p.x, p.y, (245, 245, 235), 120)
+            for e in en:
+                e.hp -= e.maxhp * (0.05 if e.is_boss else 0.15)
+                e.flash = 0.1
+                _sparks(run, e.x, e.y, ((255, 255, 250), (230, 230, 210)), 5, 60)
+    if 'tsubute' in S:
+        g['tsub'] = g.get('tsub', 0) + dt
+        en = [e for e in run.enemies if e.active()]
+        if g['tsub'] >= 3.0 and en:
+            g['tsub'] = 0
+            e = random.choice(en)
+            _sparks(run, e.x, e.y - 4, ((150, 140, 130), (110, 100, 95), (200, 190, 175)), 8, 70)
+            _ring(run, e.x, e.y, (170, 160, 150), 14)
+            run.damage_enemy(e, p.damage() * 1.5, None)
+            if not e.is_boss:
+                e.frozen = max(e.frozen, 0.4)
+    if 'ibaraki' in S:
+        g['ibar'] = g.get('ibar', 0) + dt
+        e = _nearest(run, p.x, p.y, 150) if g['ibar'] >= 2.5 else None
+        if e:
+            g['ibar'] = 0
+            d = math.hypot(e.x - p.x, e.y - p.y) or 1
+            _sparks(run, e.x, e.y, ((200, 80, 70), (240, 130, 100), (90, 30, 30)), 9, 90)
+            run.damage_enemy(e, p.damage() * 2.0, None)
+            if not e.is_boss:
+                e.kx += (e.x - p.x) / d * 420
+                e.ky += (e.y - p.y) / d * 420
+    if g.get('kessel', 0) > 0 and random.random() < 0.4:
+        from .entities import Particle
+        run.particles.append(Particle(p.x + random.uniform(-5, 5), p.y - 8, 0, -30, 0.4, (225, 225, 220), 2))
+
+
 def dmg_mult(p):
     S = p.sgs
     if not S:
@@ -1519,6 +1630,10 @@ def dmg_mult(p):
         m *= 1 + 0.03 * g.get('parade', 0)
     if g.get('hannya', 0) > 0:
         m *= 1.5
+    if 'zanshin' in S and run.time - g.get('zs_t', -9) < 2.0:
+        m *= 1 + 0.08 * g.get('zs', 0)
+    if g.get('taizan_pen'):
+        m *= 0.8
     if 'gokaku' in S:
         m *= 1 + 0.1 * g.get('gokaku', 0)
     if 'maskenwechsel' in S and g.get('rooms', 0) % 2 == 0:
@@ -1549,6 +1664,8 @@ def stat_bonus(p, f):
         f[k] += v
     if f.get('sig_anmut'):
         f['rate'] += p.sg.get('anmut', 0)
+    if f.get('sig_schwertjagd'):
+        f['dmg'] += p.sg.get('jagd_b', 0)
 
 
 def on_lightning(run, x, y):
