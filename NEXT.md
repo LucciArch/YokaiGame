@@ -63,15 +63,20 @@ für Talismane greifen (z. B. `bullet_tick`) – sollen sie auch für Strahl/Hie
   ersten Treffer, gilt auch für Kammzinken-/Spiegel-Nebenstrahlen).
 - Runde 76: `Run.LAMP_ACTIVES` (Kitsune-Laterne, Onryō-Kerze) und `LAMP_TRINKETS` (Feuer-Anhänger) zählen fürs Spielerinnen-Licht.
 
-# Nächster Schritt: Item-Synergien – restliche Hit-/Ende-Sigs bei Waffen
-Warum: Lucas Dauerwunsch „alle Items funktionieren miteinander“. Offen in `sigs.hit_post`: `rattenschwarm` liest
-`b.fl.get('pierce')` – der Strahl durchbohrt von Natur aus, sollte er Ratten auslösen (dann gedeckelt, 1 pro Strahl)?
-Dazu `bullet_end`/`bullet_bounce` (Abprall-/Ende-Sigs wie Kappa-Festmahl, Brandung): soll die Strahl-Spiegelung
-an der Wand sie auslösen? Je ein Test in `tools/waffentest.py`, vorher prüfen, dass er auf altem Code fehlschlägt.
+# Erledigt (Runden 77–78)
+- Runde 77: `weapons.beam` – Strahltreffer tragen `pierce` (Tessos Schwarm, eine Ratte pro Strahl über `_rat`);
+  Spiegelung ruft `sigs.bullet_bounce` mit Träger-Geschoss (Kappa-Festmahl, Brandung einmal pro Strahl über `_br`).
+- Runde 78: `weapons._hit` ruft bei zerplatzenden Sprengsiegel-Treffern `sigs.bullet_end` (Feuerwerk über Edo).
+  Bewusst offen: Strahl-Ende ohne Treffer löst keine Ende-Sigs aus (wäre Funken-Spam bei jedem Strahl).
+
+# Nächster Schritt: Balance-Nachmessung Waffen-Builds
+Warum: Seit Runde 65 übernehmen Waffen fast alle Wurf-Fähigkeiten – Strahl/Hieb könnten jetzt zu stark sein.
+`tools/synbalance.py` um Waffen (w_laser, w_sword, w_bow) erweitern, Schaden pro Sekunde gegen Talisman-Builds
+vergleichen, Ausreißer (> 2× Median) dämpfen; Bericht nach `design/balance/`.
 
 # Weitere Ideen
 - Amaterasu-Bossmusik (`art_src/music/`) und Titelbild-Stimmung nach dem Iwato-Sieg (wie 'yomi' in `app.py`)
 - Wanddekos Yashiki/Kawabe/Ōeyama/Shinkai/Enma-chō/Tsukiyomi in Hi-Res überarbeiten (`wall_decos`)
 - Mondpalast-Ambiente: fallende Katsura-Blätter, Mondhase als seltener Ereignis-NPC (Mochi-Tausch)
 - Shinkirō als Ereignis: eine Hamaguri spiegelt einen Trugladen vor
-- Balance-Nachmessung (`tools/synbalance.py`) für Waffen-Builds nach den Runden 65–75
+- Tessos Schwarm auch für Hiebe in Gruppen (gedeckelt wie Wurfstern) – erst nach der Balance-Messung
