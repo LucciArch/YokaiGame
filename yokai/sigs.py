@@ -157,7 +157,7 @@ TEXT = {
     'faehrmann': 'Jeder 12. Kill: der Fährmann zahlt ½ Geisterherz',
     'ewiger_winter': 'Erstarrte Feinde nehmen +50 % Schaden, Gebremste erstarren öfter',
     'tengu_flug': 'Die Rolle entfesselt einen schneidenden Windwirbel',
-    'oni_rausch': 'Torkelnde Talismane treffen +60 % statt +30 %',
+    'oni_rausch': 'Torkelnde Talismane treffen +45 % statt +30 %',
     'oni_krieger': 'Tigerhieb: die ersten drei Treffer jedes Raums und der erste Treffer auf jeden unverletzten Feind',
     'gluecksgoetter': 'Goldene Treffer lassen manchmal Mon fallen',
     'onmyodo': 'Siegel-Explosionen entlassen drei Papierdiener',
@@ -326,7 +326,7 @@ def on_fire(p, run, bullets):
             a = math.atan2(b.vy, b.vx) + random.uniform(-0.28, 0.28)
             sp = math.hypot(b.vx, b.vy)
             b.vx, b.vy = math.cos(a) * sp, math.sin(a) * sp
-            b.dmg *= 1.6 if 'oni_rausch' in S else 1.3
+            b.dmg *= 1.45 if 'oni_rausch' in S else 1.3
             if 'oni_rausch' in S:
                 b.col = (255, 150, 130)
         if 'oni_rausch' in S:
@@ -638,7 +638,7 @@ def hit_post(run, e, b, dmg):
                 _chain_strikes(run, e, 1, p.damage() * 1.6 + 3)
     if b is not None and b.fl.get('_urteil'):
         e.sg_curse = 6.0
-    if 'pentagramm' in S and not echo:
+    if 'pentagramm' in S and not echo and not (b is not None and b.fl.get('_shiki')):   # Papierdiener laden das Siegel nicht nach
         e.sg_pent = getattr(e, 'sg_pent', 0) + 1
         if e.sg_pent >= (3 if 'seimei' in S else 5):
             e.sg_pent = 0
@@ -651,7 +651,7 @@ def hit_post(run, e, b, dmg):
                 for i in range(3):
                     a = i / 3 * math.tau
                     ox, oy = math.cos(a) * (e.r + 8), math.sin(a) * (e.r + 8)   # außerhalb starten, damit man sie fliegen sieht
-                    sb = run.fire_player_bullet(e.x + ox, e.y + oy, a, p.damage() * 0.7, 160, 2.5, 1.4, {'homing': 1})
+                    sb = run.fire_player_bullet(e.x + ox, e.y + oy, a, p.damage() * 0.7, 160, 2.5, 1.4, {'homing': 1, '_shiki': 1})
                     sb.col = (240, 240, 240)
                     sb.kind = 'shiki'
     if 'schnitt' in S or 'drei_wiesel' in S:

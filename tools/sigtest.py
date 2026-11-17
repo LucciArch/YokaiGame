@@ -64,5 +64,18 @@ ebullet(run, p.x + 150, p.y, 0, 0)
 sigs.on_dash(p, run)
 if len(run.ebullets) != 1 or 'iwato' not in p.sgs:
     print('FEHLER Kagura-Suzu', len(run.ebullets), sorted(p.sgs)); bad += 1
+# Onmyōdō: Papierdiener aus der Siegel-Explosion laden das Pentagramm nicht nach (sonst Kettenreaktion, Balance 87)
+from yokai.bosses import make_boss
+g.start_run('hana', 13); run = g.run; p = run.player
+for iid in ('shikigami_papier', 'seimei_stern'):
+    p.gain_item(iid, silent=True)
+e = make_boss(run, 'shuten_doji'); run.enemies = [e]
+e.sg_pent = 4
+sigs.hit_post(run, e, None, 1)
+shiki = [b for b in run.pbullets if b.fl.get('_shiki')]
+for b in shiki:
+    sigs.hit_post(run, e, b, 1)
+if len(shiki) != 3 or e.sg_pent != 0:
+    print('FEHLER Onmyōdō-Kette', len(shiki), e.sg_pent); bad += 1
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)

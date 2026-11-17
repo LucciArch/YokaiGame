@@ -313,7 +313,7 @@ SYNERGIES = [
     dict(id='ewiger_winter', name='Ewiger Winter', desc='Alles erstarrt', items=['yuki_traene', 'suijin_schale'], fx=dict(freeze=0.1, sig_ewiger_winter=1)),
     dict(id='tengu_flug', name='Tengu-Flug', desc='Spring über Berge', items=['karasu_feder', 'tengu_geta'], fx=dict(spd=20, sig_tengu_flug=1)),
     dict(id='grosser_wind', name='Großer Wind', desc='Ein Taifun bricht los', items=['tengu_faecher', 'fujin_sack'], fx=dict(knock=1, shotspd=60, sig_taifun=1)),
-    dict(id='oni_rausch', name='Oni-Rausch', desc='Sake macht Oni unbesiegbar', items=['oni_sake', 'shuten_kalebasse'], fx=dict(dmgm=1.1, sig_oni_rausch=1)),
+    dict(id='oni_rausch', name='Oni-Rausch', desc='Sake macht Oni unbesiegbar', items=['oni_sake', 'shuten_kalebasse'], fx=dict(sig_oni_rausch=1)),
     dict(id='oni_krieger', name='Oni-Krieger', desc='Knüppel und Tigerfell', items=['kanabo', 'tigerfell'], fx=dict(dmg=1, knock=1, sig_oni_krieger=1)),
     dict(id='drachenkoenig', name='Drachenkönig', desc='Perle und Bart des Ryūjin', items=['ryu_perle', 'ryujin_bart'], fx=dict(pierce=1, sig_drachenkoenig=1)),
     dict(id='grosse_welle', name='Tsunami', desc='Die Welle prallt zurück', items=['kanagawa', 'kappa_teller'], fx=dict(bounce=1, sig_brandung=1)),
