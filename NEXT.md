@@ -277,18 +277,24 @@ für Talismane greifen (z. B. `bullet_tick`) – sollen sie auch für Strahl/Hie
 - Runde 127: Synergie `henro` (kongozue + senbazuru): `on_floor` +2 Kraniche, Geisterherz jede 2. statt 3. Ebene,
   Zähler in `nutz_lines`.
 
-# Nächster Schritt: Balance der Siegel-, Prüfungs- und Quest-Items
-Warum: Seit Runde 112 kamen viele starke Belohnungen dazu (Ichi-no-tachi, Ohabari, Miidera, Keppan, Totsuka mit
-20 + 4×Schaden auf alle Feinde, Yatagarasu-Feder, Nusa), keine wurde gemessen. Mit `tools/synbalance.py` bzw. einem
-kurzen Messlauf (Aktiv-Schaden pro Ladung gegen Boss-HP Kapitel 3/5) gegenprüfen und Ausreißer anpassen.
+# Erledigt (Runden 128–130)
+- Runde 128: `synbalance.py <boss> <tiefe> <ids> --items --leben` misst Einzel-Items (Item + Zufalls-Item gegen zwei
+  Zufalls-Items, 12 Seeds, ~80 s für 60 Items). Alle Siegel-/Prüfungs-Items gemessen: nur Habakiri war Ausreißer (×3,04,
+  4 % Max-HP auch bei Bossen) → Bosse 1 % (×1,42). Quest-Aktive pro Ladung im Rahmen. Bericht `balance-check-128`.
+- Runde 129: Synergie `misogi` (onusa + kiyome_sack): Salz macht alle Feindgeschosse im Raum zu Shide (bis 12, 60 %),
+  Ōnusa-Rolle 90 px / bis 8. Helfer `sigs._shide(p, run, rad, n, mult)`.
+- Runde 130: Yatagarasu-Feder-Symbol mit breiterer Fahne.
+
+# Nächster Schritt: Schwierigkeit mit Meister-Startitem nachmessen
+Warum: Luca fand das Spiel zu leicht (Runde 106). Seit Runde 117 starten Läufe mit Meister-Siegel mit einem
+Siegel-Item, dazu kommen rückwirkend vergebene Prüfungs-/Quest-Belohnungen im Pool. Mit dem Gott-Bot-Maß aus Runde 106
+(Bosskampfdauer je Ebene, Ziel ≥ ~15 s) mit und ohne Startitem messen; falls deutlich leichter: Boss-HP bei
+Meister-Läufen leicht anheben oder das Startitem erst ab Kapitel II geben.
 
 # Danach
-- Lucas Rückmeldung zur Schwierigkeit weiter beachten (Meister-Startitem macht Läufe leichter – ggf. nur im normalen
-  Modus oder dafür Boss-HP leicht anheben)
-- Weitere Synergien für neue Items (z. B. Fuurin + Biidoro-Splitter mit Yata-Spiegel; Nusa als aktives Item
-  ist schon da – evtl. Synergie Onusa-Signatur + Kiyome-Sack „Misogi“)
-- Codex: aktive Items im Lauf als „entdeckt“ merken (eigene Liste), falls Spoiler-Schutz gewünscht
-- Yatagarasu-Feder-Symbol: Fahne etwas breiter zeichnen (wirkt im Spiel schmal)
+- Weitere Synergien für Belohnungs-Items (z. B. Fuurin + Biidoro-Splitter + Yata-Spiegel; Hi-ōgi + Sonnen-Item)
+- Codex: aktive Items im Lauf als „entdeckt“ merken, falls Spoiler-Schutz gewünscht
+- Hi-ōgi (×1,53) und Masakari (×1,35) beobachten – oberer Rand der Siegel-Items
 
 # Weitere Ideen
 - Wanddekos: zweite Variante pro Biom (Index 2), Werkzeug walldeco_hi.py steht
