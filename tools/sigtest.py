@@ -363,6 +363,13 @@ for rr in run.rooms.values():
 p.active = 'mayoiga_wan'; p.charge = 9; n0 = len(run.pickups); run.use_active()
 if not all(rr.revealed for rr in run.rooms.values()) or len(run.pickups) != n0 + 2:
     print('FEHLER Aktiv mayoiga_wan'); bad += 1
+# Henro (Kongō-zue + Senbazuru): neue Ebene faltet zwei Kraniche
+g.start_run('hana', 33); run = g.run; p = run.player
+for iid in ('kongozue', 'senbazuru'):
+    p.gain_item(iid, silent=True)
+sigs.st(p)['cranes'] = 3; sigs.on_floor(run)
+if 'henro' not in p.sgs or sigs.st(p)['cranes'] != 5 or not any('Henro' in l for l in sigs.nutz_lines(p)):
+    print('FEHLER Henro'); bad += 1
 # Quests Teil 3: 50 Kami-Gaben → Nusa, Schleife 3 → Yatagarasu-Feder
 g.save['stats']['kami_deals'] = 49
 pd = Pedestal(data.ITEM_IDS[0], p.x, p.y + 6); pd.shrine = 'kami'; pd.cool = 0; run.pedestals = [pd]; run.collect()

@@ -202,6 +202,7 @@ TEXT = {
     'hanami_picknick': 'Bei vollen Herzen +40 % statt +20 %',
     'shogatsu': 'Klebende Feinde sind verflucht: doppelter Schaden',
     'pilger': '+10 % Schaden pro Ebene statt +5 %',
+    'henro': 'Jede neue Ebene faltet zwei Kraniche, jede 2. Ebene bringt ein Geisterherz',
     'sommerwind': 'Die Rolle wirft acht Federn, die weiter fliegen',
     'fest_der_laternen': 'Treffer entzünden doppelt so oft den Boden, die Flammen brennen länger',
     'kaufmann': 'Der Hammer zählt jede Münze doppelt, Reichtum schon ab 25 Mon (+25 %)',
@@ -368,6 +369,8 @@ def nutz_lines(p):
     if 'shinsen' in S:
         h = c.get('shinsen_h', 0)
         out.append('Shinsen: %d Schlüssel, %d %s' % (c.get('shinsen_k', 0), h, 'Herz' if h == 1 else 'Herzen'))
+    if 'henro' in S:
+        out.append('Henro: %d Kraniche unterwegs gefaltet' % c.get('henro', 0))
     if 'kaufmann' in S:
         out.append('Reich wie ein Kaufmann: +%.1f Schaden aus Mon' % min(6.0, p.coins * 0.1))
     if 'totenfaehre' in S:
@@ -1555,8 +1558,12 @@ def on_floor(run):
     if 'kongozue' in S:                                  # Pilgerstab: jede Ebene ein Stück Weg
         p.heal(1)
         g['kz'] = g.get('kz', 0) + 1
-        if g['kz'] % 3 == 0:
+        if g['kz'] % (2 if 'henro' in S else 3) == 0:
             run.spawn_pickup('spirit', p.x, p.y - 20)
+        if 'henro' in S and 'kraniche' in S and g.get('cranes', 0) < 10:   # die 88 Tempel: jede Station ein Gebet mehr
+            g['cranes'] = min(10, g.get('cranes', 0) + 2)
+            _gain(p, 'henro', 2)
+            _syn(run, 'henro', p.x, p.y, (240, 220, 180))
     p.recalc()
 
 

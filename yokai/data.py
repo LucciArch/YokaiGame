@@ -455,6 +455,7 @@ SYNERGIES = [
     dict(id='jinmenju', name='Jinmenju', desc='Der Gesichterbaum lacht über erfüllte Wünsche', items=['ema', 'jinmen_frucht'], fx=dict(sig_jinmenju=1)),
     dict(id='mokumokuren', name='Mokumokuren', desc='Augen im zerrissenen Papier', items=['shoji_papier', 'geheimkarte'], fx=dict(sig_mokumokuren=1)),
     dict(id='sommerwind', name='Sommerwind', desc='Windglocke und Spatzenfeder', items=['furin', 'suzume_feder'], fx=dict(salts_regen=0.15, sig_sommerwind=1)),
+    dict(id='henro', name='Henro', desc='Dōgyō ninin – Pilgerstab und Kraniche wandern mit dir', items=['kongozue', 'senbazuru'], fx=dict(luck=1, sig_henro=1)),
 ]
 
 # =====================================================================  TRANSFORMATIONEN
