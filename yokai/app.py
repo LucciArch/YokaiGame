@@ -1055,6 +1055,8 @@ class Game:
         for i, iid in enumerate(p.items[:40]):
             it = ITEMS[iid]
             gfx.draw_icon(s, it['icon'], it['col'], 225 + (i % 9) * 20, 95 + (i // 9) * 20)
+        for i, line in enumerate(sigs.nutz_lines(p)):              # was die Nutz-Synergien gebracht haben
+            T.add(line, 75 + (i // 3) * 150, 194 + (i % 3) * 10, 7, (170, 220, 180))
         if sheets.has(run.char) and sheets.is_hi(run.char):           # Porträt der Figur
             won = run.result != 'dead'
             spr = sheets.frame(run.char, sheets.LEFT, 0 if won else 6)

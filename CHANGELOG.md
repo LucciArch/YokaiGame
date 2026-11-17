@@ -131,6 +131,7 @@
 - Runde 107 – **Verwandlungen neu gezeichnet:** Kitsune-Avatar mit drei buschigen, schwingenden Fuchsschwänzen und kleineren Ohren; Drachenblut mit geschupptem Schlangenschwanz, hellem Bauchband, Rückenzacken und Flammenquaste statt Pfeilspitze, dazu ein schlankes Geweih; Oni-Gestalt mit gebogenen Elfenbeinhörnern (kein Band mehr über den Augen) und einem genieteten Kanabō auf dem Rücken statt der roten Zacken; Yūrei-Gestalt mit Stirndreieck über den Augen und echten Hitodama-Flammen statt Tropfen; Bake-Danuki mit runden Ohren und dickerem Ringelschwanz; kleinerer Eboshi und Tokin. Figuren, die das Merkmal schon tragen (Kuzunohas Schwänze, Ponpokos Tanuki-Ohren, Kotarōs Flügel, Okikus Stirntuch), bekommen es nicht doppelt.
 - Runde 108 – **Flügel und Heiligenschein neu:** Tengu-Avatar mit schwarzen Krähenflügeln aus geschichteten Hand-, Arm- und Deckfedern, die sich beim Schlag spreizen; Flug-Items geben weiße Kranichflügel mit dunklen Schwungfedern; Kami-Avatar trägt einen Kaen-Kōhai – Goldreif mit Spiegelpunkten und züngelnden Flammen
 - Runde 109 – **Shinkirō ab Kapitel II:** Manchmal haucht die Muschel zwei echte Items aus – nimmst du eins, bleibt das zweite liegen und kostet ein Herz
+- Runde 110 – **Lauf-Statistik der Nutz-Synergien:** Der Endbildschirm zeigt, was Fuchsgeld, Glückliches Haus, Wunsch erfüllt, Shinsen, Kaufmann und Totenfähre im Lauf gebracht haben
 
 ## 1.4.0 – „Hyakki-Update“ (enthält 1.3 „Kapitel-Update“)
 

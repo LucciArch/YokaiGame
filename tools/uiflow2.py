@@ -83,6 +83,7 @@ try:
     step([K(pygame.K_RETURN)], 5)
     g.sel = 2; step([K(pygame.K_RETURN)], 5); print('opts', g.state); step([K(pygame.K_ESCAPE)], 5); print('back', g.state)
     g.sel = 3; step([K(pygame.K_RETURN)], 5); step([K(pygame.K_RETURN)], 60); print('over', g.state)
+    gfx.TEXT.clear(); g.st_over(0, [], []); assert any(t[0] == 'Fuchsgeld: 12 Mon extra' for t in gfx.TEXT.items), 'Endbildschirm zeigt Nutz-Zähler nicht'
     step([K(pygame.K_r)], 60); print('retry', g.state)
     step([K(pygame.K_ESCAPE)], 5); g.sel = 4; step([K(pygame.K_RETURN)], 5); step([K(pygame.K_RETURN)], 10); print('menu', g.state)
     menu(1); print('daily', g.state, g.run.daily, g.run.char)
