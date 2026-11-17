@@ -527,3 +527,155 @@ def yomi_oku_hi(name, base):
 
 
 HI.update(jigoku=jigoku_hi, iwato=iwato_hi, yomi_oku=yomi_oku_hi)
+
+
+def _niche(cv, x0, x1, y0, c=K):
+    """Dunkle Nische bis zum Wandfuß, oben mit abgerundeten Ecken."""
+    hr(cv, x0, y0, x1, 29, c)
+    cv.a[y0, x0] = cv.a[y0, x0 - 1]; cv.a[y0, x1] = cv.a[y0, x1 + 1]
+
+
+# ---- Chikurin: Taketori – leuchtendes Bambusrohr mit der kleinen Kaguya / Ishidōrō in der Nische
+def chikurin_hi(name, base):
+    a, b = base.copy(), base.copy()
+    lf = BIOMES[name]['leaf']
+    bam = ('#0e2418', '#1e4a2a', '#3a7a3a', '#7ab060')
+    Y, X = _g(a)
+    # A: dickes Rohr vorn, schräg angeschnitten, das untere Glied leuchtet golden
+    hr(a, 26, 4, 35, 29, bam[1])
+    hr(a, 27, 4, 28, 29, bam[2]); hr(a, 27, 4, 27, 29, bam[3])
+    hr(a, 35, 4, 35, 29, bam[0])
+    for y in (4, 26):                                             # Knoten
+        hr(a, 25, y, 36, y + 1, bam[0]); hr(a, 26, y, 34, y, bam[2])
+    cut = hpoly(a, [(26, 12), (35, 8), (35, 25), (26, 25)])       # angeschnittenes Glied
+    hfill(a, cut, '#8a5a18')
+    glow = he(a, 30.5, 19, 4.5, 6) & cut
+    hfill(a, glow, '#e8b040')
+    hfill(a, he(a, 30.5, 20, 2.8, 4) & cut, '#ffe890')
+    hln(a, [(26, 12), (35, 8)], '#fff4c0')                       # Schnittkante
+    hln(a, [(26, 13), (35, 9)], bam[3])
+    hfill(a, he(a, 30.5, 17.5, 1.1, 1.1), '#2a1a18')             # Kaguya: Kopf mit Haar
+    hr(a, 29, 19, 32, 23, '#b03030'); hr(a, 30, 19, 31, 23, '#e05040')   # Jūnihitoe in Rot
+    hr(a, 29, 18, 29, 22, '#2a1a18')                              # langes Haar am Rücken
+    hp(a, 31, 17, '#f0e0d0')
+    for (x, y) in ((24, 10), (38, 14), (22, 20), (40, 7), (37, 22)):   # Lichtfunken
+        hp(a, x, y, '#fff4c0')
+    for (x, y, d) in ((36, 6, 1), (25, 6, -1), (36, 24, 1)):       # Blätter
+        hln(a, [(x, y), (x + d * 3, y - 1), (x + d * 7, y + 1)], lf[1])
+        hln(a, [(x + d, y + 1), (x + d * 5, y + 2)], lf[0])
+    # B: Ishidōrō in einer Lücke zwischen den Rohren, Licht bei (32, 20)
+    _niche(b, 18, 45, 12)
+    s = ('#191a28', '#2e3044', '#4a4e66', '#70768e')
+    hr(b, 28, 26, 36, 29, s[1]); hr(b, 28, 26, 36, 26, s[2])     # Sockel
+    hr(b, 30, 23, 34, 25, s[2]); hr(b, 30, 23, 30, 25, s[3])     # Schaft
+    hr(b, 27, 22, 37, 22, s[2])
+    hr(b, 28, 17, 36, 21, s[1]); hr(b, 28, 17, 28, 21, s[3])     # Feuerkammer
+    hr(b, 30, 18, 34, 20, '#d8961a'); hr(b, 31, 18, 33, 19, '#ffe24a'); hp(b, 32, 18, '#fffbc0')
+    hfill(b, hpoly(b, [(24, 16), (40, 16), (36, 13), (28, 13)]), s[2])   # Dach
+    hr(b, 24, 16, 40, 16, s[1]); hln(b, [(28, 13), (36, 13)], s[3])
+    hr(b, 31, 10, 33, 12, s[2]); hp(b, 32, 9, s[3])                # Hōju
+    for (x, y) in ((28, 27), (29, 26), (35, 26), (36, 28), (24, 16), (39, 16)):   # Moos
+        hp(b, x, y, MOSS[2])
+    hln(b, [(18, 28), (22, 25), (24, 29)], lf[0])                # Farn am Nischenrand
+    hln(b, [(45, 28), (42, 24), (40, 29)], lf[1])
+    return [a, b]
+
+
+HI['chikurin'] = chikurin_hi
+
+
+# ---- Inari: Torii vor dem Senbon-Torii-Gang / Steinfuchs mit Speicherschlüssel und rotem Lätzchen
+def _torii(cv, x0, x1, y0, h, c, dark):
+    hr(cv, x0, y0, x1, y0 + 1, dark)                              # Kasagi, Enden geschwungen
+    hp(cv, x0 - 1, y0 - 1, dark); hp(cv, x1 + 1, y0 - 1, dark)
+    hr(cv, x0 + 1, y0 + 2, x1 - 1, y0 + 3, c[2]); hr(cv, x0 + 1, y0 + 2, x1 - 1, y0 + 2, c[3])
+    w = x1 - x0
+    for px in (x0 + w // 6, x1 - w // 6 - 2):
+        hr(cv, px, y0 + 4, px + 2, y0 + h, c[2]); hr(cv, px, y0 + 4, px, y0 + h, c[3])
+        hr(cv, px + 2, y0 + 4, px + 2, y0 + h, c[1]); hr(cv, px, y0 + h - 1, px + 2, y0 + h, dark)
+    hr(cv, x0 + 2, y0 + 7, x1 - 2, y0 + 8, c[2]); hr(cv, x0 + 2, y0 + 8, x1 - 2, y0 + 8, c[1])   # Nuki
+
+
+def inari_hi(name, base):
+    a, b = base.copy(), base.copy()
+    dark = '#16121e'
+    _niche(a, 18, 45, 10, '#0c0812')
+    for w, top, c in ((3, 20, '#3a0e20'), (5, 18, '#4e1222'), (7, 16, '#6a1a26'), (9, 14, '#86222a')):   # Senbon-Torii-Gang
+        for x in (31 - w, 32 + w):
+            hr(a, x, top, x, 29, c)
+        hr(a, 30 - w, top, 33 + w, top, c)
+        hr(a, 31 - w, top + 2, 32 + w, top + 2, c)
+    _torii(a, 6, 57, 1, 28, ('#3a0e2a', '#6e1a2c', '#b8322a', '#e05a38'), dark)
+    hr(a, 29, 6, 34, 9, dark); hr(a, 30, 7, 33, 8, GOLD[2]); hp(a, 31, 7, GOLD[3])   # Gakuzuka mit Tafel
+    for (x, y) in ((31, 27), (33, 25), (32, 22)):                 # Fuchsfeuer tief im Gang
+        hp(a, x, y, '#5ab0c8')
+    # B: Kitsune-Statue auf Sockel, Schlüssel im Maul, rotes Lätzchen
+    _niche(b, 16, 47, 10)
+    s = ('#191a28', '#3a3c54', '#5c627e', '#8a90a8')
+    hr(b, 22, 26, 41, 29, s[1]); hr(b, 22, 26, 41, 26, s[2]); hr(b, 22, 29, 41, 29, s[0])
+    fox = hpoly(b, [(26, 25), (27, 17), (29, 13), (30, 9), (32, 13), (34, 15), (36, 18), (37, 25)]) \
+        | he(b, 30.5, 12, 3.2, 2.6) | hpoly(b, [(28, 10), (29, 5), (31, 9)]) | hpoly(b, [(31, 9), (33, 5), (33, 10)])
+    tail = hpoly(b, [(36, 24), (40, 20), (41, 14), (43, 10), (44, 15), (42, 22), (38, 25)])
+    hfill(b, edge(fox | tail), K)
+    hfill(b, fox | tail, s[2])
+    hfill(b, (fox | tail) & ~np.roll(fox | tail, -1, 1), s[1])   # Schatten rechts
+    hfill(b, (fox | tail) & ~np.roll(fox | tail, 1, 1), s[3])    # Licht links
+    hfill(b, he(b, 43, 11, 1.5, 1.5) & tail, '#d0d4e0')          # Schwanzspitze (Hōju)
+    hr(b, 26, 13, 27, 14, s[2]); hp(b, 25, 14, K)                 # Schnauze
+    hp(b, 29, 11, '#c03030'); hp(b, 30, 11, K)                    # Auge mit rotem Lid
+    hr(b, 22, 14, 26, 14, GOLD[1]); hr(b, 21, 13, 22, 15, GOLD[2]); hp(b, 21, 13, GOLD[3])   # Kagi im Maul
+    bib = hpoly(b, [(27, 15), (34, 16), (31, 21)])
+    hfill(b, bib, RED[2]); hfill(b, bib & ~np.roll(bib, -1, 0), RED[1]); hr(b, 27, 15, 34, 15, RED[3])
+    hr(b, 27, 22, 28, 25, s[3]); hr(b, 33, 23, 34, 25, s[1])     # Vorderpfoten
+    return [a, b]
+
+
+HI['inari'] = inari_hi
+
+
+# ---- Obakedera: Ofuda mit Pinselzeichen, einer halb abgerissen / Yūrei-ga – Rollbild einer Geisterfrau
+def obakedera_hi(name, base):
+    a, b = base.copy(), base.copy()
+    pap = ('#4a4a64', '#8a8ca4', '#c4c6d4', '#e4e4ea')
+    ink, red = '#1a1420', '#a82a2a'
+    for i, (x, y, h, torn) in enumerate(((8, 11, 13, 0), (20, 13, 11, 0), (33, 9, 15, 1), (47, 12, 12, 0))):
+        if torn:                                                  # schräg hängend, eine Ecke flattert
+            m = hpoly(a, [(x, y), (x + 6, y + 1), (x + 9, y + h), (x + 3, y + h + 1)])
+        else:
+            m = (_g(a)[1] >= x) & (_g(a)[1] <= x + 6) & (_g(a)[0] >= y) & (_g(a)[0] <= y + h)
+        hfill(a, edge(m) & (_g(a)[0] > y), '#0a0814')            # Schlagschatten
+        hfill(a, m, pap[2])
+        hfill(a, m & ~np.roll(m, -1, 1), pap[1])
+        hfill(a, m & ~np.roll(m, 1, 1), pap[3])
+        ox = 2 if torn else 0
+        hr(a, x + 2 + ox // 2, y + 2, x + 4 + ox // 2, y + 2, ink)   # Pinselzeichen
+        hln(a, [(x + 3 + ox // 2, y + 3), (x + 3 + ox, y + h - 4)], ink)
+        hln(a, [(x + 2 + ox // 2, y + 5), (x + 4 + ox // 2, y + 6)], ink)
+        hr(a, x + 2 + ox, y + h - 3, x + 4 + ox, y + h - 2, red)  # Siegelstempel
+        hp(a, x + 3, y, '#5a5a6a')                                # Nagel
+    hln(a, [(43, 24), (45, 26), (44, 28)], pap[2])                # abgerissene Ecke weht davon
+    # B: Hängerolle mit Geisterfrau, unten ohne Füße in Nebel verblassend
+    hr(b, 20, 5, 43, 6, '#3a2418'); hr(b, 19, 5, 19, 6, '#1a1010'); hr(b, 44, 5, 44, 6, '#1a1010')
+    hln(b, [(31, 5), (31, 2)], '#6a5040')
+    hr(b, 21, 7, 42, 27, '#5a4a3a')                               # Brokatrand
+    hr(b, 23, 8, 40, 26, '#c8c0a8'); hr(b, 23, 8, 23, 26, '#a89e88')
+    hr(b, 20, 28, 43, 29, '#3a2418')
+    Y, X = _g(b)
+    body = hpoly(b, [(29, 12), (34, 12), (36, 18), (35, 23), (28, 23), (27, 18)])
+    hfill(b, body & (Y < 20), '#e8e8ee')                          # weißes Totengewand
+    hfill(b, body & (Y >= 20) & ((X + Y) % 2 == 0), '#d8d6d8')    # verblasst nach unten
+    hln(b, [(31, 13), (33, 17), (32, 19)], '#9a98a8')             # Kragen links über rechts
+    hfill(b, he(b, 31.5, 11, 2.4, 2.4), '#e8e4e0')                # Gesicht
+    hp(b, 30, 11, ink); hp(b, 33, 11, ink); hr(b, 31, 13, 32, 13, '#7a5a6a')
+    for (x0, x1) in ((28, 28), (35, 35), (27, 27), (36, 36)):     # langes offenes Haar
+        hln(b, [(29 if x0 < 31 else 34, 8), (x0, 14), (x0 + (1 if x0 < 31 else -1), 22)], ink)
+    hr(b, 29, 8, 34, 9, ink)
+    hln(b, [(28, 16), (25, 19), (26, 20)], '#e8e8ee')             # hängende Hände
+    hln(b, [(35, 16), (37, 18)], '#e8e8ee')
+    for (x, y) in ((25, 24), (38, 23), (30, 25), (34, 25)):       # Nebel
+        hr(b, x - 1, y, x + 2, y, '#b0aaa0')
+    hr(b, 38, 24, 39, 25, red)                                    # Künstlersiegel
+    return [a, b]
+
+
+HI['obakedera'] = obakedera_hi
