@@ -670,7 +670,7 @@ def generate_floor(rng, depth, labyrinth=False, hard=False):
         rng.shuffle(extras)
         for p, k in zip(rest[2:], extras):
             if k == 'treasure2':
-                if depth >= 2 and rng.random() < 0.5:
+                if depth >= 2 and rng.random() < 0.3:
                     rooms[p].kind = 'treasure'
             elif k == 'library' and depth < 2:
                 continue

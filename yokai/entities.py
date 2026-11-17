@@ -341,6 +341,25 @@ def roll_ghost(im):
 POSE_T = 2.4
 
 
+
+def flat_dmg(bonus):
+    """Grundschaden 3,5 plus Schadensboni mit abnehmendem Ertrag (Wurzel), damit Stapeln nicht davonläuft."""
+    if bonus <= 0:
+        return 3.5 + bonus
+    return 3.5 * math.sqrt(1 + bonus * 0.55)
+
+
+def stack_dmgm(ms):
+    """Der stärkste Schadensmultiplikator wirkt voll, jeder weitere nur mit 40 % seines Bonus."""
+    ups = sorted((m for m in ms if m >= 1), reverse=True)
+    out = ups[0] if ups else 1.0
+    for m in ups[1:]:
+        out *= 1 + (m - 1) * 0.4
+    for m in ms:
+        if m < 1:
+            out *= m
+    return out
+
 class Player:
     def __init__(self, run, char_id):
         self.run = run
@@ -415,11 +434,11 @@ class Player:
 
     def recalc(self):
         f = defaultdict(float)
-        dm, rm = 1.0, 1.0
+        dms, rm = [], 1.0
         for fx in self.sources():
             for k, v in fx.items():
                 if k == 'dmgm':
-                    dm *= v
+                    dms.append(v)
                 elif k == 'ratem':
                     rm *= v
                 elif k in ONE_TIME:
@@ -427,11 +446,12 @@ class Player:
                 else:
                     f[k] += v
         sigs.stat_bonus(self, f)
+        dm = stack_dmgm(dms)
         self.f = f
         self.sgs = sigs.active(self)
         old = dict(self.s) if self.s else None
         self.s = dict(
-            dmg=max(0.5, (3.5 + f['dmg']) * dm),
+            dmg=max(0.5, flat_dmg(f['dmg']) * dm),
             rate=clamp((2.6 + f['rate']) * rm, 0.8, 12),
             shotspd=clamp(210 + f['shotspd'], 110, 440),
             range=clamp(190 + f['range'], 70, 500),
@@ -1081,7 +1101,7 @@ class Enemy:
         elif d['sprite'] in art.ARTS:
             sp = art.make(d['sprite'])
             self.r = max(self.r, int(min(sp.get_width(), sp.get_height()) * 0.36))
-        mult = (1 + 0.3 * (run.tier - 1) + 0.05 * (run.tier - 1) ** 2 + (0.3 if run.depth >= 6 else 0)) * (1.3 if run.hard else 1.0) * run.loop_mult
+        mult = (1 + 0.35 * (run.tier - 1) + 0.07 * (run.tier - 1) ** 2 + (0.3 if run.depth >= 6 else 0)) * (1.3 if run.hard else 1.0) * run.loop_mult
         self.champ = champ
         cm = CHAMPIONS[champ] if champ else {}
         self.maxhp = self.hp = d['hp'] * mult * cm.get('hp', 1)

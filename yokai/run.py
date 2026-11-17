@@ -310,8 +310,8 @@ class Run:
 
     @property
     def enemy_dmg(self):
-        """Ab Kapitel IV kosten Treffer ein ganzes Herz."""
-        return 2 if (self.depth >= 4 or self.loop) and not self.relaxed else 1
+        """Ab Kapitel III kosten Treffer ein ganzes Herz."""
+        return 2 if (self.depth >= 3 or self.loop) and not self.relaxed else 1
 
     def new_floor(self):
         rng = self.rng
@@ -546,7 +546,7 @@ class Run:
         return iid
 
     def champ_roll(self):
-        ch = 0.03 + 0.02 * self.depth + 0.03 * self.stage + (0.08 if self.hard else 0) + (0.12 if self.depth == 6 else 0) + 0.1 * self.loop
+        ch = 0.04 + 0.03 * self.depth + 0.03 * self.stage + (0.08 if self.hard else 0) + (0.12 if self.depth == 6 else 0) + 0.1 * self.loop
         if random.random() < ch:
             return random.choice(list(CHAMPIONS.keys()))
         return None
@@ -576,7 +576,7 @@ class Run:
         ground = [e for e in pool if e not in fliers]
         rng = random
         spawns = room.spawns or [(rng.randint(2, 10), rng.randint(1, 5), 'x') for _ in range(rng.randint(3, 5))]
-        n_extra = (1 if (self.hard or self.depth >= 3) and rng.random() < 0.6 else 0) + (1 if self.depth >= 5 and rng.random() < 0.6 else 0)
+        n_extra = (1 if (self.hard or self.depth >= 2) and rng.random() < 0.6 else 0) + (1 if self.depth >= 4 and rng.random() < 0.6 else 0) + (1 if self.depth >= 6 and rng.random() < 0.5 else 0)
         chosen = list(spawns)
         for _ in range(n_extra):
             chosen.append((rng.randint(2, 10), rng.randint(1, 5), 'x'))
@@ -634,10 +634,10 @@ class Run:
             disc = (0.66 if self.player.f['discount'] else 1.0) * (0.7 if self.blessing == 'fuchs' else 1.0)
             xs = [-120, -60, 0, 60, 120]
             for i, dx in enumerate(xs[:4] if random.random() < 0.6 else xs):
-                if i < 3:
+                if i < 2:
                     iid = self.pick_item('S', 0.1)
                     q = ITEMS[iid]['q'] if not iid.startswith('active:') else 2
-                    price = int((10 + q * 4) * disc)
+                    price = int((12 + q * 5) * disc)
                     self.pedestals.append(Pedestal(iid, cx + dx, cy - 10, price=price))
                 else:
                     kind, price = random.choice([('heart', 3), ('key', 5), ('salt', 4), ('spirit', 5), ('battery', 6), ('chest', 6), ('trinket', 8)])
@@ -712,7 +712,7 @@ class Run:
             self.banner('Tanuki-Spielhalle', 'Wage dein Glück!', (230, 150, 90))
         elif k == 'secret':
             r = random.random()
-            if r < 0.45:
+            if r < 0.35:
                 self.pedestals.append(Pedestal(self.pick_item('K' if random.random() < 0.3 else 'T', 0.1), cx, cy))
             elif r < 0.75:
                 for i in range(random.randint(6, 11)):
@@ -1305,7 +1305,7 @@ class Run:
             self.objs.append(Obj('victory', cx, cy + 40))
         else:
             self.objs.append(Obj('torii', cx, cy + 40))
-            ch = 1.0 if self.stage == 1 else 0.28 + (0.3 if not p.hit_this_floor else 0) + 0.03 * p.s['luck']   # Kapitelende: immer ein Schrein
+            ch = 1.0 if self.stage == 1 else 0.12 + (0.2 if not p.hit_this_floor else 0) + 0.02 * p.s['luck']   # Kapitelende: immer ein Schrein
             if random.random() < ch:
                 oni = random.random() < (0.35 if not p.hit_this_floor else 0.6)
                 self.objs.append(Obj('shrine', cx + 110, cy - 30, oni=oni))
@@ -1732,7 +1732,7 @@ class Run:
             audio.get().music(self.biome['music'])
         elif room.kind == 'dojo':
             self.spawn_pickup('chest', cx, cy)
-            if random.random() < 0.35:
+            if random.random() < 0.2:
                 self.pedestals.append(Pedestal(self.pick_item('T', 0.1), cx, cy - 30))
             self.achieve('dojo')
         elif room.kind == 'challenge':
@@ -1741,7 +1741,7 @@ class Run:
             self.save.stat('challenges')
         elif room.extra.get('mini'):
             self.spawn_pickup('chest', cx, cy)
-            if random.random() < 0.3:
+            if random.random() < 0.15:
                 self.pedestals.append(Pedestal(self.pick_item('T', 0.1), cx, cy - 30))
         elif random.random() < 0.27 + 0.03 * p.s['luck']:
             self.random_drop(cx, cy)
@@ -1823,7 +1823,7 @@ class Run:
                 audio.play('chest')
                 sigs.on_chest(self, pk)
                 burst(self, pk.x, pk.y, (240, 200, 90), 16, 70)
-                if random.random() < 0.1 + 0.015 * p.s['luck']:
+                if random.random() < 0.05 + 0.01 * p.s['luck']:
                     self.pedestals.append(Pedestal(self.pick_item('T'), pk.x, pk.y))
                 else:
                     for i in range(random.randint(2, 4)):

@@ -4,6 +4,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'
 import pygame
 from yokai.app import Game
 from yokai import gfx
+from yokai.settings import RX, RY
 g = Game()
 K = lambda k: pygame.event.Event(pygame.KEYDOWN, key=k, mod=0, unicode='', scancode=0)
 def step(ev, n=1):
@@ -43,7 +44,7 @@ try:
     assert any('Zusatzangriff' in t[0] for t in gfx.TEXT.items), 'Figurenwahl nennt Waffen-Brücke nicht'
     g.save['chars'].remove('kenji'); g.char_sel = sel0
     step([K(pygame.K_RETURN)], 200); print('play', g.state)
-    run, p = g.run, g.run.player; p.invuln = 999; start = run.room.pos
+    run, p = g.run, g.run.player; p.iframes = 999; start = run.room.pos
     def shinkiro():                                     # Ereignis Shinkirō in einem Nachbarraum erzwingen
         pos = next(q for q, r in run.rooms.items() if r.kind == 'normal' and q != run.room.pos)
         r = run.rooms[pos]; r.kind = 'shinkiro'; r.cleared = True; r.populated = False; r.objects = []
@@ -55,10 +56,10 @@ try:
     assert len(p.items) == n0 and not [pd for pd in run.pedestals if pd.group], 'Trugbild gibt ein Item'
     real = next(pd for pd in shinkiro() if not pd.mirage); p.x, p.y = real.x, real.y - 6; step([], 3)
     assert real.item in p.items, 'echtes Shinkirō-Item fehlt'
-    shinkiro(); p.x, p.y = 240, 290; step([], 60 * 16)
+    shinkiro(); p.x, p.y = RX + 30, RY + 30; step([], 60 * 16)   # Ecke: keine Tür, kein Sockel
     assert not [pd for pd in run.pedestals if pd.group], 'Muschel schließt sich nicht'
     assert 'shinkiro' in g.save.data['events_seen']; g.save.data['events_seen'].remove('shinkiro')
-    run.enter_room(start, 'n'); step([], 20); p.invuln = 0
+    run.enter_room(start, 'n'); step([], 20); p.iframes = 0
     for k in (pygame.K_e, pygame.K_q, pygame.K_SPACE): step([K(k)], 20)
     step([K(pygame.K_ESCAPE)], 5); print('pause', g.state)
     nsy = next(sy for sy in SYNERGIES if len(sy['items']) >= 2); g.run.player.items[:] = nsy['items'][:-1]
