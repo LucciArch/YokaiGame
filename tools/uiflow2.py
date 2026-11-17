@@ -59,6 +59,7 @@ try:
     d0, run.depth = run.depth, 4                         # ab Kapitel II: manchmal zwei echte, das zweite kostet ein Herz
     peds = next(pp for pp in (shinkiro() for _ in range(40)) if sum(not pd.mirage for pd in pp) == 2)
     a, b = [pd for pd in peds if not pd.mirage]; hp0 = p.maxhp = max(p.maxhp, 6)
+    a.item, b.item = 'tenugui', 'sakura_zweig'                # feste Items ohne Herz-Bonus, sonst wackelt die Herz-Rechnung
     p.x, p.y = a.x, a.y - 6; step([], 3)
     assert a.item in p.items and b.hearts == 1 and b in run.pedestals and not [pd for pd in run.pedestals if pd.mirage], 'Shinkirō-Zwilling falsch'
     p.x, p.y = b.x, b.y - 6; step([], 3)
@@ -68,7 +69,7 @@ try:
     assert not [pd for pd in run.pedestals if pd.group], 'Muschel schließt sich nicht'
     assert 'shinkiro' in g.save.data['events_seen']; g.save.data['events_seen'].remove('shinkiro')
     def mochitsuki(perfect):                            # Ereignis Mochitsuki: im Fenster ans Usu, vor dem Schlag weg
-        pos = next(q for q, r in run.rooms.items() if r.kind in ('normal', 'mochitsuki') and q != run.room.pos)
+        pos = next(q for q, r in run.rooms.items() if r.kind in ('normal', 'mochitsuki', 'shinkiro') and q != run.room.pos)
         r = run.rooms[pos]; r.kind = 'mochitsuki'; r.cleared = True; r.populated = False; r.extra.clear()
         run.enter_room(pos, 's'); step([], 5)
         from yokai.yomeiri import mochi_zone
