@@ -1365,6 +1365,9 @@ class Enemy:
                     run.particles.append(Particle(self.x + random.uniform(-5, 5), self.y + 3, 0, -15, 0.4, (150, 140, 120), 2))
                 if self.st <= 0 or dist < 30:
                     t, _, _ = tile_at(room, self.x, self.y)
+                    if self.st < -3 and (t in SOLID_TILES or t == T_PIT):   # unter Fels/Grube festgesteckt: anderswo auftauchen
+                        self.x, self.y = free_tile_pos(room, random, (p.x, p.y), 40)
+                        t = None
                     if t not in SOLID_TILES and t != T_PIT:
                         self.state = 'emerge'
                         self.st = 0.45
