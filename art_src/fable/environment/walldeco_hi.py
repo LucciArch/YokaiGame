@@ -360,3 +360,170 @@ def tsukiyomi_hi(name, base):
 
 
 HI.update(shinkai=shinkai_hi, enma_cho=enma_hi, tsukiyomi=tsukiyomi_hi)
+
+
+# ---- Jigoku: Lavafall aus einer Felsspalte / Ketten mit Fußfesseln und Eisenegge
+def jigoku_hi(name, base):
+    a, b = base.copy(), base.copy()
+    Y, X = _g(a)
+    crack = hpoly(a, [(27, 9), (31, 11), (36, 8), (39, 12), (37, 27), (26, 27), (24, 13)])
+    hfill(a, edge(crack), K)
+    hfill(a, crack, LAVA[0])
+    fall = crack & (X >= 28) & (X <= 35) & (Y >= 11)
+    hfill(a, fall, LAVA[1])
+    for x in range(28, 36):                                       # fließende Glutstreifen
+        for y in range(11 + (x * 5) % 4, 27, 4):
+            hr(a, x, y, x, y + 1, LAVA[2] if x % 2 else LAVA[3])
+    hr(a, 31, 11, 32, 26, LAVA[3])
+    hr(a, 31, 13, 31, 22, '#ffe8a0')
+    for (x, y) in ((26, 12), (25, 16), (38, 14), (37, 19)):       # glühende Ränder
+        hp(a, x, y, LAVA[2])
+    pool = he(a, 32, 28, 12, 3) & (Y >= 26)
+    hfill(a, edge(pool) & (Y >= 25), K)
+    hfill(a, pool, LAVA[2])
+    hfill(a, pool & he(a, 32, 28, 7, 1.5), LAVA[3])
+    hr(a, 30, 27, 34, 27, '#ffe8a0')
+    for (x, y) in ((22, 23), (25, 20), (40, 21), (43, 24), (29, 6), (36, 5)):   # Funken
+        hp(a, x, y, LAVA[3])
+    # B: zwei Ketten mit Fußfesseln, dazwischen eine Eisenegge mit blutigen Zinken
+    for x in (14, 49):
+        for y in range(8, 22, 3):                                 # Kettenglieder abwechselnd quer/hochkant
+            if (y // 3) % 2:
+                hr(b, x - 1, y, x + 1, y, IRON[3]); hr(b, x - 1, y + 2, x + 1, y + 2, IRON[1])
+                hp(b, x - 1, y + 1, IRON[2]); hp(b, x + 1, y + 1, IRON[2])
+            else:
+                hr(b, x, y, x, y + 2, IRON[2]); hp(b, x, y, IRON[3])
+        ring = he(b, x, 25, 3.5, 3) & ~he(b, x, 25, 1.8, 1.4)
+        hfill(b, edge(ring | he(b, x, 25, 1.8, 1.4)), K)
+        hfill(b, ring, IRON[1])
+        hfill(b, ring & (Y <= 24), IRON[3])
+        hp(b, x, 28, IRON[0])
+    bar = (X >= 21) & (X <= 42) & (Y >= 9) & (Y <= 12)
+    hfill(b, edge(bar), K)
+    hfill(b, bar, IRON[1])
+    hr(b, 21, 9, 42, 9, IRON[3])
+    hr(b, 21, 12, 42, 12, IRON[0])
+    for x in (23, 40):
+        hp(b, x, 10, GOLD[2])                                     # Nieten
+    for x in range(23, 42, 4):                                    # Zinken
+        sp = hpoly(b, [(x, 13), (x + 2, 13), (x + 1, 22)])
+        hfill(b, edge(sp) & (Y >= 13), K)
+        hfill(b, sp, IRON[2])
+        hr(b, x, 13, x, 18, IRON[3])
+        hr(b, x + 1, 19, x + 1, 21, '#7a1622')                    # Blut an der Spitze
+    hr(b, 31, 3, 32, 8, IRON[2])                                  # Aufhängung
+    return [a, b]
+
+
+# ---- Iwato: gedrehtes Shimenawa mit Shide / Kagaribi-Feuerkorb der wartenden Götter
+def iwato_hi(name, base):
+    import math
+    a, b = base.copy(), base.copy()
+    Y, X = _g(a)
+    for x in range(3, 61):
+        t = (x - 3) / 57
+        yc = 9 + 6 * math.sin(math.pi * t)
+        th = 4 - abs(t - .5) * 2                                  # in der Mitte dicker
+        for y in range(int(yc - th), int(yc + th) + 1):
+            tw = (x + y * 2) % 6                                  # Drehung: schräge Strohbündel
+            c = STRAW[3] if tw < 2 else STRAW[2] if tw < 4 else STRAW[1]
+            if y in (int(yc - th), int(yc + th)):
+                c = STRAW[0] if y == int(yc + th) else c
+            hp(a, x, y, c)
+        hp(a, x, int(yc - th) - 1, K)
+        hp(a, x, int(yc + th) + 1, K)
+    for (x, ln) in ((14, 7), (32, 9), (50, 7)):                   # Shide: Blitz-Zickzack aus Papier
+        yc = int(9 + 6 * math.sin(math.pi * (x - 3) / 57)) + 4
+        for i in range(ln):
+            sx = x + (2 if (i // 2) % 2 else 0)
+            hr(a, sx, yc + i * 2, sx + 3, yc + i * 2 + 1, PAPER[3] if i % 2 == 0 else PAPER[2])
+            hp(a, sx + 3, yc + i * 2 + 1, PAPER[1])
+    for x in (23, 41):                                            # Strohquasten (Kazari)
+        yc = int(9 + 6 * math.sin(math.pi * (x - 3) / 57)) + 4
+        for dx in range(-1, 2):
+            hr(a, x + dx, yc, x + dx, yc + 5 + (dx == 0), STRAW[2] if dx else STRAW[3])
+    # B: Kagaribi auf drei Beinen in einer Felsnische, Licht bei (30, 12)
+    nm = (X >= 20) & (X <= 43) & (Y >= 6) & (Y <= 29) & ~(((X == 20) | (X == 43)) & (Y == 6))
+    hfill(b, nm, K)
+    hfill(b, nm & (Y >= 18) & (abs(X - 31.5) < 9), '#2a1410')       # Feuerschein auf dem Fels
+    for (x0, x1) in ((24, 27), (39, 36), (31, 31)):               # Beine
+        hln(b, [(x0, 29), (x1, 20)], IRON[2])
+    basket = hpoly(b, [(23, 13), (40, 13), (37, 20), (26, 20)])
+    hfill(b, edge(basket), IRON[0])
+    hfill(b, basket, '#1c1418')
+    for x in range(24, 40, 3):                                    # Eisenkorb-Streben
+        hln(b, [(x, 13), (x + (1 if x < 31 else -1), 20)], IRON[2])
+    hr(b, 23, 13, 40, 13, IRON[3])
+    hr(b, 25, 17, 38, 17, IRON[1])
+    for x in range(25, 39, 3):                                    # Glut zwischen den Streben
+        hp(b, x + 1, 15, LAVA[2]); hp(b, x + 2, 18, LAVA[1])
+    fl = hpoly(b, [(24, 13), (26, 7), (28, 10), (30, 2), (33, 9), (35, 5), (37, 10), (39, 13)])
+    hfill(b, fl, LAVA[2])
+    hfill(b, hpoly(b, [(27, 13), (29, 8), (31, 5), (33, 10), (36, 13)]), LAVA[3])
+    hfill(b, hpoly(b, [(29, 13), (31, 8), (34, 13)]), SUN[3])
+    for (x, y) in ((25, 3), (36, 1), (40, 6), (22, 8)):           # Funken
+        hp(b, x, y, SUN[3])
+    return [a, b]
+
+
+# ---- Yomi no Oku: zerschlissene Misu mit herausgreifender Hand / Tōrō mit kaltem Totenfeuer
+def yomi_oku_hi(name, base):
+    v = VIOLET
+    a, b = base.copy(), base.copy()
+    Y, X = _g(a)
+    blind = (X >= 10) & (X <= 53) & (Y >= 10) & (Y <= 27)
+    hfill(a, blind, v[2])
+    hfill(a, blind & (Y % 3 == 0), v[1])                          # Bambusstreifen
+    hfill(a, blind & (Y % 3 == 1) & (X % 7 == 0), v[3])
+    for x in (18, 31, 45):                                        # Bindeschnüre
+        hfill(a, blind & (X == x), v[0])
+    hr(a, 8, 7, 55, 9, GOLD[1])                                   # Brokatsaum
+    hr(a, 8, 7, 55, 7, GOLD[2])
+    for x in range(10, 55, 4):
+        hp(a, x, 8, RED[2])
+    hr(a, 8, 6, 55, 6, K)
+    tear = hpoly(a, [(34, 17), (41, 15), (49, 18), (47, 28), (38, 28), (36, 22)])
+    hfill(a, tear & blind, K)
+    for (x, y) in ((35, 18), (40, 16), (48, 20), (37, 25)):       # Fransen
+        hp(a, x, y, v[3])
+    hand = hpoly(a, [(38, 28), (40, 22), (44, 21), (45, 28)])     # bleiche Hand aus dem Riss
+    for fx in (39, 41, 43, 45):
+        hand |= (X == fx) & (Y >= 17 + abs(fx - 42) // 2) & (Y <= 22)
+    hfill(a, edge(hand) & tear, '#1a1424')
+    hfill(a, hand, '#b8b0c0')
+    hfill(a, hand & (X >= 44), '#8a8098')
+    for fx in (39, 41, 43, 45):
+        hp(a, fx, 17 + abs(fx - 42) // 2, '#5a4a62')              # dunkle Nägel
+    hr(a, 18, 10, 18, 22, RED[1])                                 # Quaste
+    hfill(a, hpoly(a, [(16, 23), (20, 23), (21, 28), (15, 28)]), RED[2])
+    hr(a, 16, 23, 20, 24, GOLD[2])
+    hr(a, 17, 25, 17, 28, RED[3])
+    # B: hängende Tōrō mit kaltem Totenfeuer in einer Nische, Licht bei (30, 18)
+    nm = (X >= 20) & (X <= 42) & (Y >= 10) & (Y <= 29) & ~(((X == 20) | (X == 42)) & (Y == 10))
+    hfill(b, nm, K)
+    hr(b, 30, 4, 31, 9, IRON[1])                                  # Haken
+    roof = hpoly(b, [(23, 13), (31, 8), (38, 13), (36, 14), (25, 14)])
+    hfill(b, edge(roof), K)
+    hfill(b, roof, IRON[1])
+    hln(b, [(23, 13), (31, 8), (38, 13)], IRON[3])
+    hp(b, 22, 12, IRON[2]); hp(b, 39, 12, IRON[2])                # aufgebogene Traufen
+    cage = (X >= 25) & (X <= 36) & (Y >= 15) & (Y <= 24)
+    hfill(b, cage, IRON[0])
+    glow = (X >= 26) & (X <= 35) & (Y >= 16) & (Y <= 23)
+    hfill(b, glow, ONIBI[1])
+    hfill(b, he(b, 30.5, 20, 4, 3.5), ONIBI[2])
+    flm = hpoly(b, [(28, 23), (29, 18), (30, 19), (31, 15), (32, 19), (33, 17), (33, 23)])
+    hfill(b, flm, ONIBI[3])
+    hr(b, 30, 20, 31, 23, '#f4f0ff')
+    for x in (28, 33):                                            # Gitterstäbe
+        hfill(b, cage & (X == x), IRON[0])
+    hfill(b, cage & (Y == 19), IRON[0])
+    hr(b, 24, 25, 37, 26, IRON[2])                                # Boden mit Fuß
+    hr(b, 24, 25, 37, 25, IRON[3])
+    hr(b, 29, 27, 32, 28, IRON[1])
+    for (x, y) in ((24, 18), (38, 21), (26, 28), (36, 11)):       # Seelenfunken
+        hp(b, x, y, ONIBI[2])
+    return [a, b]
+
+
+HI.update(jigoku=jigoku_hi, iwato=iwato_hi, yomi_oku=yomi_oku_hi)
