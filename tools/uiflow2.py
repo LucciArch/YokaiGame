@@ -65,6 +65,12 @@ try:
     assert (nsy, nsy['items'][-1]) in g.run.near_synergies(), 'Pausenmenü kennt fast komplette Synergie nicht'
     g.sel = 1; step([K(pygame.K_RETURN)], 5)
     g.draw_itemlist(g.screen); assert any(t[0].startswith('Fast komplett') for t in gfx.TEXT.items), 'Pausenmenü zeigt fast komplette Synergien nicht'
+    from yokai import sigs
+    pl = g.run.player; pl.sgs = set(pl.sgs) | {'fuchsgeld', 'totenfaehre', 'shinsen'}
+    sigs.st(pl)['nutz'] = {'fuchsgeld': 12, 'shinsen_h': 2}; sigs.st(pl)['faehre'] = 23; pl.revives = 0
+    nl = sigs.nutz_lines(pl)
+    assert 'Fuchsgeld: 12 Mon extra' in nl and 'Totenfähre: 23/40 Kills' in nl and 'Shinsen: 0 Schlüssel, 2 Herzen' in nl, nl
+    g.draw_itemlist(g.screen); assert any(t[0] == 'Fuchsgeld: 12 Mon extra' for t in gfx.TEXT.items), 'Pausenmenü zeigt Nutz-Zähler nicht'
     step([K(pygame.K_RETURN)], 5)
     g.sel = 2; step([K(pygame.K_RETURN)], 5); print('opts', g.state); step([K(pygame.K_ESCAPE)], 5); print('back', g.state)
     g.sel = 3; step([K(pygame.K_RETURN)], 5); step([K(pygame.K_RETURN)], 60); print('over', g.state)

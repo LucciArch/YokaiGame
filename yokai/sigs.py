@@ -274,6 +274,33 @@ def _syn(run, key, x, y, col):
     run.particles.append(Particle(x, y, 0, 0, 0.45, col, 38, kind='wave'))
 
 
+def _gain(p, key, n=1):
+    """Zähler für Nutz-Synergien, die das Pausenmenü zeigt (nutz_lines)."""
+    c = st(p).setdefault('nutz', {})
+    c[key] = c.get(key, 0) + n
+
+
+def nutz_lines(p):
+    """Was die stillen Nutz-Synergien bisher gebracht haben, als Text fürs Pausenmenü."""
+    S, g = p.sgs, st(p)
+    c = g.get('nutz', {})
+    out = []
+    if 'fuchsgeld' in S:
+        out.append('Fuchsgeld: %d Mon extra' % c.get('fuchsgeld', 0))
+    if 'gluecksheim' in S:
+        out.append('Glückliches Haus: %d Krüge mehr' % c.get('gluecksheim', 0))
+    if 'wunsch' in S:
+        out.append('Wunsch erfüllt: %d Sternschnuppen' % c.get('wunsch', 0))
+    if 'shinsen' in S:
+        h = c.get('shinsen_h', 0)
+        out.append('Shinsen: %d Schlüssel, %d %s' % (c.get('shinsen_k', 0), h, 'Herz' if h == 1 else 'Herzen'))
+    if 'kaufmann' in S:
+        out.append('Reich wie ein Kaufmann: +%.1f Schaden aus Mon' % min(6.0, p.coins * 0.1))
+    if 'totenfaehre' in S:
+        out.append('Totenfähre: ' + ('Münze liegt bereit' if p.revives else '%d/40 Kills' % g.get('faehre', 0)))
+    return out
+
+
 def _sparks(run, x, y, cols, n=10, spd=110):
     from .entities import Particle
     for _ in range(n):
@@ -804,6 +831,7 @@ def on_kill(run, e):
         if g['faehre'] >= 40:
             g['faehre'] = 0
             p.revives = 1
+            _gain(p, 'totenfaehre')
             _float(run, p, 'Münze für den Fährmann', (190, 220, 230))
             _syn(run, 'totenfaehre', p.x, p.y + 10, (190, 220, 230))
     if 'parade' in S:
@@ -1085,6 +1113,7 @@ def on_coin(p, run, v):
     if 'fuchsglueck' in S and v == 1 and random.random() < (0.4 if 'fuchsgeld' in S else 0.2):
         extra = 4
         if 'fuchsgeld' in S:
+            _gain(p, 'fuchsgeld', 4)
             _syn(run, 'fuchsgeld', p.x, p.y, (255, 170, 90))
     if 'tanuki_bauch' in S:
         g['bauch'] = g.get('bauch', 0) + v + extra
@@ -1132,10 +1161,12 @@ def on_room_clear(run):
     if 'opfergabe' in S and random.random() < (0.1 + 0.01 * luck) * (3 if 'shinsen' in S else 1):
         run.spawn_pickup('key', p.x, p.y - 20)
         if 'shinsen' in S:
+            _gain(p, 'shinsen_k')
             _syn(run, 'shinsen', p.x, p.y, (240, 240, 245))
     if 'sternschnuppe' in S and random.random() < (0.08 + 0.006 * luck) * (3 if 'wunsch' in S else 1):
         run.random_drop(p.x + random.uniform(-30, 30), p.y - 24)
         if 'wunsch' in S:
+            _gain(p, 'wunsch')
             _syn(run, 'wunsch', p.x, p.y, (255, 240, 170))
     if 'kraniche' in S and g.get('cranes', 0) < 10:
         g['cranes'] = g.get('cranes', 0) + 1
@@ -1180,6 +1211,7 @@ def on_salt(p, run):
     if 'reinigung' in p.sgs:
         p.heal(2 if 'shinsen' in p.sgs else 1)
         if 'shinsen' in p.sgs:
+            _gain(p, 'shinsen_h')
             _syn(run, 'shinsen', p.x, p.y, (240, 240, 245))
 
 
@@ -1189,6 +1221,7 @@ def on_pot(run, x, y):
     if 'hausglueck' in p.sgs and st(p).get('pot', 0) < (2 if 'gluecksheim' in p.sgs else 1):
         st(p)['pot'] = st(p).get('pot', 0) + 1
         if st(p)['pot'] == 2:
+            _gain(p, 'gluecksheim')
             _syn(run, 'gluecksheim', x, y, (255, 190, 200))
         return True
     return False

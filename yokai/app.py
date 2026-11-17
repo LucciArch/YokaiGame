@@ -6,7 +6,7 @@ import random
 import sys
 import pygame
 from .settings import *
-from . import gfx, audio, sheets, art, bestiary, props
+from . import gfx, audio, sheets, art, bestiary, props, sigs
 from .save import Save
 from .data import (ITEMS, ITEM_IDS, CHARS, CHAR_ORDER, ACHIEVEMENTS, ACTIVES, SYNERGIES, TRANSFORMS, BOSSES,
                    BIOMES, CHALLENGES, ENEMIES)
@@ -920,6 +920,8 @@ class Game:
             txt = ', '.join('%s (+ %s)' % (sy['name'] if sy['id'] in seen else '???', ITEMS[iid]['name'])
                             for sy, iid in near[:4]) + (' …' if len(near) > 4 else '')
             y = self._wrap('Fast komplett: ' + txt, 30, y, W - 70, 7, (200, 170, 230)) + 2
+        for line in sigs.nutz_lines(p):
+            y = self._wrap(line, 30, y, W - 70, 7, (170, 220, 180)) + 2
         if p.transforms:
             self._wrap('Transformationen: ' + ', '.join(TRANSFORMS[t]['name'] for t in p.transforms), 30, y, W - 70, 7, (180, 220, 255))
 
