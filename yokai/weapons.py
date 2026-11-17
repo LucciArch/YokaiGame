@@ -92,8 +92,9 @@ def _hitboxes(e):
     return hb() if hb else [(e.x, e.y, e.r)]
 
 
-def melee(run, x, y, ang, radius, arc, dmg, knock=180, kind='w_sword', col=(230, 240, 255), fl=None):
-    """Trifft alle Gegner in einem Kreissektor und zerschlägt feindliche Geschosse darin."""
+def melee(run, x, y, ang, radius, arc, dmg, knock=180, kind='w_sword', col=(230, 240, 255), fl=None, seen=None):
+    """Trifft alle Gegner in einem Kreissektor und zerschlägt feindliche Geschosse darin.
+    seen: schon getroffene Feinde dieses Angriffs – Seiten-/Rückhiebe treffen einen großen Boss nicht ein zweites Mal."""
     S = run.player.sgs
     if 'gross' in S:
         radius *= 1.25
@@ -102,7 +103,7 @@ def melee(run, x, y, ang, radius, arc, dmg, knock=180, kind='w_sword', col=(230,
                    x, y, math.cos(ang), math.sin(ang), radius, 0, dmg / 2)
     hit = False
     for e in list(run.enemies):
-        if not e.active():
+        if not e.active() or (seen is not None and id(e) in seen):
             continue
         for hx, hy, hr in _hitboxes(e):
             dx, dy = hx - x, hy - y
@@ -113,6 +114,8 @@ def melee(run, x, y, ang, radius, arc, dmg, knock=180, kind='w_sword', col=(230,
             if arc < math.tau and abs(da) > arc / 2 + math.atan2(hr, max(1, d)):
                 continue
             _hit(run, e, hx, hy, dmg, ang, fl, curve=int('sichel' in S))
+            if seen is not None:
+                seen.add(id(e))
             fl = dict(fl or {}, _ric=9)                     # Wurfstern: nur ein Abpraller pro Hieb
             kb = knock * (0.15 if e.is_boss else 1)
             nx, ny = (dx / d, dy / d) if d > 0 else (math.cos(ang), math.sin(ang))
@@ -255,20 +258,21 @@ def fire(p, d, wk):
     if wk in ('w_sword', 'w_club', 'w_scythe', 'w_spear'):
         reach = {'w_sword': 30, 'w_club': 26, 'w_scythe': 36, 'w_spear': 54}[wk] + 4 * p.s['size']
         n = 1 + int(p.f['multishot'])
+        seen = set()
         for i, a in enumerate([base] + angs[n:]):               # Hiebe nach vorn, hinten, zur Seite
             if homing:
                 a = _aim(run, x, y, a, 0.8, reach * 1.8)
             if wk == 'w_sword':
-                melee(run, x + math.cos(a) * 6, y + math.sin(a) * 6, a, reach, math.radians(130), dmg * 2.2, kind=wk, col=col if fl else (230, 240, 255), fl=fl)
+                melee(run, x + math.cos(a) * 6, y + math.sin(a) * 6, a, reach, math.radians(130), dmg * 2.2, kind=wk, col=col if fl else (230, 240, 255), fl=fl, seen=seen)
                 if p.f['sword_wave'] and i == 0:
                     wave(a, 0.9)
             elif wk == 'w_club':
-                melee(run, x + math.cos(a) * 5, y + math.sin(a) * 5, a, reach, math.radians(110), dmg * 2.8, knock=320, kind=wk, col=col if fl else (255, 200, 160), fl=fl)
+                melee(run, x + math.cos(a) * 5, y + math.sin(a) * 5, a, reach, math.radians(110), dmg * 2.8, knock=320, kind=wk, col=col if fl else (255, 200, 160), fl=fl, seen=seen)
             elif wk == 'w_scythe':
                 if i == 0:
-                    melee(run, x, y, a, reach, math.tau, dmg * 2.6, kind=wk, col=col if fl else (200, 170, 255), fl=fl)
+                    melee(run, x, y, a, reach, math.tau, dmg * 2.6, kind=wk, col=col if fl else (200, 170, 255), fl=fl, seen=seen)
             else:
-                melee(run, x + math.cos(a) * 4, y + math.sin(a) * 4, a, reach, math.radians(26), dmg * 2.0, knock=120, kind=wk, col=col if fl else (255, 230, 160), fl=fl)
+                melee(run, x + math.cos(a) * 4, y + math.sin(a) * 4, a, reach, math.radians(26), dmg * 2.0, knock=120, kind=wk, col=col if fl else (255, 230, 160), fl=fl, seen=seen)
         for a in angs[:n] if n > 1 else ():                 # Mehrfachwurf: jeder weitere Wurf wird zur Klingenwelle
             wave(a)
         audio.play('ehit' if wk == 'w_club' else 'slash', 1.0 if wk in ('w_club', 'w_scythe') else 0.7)

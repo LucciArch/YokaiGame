@@ -178,5 +178,16 @@ p.sgs = {'feuerwerk'}
 e = Enemy(r, 'nurikabe', p.x + 20, p.y - 4); r.enemies.append(e); e.spawn_t = 0; e.hp = 1
 p.fire((1, 0))
 check(sum(1 for b in r.pbullets if b.fl.get('burn')) == 5, 'Feuerwerk: Sprengsiegel-Hieb sprüht keine fünf Funken')
+# Seitenhiebe (Kunai) treffen einen großen Feind direkt daneben nicht ein zweites Mal im selben Angriff
+def big_hit(**f):
+    r, p = setup(w_sword=1, **f)
+    e = Enemy(r, 'nurikabe', p.x + 14, p.y); r.enemies.append(e); e.spawn_t = 0
+    e.hp = e.maxhp = 999; e.r = 30                          # bossgroß, reicht bis neben die Spielerin
+    p.fire((1, 0))
+    return 999 - e.hp
+
+
+plain, side = big_hit(), big_hit(side=1)
+check(plain > 0 and abs(side - plain) < 0.01, 'Schwert + Seitenwurf trifft denselben Feind mehrfach (%.1f / %.1f)' % (side, plain))
 print('Waffen-Synergien geprüft, Fehler:', bad)
 sys.exit(1 if bad else 0)

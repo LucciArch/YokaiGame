@@ -100,6 +100,7 @@
 - Runde 76 – **Mehr Licht:** Kitsune-Laterne und Kerze der Onryō in der Hand sowie der Feuer-Anhänger machen dein Licht in dunklen Räumen größer, wie die Laternen-Items; ihre Farbe zeigt sich, solange du kein Laternen-Item trägst – die Onryō leuchtet jetzt von Anfang an violett
 - Runde 77 – **Strahl mit Ratten und Wasser:** Der Lichtstrahl durchbohrt von Natur aus und weckt deshalb Tessos Schwarm – höchstens eine Ratte pro Strahl. Prallt der Strahl mit einem Abprall-Item an der Wand ab, spritzt das Kappa-Festmahl bremsendes Wasser und Tsunami teilt die Spiegelung in zwei Wellen-Talismane
 - Runde 78 – **Feuerwerk mit Waffen:** Zerplatzt ein Schwerthieb, Sensen-, Speer-, Keulenschlag oder Lichtstrahl mit Sprengsiegel an einem angeschlagenen Feind, sprüht „Feuerwerk über Edo“ jetzt fünf brennende Funken wie bei Talismanen
+- Runde 79 – **Balance Waffen:** Seiten- und Rückhiebe (z. B. mit Kunai) treffen einen großen Feind direkt neben dir nicht mehr doppelt oder dreifach im selben Angriff – Shinobi mit Schwert besiegte Shuten-dōji in 30 s statt rund 60 s. Neues Messwerkzeug `synbalance.py --waffe=…`, Bericht unter `design/balance/balance-check-79-waffen-builds.md`
 
 ## 1.4.0 – „Hyakki-Update“ (enthält 1.3 „Kapitel-Update“)
 
