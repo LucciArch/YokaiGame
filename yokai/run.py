@@ -697,16 +697,17 @@ class Run:
             hm = Obj('hamaguri', cx, cy - 46)
             hm.r = -100
             self.objs.append(hm)
-            real = random.randrange(3)
+            real = random.sample(range(3), 2 if self.depth >= 4 and random.random() < 0.35 else 1)
             for i, dx in enumerate((-70, 0, 70)):
                 pd = Pedestal(self.pick_item('T'), cx + dx, cy + 14, group='shinkiro')
-                pd.mirage = i != real
+                pd.mirage = i not in real
+                pd.twin = len(real) > 1 and not pd.mirage     # ab Kapitel II: zwei echte, das zweite kostet ein Herz
                 if pd.mirage:
                     self.pool.append(pd.item)          # Trugbilder nehmen dem Lauf kein Item weg
                 self.pedestals.append(pd)
             room.extra['shinkiro_t'] = 15.0
             audio.play('shinkiro', 0.8)
-            self.banner('Shinkirō', 'Die Hamaguri atmet ein Trugbild aus – nur ein Item ist echt', (150, 210, 240))
+            self.banner('Shinkirō', 'Die Hamaguri atmet ein Trugbild aus – ' + ('zwei Items sind echt' if len(real) > 1 else 'nur ein Item ist echt'), (150, 210, 240))
         elif k == 'slots':
             self.objs.append(Obj('slots', cx, cy))
             self.banner('Tanuki-Spielhalle', 'Wage dein Glück!', (230, 150, 90))
@@ -1855,9 +1856,10 @@ class Run:
                 else:
                     continue
                 pd.hearts = 0
-                self.save.stat('oni_deals')
-                if self.save['stats']['oni_deals'] >= 3:
-                    self.achieve('akago')
+                if pd.group != 'shinkiro':
+                    self.save.stat('oni_deals')
+                    if self.save['stats']['oni_deals'] >= 3:
+                        self.achieve('akago')
                 for o in self.pedestals:
                     if getattr(o, 'shrine', None) == 'oni' and o is not pd:
                         o.hearts = max(o.hearts, 1)
@@ -1889,12 +1891,17 @@ class Run:
             else:
                 pd.taken = True
                 p.gain_item(pd.item)
+            twin = getattr(pd, 'twin', False) and not getattr(pd, 'mirage', False)
             if pd.group:
                 for o in self.pedestals:
                     if o is not pd and o.group == pd.group:
+                        if twin and getattr(o, 'twin', False):
+                            o.twin, o.hearts = False, 1
+                            self.banner('Noch ein echtes Bild', 'Auch dieses wirft einen Schatten – es kostet ein Herz', (150, 210, 240))
+                            continue
                         o.taken = True
                         burst(self, o.x, o.y - 10, (200, 200, 200), 10, 50)
-                if pd.group == 'shinkiro':
+                if pd.group == 'shinkiro' and not twin:
                     self.room.extra['shinkiro_t'] = 0
                     self.event_done('shinkiro')
         self.pedestals = [pd for pd in self.pedestals if not (pd.taken and pd.group)]

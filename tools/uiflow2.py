@@ -46,16 +46,24 @@ try:
     step([K(pygame.K_RETURN)], 200); print('play', g.state)
     run, p = g.run, g.run.player; p.iframes = 999; start = run.room.pos
     def shinkiro():                                     # Ereignis Shinkirō in einem Nachbarraum erzwingen
-        pos = next(q for q, r in run.rooms.items() if r.kind == 'normal' and q != run.room.pos)
+        pos = next(q for q, r in run.rooms.items() if r.kind in ('normal', 'shinkiro') and q != run.room.pos)
         r = run.rooms[pos]; r.kind = 'shinkiro'; r.cleared = True; r.populated = False; r.objects = []
         run.enter_room(pos, 's'); step([], 40)
         peds = [pd for pd in run.pedestals if pd.group == 'shinkiro']
-        assert len(peds) == 3 and sum(not pd.mirage for pd in peds) == 1, 'Shinkirō braucht genau ein echtes Item'
+        assert len(peds) == 3 and sum(not pd.mirage for pd in peds) in ((1,) if run.depth < 4 else (1, 2)), 'Shinkirō: falsche Zahl echter Items'
         return peds
     n0 = len(p.items); mir = next(pd for pd in shinkiro() if pd.mirage); p.x, p.y = mir.x, mir.y - 6; step([], 3)
     assert len(p.items) == n0 and not [pd for pd in run.pedestals if pd.group], 'Trugbild gibt ein Item'
     real = next(pd for pd in shinkiro() if not pd.mirage); p.x, p.y = real.x, real.y - 6; step([], 3)
     assert real.item in p.items, 'echtes Shinkirō-Item fehlt'
+    d0, run.depth = run.depth, 4                         # ab Kapitel II: manchmal zwei echte, das zweite kostet ein Herz
+    peds = next(pp for pp in (shinkiro() for _ in range(40)) if sum(not pd.mirage for pd in pp) == 2)
+    a, b = [pd for pd in peds if not pd.mirage]; hp0 = p.maxhp = max(p.maxhp, 6)
+    p.x, p.y = a.x, a.y - 6; step([], 3)
+    assert a.item in p.items and b.hearts == 1 and b in run.pedestals and not [pd for pd in run.pedestals if pd.mirage], 'Shinkirō-Zwilling falsch'
+    p.x, p.y = b.x, b.y - 6; step([], 3)
+    assert b.item in p.items and p.maxhp == hp0 - 2 and not [pd for pd in run.pedestals if pd.group], 'zweites echtes Shinkirō-Item kostet kein Herz'
+    run.depth = d0
     shinkiro(); p.x, p.y = RX + 30, RY + 30; step([], 60 * 16)   # Ecke: keine Tür, kein Sockel
     assert not [pd for pd in run.pedestals if pd.group], 'Muschel schließt sich nicht'
     assert 'shinkiro' in g.save.data['events_seen']; g.save.data['events_seen'].remove('shinkiro')

@@ -1215,7 +1215,7 @@ class Game:
                          lore='Fata Morganen über dem Meer galten als Atem einer riesigen Hamaguri-Muschel, die auf dem '
                               'Grund liegt und Paläste, Türme und Schiffe in die Luft haucht. Wer danach greift, greift ins Leere.',
                          ingame='Drei Items schweben im Dunst, nur eines ist echt – Trugbilder werfen keinen Schatten. '
-                                'Nach 15 Sekunden schließt sich die Muschel.'),
+                                'Ab Kapitel II sind manchmal zwei echt – das zweite kostet ein Herz. Nach 15 Sekunden schließt sich die Muschel.'),
         'omikuji': dict(name='Omikuji', spr=None,
                         lore='Für eine kleine Gabe zieht man im Schrein ein Los, das von Daikichi, großem Glück, bis Daikyō, '
                              'großem Unglück, reicht. Ein schlechtes Los knotet man an ein Gestell – so bleibt das Unglück im Schrein zurück.',
