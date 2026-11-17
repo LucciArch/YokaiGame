@@ -145,7 +145,7 @@ TEXT = {
     'brandung': 'Talismane teilen sich beim Abprallen',
     'a_un': 'Wirst du getroffen, brüllt der Wächter alle zurück',
     'sonne_mond': 'Würfe wechseln: Sonne (Feuer) und Mond (Frost)',
-    'taifun': 'Talismane wehen Geschosse in weitem Umkreis weg',
+    'taifun': 'Talismane wehen Geschosse in weitem Umkreis weg und schicken sie als Windklinge zurück',
     'fuchsstern': 'Die Sternkugel schießt drei Sterne',
     'giftnetz': 'Spinnennetze vergiften',
     'papiersturm': 'Jeder 2. Wurf bringt drei Talismane mehr',
@@ -172,7 +172,7 @@ TEXT = {
     'feuerkind': 'Die Rolle schleudert brennendes Öl auf Feinde in der Nähe',
     'feuerwagen': 'Die Rolle lässt zwei Feuerräder in Rollrichtung losrollen',
     'gericht': 'Zurückgeworfene Geschosse verfluchen: doppelter Schaden',
-    'sturmfaecher': 'Blitze entfesseln Böen, die Feinde wegschleudern',
+    'sturmfaecher': 'Jeder dritte Schlag ruft einen Blitz; Blitze entfesseln Böen, die Feinde wegschleudern',
     'sturmgott': 'Statik lädt doppelt so schnell, ihr Blitz springt auf drei Feinde',
     'blitzschlag': 'Das Donnerbiest erwacht schon nach 2 Treffern und springt weiter',
     'orochi': 'Das Grasmäher-Schwert trifft Vergiftete 20 % härter',
@@ -319,6 +319,10 @@ def on_fire(p, run, bullets):
             a = run.fire_player_bullet(p.x, p.y - 4, base, dmg * 1.6, spd * 1.7, max(2, size * 0.8), life * 1.4 / 1.7, fl)
             a.arrow = True
             _syn(run, 'goetter_arsenal', p.x, p.y, (255, 220, 150))
+    if 'sturmfaecher' in S and n % 3 == 0:
+        tgt = run.nearest_enemy(p.x, p.y, 130)
+        if tgt:
+            run.lightning(tgt.x, tgt.y, dmg * 1.5 + 3)
     if 'sonne_mond' in S:
         sun = n % 2 == 0
         for b in bullets:
@@ -522,6 +526,11 @@ def bullet_tick(b, run, dt):
                 eb.dead = True
                 if 'taifun' in S:
                     _syn(run, 'taifun', b.x, b.y, (210, 240, 230))
+                    tgt = None if b.fl.get('_tf') else run.nearest_enemy(eb.x, eb.y, 220)
+                    if tgt:   # ein Gegenwind pro Geschoss, sonst zerlegt der Fächer jeden Kugelhagel in Windklingen
+                        b.fl = dict(b.fl, _tf=1)
+                        w = run.fire_player_bullet(eb.x, eb.y, math.atan2(tgt.y - eb.y, tgt.x - eb.x), run.player.damage() * 1.5, 230, 3, 1.2, {'pierce': 1, 'knock': 1})
+                        w.wind = True; w.col = (210, 240, 230)
                 if 'gewittersturm' in S and random.random() < 0.08:
                     tgt = run.nearest_enemy(b.x, b.y, 200)
                     if tgt:

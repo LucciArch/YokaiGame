@@ -95,5 +95,14 @@ run.pbullets = []
 weapons.fire(p, (1, 0), weapons.weapon_of(p))
 if weapons.weapon_of(p) != 'w_spear' or sum(getattr(b, 'arrow', False) for b in run.pbullets) != 1:
     print('FEHLER Arsenal-Pfeil', weapons.weapon_of(p), len(run.pbullets)); bad += 1
+# Sturmfächer: jeder dritte Schlag ruft einen Blitz auf den nächsten Feind (Runde 92)
+g.start_run('hana', 16); run = g.run; p = run.player
+for iid in ('tengu_faecher', 'raijin_trommel'):
+    p.gain_item(iid, silent=True)
+e = make_boss(run, 'shuten_doji'); e.x, e.y = p.x + 60, p.y; e.spawn_t = 0; e.invuln = False; run.enemies = [e]; run.hazards = []
+for _ in range(3):
+    sigs.on_fire(p, run, [])
+if sum(h.kind == 'strike' and h.owner == 'p' for h in run.hazards) != 1:
+    print('FEHLER Sturmfächer-Blitz', len(run.hazards)); bad += 1
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)

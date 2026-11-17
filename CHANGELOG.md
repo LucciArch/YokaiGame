@@ -113,6 +113,7 @@
 - Runde 89 – **Balance Drachenkönig und Sanshu no Jingi:** Der Seidenfaden des Drachenkönigs schneidet 1,75× statt doppelt – durchbohrende Talismane spannten im Boss so viele Fäden, dass er fast viermal so stark war wie seine Items (51 % → 27 %). Die drei Throninsignien geben +20 % statt +40 % Schaden und bleiben die stärkste Synergie (81 % → 77 %)
 - Runde 90 – **Balance Orochi und Izanagis Flucht:** Das Grasmäher-Schwert trifft Vergiftete um 20 % statt 40 % härter und verliert den zusätzlichen Schadensbonus – das Gift des Orochi-Zahns lag fast immer auf dem Boss (50 % → 40 %). Izanagis Rollen-Pfirsiche werfen mit 150 % statt 300 % (48 % → 38 %); die Pfirsiche bei Treffern bleiben unverändert
 - Runde 91 – **Göttliches Arsenal und Kranichschwarm aufgewertet:** Mit Ame-no-Nuboko und Hachimans Bogen schießt jetzt jeder Speerstoß zusätzlich einen göttlichen Pfeil – vorher ging der Bogen im Speer unter. Beim Kranichschwarm fliegen immer mindestens zwei Papierkraniche, für je drei gefaltete einer mehr. Das Balance-Werkzeug lässt Nahkampf-Builds jetzt auch ohne Schalter herankommen
+- Runde 92 – **Sturm im Fächer:** Beim Sturmfächer (Tengu-Fächer + Raijins Trommelstock) ruft jeder dritte Schlag einen Blitz auf den nächsten Feind, der wie bisher eine Böe entfesselt – so wirkt die Synergie endlich auch gegen Bosse. Beim Großen Wind (Tengu-Fächer + Fūjins Windsack) kehren weggewehte Geschosse als schneidende Windklinge zum nächsten Feind zurück
 
 ## 1.4.0 – „Hyakki-Update“ (enthält 1.3 „Kapitel-Update“)
 
