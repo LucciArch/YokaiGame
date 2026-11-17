@@ -679,3 +679,152 @@ def obakedera_hi(name, base):
 
 
 HI['obakedera'] = obakedera_hi
+
+
+# ---- Hakaba: Sotoba mit Bonji und Higanbana / Jizō mit rotem Lätzchen und Mütze, Kerze und Steinhäufchen
+def _higanbana(cv, x, y):
+    """Rote Totenblume: Stängel, sechs gebogene Blütenblätter mit langen Staubfäden."""
+    hln(cv, [(x, 29), (x, y + 2)], '#2e5a2a')
+    for dx, dy in ((-3, -1), (-2, -3), (0, -4), (2, -3), (3, -1), (0, 1)):
+        hln(cv, [(x, y), (x + dx, y + dy)], '#c82a2a')
+        hp(cv, x + dx + (1 if dx > 0 else -1 if dx < 0 else 0), y + dy - 1, '#ff6a4a')
+    hp(cv, x, y, '#7a1018')
+
+
+def hakaba_hi(name, base):
+    a, b = base.copy(), base.copy()
+    wd = ('#1e1618', '#4a3a38', '#6e5a48', '#9a8460')
+    for i, (x, top, lean) in enumerate(((7, 4, 0), (17, 1, 0), (28, 6, 1), (39, 2, 0), (50, 5, -1))):
+        m = hpoly(a, [(x + lean * 2, top + 4), (x + 4 + lean * 2, top + 4), (x + 4, 29), (x, 29)])
+        for k in range(3):                                        # Gorintō-Kerben am Kopf
+            m |= hpoly(a, [(x + lean * 2 - (k == 1), top + k), (x + 4 + lean * 2 + (k == 1), top + k),
+                           (x + 4 + lean * 2, top + k + 1), (x + lean * 2, top + k + 1)])
+        m |= he(a, x + 2 + lean * 2, top + .5, 1.2, 1.4)
+        hfill(a, edge(m), K)
+        hfill(a, m, wd[2])
+        hfill(a, m & ~np.roll(m, 1, 1), wd[3])
+        hfill(a, m & ~np.roll(m, -1, 1), wd[1])
+        for k in (1, 3):                                          # Kerben
+            hp(a, x + lean * 2, top + k + 1, K); hp(a, x + 4 + lean * 2, top + k + 1, K)
+        for y in range(top + 7, 27, 4):                           # Bonji in Tusche, verwittert
+            hr(a, x + 2 + lean, y, x + 2 + lean, y + 1, '#1a1214')
+            hp(a, x + 1 + lean, y + 2, '#1a1214')
+        if i == 3:
+            hr(a, x + 1, 18, x + 3, 18, wd[0])                     # Riss im Holz
+    for (x, y) in ((13, 22), (34, 24), (47, 21)):
+        _higanbana(a, x, y)
+    # B: Jizō in der Nische, Kerze rechts (Licht bei (19, 9))
+    _niche(b, 12, 47, 9)
+    s = ('#191a28', '#3a3c54', '#5c627e', '#8a90a8')
+    body = hpoly(b, [(22, 18), (32, 18), (34, 29), (20, 29)])
+    head = he(b, 27, 14, 4.2, 4.4)
+    hfill(b, edge(body | head), K)
+    hfill(b, body | head, s[2])
+    hfill(b, (body | head) & ~np.roll(body | head, 1, 1), s[3])
+    hfill(b, (body | head) & ~np.roll(body | head, -1, 1), s[1])
+    cap = he(b, 27, 12, 4.4, 3.2) & (_g(b)[0] <= 12)
+    hfill(b, cap, '#a82a2a'); hfill(b, cap & ~np.roll(cap, 1, 0), '#d84a3a')   # rote Strickmütze
+    hr(b, 25, 15, 26, 15, s[0]); hr(b, 28, 15, 29, 15, s[0])     # geschlossene Augen
+    hp(b, 27, 17, s[1])
+    bib = hpoly(b, [(22, 19), (32, 19), (27, 25)])
+    hfill(b, bib, '#b8302a'); hfill(b, bib & ~np.roll(bib, -1, 0), '#7a1a20'); hr(b, 22, 19, 32, 19, '#e05a40')
+    hr(b, 26, 22, 28, 25, s[3]); hp(b, 27, 21, s[3])             # gefaltete Hände
+    for (x, y, c) in ((15, 28, 1), (17, 28, 2), (16, 27, 3), (16, 26, 2)):   # Steinhäufchen (Sai no Kawara)
+        hr(b, x - 1, y, x + 1, y, s[c]); hp(b, x - 1, y, K)
+    hr(b, 37, 26, 41, 29, s[1]); hr(b, 37, 26, 41, 26, s[2])     # Kerzenständer
+    hr(b, 38, 20, 40, 25, '#e0dcd0'); hr(b, 40, 20, 40, 25, '#a8a49c')   # Kerze
+    hp(b, 39, 19, K)
+    hr(b, 38, 16, 40, 18, '#e89020'); hp(b, 39, 15, '#ffcc40'); hp(b, 39, 17, '#fff4c0')
+    hp(b, 37, 24, '#e0dcd0')                                      # Wachstropfen
+    return [a, b]
+
+
+HI['hakaba'] = hakaba_hi
+
+
+# ---- Kurama: Shimenawa mit Shide am Zedernfelsen / Hanadaka-Tengu-Maske am Nagel
+def kurama_hi(name, base):
+    a, b = base.copy(), base.copy()
+    st_ = ('#6a5428', '#a88a48', '#d4b870', '#f0dca0')
+    sag = lambda x: 11 + 4 * math.sin(math.pi * (x - 2) / 59)
+    for x in range(2, 62):                                        # dicke, gedrehte Strohkordel
+        y = int(round(sag(x)))
+        hr(a, x, y - 2, x, y + 2, st_[1])
+        hp(a, x, y - 2 + (x // 2) % 4, st_[3]); hp(a, x, y - 1 + (x // 2) % 4, st_[2])
+        hp(a, x, y + 3, K); hp(a, x, y - 3, K)
+    for x in (2, 61):                                             # Enden gebunden
+        hr(a, x - 1, 7, x + 1, 13, st_[0])
+    for x in (12, 32, 52):                                        # Shide im Zickzack
+        y = int(round(sag(x))) + 3
+        for k, (dx0, dx1) in enumerate(((0, 3), (-2, 1), (0, 3), (-2, 1))):
+            hr(a, x + dx0, y + k * 3, x + dx1, y + k * 3 + 2, PAPER[3])
+            hr(a, x + dx0, y + k * 3 + 2, x + dx1, y + k * 3 + 2, PAPER[1])
+    for x in (22, 42):                                            # herabhängende Strohbüschel
+        y = int(round(sag(x))) + 3
+        for dx in range(-1, 2):
+            hln(a, [(x + dx, y), (x + dx * 2, y + 5)], st_[2])
+        hp(a, x, y + 6, st_[1])
+    # B: rote Tengu-Maske mit langer Nase, weißen Brauen und Bart, Tokin auf der Stirn
+    hln(b, [(32, 2), (27, 7)], '#3a2418'); hln(b, [(32, 2), (37, 7)], '#3a2418'); hr(b, 31, 1, 33, 2, '#7a7a8a')
+    face = he(b, 32, 15, 8.5, 9.5)
+    nose = hpoly(b, [(30, 14), (34, 14), (33, 27), (31, 27)])
+    hfill(b, edge(face | nose), K)
+    hfill(b, face, '#a82424')
+    hfill(b, face & ~np.roll(face, 1, 1) & ~np.roll(face, 2, 1), '#d84a32')
+    hfill(b, face & ~np.roll(face, -1, 1), '#6e1420')
+    hfill(b, nose, '#c03428'); hr(b, 31, 14, 31, 26, '#f06a40'); hr(b, 33, 15, 33, 26, '#7a1820')
+    hr(b, 30, 4, 34, 7, K); hr(b, 31, 5, 33, 6, '#2a2430')        # Tokin
+    for sx in (-1, 1):
+        hln(b, [(32 + sx * 2, 10), (32 + sx * 5, 9), (32 + sx * 9, 11)], '#e8e8ee')   # buschige Brauen
+        hln(b, [(32 + sx * 2, 11), (32 + sx * 6, 10)], '#b8b8c4')
+        ex = 32 + sx * 4
+        hr(b, ex - 1, 12, ex + 1, 13, '#e8c040'); hp(b, ex, 13, K)   # goldene Augen
+        hp(b, ex - sx, 12, '#fff4a0')
+        hln(b, [(32 + sx * 4, 21), (32 + sx * 7, 23), (32 + sx * 6, 26)], '#e8e8ee')   # Bart
+        hln(b, [(32 + sx * 3, 22), (32 + sx * 5, 26)], '#b8b8c4')
+    hr(b, 29, 19, 30, 19, K); hr(b, 34, 19, 35, 19, K)            # Mundwinkel unter der Nase
+    return [a, b]
+
+
+HI['kurama'] = kurama_hi
+
+
+# ---- Yukiyama: Eiszapfen mit Reifkante / Eishöhle, in der Yuki-onna wartet
+def yukiyama_hi(name, base):
+    a, b = base.copy(), base.copy()
+    hr(a, 0, 8, 63, 9, ICE[3]); hr(a, 0, 10, 63, 10, ICE[2])     # Reifkante
+    for x in range(0, 64, 5):
+        hp(a, x, 7, '#e8f6ff')
+    for (x, w, h) in ((3, 6, 12), (11, 4, 7), (17, 7, 17), (26, 3, 6), (31, 6, 13), (39, 4, 8), (45, 7, 18), (54, 5, 10), (60, 3, 6)):
+        m = hpoly(a, [(x, 10), (x + w, 10), (x + w // 2, 10 + h)])
+        hfill(a, edge(m) & (_g(a)[0] > 10), ICE[0])
+        hfill(a, m, ICE[3])
+        hfill(a, m & ~np.roll(m, -1, 1), ICE[2])
+        hln(a, [(x + 1, 11), (x + w // 2, 8 + h)], '#e8f6ff')
+        hp(a, x + w // 2, 11 + h, ICE[3])                         # Tropfen an der Spitze
+    # B: Höhle, Eiszapfen als Zähne, darin ein bleiches Gesicht mit schwarzem Haar und kalten Augen
+    Y, X = _g(b)
+    cave = he(b, 32, 29, 17, 17) & (Y >= 12) & (Y <= 29)
+    hfill(b, edge(cave) & (Y <= 29), ICE[3])
+    hfill(b, cave, K)
+    hfill(b, cave & ~he(b, 32, 30, 14, 14), '#101830')
+    for (x, h) in ((21, 5), (26, 7), (31, 4), (36, 8), (42, 5)):  # Zähne
+        m = hpoly(b, [(x - 1, 13), (x + 2, 13), (x, 13 + h)])
+        hfill(b, m, ICE[2]); hln(b, [(x - 1, 13), (x, 12 + h)], ICE[3])
+    hair = hpoly(b, [(27, 18), (37, 18), (39, 29), (25, 29)])
+    hfill(b, hair, '#26223c')
+    for x in (26, 28, 36, 38):                                    # Strähnen
+        hln(b, [(x if x < 32 else x - 1, 20), (x - 1 if x < 32 else x, 29)], '#3a3656')
+    face = he(b, 32, 22, 3.3, 4.2)
+    hfill(b, face, '#c8d4e8'); hfill(b, face & ~np.roll(face, -1, 1), '#8a9ab8')
+    hr(b, 29, 18, 35, 19, '#141020')                              # Mittelscheitel, Haar übers Gesicht
+    hp(b, 30, 21, '#a0f0ff'); hp(b, 34, 21, '#a0f0ff')            # kalte Augen
+    hp(b, 32, 25, '#5a6a8a')
+    for (x, y) in ((36, 25), (39, 24), (42, 25), (44, 23)):       # eisiger Atem
+        hp(b, x, y, '#d0e8f8')
+    for (x, y) in ((23, 28), (41, 28)):
+        hp(b, x, y, ICE[3])
+    return [a, b]
+
+
+HI['yukiyama'] = yukiyama_hi
