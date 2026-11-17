@@ -235,26 +235,28 @@ für Talismane greifen (z. B. `bullet_tick`) – sollen sie auch für Strahl/Hie
 - Balance nicht gemessen (alle Werte bewusst moderat, Stufe 3). Item-Ideen hatten Namenskonflikte: `hara_tsuzumi` ist
   schon eine Synergie – vor neuen Sig-Namen `grep -n "'name'" yokai/sigs.py yokai/data.py`.
 
-# Nächster Schritt: Figuren-Siegel Welle 5 (oni = Sieg im Oni-Modus) → dann 50 Siegel-Items
-Warum: letzte Welle des Siegel-Systems, gleiches Muster (Daten in data.py nach `kushinada_kushi`, Regex-Ergänzung in
-CHAR_UNLOCKS, TEXT + Hook in sigs.py, Symbol in icons_v16.py, sigtest). Oni-Modus ist die schwerste Prüfung → Items
-dürfen etwas auffälliger sein (aber Schwierigkeit beachten). Vorschläge: hana Ōnusa (großer Reinigungsstab: Rolle
-reinigt Flüche/Geschosse), kenji Ichi-no-tachi (erster Hieb im Raum 400 %), kuzunoha Kitsunebi-Laterne (Glück →
-Kreis aus Fuchsfeuern), ponpoko Tanuki-Kesa (Mönchsrobe: Verwandlung in Jizō, 2 s unverwundbar, 1×/Raum),
-benkei Kanjinchō (Spendenliste: Ladenpreise −15 %), okiku Sara-yashiki-Brunnen (Geisterherzen heilen mehr),
-kotarō Ushiwaka-Flöte (Gegner kurz bezaubert), seimei Seimei-Brunnen (Kikyō-Quelle: Raum ohne Treffer +Geisterherz),
-akago Oni-Kanabō aus Kindertagen (Rückstoß-Keule), susanoo Ama-no-Ōhabari (Schwert der Götter: Blitz-Ketten).
-Danach: Siegel-Komplettbelohnung je Figur (alle 5 Siegel → Farbvariante oder Startitem).
+# Erledigt (Runden 116–118)
+- Runde 116: Figuren-Siegel Welle 5 (Oni-Modus) – onusa, ichi_no_tachi, kitsune_chochin, tanuki_kesa (`sigs.jizo` in
+  `Player.hurt`), kanjincho (Rabatt in `Run` Laden-Aufbau), okiku_ido, ushiwaka_fue, seimei_ido, kodomo_kanabo, ohabari.
+  Jede Figur hat jetzt 5 Siegel-Items (50 insgesamt).
+- Runde 117: Meister-Siegel – `Run.check_meister()` vergibt `meister_<figur>`; Läufe starten dann mit einem zufälligen
+  eigenen Siegel-Item (nicht Prüfung/Tageslauf). Charakterwahl zeigt „Meister“.
+- Runde 118: eigener Klang `kine` (art_src/music/sfx.py, 2 Varianten) für den Kine-Schlag beim Mochitsuki.
 
-# Danach: weitere Freischaltungen jenseits der Siegel
-- Herausforderungen je Figur (CHALLENGES hat schon 9) mit Item-Belohnung statt nur Erfolg
+# Nächster Schritt: Herausforderungen je Figur mit Item-Belohnung
+Warum: Das Siegel-System ist komplett; das nächste große Freischalt-Ziel wie in Isaac sind Prüfungen mit Belohnung.
+`CHALLENGES` (data.py) hat 9 Prüfungen – jede bekommt eine Item-Belohnung (neues Item, eigene sig + Symbol in einer
+neuen Datei `art_src/fable/items/icons_v17.py` nach Muster von icons_v16.py), dazu 1–2 neue Prüfungen für Figuren ohne
+eigene (z. B. Okiku „Nur Geisterherzen“, Susanoo „Sturm: ständiger Wind“). Belohnung über ACHIEVEMENTS ('item', id).
+
+# Danach
 - „Quests“: z. B. 3 Mochitsuki-Erfolge, alle Ereignisse in einem Lauf, 5 Bosse ohne Treffer → neue aktive Items
-- Alle Siegel einer Figur → kosmetische Belohnung (Farbvariante) oder Bonus-Startitem
-- Lucas Rückmeldung zur Schwierigkeit weiter beachten (Boss-HP ab Kapitel V / Laden 3 Items)
+- Balance der neuen Siegel-Items mit `tools/synbalance.py` gegenprüfen (Ichi-no-tachi, Ohabari, Sarayashiki-Brunnen)
+- Lucas Rückmeldung zur Schwierigkeit weiter beachten (Meister-Startitem macht Läufe leichter – ggf. nur im normalen
+  Modus oder dafür Boss-HP leicht anheben)
 
 # Weitere Ideen
 - Wanddekos: zweite Variante pro Biom (Index 2), Werkzeug walldeco_hi.py steht
-- Mochitsuki: eigener Klang für den Kine-Schlag (dumpfes Holz auf Teig) statt 'drum' (`art_src/music/sfx.py`)
 - Mondhase ist im Raum recht klein – ggf. größer zeichnen (Canvas 64×60 → 80×72) und Wendezone anpassen
 - Spitze (Feuerwerk/Oni-Rausch/Hannya-Zorn ≈ ×4,2) mit `--raum` gegenprüfen, ob sie auch in Räumen dominieren
 - Bogen-Brücke (Hamaya bei Benkei +1,1) nach weiteren Läufen nachmessen
