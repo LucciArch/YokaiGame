@@ -330,8 +330,8 @@ def fire(p, d, wk):
         made.append(b)
     elif side == 'w_fan':                                   # drei Windstöße mit Rückstoß
         for i in (-1, 0, 1):
-            b = run.fire_player_bullet(x, y, base + i * 0.22, dmg * 0.45, p.s['shotspd'] * 1.1, p.s['size'] * 1.2,
-                                       0.42, dict(fl, pierce=1, knock=max(2, fl.get('knock', 0))))
+            b = run.fire_player_bullet(x, y, base + i * 0.22, dmg * 0.65, p.s['shotspd'] * 1.1, p.s['size'] * 1.2,
+                                       0.5, dict(fl, pierce=1, knock=max(2, fl.get('knock', 0))))
             b.wind = True
             made.append(b)
     elif side:                                              # Nahkampf-Item an Kotarōs Fächer: Klingenwelle

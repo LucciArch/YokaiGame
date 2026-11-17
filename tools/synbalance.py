@@ -5,6 +5,8 @@ Mit --raum: statt des Bosses drei Wellen zu je 8 Normalgegnern aus dem Gebiet de
 Mit --leben: ohne Gott-Modus; gemessen wird der Boss-Schaden in % bis zum Tod (Faktor > 1 = mehr Schaden als Zufall),
   damit Effekte „wenn du getroffen wirst“ nur so oft wirken, wie die Herzen reichen.
 Mit --waffe=w_laser (w_sword, w_bow ...): alle Kämpfe mit dieser Angriffsart.
+Mit --figur=kenji (benkei, kotaro ...): alle Kämpfe mit dieser Figur; dann wird statt der Synergien jedes Waffen-Item
+  (+ ein Zufalls-Item) gemessen – bei Figuren mit eigener Waffe also die Waffen-Brücke (weapons.bridge_of).
 Mit Nahkampfwaffe (auch aus Items wie Speer oder Tamahagane) läuft der Bot zum Ziel und umkreist es."""
 import os, sys, math, random
 os.environ['SDL_VIDEODRIVER'] = 'dummy'; os.environ['SDL_AUDIODRIVER'] = 'dummy'
@@ -24,7 +26,8 @@ RAUM = '--raum' in sys.argv
 if RAUM:
     sys.argv.remove('--raum')
 WAFFE = next((a[8:] for a in sys.argv if a.startswith('--waffe=')), None)
-sys.argv = [a for a in sys.argv if not a.startswith('--waffe=')]
+FIGUR = next((a[8:] for a in sys.argv if a.startswith('--figur=')), None)
+sys.argv = [a for a in sys.argv if not a.startswith(('--waffe=', '--figur='))]
 MELEE = ('w_sword', 'w_spear', 'w_club', 'w_scythe', 'w_fan')
 BOSS = sys.argv[1] if len(sys.argv) > 1 else 'shuten_doji'
 DEPTH = int(sys.argv[2]) if len(sys.argv) > 2 else 5
@@ -34,7 +37,7 @@ g = Game(headless=True)
 
 def fight(items, seed):
     random.seed(seed)
-    g.start_run('hana', seed)
+    g.start_run(FIGUR or 'hana', seed)
     run = g.run; run.depth = DEPTH; run.room.cleared = False
     p = run.player
     for iid in items:
@@ -89,7 +92,7 @@ def fight(items, seed):
     return (100 * (1 - b.hp / b.maxhp) if LEBEN else t), hits, run.player
 
 
-SEEDS = tuple(range(11, 23)) if TOD else tuple(range(11, 17)) if RAUM else (11, 12, 13)   # Überleben und Räume streuen stärker
+SEEDS = tuple(range(11, 23)) if TOD or FIGUR else tuple(range(11, 17)) if RAUM else (11, 12, 13)   # Überleben und Räume streuen stärker
 pool = [i for i in data.ITEM_IDS if not data.ITEMS[i].get('active')]
 base = {}
 for n in (2, 3):
@@ -97,7 +100,17 @@ for n in (2, 3):
     base[n] = (sum(r[0] for r in rs) / len(rs), sum(r[1] for r in rs) / len(rs))
     print('Zufall %d Items: %.1f %s, %.1f Treffer' % (n, base[n][0], '%' if LEBEN else 's', base[n][1]))
 out = []
-for sy in data.SYNERGIES:
+if FIGUR:   # Waffen-Items + je ein Zufalls-Item: mit Brücke gegen dasselbe ohne Brücke (Spalte „ohne“)
+    bridge = weapons.bridge_of
+    for wid in [i for i in pool if any(k.startswith('w_') for k in data.ITEMS[i].get('fx', {})) and (not ONLY or i in ONLY)]:
+        its = [[wid, random.Random(s * 13).choice([i for i in pool if i != wid])] for s in SEEDS]
+        rs = [fight(it, s) for it, s in zip(its, SEEDS)]
+        weapons.bridge_of = lambda p: None
+        r0 = [fight(it, s)[0] for it, s in zip(its, SEEDS)]
+        weapons.bridge_of = bridge
+        t = sum(r[0] for r in rs) / len(rs); h = sum(r[1] for r in rs) / len(rs)
+        out.append((t / base[2][0], h - base[2][1], '%s ohne ×%.2f' % (wid, sum(r0) / len(r0) / base[2][0]), t))
+for sy in ([] if FIGUR else data.SYNERGIES):
     if ONLY and sy['id'] not in ONLY:
         continue
     rs = [fight(sy['items'], s) for s in SEEDS]
@@ -106,4 +119,4 @@ for sy in data.SYNERGIES:
     t = sum(r[0] for r in rs) / len(rs); h = sum(r[1] for r in rs) / len(rs)
     out.append((t / bt, h - bh, sy['id'], t))
 for f, dh, sid, t in sorted(out, reverse=TOD or LEBEN):
-    print('%-16s %s ×%.2f (%5.1f %s)  Treffer %+5.1f' % (sid, 'Schaden' if LEBEN else 'Zeit', f, t, '%' if LEBEN else 's', dh))
+    print('%-28s %s ×%.2f (%5.1f %s)  Treffer %+5.1f' % (sid, 'Schaden' if LEBEN else 'Zeit', f, t, '%' if LEBEN else 's', dh))
