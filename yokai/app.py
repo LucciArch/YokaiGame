@@ -1510,6 +1510,7 @@ class Game:
             if reward:
                 kind, val = reward
                 r = {'char': lambda v: 'Charakter: ' + CHARS[v]['name'], 'item': lambda v: 'Item: ' + ITEMS[v]['name'],
+                     'active': lambda v: 'Aktiv: ' + ACTIVES[v]['name'],
                      'mode': lambda v: 'Oni-Modus' if v == 'hard' else 'Takamagahara'}[kind](val)
                 T.add(r, W - 32, y + 6, 7, (180, 210, 240) if ok else (120, 120, 140), 'r')
         T.add('Hoch/Runter – blättern     Esc – Zurück', W // 2, 285, 6, (150, 140, 140), 'c')

@@ -112,11 +112,11 @@ class Run:
         self.char = char_id
         for aid in self.save['achievements']:       # Belohnungen, die erst nach dem Erfolg dazukamen (z. B. Prüfungs-Items)
             rw = ACH[aid][3] if aid in ACH else None
-            if rw and rw[0] == 'item':
+            if rw and rw[0] in ('item', 'active'):
                 self.save.add_to('items', rw[1])
         unlocked = set(self.save['items'])
         self.pool = [i for i in ITEM_IDS if (not ITEMS[i]['locked'] or i in unlocked)]
-        self.active_pool = list(ACTIVES.keys())
+        self.active_pool = [a for a in ACTIVES if not ACTIVES[a].get('locked') or a in unlocked]
         self.particles, self.ambient, self.floats = [], [], []
         self.slashes = []
         self.pbullets, self.ebullets, self.enemies = [], [], []
@@ -1287,6 +1287,8 @@ class Run:
         if not self.boss_hit:
             self.achieve('nohit')
             s.stat('nohit_bosses')
+            if s['stats']['nohit_bosses'] >= 5:
+                self.achieve('q_nohit5')
         rew = BOSS_REWARD.get(b.id)
         if rew and rew not in s['items']:
             s['items'].append(rew)
@@ -1437,6 +1439,20 @@ class Run:
             for i in range(20):
                 a2 = i / 20 * math.tau
                 self.particles.append(Particle(p.x, p.y, math.cos(a2) * 200, math.sin(a2) * 200, 0.4, (200, 240, 200), 2))
+        elif a == 'mondkine':
+            sigs._blast(self, p.x, p.y, 80, 12 + dmg * 3, (240, 240, 255), 320)
+            for e in self.enemies:
+                if e.active() and math.hypot(e.x - p.x, e.y - p.y) < 80 + e.r:
+                    e.frozen = max(e.frozen, 1.5 if not e.is_boss else 0.4)
+            self.shake(6)
+            audio.play('kine')
+        elif a == 'shiomitsu_tama':
+            self.clear_ebullets()
+            sigs._blast(self, p.x, p.y, 480, 6 + dmg * 1.5, (90, 170, 255), 240)
+            for e in self.enemies:
+                if e.active():
+                    e.slowed = max(e.slowed, 5)
+            audio.play('blank', 0.6)
 
     def use_salt(self):
         p = self.player
@@ -2222,6 +2238,11 @@ class Run:
                 if val not in self.pool:
                     self.pool.append(val)
                 sub = 'Neues Item: ' + ITEMS[val]['name']
+            elif kind == 'active':
+                s.add_to('items', val)
+                if val not in self.active_pool:
+                    self.active_pool.append(val)
+                sub = 'Neues aktives Item: ' + ACTIVES[val]['name']
             elif kind == 'mode':
                 if val == 'hard':
                     s.data['hard_unlocked'] = True

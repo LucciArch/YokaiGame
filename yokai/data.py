@@ -487,6 +487,9 @@ ACTIVES = {
     'kitsune_laterne': dict(name='Kitsune-Laterne', desc='Vier Fuchsfeuer umkreisen dich', icon='lantern', col=(120, 180, 255), charge=3),
     'horagai': dict(name='Horagai', desc='Der Muschelhornruf lähmt alle Yokai', icon='shell', col=(240, 210, 190), charge=3),
     'tengu_uchiwa': dict(name='Tengu-Uchiwa', desc='Ein Windstoß fegt alles fort', icon='fan', col=(60, 140, 60), charge=2),
+    # Quest-Belohnungen (gesperrt bis zum Erfolg, siehe ACHIEVEMENTS 'q_*')
+    'mondkine': dict(name='Kine des Mondhasen', desc='Ein Mörserschlag betäubt alles in der Nähe', icon='hammer', col=(235, 235, 255), charge=3, locked=True),
+    'shiomitsu_tama': dict(name='Shiomitsu-Tama', desc='Ryūjins Flutjuwel spült alle Geschosse fort', icon='orb', col=(90, 170, 255), charge=4, locked=True),
 }
 
 # =====================================================================  CHARAKTERE
@@ -715,6 +718,8 @@ ACHIEVEMENTS = [
     ('foxfire', 'Kitsunebi-Fänger', 'Fange ein Fuchsfeuer im Inari-Schrein', None),
     ('quirks_all', 'Wanderer der Welten', 'Erlebe die Eigenheiten aller Biome', None),
     ('synergy25', 'Meister der Harmonie', 'Entdecke 25 verschiedene Synergien', None),
+    ('q_mochi', 'Gehilfe des Mondhasen', 'Gelinge dreimal beim Mochitsuki (mindestens 5 Teige gewendet)', ('active', 'mondkine')),
+    ('q_nohit5', 'Unberührbar', 'Besiege insgesamt 5 Bosse ohne Treffer', ('active', 'shiomitsu_tama')),
 ]
 
 

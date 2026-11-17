@@ -320,5 +320,26 @@ g.start_run('okiku', 26)
 if 'meister_okiku' not in g.save['achievements'] or not set(g.run.player.items) & set(data.CHAR_UNLOCKS['okiku'].values()):
     print('FEHLER Meister'); bad += 1
 g.save['achievements'][:] = ach0; g.save.write()
+# Quests: aktive Belohnungen sind gesperrt, bis der Erfolg da ist; beide Aktiv-Wirkungen greifen
+ach0, it0, st0 = list(g.save['achievements']), list(g.save['items']), dict(g.save['stats'])
+g.save['achievements'][:] = [a for a in ach0 if not a.startswith('q_')]
+g.save['items'][:] = [i for i in it0 if i not in ('mondkine', 'shiomitsu_tama')]
+g.start_run('hana', 31); run = g.run; p = run.player
+if 'mondkine' in run.active_pool:
+    print('FEHLER Quest-Sperre'); bad += 1
+g.save['stats']['nohit_bosses'] = 4; run.boss_hit = False
+for _ in range(2):
+    run.save.stat('mochi_good')
+run.achieve('q_mochi'); run.achieve('q_nohit5')
+if 'mondkine' not in run.active_pool or 'shiomitsu_tama' not in run.active_pool:
+    print('FEHLER Quest-Belohnung'); bad += 1
+e = make_boss(run, 'shuten_doji'); e.spawn_t = 0; e.invuln = False; e.x, e.y = p.x + 40, p.y; run.enemies = [e]
+for a in ('mondkine', 'shiomitsu_tama'):
+    p.active = a; p.charge = 9; h0 = e.hp
+    run.ebullets.append(Bullet(p.x + 60, p.y, 0, 0, 1, 3, 1, 'e', (255, 0, 0), {}))
+    run.use_active()
+    if not e.hp < h0 or (a == 'shiomitsu_tama' and (run.ebullets or not e.slowed)) or (a == 'mondkine' and not e.frozen):
+        print('FEHLER Aktiv', a); bad += 1
+g.save['achievements'][:] = ach0; g.save['items'][:] = it0; g.save['stats'].clear(); g.save['stats'].update(st0); g.save.write()
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)

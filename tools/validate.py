@@ -32,6 +32,7 @@ for b in data.BIOMES.values():
         if e not in data.ENEMIES: print('biome enemy',e); bad+=1
 for a in data.ACHIEVEMENTS:
     if a[3] and a[3][0]=='item' and a[3][1] not in data.ITEMS: print('ach item',a); bad+=1
+    if a[3] and a[3][0]=='active' and not data.ACTIVES.get(a[3][1], {}).get('locked'): print('ach active',a); bad+=1
 for k,v in data.BOSS_REWARD.items():
     if v and v not in data.ITEMS: print('reward',k,v); bad+=1
 import os as _os

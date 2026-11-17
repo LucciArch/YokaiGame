@@ -396,6 +396,9 @@ def mochitsuki_update(run, dt):
         run.banner('Mondmochi!', '%d von %d gewendet – ein Herz mehr' % (ok, MOCHI_N), (240, 240, 255))
         if ok == MOCHI_N and not m.get('hits'):
             run.achieve('mochitsuki')
+        run.save.stat('mochi_good')
+        if run.save['stats']['mochi_good'] >= 3:
+            run.achieve('q_mochi')
     elif ok >= 2:
         p.apply_once({'heal': 2 if ok >= 3 else 1})
         run.banner('Tsukimi-Dango', '%d von %d gewendet – der Hase teilt mit dir' % (ok, MOCHI_N), (230, 230, 245))
