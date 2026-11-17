@@ -206,15 +206,23 @@ für Talismane greifen (z. B. `bullet_tick`) – sollen sie auch für Strahl/Hie
 - Runde 109: Shinkirō ab Tiefe 4 zu 35 % mit zwei echten Items (`pd.twin`); nach dem ersten bekommt das zweite
   `hearts = 1` (zählt nicht als Oni-Handel). uiflow2 prüft das.
 
-# Nächster Schritt: Lucas Rückmeldung zur Schwierigkeit abwarten / Spitze nachziehen
+# Erledigt (Runden 110–111)
+- Runde 110: Endbildschirm (`App.st_over`) zeigt `sigs.nutz_lines(p)` in zwei Spalten unter der Statistik; uiflow2 prüft das.
+- Runde 111: Ereignis `mochitsuki` (Tsukimi): Obj `usagi` (Hi-Res `objects_hi.usagi(f)`, 3 Bilder → `_shared/usagi_hi.png`,
+  nur diese Datei schreiben), Logik `yomeiri.mochitsuki_start/update`, Wendezone `mochi_zone(o)` links vom Usu. Takt
+  `per = 1,3 − 0,07·n`, Fenster 0,25–0,75, Schlag bei 1,0 trifft, wer noch am Usu steht. 5–6 gewendet: +1 Herz, 3–4: 1 Herz,
+  2: ½ Herz. Erfolg `mochitsuki` („Aitori“), Lexikon, Minikarten-Symbol, `EVENT_KINDS` (Festtagsgast zählt jetzt alle).
+  Achtung: `rooms.py` zieht eine Zufallszahl mehr → Karten zu festen Seeds haben sich verschoben.
+
+# Nächster Schritt: Lucas Rückmeldung zur Schwierigkeit abwarten / sonst Wanddekos Variante 2
 Warum: Ab Ebene 8 fallen Bosskämpfe im Bot weiter auf ~8 s. Falls Luca es noch zu leicht findet: Boss-HP ab Kapitel V
-anheben (`bosses.py` hpm) oder Feuerrate (`rate`) ebenfalls mit abnehmendem Ertrag. Falls zu schwer: Laden wieder 3 Items.
-Ohne Rückmeldung: Nutz-Zähler auf dem Endbildschirm („Fuchsgeld brachte 40 Mon“) – kleine Lauf-Statistik, nutzt
-`sigs.nutz_lines(p)` schon fertig.
+anheben (`bosses.py` hpm) oder Feuerrate (`rate`) mit abnehmendem Ertrag. Falls zu schwer: Laden wieder 3 Items.
+Ohne Rückmeldung: Wanddekos zweite Variante pro Biom (Index 2) – lange Gänge wirken eintönig, Werkzeug
+(`walldeco_hi.py`, Vorschau-Skript aus Runde 96) ist fertig.
 
 # Weitere Ideen
-- Ereignisraum Tsukimi: Mondhasen-Mochi gegen Opfergabe (Stil wie `design/ereignisse.md`)
-- Wanddekos: zweite Variante pro Biom (Index 2) für mehr Abwechslung in langen Gängen
+- Mochitsuki: eigener Klang für den Kine-Schlag (dumpfes Holz auf Teig) statt 'drum' (`art_src/music/sfx.py`)
+- Mondhase ist im Raum recht klein – ggf. größer zeichnen (Canvas 64×60 → 80×72) und Wendezone anpassen
 - Spitze (Feuerwerk/Oni-Rausch/Hannya-Zorn ≈ ×4,2) mit `--raum` gegenprüfen, ob sie auch in Räumen dominieren
 - Bogen-Brücke (Hamaya bei Benkei +1,1) nach weiteren Läufen nachmessen
 - Tengu-Kappe (Tokin) ist im Spiel sehr klein – ggf. etwas größer zeichnen
