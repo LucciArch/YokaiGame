@@ -459,6 +459,27 @@ def s_pose_susanoo(v):
     return at(1.3, (0, s_thunder(0), 1.0), (0, s_gust(0)[:int(SR * 0.8)], 0.5))
 
 
+def s_shinkiro(v):
+    """Die Hamaguri atmet aus: Dunst-Hauch, darüber gläsernes Flimmern verstimmter Obertöne."""
+    d = 1.8
+    t = T(d)
+    breath = sweep_noise(d, 250, 900, 0.8, 0.7) * np.sin(np.pi * t / d) ** 2 * 0.8
+    glass = sum(np.sin(2 * np.pi * f * t + 3 * np.sin(2 * np.pi * (4 + i) * t)) * (0.5 + 0.5 * np.sin(2 * np.pi * (1.3 + i * 0.7) * t + i))
+                for i, f in enumerate((1568, 1661, 2093, 2349)))
+    glass = glass * np.minimum(1, t / 0.6) * np.exp(-np.maximum(0, t - 0.8) * 3) * 0.12
+    return room(at(d, (0, breath, 1.0), (0.15, glass, 1.0), (0.2, Y.kane(2637, 0.4, 1.2), 0.25)), 1.4, 0.5)
+
+
+def s_mirage(v):
+    """Ein Trugbild zerfließt: weiches Plopp, dann ein sinkender, wässriger Nachklang."""
+    plop = tone(380, 900, 0.07, 'sine', 30)
+    t = T(0.7)
+    f = 1300 * (0.35 ** (t / 0.7)) * (1 + 0.04 * np.sin(2 * np.pi * 11 * t))
+    melt = np.sin(np.cumsum(2 * np.pi * f / SR)) * np.minimum(1, t / 0.05) * np.exp(-t * 4.5) * 0.35
+    hiss = sweep_noise(0.6, 2500, 600, 1.0, 1.0) * env(0.6, 0.02, 6) * 0.3
+    return room(at(0.9, (0, plop, 1.0), (0.05, melt, 1.0), (0.05, hiss, 1.0)), 0.8, 0.4)
+
+
 SFX = {k[2:]: f for k, f in globals().items() if k.startswith('s_')}
 VARIANTS = {'slash': 3, 'eshot': 3, 'shoot': 4, 'hit': 4, 'ehit': 4, 'kill': 4, 'coin': 3, 'kill_ghost': 3, 'kill_big': 2, 'pot': 3}
 PEAK = {'slash': 0.5, 'laser': 0.4, 'bow': 0.45, 'eshot': 0.3, 'shoot': 0.35, 'hit': 0.55, 'ehit': 0.45, 'kill': 0.6, 'hurt': 0.8, 'coin': 0.45, 'move': 0.35, 'select': 0.5,
@@ -470,7 +491,7 @@ LOUD = dict(shoot=-24, move=-22, select=-19, hit=-18, ehit=-20, eshot=-21, coin=
             kill=-15, kill_ghost=-16, kill_big=-12, pickup=-16, heal=-15, spirit=-15, salt=-17, key=-16, trinket=-16, chest=-15,
             item=-14, synergy=-13, unlock=-14, hurt=-11, bell=-15, explode=-11, drum=-13, gust=-17, wave=-17, wisp=-16,
             grab=-14, lock=-16, roar=-11, thunder=-13, blank=-13, buy=-15, door=-16, stairs=-14, splash=-16, rock=-16,
-            dash=-17, bamboo=-16, death=-9, boss=-8, bossdie=-7,
+            dash=-17, bamboo=-16, shinkiro=-15, mirage=-16, death=-9, boss=-8, bossdie=-7,
             **{'pose_' + c: -16 for c in ('hana', 'kenji', 'kuzunoha', 'ponpoko', 'benkei', 'okiku', 'kotaro', 'seimei', 'akago', 'susanoo')})
 
 

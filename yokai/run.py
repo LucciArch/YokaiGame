@@ -705,6 +705,7 @@ class Run:
                     self.pool.append(pd.item)          # Trugbilder nehmen dem Lauf kein Item weg
                 self.pedestals.append(pd)
             room.extra['shinkiro_t'] = 15.0
+            audio.play('shinkiro', 0.8)
             self.banner('Shinkirō', 'Die Hamaguri atmet ein Trugbild aus – nur ein Item ist echt', (150, 210, 240))
         elif k == 'slots':
             self.objs.append(Obj('slots', cx, cy))
@@ -1551,6 +1552,7 @@ class Run:
                     if pd.group == 'shinkiro':
                         pd.taken = True
                         burst(self, pd.x, pd.y - 10, (170, 210, 240), 10, 40)
+                audio.play('mirage', 0.7)
                 self.banner('Die Muschel schließt sich', 'Das Trugbild ist verweht', (150, 200, 230))
                 self.event_done('shinkiro')
         if getattr(self, 'apparitions', None):
@@ -1865,7 +1867,7 @@ class Run:
             if getattr(pd, 'mirage', False):
                 pd.taken = True
                 burst(self, pd.x, pd.y - 10, (170, 210, 240), 16, 50)
-                audio.play('kill_ghost', 0.6)
+                audio.play('mirage', 0.8)
                 self.banner('Nur ein Trugbild', 'Es zerfließt im Dunst der Muschel', (150, 200, 230))
             elif pd.item.startswith('active:'):
                 new = pd.item[7:]

@@ -126,6 +126,7 @@
 - Runde 102 – **Neues Ereignis Shinkirō:** Eine Riesenmuschel atmet ein Trugbild aus – drei Items schweben im Dunst, aber nur eines ist echt. Trugbilder werfen keinen Schatten; wer das falsche nimmt, greift ins Leere. Nach 15 Sekunden schließt sich die Muschel. Eigenes Kartensymbol, Lexikon-Eintrag und Nachtmarkt-Musik; zählt für den Erfolg „Festtagsgast“
 - Runde 103 – **Figurenwahl erklärt Waffen-Items:** Bei Kenji, Benkei, Kotarō, Susanoo und Akago steht jetzt, dass Waffen-Items zum Zusatzangriff werden. Der UI-Test prüft außerdem das Shinkirō-Ereignis (Trugbild, echtes Item, Zeitablauf)
 - Runde 104 – **Nutz-Synergien zeigen, was sie bringen:** Im Pausenmenü „Items & Werte“ steht jetzt für Fuchsgeld, Glückliches Haus, Wunsch erfüllt, Shinsen, Reich wie ein Kaufmann und Totenfähre ein eigener Zähler – z. B. „Fuchsgeld: 12 Mon extra“, „Shinsen: 3 Schlüssel, 2 Herzen“ oder „Totenfähre: 23/40 Kills“. Der UI-Test prüft Zähler und Anzeige.
+- Runde 105 – **Eigene Klänge für das Shinkirō:** Wenn die Hamaguri ihr Trugbild ausatmet, hört man einen Dunst-Hauch mit gläsernem Flimmern; greift man ein Trugbild oder schließt sich die Muschel, zerfließt es mit einem weichen „Plopp“ und sinkendem, wässrigem Nachklang (selbst synthetisiert in `art_src/music/sfx.py`).
 
 ## 1.4.0 – „Hyakki-Update“ (enthält 1.3 „Kapitel-Update“)
 
