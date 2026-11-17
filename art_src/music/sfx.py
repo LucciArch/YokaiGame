@@ -221,6 +221,17 @@ def s_drum(v):
     return room(at(0.9, (0, Y.odaiko(55, 1.0, 0.8), 1.0), (0.13, Y.odaiko(62, 0.8, 0.7), 0.8)), 0.6, 0.2)
 
 
+def s_kine(v):
+    """Kine schlägt in den Mochi: dumpfer Holzschlag, weich gedämpft vom Teig, ein feuchtes Schmatzen."""
+    p = 1 + (v - 0.5) * 0.06
+    thud = tone(95 * p, 55 * p, 0.25, 'sine', 16)
+    knock = tone(230 * p, 180 * p, 0.05, 'rich', 55)
+    n = int(SR * 0.16)
+    squish = onepole_lp(noise(n), 500) * env(0.16, 0.008, 22) * 2.5
+    smack = biquad(noise(int(SR * 0.025)), 'bp', 900 * p, 1.2) * env(0.025, 0.001, 120)
+    return room(at(0.4, (0, thud, 1.0), (0, knock, 0.45), (0.004, squish, 0.7), (0.002, smack, 0.35)), 0.3, 0.12)
+
+
 def s_gust(v):
     n = int(SR * 0.9)
     return sweep_noise(0.9, 300, 1400, 2.0, 1.0) * np.sin(np.linspace(0, np.pi, n)) * 1.6
@@ -481,7 +492,7 @@ def s_mirage(v):
 
 
 SFX = {k[2:]: f for k, f in globals().items() if k.startswith('s_')}
-VARIANTS = {'slash': 3, 'eshot': 3, 'shoot': 4, 'hit': 4, 'ehit': 4, 'kill': 4, 'coin': 3, 'kill_ghost': 3, 'kill_big': 2, 'pot': 3}
+VARIANTS = {'slash': 3, 'eshot': 3, 'shoot': 4, 'hit': 4, 'ehit': 4, 'kill': 4, 'coin': 3, 'kill_ghost': 3, 'kill_big': 2, 'pot': 3, 'kine': 2}
 PEAK = {'slash': 0.5, 'laser': 0.4, 'bow': 0.45, 'eshot': 0.3, 'shoot': 0.35, 'hit': 0.55, 'ehit': 0.45, 'kill': 0.6, 'hurt': 0.8, 'coin': 0.45, 'move': 0.35, 'select': 0.5,
         'boss': 0.9, 'explode': 0.85, 'roar': 0.75, 'thunder': 0.8, 'kill_ghost': 0.5, 'kill_big': 0.75, 'pot': 0.5, 'rock': 0.6,
         'chest': 0.6, 'spirit': 0.55, 'salt': 0.45, 'trinket': 0.5, 'death': 0.9, 'bossdie': 0.95}

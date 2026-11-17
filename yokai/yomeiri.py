@@ -376,7 +376,7 @@ def mochitsuki_update(run, dt):
         return
     m['t'] -= per
     m['n'] += 1
-    audio.play('drum', 0.5)
+    audio.play('kine', 0.6)
     run.particles.extend(Particle(zx + random.uniform(-6, 6), zy - 4, random.uniform(-30, 30), random.uniform(-50, -20), 0.4,
                                   (240, 240, 250), 2) for _ in range(6))
     if inz and p.hurt(1, 'den Kine des Mondhasen'):
