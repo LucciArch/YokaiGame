@@ -268,6 +268,8 @@ nicht, was es freizuschalten gibt. Eine Seite mit allen `ACTIVES` (Symbol, Name,
 „Freischalten: <Erfolg>“) im bestehenden Codex-Muster (`app.py`, Suche nach „Freischalten:“) ergänzen, uiflow2 prüfen.
 
 # Danach
+- bosstest.py: Amaterasu-Assert schlägt mit dem geteilten Test-Spielstand (`/tmp/yokai_test`, nach sigtest/bot) fehl
+  (Phase 2 nach 240 s), mit frischem APPDATA besteht er – Test eigenen leeren Spielstand geben
 - Weitere Quests: 3 Geheimräume in einem Lauf, 50 Kami-Segen gesamt, Endlose Nacht Schleife 3 – je ein aktives Item
 - Balance der Siegel- und Prüfungs-Items mit `tools/synbalance.py` gegenprüfen (Ichi-no-tachi, Ohabari, Miidera, Keppan)
 - Lucas Rückmeldung zur Schwierigkeit weiter beachten (Meister-Startitem macht Läufe leichter – ggf. nur im normalen
