@@ -169,15 +169,26 @@ für Talismane greifen (z. B. `bullet_tick`) – sollen sie auch für Strahl/Hie
   Vorschau-Skript wie Runde 96/98; `pip install --ignore-installed pillow` nötig.
   Ohne eigene Zeichnung bleiben: yomi, takamagahara.
 
-# Nächster Schritt: Hi-Res-Wanddekos Teil 5 (yomi, takamagahara)
-Warum: Danach hat jedes Biom eigene Wandbilder in doppelter Pixeldichte; nur noch zwei Biome nutzen die SS=2-Fassung.
-yomi: Yomotsu-Hirasaka-Steinblock mit Shimenawa / Ikazuchi (Donnergott, der aus Izanamis Leib kriecht) in einer Nische.
-takamagahara: Wolkenpalast mit goldenem Dach / Ame-no-Ukihashi (schwebende Himmelsbrücke) – Licht `('takamagahara', 0)`
-bei (16, 8) beibehalten. Funktionen in `art_src/fable/environment/walldeco_hi.py` (`HI[...]`), Bau mit `hi.py`.
+# Erledigt (Runden 101–103)
+- Runde 101: Eigene Hi-Res-Wanddekos Yomi (Chibiki-iwa mit Shimenawa/Shide und Shikome-Augen; Ikazuchi auf Izanamis
+  Gebeinen, neues Licht `('yomi', 1)`) und Takamagahara (Wolkenpalast mit Chigi/Katsuogi, Tor-Licht bei (16, 8);
+  Ame-no-Ukihashi mit Ame-no-Nuboko). **Jetzt haben alle Biome eigene Hi-Res-Wandbilder.**
+- Runde 102: Ereignis `shinkiro` – Hamaguri (Bild `shinkai/rock_hi.png`[0]) haucht drei Items (Gruppe 'shinkiro') aus,
+  nur das echte (`pd.mirage == False`) wirft einen Hi-Res-Schatten; 15 s (`room.extra['shinkiro_t']`). Trugbild-Items gehen
+  zurück in `run.pool`. In `EVENT_KINDS`, `MATSURI_ROOMS`, Kartensymbol, Lexikon, `design/ereignisse.md`.
+- Runde 103: Figurenwahl zeigt „Waffen-Items werden zum Zusatzangriff“; uiflow2 prüft Shinkirō und den Hinweis.
+- Hinweis: Lokaler `main` im Container kann ein fremder alter Klon sein (keine gemeinsame Geschichte mit origin/main) –
+  dann auf einem Zweig von `origin/main` arbeiten und mit `git push origin HEAD:main` pushen.
+
+# Nächster Schritt: Nutz-Synergien sichtbar machen
+Warum: Fuchsgeld, Glückliches Haus, Wunsch erfüllt, Shinsen, Reich wie ein Kaufmann, Totenfähre wirken unsichtbar – der
+Spieler merkt kaum, dass die Synergie etwas tut. Im Pausenmenü „Items & Werte“ pro aktiver Nutz-Synergie einen Zähler
+zeigen (z. B. „Fuchsgeld: 12 Mon extra“, „Totenfähre: 23/40 Kills“), gezählt in `run`/`player` an der Stelle, wo die
+jeweilige sig_-Fähigkeit in `yokai/sigs.py` greift. uiflow2 um eine Prüfung erweitern.
 
 # Weitere Ideen
-- Nutz-Synergien (Fuchsgeld, Glückliches Haus, Wunsch, Shinsen) im Pausenmenü mit sichtbarem Zähler belohnen
-- Shinkirō als Ereignis: eine Hamaguri spiegelt einen Trugladen vor
-- Figurenbeschreibung im Auswahlmenü: Hinweis, dass Waffen-Items zum Zusatzangriff werden
+- Shinkirō-Variante ab Kapitel II: manchmal zwei echte Items, aber das zweite kostet ein Herz (Wahl mit Preis)
+- Wanddekos: zweite Variante pro Biom (Index 2) für mehr Abwechslung in langen Gängen
 - Spitze (Feuerwerk/Oni-Rausch/Hannya-Zorn ≈ ×4,2) mit `--raum` gegenprüfen, ob sie auch in Räumen dominieren
 - Bogen-Brücke (Hamaya bei Benkei +1,1) nach weiteren Läufen nachmessen
+- Eigener Klang für das Shinkirō (gläsernes Flimmern beim Betreten, „Plopp“ beim Zerfließen)
