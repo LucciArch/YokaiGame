@@ -78,7 +78,7 @@ for b in shiki:
 if len(shiki) != 3 or e.sg_pent != 0:
     print('FEHLER Onmyōdō-Kette', len(shiki), e.sg_pent); bad += 1
 # Feuerwerk über Edo: die fünf Funken teilen sich eine Trefferliste (Balance 88)
-from yokai.entities import Bullet
+from yokai.entities import Bullet, Pedestal
 g.start_run('hana', 14); run = g.run; p = run.player
 for iid in ('hanabi', 'chochin_feuer'):
     p.gain_item(iid, silent=True)
@@ -363,6 +363,19 @@ for rr in run.rooms.values():
 p.active = 'mayoiga_wan'; p.charge = 9; n0 = len(run.pickups); run.use_active()
 if not all(rr.revealed for rr in run.rooms.values()) or len(run.pickups) != n0 + 2:
     print('FEHLER Aktiv mayoiga_wan'); bad += 1
+# Quests Teil 3: 50 Kami-Gaben → Nusa, Schleife 3 → Yatagarasu-Feder
+g.save['stats']['kami_deals'] = 49
+pd = Pedestal(data.ITEM_IDS[0], p.x, p.y + 6); pd.shrine = 'kami'; pd.cool = 0; run.pedestals = [pd]; run.collect()
+run.depth, run.stage, run.loop = 6, 1, 1; run.go_deeper()
+if 'nusa' not in run.active_pool or 'yatagarasu_feder' not in run.active_pool:
+    print('FEHLER Quests Teil 3', g.save['stats']['kami_deals'], run.loop); bad += 1
+p = run.player; run.curse = 'nebel'; run.ebullets.append(Bullet(p.x + 60, p.y, 0, 0, 1, 3, 1, 'e', (255, 0, 0), {}))
+p.active = 'nusa'; p.charge = 9; p.iframes = 0; run.use_active()
+if run.curse or run.ebullets or p.iframes < 2.9:
+    print('FEHLER Aktiv nusa'); bad += 1
+p.active = 'yatagarasu_feder'; p.charge = 9; run.use_active()
+if not p.f['homing'] or not p.f['pierce']:
+    print('FEHLER Aktiv yatagarasu_feder'); bad += 1
 g.save['achievements'][:] = ach0; g.save['items'][:] = it0; g.save['stats'].clear(); g.save['stats'].update(st0); g.save.write()
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)

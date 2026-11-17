@@ -107,7 +107,41 @@ def mayoiga_wan():
     return c
 
 
-NAMES = ['mondkine', 'shiomitsu_tama', 'matsuri_uchiwa', 'totsuka', 'mayoiga_wan']
+def nusa():
+    """Ōnusa des Ōharae: Kiefernstab, an dessen Kopf weiße Shide-Papierstreifen in Treppenform hängen; Funken der Reinigung."""
+    c = Cv()
+    c.form(L(26, 30, 1.5, 15, 8, 1.5), 'jdD', 1, 1, ring='K')          # Stab
+    for k, x0 in enumerate((4, 10, 16)):                                # Shide: gefaltete Papierstreifen
+        sh = None
+        for s in range(5):
+            dx = 2 if s % 2 else 0
+            blk = R(x0 + dx, 8 + s * 4, x0 + dx + 3, 11 + s * 4)
+            sh = blk if sh is None else sh | blk
+        c.form(sh, 'nvW', 0, 1, ring='K')
+    c.form(R(5, 5, 21, 7), 'qrR', 0, 1, ring='K')                       # rotes Band am Stabkopf
+    c.form(E(15, 4, 2.6, 2), 'jdD', 0, 1, ring='K')                     # Stabknauf
+    sparkle(c, 27, 8, 'W', 'Y')
+    sparkle(c, 23, 20, 'W', 'A')
+    return c
+
+
+def yatagarasu_feder():
+    """Yatagarasu-Feder: schwarze Schwungfeder mit Indigoschimmer vor der roten Morgensonne – der Bote, der Jimmu den Weg wies."""
+    c = Cv()
+    c.form(E(20, 11, 9, 9), 'qrR', 1, 1, ring='K')                      # Sonnenscheibe
+    c.fill(E(17, 8, 2.4, 1.6), 'e')
+    vane = REL(13, 18, 3.6, 12, -40)                                    # Fahne schräg
+    c.form(vane, 'khH', 1, 1, ring='K')
+    c.line([(9, 23), (19, 11)], 'J', 1, only=vane)                      # Indigoschimmer
+    c.line([(11, 22), (18, 14)], 'O', 1, only=vane)
+    for k in range(3):                                                  # Kerben in der Fahne
+        c.line([(14 + k * 3, 19 - k * 3), (17 + k * 3, 19 - k * 3)], 'K', 1, only=vane)
+    c.line([(4, 29), (21, 8)], 'K', 2)                                  # Kiel
+    c.line([(5, 28), (20, 9)], 'w', 1)
+    sparkle(c, 6, 6, 'W', 'Y')
+    return c
+
+NAMES = ['mondkine', 'shiomitsu_tama', 'matsuri_uchiwa', 'totsuka', 'mayoiga_wan', 'nusa', 'yatagarasu_feder']
 
 
 def build():

@@ -407,6 +407,8 @@ class Run:
             self.loop_mult = 1 + 0.6 * self.loop
             self.bullet_speed_mult = (1.12 if self.hard else 1.0) + 0.07 * self.loop
             self.achieve('loop1')
+            if self.loop >= 2:
+                self.achieve('q_loop3')
             self.banner('Schleife %d' % (self.loop + 1), 'Die Nacht beginnt von vorn – stärker als zuvor', (200, 140, 255), big=True)
         audio.play('stairs')
         self.fade = 1.0
@@ -1478,6 +1480,20 @@ class Run:
             burst(self, p.x, p.y, (240, 230, 210), 20, 70, 0.8, 3)
             self.banner('Mayoiga-Wan', 'Der Weg zum verborgenen Haus liegt offen', (230, 200, 160))
             audio.play('unlock')
+        elif a == 'nusa':   # Ōharae: die Große Reinigung, die zweimal im Jahr alle Unreinheit fortträgt
+            if self.curse:
+                self.banner('Ōharae', 'Der Fluch „%s“ ist gebannt' % CURSES[self.curse], (240, 240, 230))
+                self.curse = None
+            p.iframes = max(p.iframes, 3.0)
+            p.add_spirit(1)
+            self.clear_ebullets()
+            burst(self, p.x, p.y, (250, 250, 240), 24, 80, 0.8, 3)
+            audio.play('bell')
+        elif a == 'yatagarasu_feder':   # die Krähe Amaterasus führte Jimmu durch die Berge von Kumano
+            p.temp.append([{'homing': 1, 'pierce': 1}, 8.0])
+            p.recalc()
+            burst(self, p.x, p.y, (40, 40, 80), 18, 60, 0.7, 3)
+            audio.play('gust', 0.7)
         elif a == 'totsuka':
             for e in list(self.enemies):
                 if e.active():
@@ -1938,6 +1954,8 @@ class Run:
             if getattr(pd, 'shrine', None) == 'kami':
                 self.save.stat('kami_deals')
                 self.achieve('kami')
+                if self.save['stats']['kami_deals'] >= 50:
+                    self.achieve('q_kami50')
             if getattr(pd, 'mirage', False):
                 pd.taken = True
                 burst(self, pd.x, pd.y - 10, (170, 210, 240), 16, 50)

@@ -493,6 +493,8 @@ ACTIVES = {
     'matsuri_uchiwa': dict(name='Matsuri-Uchiwa', desc='Hanabi! Feuerwerk zerplatzt über den Feinden', icon='matsuri_uchiwa', col=(255, 140, 90), charge=3, locked=True),
     'totsuka': dict(name='Totsuka no Tsurugi', desc='Die Klinge, die Orochi zerteilte, trifft jeden Feind', icon='totsuka', col=(220, 230, 250), charge=5, locked=True),
     'mayoiga_wan': dict(name='Mayoiga-Wan', desc='Die Schale aus dem verborgenen Haus zeigt den Weg und füllt sich', icon='mayoiga_wan', col=(200, 70, 60), charge=4, locked=True),
+    'nusa': dict(name='Nusa des Ōharae', desc='Die Große Reinigung tilgt Fluch und Geschosse und schützt kurz', icon='nusa', col=(245, 245, 235), charge=3, locked=True),
+    'yatagarasu_feder': dict(name='Yatagarasu-Feder', desc='Die dreibeinige Krähe weist deinen Würfen den Weg', icon='yatagarasu_feder', col=(60, 60, 110), charge=3, locked=True),
 }
 
 # =====================================================================  CHARAKTERE
@@ -726,6 +728,8 @@ ACHIEVEMENTS = [
     ('q_feste4', 'Festnacht', 'Erlebe vier verschiedene Ereignisräume in einem Lauf', ('active', 'matsuri_uchiwa')),
     ('q_pruefungen', 'Alle Prüfungen', 'Bestehe alle zehn Prüfungen', ('active', 'totsuka')),
     ('q_geheim3', 'Mayoiga', 'Entdecke drei Geheimräume in einem Lauf', ('active', 'mayoiga_wan')),
+    ('q_kami50', 'Ōharae', 'Nimm insgesamt 50 Kami-Gaben an', ('active', 'nusa')),
+    ('q_loop3', 'Ewige Nacht', 'Erreiche Schleife 3 in der Endlosen Nacht', ('active', 'yatagarasu_feder')),
 ]
 
 
