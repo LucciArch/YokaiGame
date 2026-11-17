@@ -37,7 +37,28 @@ try:
     g.state = 'lexicon'; g.lex_tab = 2; g.lex_sel = list(g.LEX_EVENTS).index('omikuji'); step([], 2)   # Lose-Zeile zeichnen
     g.save.data['events_seen'].remove('omikuji'); g.save['kuji_seen'][:] = []; g.state = 'title'
     g.save['seen'].remove(jiid)
-    menu(0); print('chars', g.state); step([K(pygame.K_RETURN)], 200); print('play', g.state)
+    menu(0); print('chars', g.state)
+    from yokai.data import CHAR_ORDER
+    sel0 = g.char_sel; g.char_sel = CHAR_ORDER.index('kenji'); g.save['chars'].append('kenji'); step([], 2); g.st_chars(1 / 60, [], g.menu_keys([]))
+    assert any('Zusatzangriff' in t[0] for t in gfx.TEXT.items), 'Figurenwahl nennt Waffen-Brücke nicht'
+    g.save['chars'].remove('kenji'); g.char_sel = sel0
+    step([K(pygame.K_RETURN)], 200); print('play', g.state)
+    run, p = g.run, g.run.player; p.invuln = 999; start = run.room.pos
+    def shinkiro():                                     # Ereignis Shinkirō in einem Nachbarraum erzwingen
+        pos = next(q for q, r in run.rooms.items() if r.kind == 'normal' and q != run.room.pos)
+        r = run.rooms[pos]; r.kind = 'shinkiro'; r.cleared = True; r.populated = False; r.objects = []
+        run.enter_room(pos, 's'); step([], 40)
+        peds = [pd for pd in run.pedestals if pd.group == 'shinkiro']
+        assert len(peds) == 3 and sum(not pd.mirage for pd in peds) == 1, 'Shinkirō braucht genau ein echtes Item'
+        return peds
+    n0 = len(p.items); mir = next(pd for pd in shinkiro() if pd.mirage); p.x, p.y = mir.x, mir.y - 6; step([], 3)
+    assert len(p.items) == n0 and not [pd for pd in run.pedestals if pd.group], 'Trugbild gibt ein Item'
+    real = next(pd for pd in shinkiro() if not pd.mirage); p.x, p.y = real.x, real.y - 6; step([], 3)
+    assert real.item in p.items, 'echtes Shinkirō-Item fehlt'
+    shinkiro(); p.x, p.y = 240, 290; step([], 60 * 16)
+    assert not [pd for pd in run.pedestals if pd.group], 'Muschel schließt sich nicht'
+    assert 'shinkiro' in g.save.data['events_seen']; g.save.data['events_seen'].remove('shinkiro')
+    run.enter_room(start, 'n'); step([], 20); p.invuln = 0
     for k in (pygame.K_e, pygame.K_q, pygame.K_SPACE): step([K(k)], 20)
     step([K(pygame.K_ESCAPE)], 5); print('pause', g.state)
     nsy = next(sy for sy in SYNERGIES if len(sy['items']) >= 2); g.run.player.items[:] = nsy['items'][:-1]

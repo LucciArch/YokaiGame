@@ -738,6 +738,8 @@ class Game:
                 + (['%d Mon' % c['coins']] if c['coins'] else [])
             y = self._wrap('  •  '.join(extra) if extra else 'Keine Startitems', x0 + 2, y, iw, 7, (210, 196, 160))
             fx = fx_lines(c['fx'])
+            if any(k.startswith('w_') for k in c['fx']):
+                fx.append('Waffen-Items werden zum Zusatzangriff')
             if fx:
                 self._wrap('  •  '.join(fx), x0 + 2, y, iw, 6, (170, 195, 230))
         else:
