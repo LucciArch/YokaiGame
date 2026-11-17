@@ -54,14 +54,13 @@ def _carrier(x, y, ang, dmg, fl):
     return b
 
 
-def _hit(run, e, hx, hy, dmg, ang, fl):
-    if fl:
-        b = _carrier(hx, hy, ang, dmg, fl)
-        run.damage_enemy(e, dmg, b)
-        if fl.get('explode') and e.hp <= dmg * 3:          # Sprengsiegel: Treffer zerplatzen
-            run.explode(hx, hy, 22, dmg * 0.7, 'p')
-    else:
-        run.damage_enemy(e, dmg, None)
+def _hit(run, e, hx, hy, dmg, ang, fl, t=0.0, curve=0):
+    """t: Flugzeit, die ein Talisman bis hierher gebraucht hätte (Kyūdō); curve: Sichel-Hieb zählt als gebogen."""
+    b = _carrier(hx, hy, ang, dmg, fl or {})
+    b.t, b.curve = t, curve
+    run.damage_enemy(e, dmg, b)
+    if b.fl.get('explode') and e.hp <= dmg * 3:            # Sprengsiegel: Treffer zerplatzen
+        run.explode(hx, hy, 22, dmg * 0.7, 'p')
 
 
 def _aim(run, x, y, ang, cone, reach, taken=None):
@@ -111,7 +110,8 @@ def melee(run, x, y, ang, radius, arc, dmg, knock=180, kind='w_sword', col=(230,
             da = (math.atan2(dy, dx) - ang + math.pi) % math.tau - math.pi
             if arc < math.tau and abs(da) > arc / 2 + math.atan2(hr, max(1, d)):
                 continue
-            _hit(run, e, hx, hy, dmg, ang, fl)
+            _hit(run, e, hx, hy, dmg, ang, fl, curve=int('sichel' in S))
+            fl = dict(fl or {}, _ric=9)                     # Wurfstern: nur ein Abpraller pro Hieb
             kb = knock * (0.15 if e.is_boss else 1)
             nx, ny = (dx / d, dy / d) if d > 0 else (math.cos(ang), math.sin(ang))
             e.kx += nx * kb; e.ky += ny * kb
@@ -181,7 +181,9 @@ def beam(run, x, y, ang, dmg, width=4, col=(255, 236, 150), fl=None, bounces=Non
                 continue
             perp = abs(px_ * dy - py_ * dx)
             if perp <= hr + width:
-                _hit(run, e, hx, hy, dmg * (1 + 0.6 * along / 460 if 'stromauf' in S else 1), ang, fl)
+                _hit(run, e, hx, hy, dmg * (1 + 0.6 * along / 460 if 'stromauf' in S else 1), ang, fl,
+                     t=along / max(1, run.player.s['shotspd']))
+                fl = dict(fl, _ric=9)                       # Wurfstern: nur ein Abpraller pro Strahl
                 break
     _path_sigs(run, S, x, y, dx, dy, L, width, dmg)
     if 'kammzinken' in S and not fl.get('_kz') and L > 60:   # der Strahl spaltet sich wie Kammzinken

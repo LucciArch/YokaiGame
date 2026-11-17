@@ -120,6 +120,29 @@ check(e.gold_hit, 'Goldwurf-Item wirkt nicht beim Schwerthieb')
 r, p = setup(w_bow=1, gold_shots=1)
 p.fire((1, 0))
 check(r.pbullets and all(b.gold for b in r.pbullets), 'Goldwurf-Item wirkt nicht beim Bogen')
+# Hit-Sigs bei Waffen: Sichel-Hiebe zählen als gebogen (Mondsichel-Klinge), ferne Strahltreffer als weit (Kyūdō)
+r, p, e, _ = sword_hit({'schnitt', 'sichel', 'mondschnitt'})
+check(getattr(e, 'sg_bleed', 0) == 2, 'Mondsichel-Klinge: Sichel-Hieb blutet nicht tief')
+
+
+def laser_dmg(dist, sg):
+    r, p = setup(w_laser=1)
+    p.sgs = set(sg)
+    e = Enemy(r, 'nurikabe', p.x + dist, p.y - 4); r.enemies.append(e); e.spawn_t = 0
+    e.hp = e.maxhp = 999
+    p.fire((1, 0))
+    return 999 - e.hp
+
+
+check(laser_dmg(250, {'kyudo'}) > laser_dmg(30, {'kyudo'}) * 1.4, 'Kyūdō: ferner Strahltreffer nicht stärker')
+# Wurfstern: ein Schwerthieb in eine Gruppe gibt genau einen Abpraller
+r, p = setup(w_sword=1)
+p.sgs = {'wurfstern'}
+for dy in (-14, 0, 14):
+    e = Enemy(r, 'nurikabe', p.x + 20, p.y - 4 + dy); r.enemies.append(e); e.spawn_t = 0; e.hp = e.maxhp = 999
+e = Enemy(r, 'nurikabe', p.x + 110, p.y); r.enemies.append(e); e.spawn_t = 0; e.hp = e.maxhp = 999
+p.fire((1, 0))
+check(sum(1 for b in r.pbullets if b.fl.get('_ric')) == 1, 'Wurfstern + Schwert: nicht genau ein Abpraller')
 # Laternen-Items vergrößern und färben das Licht der Spielerin
 r, p = setup()
 p.gain_item('chochin_feuer', silent=True)
