@@ -285,14 +285,20 @@ für Talismane greifen (z. B. `bullet_tick`) – sollen sie auch für Strahl/Hie
   Ōnusa-Rolle 90 px / bis 8. Helfer `sigs._shide(p, run, rad, n, mult)`.
 - Runde 130: Yatagarasu-Feder-Symbol mit breiterer Fahne.
 
-# Nächster Schritt: Schwierigkeit mit Meister-Startitem nachmessen
-Warum: Luca fand das Spiel zu leicht (Runde 106). Seit Runde 117 starten Läufe mit Meister-Siegel mit einem
-Siegel-Item, dazu kommen rückwirkend vergebene Prüfungs-/Quest-Belohnungen im Pool. Mit dem Gott-Bot-Maß aus Runde 106
-(Bosskampfdauer je Ebene, Ziel ≥ ~15 s) mit und ohne Startitem messen; falls deutlich leichter: Boss-HP bei
-Meister-Läufen leicht anheben oder das Startitem erst ab Kapitel II geben.
+# Erledigt (Runden 131–132)
+- Runde 131: Meister-Läufe `Run.boss_mult = 1.15` (Boss-HP, in `RUN_KEYS`). Messung: Startitem kürzte Bosskämpfe
+  auf Ebene 4–6 um ~25–50 %.
+- Runde 132: Kapitel IV–V Boss-HP × `1 + 0,25·(tier−3)` in `bosses.Boss.__init__`; Ebene 7–10 jetzt 9–14 s statt
+  7–12 s. Bericht `design/balance/balance-check-131-meister.md`. Messskript: Bot mit `dmg=1`, `Run.update`
+  umwickeln und Zeit im Bossraum mit lebenden Gegnern je `floor_no` summieren (~4 min für 8 Läufe).
+
+# Nächster Schritt: Synergie für Belohnungs-Items
+Warum: Siegel-, Prüfungs- und Quest-Items haben noch keine Synergien untereinander; Kombinationen sind der Kern des
+Wiederspielwerts. Vorschlag: Fūrin + Biidoro-Splitter + Yata-Spiegel (Klang/Glas/Licht) oder Hi-ōgi + Sonnen-Item –
+eigene `sig_*` in `yokai/sigs.py`, Eintrag in `SYNERGIES`, sigtest-Prüfung, danach mit `synbalance.py` messen.
 
 # Danach
-- Weitere Synergien für Belohnungs-Items (z. B. Fuurin + Biidoro-Splitter + Yata-Spiegel; Hi-ōgi + Sonnen-Item)
+- Ebene 9–10 ohne Meister noch ~10 s Bosszeit – nach Lucas Spieltest ggf. weiter anheben
 - Codex: aktive Items im Lauf als „entdeckt“ merken, falls Spoiler-Schutz gewünscht
 - Hi-ōgi (×1,53) und Masakari (×1,35) beobachten – oberer Rand der Siegel-Items
 
