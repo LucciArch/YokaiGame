@@ -15,7 +15,7 @@ from .yomeiri import Parade, Procession, Apparition, kakurenbo_start, kakurenbo_
 
 ACH = {a[0]: a for a in ACHIEVEMENTS}
 MATSURI = ('yo', 60, 96, 'matsuri', 55)          # Nachtmarkt-Musik für Laden und Ereignisräume
-MATSURI_ROOMS = ('shop', 'yomeiri', 'kakurenbo', 'teahouse', 'slots', 'ema')
+MATSURI_ROOMS = ('shop', 'yomeiri', 'kakurenbo', 'teahouse', 'slots', 'ema', 'shinkiro')
 TIPS = ['Esc → „Speichern & Hauptmenü“: Der Lauf geht später ab dieser Ebene weiter.',
         'Gesegnete Ebenen erkennst du am goldenen Banner – nutze den Segen, solange er gilt.',
         'Im Item-Tooltip steht, ob ein Fund eine Synergie vervollständigt.',
@@ -465,6 +465,7 @@ class Run:
               'omikuji': 'Omikuji: Für 5 Mon ein Los ziehen. Ein Unglückslos bindest du für 3 Mon ans Gestell.',
               'ema': 'Ema-Wand: Berühre eine Tafel – nur ein Wunsch geht in Erfüllung.',
               'hyakki': 'Hyakki Yagyō: Weiche der Parade aus. Ohne Treffer gibt es zwei Truhen.',
+              'shinkiro': 'Shinkirō: Nur ein Item ist echt – Trugbilder werfen keinen Schatten. Die Muschel schließt sich bald.',
               'challenge': 'Prüfungsraum: Mehrere Wellen überstehen, dann gibt es eine Belohnung.',
               'secret': 'Geheimraum! Rissige Wände lassen sich mit Salz aufsprengen.',
               'boss': 'Der Boss dieser Ebene. Bei 25 % Leben rasen Bosse vor Wut.'}.get(room.kind)
@@ -692,6 +693,19 @@ class Run:
             for i, (nm, desc, fx, col) in enumerate(wishes[:3]):
                 self.objs.append(Obj('ema', cx - 90 + i * 90, cy - 4, name=nm, desc=desc, fx=fx, col=col))
             self.banner('Ema-Wand', 'Schreib einen Wunsch auf – nur einer geht in Erfüllung', (230, 190, 140))
+        elif k == 'shinkiro':
+            hm = Obj('hamaguri', cx, cy - 46)
+            hm.r = -100
+            self.objs.append(hm)
+            real = random.randrange(3)
+            for i, dx in enumerate((-70, 0, 70)):
+                pd = Pedestal(self.pick_item('T'), cx + dx, cy + 14, group='shinkiro')
+                pd.mirage = i != real
+                if pd.mirage:
+                    self.pool.append(pd.item)          # Trugbilder nehmen dem Lauf kein Item weg
+                self.pedestals.append(pd)
+            room.extra['shinkiro_t'] = 15.0
+            self.banner('Shinkirō', 'Die Hamaguri atmet ein Trugbild aus – nur ein Item ist echt', (150, 210, 240))
         elif k == 'slots':
             self.objs.append(Obj('slots', cx, cy))
             self.banner('Tanuki-Spielhalle', 'Wage dein Glück!', (230, 150, 90))
@@ -1529,6 +1543,16 @@ class Run:
             self.yomeiri = None
         if self.room.kind == 'kakurenbo':
             kakurenbo_update(self, dt)
+        ex = self.room.extra
+        if ex.get('shinkiro_t', 0) > 0:
+            ex['shinkiro_t'] -= dt
+            if ex['shinkiro_t'] <= 0:
+                for pd in self.pedestals:
+                    if pd.group == 'shinkiro':
+                        pd.taken = True
+                        burst(self, pd.x, pd.y - 10, (170, 210, 240), 10, 40)
+                self.banner('Die Muschel schließt sich', 'Das Trugbild ist verweht', (150, 200, 230))
+                self.event_done('shinkiro')
         if getattr(self, 'apparitions', None):
             self.apparitions = [a for a in self.apparitions if a.update(dt)]
         self.update_bullets(dt)
@@ -1838,7 +1862,12 @@ class Run:
             if getattr(pd, 'shrine', None) == 'kami':
                 self.save.stat('kami_deals')
                 self.achieve('kami')
-            if pd.item.startswith('active:'):
+            if getattr(pd, 'mirage', False):
+                pd.taken = True
+                burst(self, pd.x, pd.y - 10, (170, 210, 240), 16, 50)
+                audio.play('kill_ghost', 0.6)
+                self.banner('Nur ein Trugbild', 'Es zerfließt im Dunst der Muschel', (150, 200, 230))
+            elif pd.item.startswith('active:'):
                 new = pd.item[7:]
                 old = p.active
                 old_charge = p.charge
@@ -1863,6 +1892,9 @@ class Run:
                     if o is not pd and o.group == pd.group:
                         o.taken = True
                         burst(self, o.x, o.y - 10, (200, 200, 200), 10, 50)
+                if pd.group == 'shinkiro':
+                    self.room.extra['shinkiro_t'] = 0
+                    self.event_done('shinkiro')
         self.pedestals = [pd for pd in self.pedestals if not (pd.taken and pd.group)]
         for o in self.objs:
             o.t += 1 / 60
@@ -2119,7 +2151,7 @@ class Run:
         self.ambient = [pt for pt in self.ambient if pt.update(dt) and RY - 10 < pt.y < RY + RH + 10 and pt.x < RX + RW + 10][-260:]
 
     # ======================================================================  Erfolge & Ende
-    EVENT_KINDS = ('yomeiri', 'kakurenbo', 'ema', 'hyakki')
+    EVENT_KINDS = ('yomeiri', 'kakurenbo', 'ema', 'hyakki', 'shinkiro')
 
     def event_done(self, kind):
         """Ein Ereignisraum wurde erlebt (für Statistik und Erfolg)."""
@@ -2467,7 +2499,7 @@ class Run:
             rect = pygame.Rect(0, 0, w, h)
             rect.center = (x, y + (-6 if d == 'n' else 6 if d == 's' else 0)) if horiz else (x + (-6 if d == 'w' else 6), y)
             frame = {'boss': (150, 30, 40), 'treasure': (230, 190, 70), 'shop': (90, 160, 90), 'curse': (110, 40, 120),
-                     'challenge': (200, 90, 50), 'omikuji': (210, 60, 50), 'onsen': (120, 190, 220), 'yomeiri': (240, 150, 80), 'kakurenbo': (220, 150, 190), 'ema': (200, 150, 100), 'hyakki': (160, 120, 230),
+                     'challenge': (200, 90, 50), 'omikuji': (210, 60, 50), 'onsen': (120, 190, 220), 'yomeiri': (240, 150, 80), 'kakurenbo': (220, 150, 190), 'ema': (200, 150, 100), 'hyakki': (160, 120, 230), 'shinkiro': (120, 180, 220),
                      'library': (150, 120, 200), 'dojo': (230, 140, 60), 'secret': (160, 140, 110),
                      'teahouse': (110, 170, 90), 'slots': (230, 120, 70)}.get(other.kind, (110, 70, 45))
             if self.curse == 'verirrt' and not other.visited:
@@ -2977,7 +3009,7 @@ class Run:
         pygame.draw.rect(bg, (120, 96, 70, 170), bg.get_rect(), 1)
         s.blit(bg, (x0 - 2, y0 - 2))
         icons = {'secret': (200, 180, 140), 'boss': (230, 50, 50), 'treasure': (240, 200, 70), 'shop': (90, 200, 90), 'curse': (170, 80, 200),
-                 'challenge': (230, 120, 60), 'omikuji': (230, 80, 70), 'onsen': (120, 200, 230), 'yomeiri': (255, 170, 90), 'kakurenbo': (240, 170, 210), 'ema': (220, 170, 110), 'hyakki': (180, 140, 255),
+                 'challenge': (230, 120, 60), 'omikuji': (230, 80, 70), 'onsen': (120, 200, 230), 'yomeiri': (255, 170, 90), 'kakurenbo': (240, 170, 210), 'ema': (220, 170, 110), 'hyakki': (180, 140, 255), 'shinkiro': (140, 200, 240),
                  'library': (170, 140, 230), 'dojo': (240, 160, 60), 'teahouse': (120, 190, 100), 'slots': (240, 140, 80)}
         for pos, r in rooms.items():
             if not (r.seen or show_all) or not r.revealed:

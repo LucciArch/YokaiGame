@@ -561,6 +561,15 @@ MAP_COL = {
     'D': (150, 100, 60), 'd': (90, 56, 34), 'k': (40, 32, 44), 'S': (240, 170, 200),
 }
 MAP_ICONS = {
+    'shinkiro': """
+.W..w..W..
+..w..W..w.
+..........
+..bbbbbb..
+.bBBBBBBb.
+bBkkWWkkBb
+bbBBBBBBbb
+.bbbbbbbb.""",
     'boss': """
 ..WWWWWW..
 .WWWWWWWW.

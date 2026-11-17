@@ -1652,6 +1652,16 @@ class Pedestal:
             return
         name, desc, icon, col = self.info()
         bob = math.sin(self.t * 2.5) * 2
+        mir = getattr(self, 'mirage', None)
+        if mir is not None:                            # Shinkirō: alle flimmern, nur das echte Item wirft Schatten
+            x += int(round(math.sin(self.t * 4 + self.x)))
+            if not mir:
+                w = 26 - int(bob * 2)
+                sh = _OBJ_HI.get(('shadow', w))
+                if sh is None:
+                    sh = _OBJ_HI[('shadow', w)] = pygame.Surface((w, 6), pygame.SRCALPHA)
+                    pygame.draw.ellipse(sh, (4, 2, 10, 190), sh.get_rect())
+                gfx.hi_blit(sh, x, y + 1)
         gfx.draw_glow(s, x, int(y - 10 + bob), 14, col, 60)
         gfx.draw_icon(s, icon, col, x, y - 10 + bob)
         if self.item.startswith('active:'):
@@ -1765,6 +1775,11 @@ class Obj:
             else:
                 put(props.hokora(bool(oni)), y + 6)
             gfx.TEXT.add('Oni-Schrein' if oni else 'Kami-Schrein', x, y + 8, 6, col, 'c')
+        elif k == 'hamaguri':
+            im = gfx.env_img('shinkai', 'rock_hi', 64)
+            if im:
+                gfx.hi_blit(im[0], x, y + 12)
+            gfx.draw_glow(s, x, y - 14, 30, (140, 190, 230), int(40 + 15 * math.sin(t * 1.5)))
         elif k == 'ema':
             col = tuple(self.data['col'])
             if not self.used:

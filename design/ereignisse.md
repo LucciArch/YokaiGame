@@ -11,6 +11,7 @@ und spielen die Nachtmarkt-Musik „Yomise“.
 | Ema-Wand | alle | ca. jede 6. Ebene | Einen von drei Wünschen wählen | Schaden, Herz, Mon, Karte+Schlüssel, Seelenherzen oder Feuerrate |
 | Omikuji-Schrein | alle | Sonderraum | Ein Los ziehen (5 Mon), Unglückslos am Musubi-Gestell anbinden (3 Mon) | Item, Ebenen-Segen, Schaden oder Drops / Ebenen-Fluch, bei Daikyō −1 Herz |
 | Hyakki Yagyō (Nachtparade) | ab II | ca. jede 9. Ebene | Den drei Reihen der Parade ausweichen | Eine Truhe, ohne Treffer zwei; Treffer kosten Herzen |
+| Shinkirō (Trugbild der Hamaguri) | alle | ca. jede 3. Ebene | Das echte von drei Items nehmen – nur es wirft einen Schatten; 15 s Zeit | Ein Item / Trugbild zerfließt, nichts |
 
 Code: `yokai/yomeiri.py`, Raumverteilung in `yokai/rooms.py` (`extras`).
 

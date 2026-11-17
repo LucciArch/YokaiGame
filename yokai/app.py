@@ -1207,6 +1207,11 @@ class Game:
                     lore='Ema sind kleine Holztafeln, auf die man in Schreinen seine Wünsche schreibt. Früher opferte man '
                          'den Göttern Pferde – heute genügt ein gemaltes.',
                     ingame='Drei Tafeln, drei Wünsche – nur einer geht in Erfüllung.'),
+        'shinkiro': dict(name='Shinkirō', spr=None,
+                         lore='Fata Morganen über dem Meer galten als Atem einer riesigen Hamaguri-Muschel, die auf dem '
+                              'Grund liegt und Paläste, Türme und Schiffe in die Luft haucht. Wer danach greift, greift ins Leere.',
+                         ingame='Drei Items schweben im Dunst, nur eines ist echt – Trugbilder werfen keinen Schatten. '
+                                'Nach 15 Sekunden schließt sich die Muschel.'),
         'omikuji': dict(name='Omikuji', spr=None,
                         lore='Für eine kleine Gabe zieht man im Schrein ein Los, das von Daikichi, großem Glück, bis Daikyō, '
                              'großem Unglück, reicht. Ein schlechtes Los knotet man an ein Gestell – so bleibt das Unglück im Schrein zurück.',
@@ -1314,7 +1319,7 @@ class Game:
                     cache[key] = pygame.transform.scale(fr, (fr.get_width() * 2, fr.get_height() * 2))
                 gfx.hi_blit(cache[key], cx, 128 - int(abs(math.sin(self.t * 3)) * 2))
             else:
-                hi = gfx.env_img('_shared', eid + '_hi', 40 if eid == 'omikuji' else 44)
+                hi = gfx.env_img('shinkai', 'rock_hi', 64) if eid == 'shinkiro' else gfx.env_img('_shared', eid + '_hi', 40 if eid == 'omikuji' else 44)
                 if hi:
                     im = hi[0]
                 else:
