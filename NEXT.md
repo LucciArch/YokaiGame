@@ -188,11 +188,23 @@ für Talismane greifen (z. B. `bullet_tick`) – sollen sie auch für Strahl/Hie
 - Runde 105: SFX `shinkiro` (Ausatmen) und `mirage` (Trugbild zerfließt / Muschel schließt) in `art_src/music/sfx.py`,
   gespielt in `run.py`. Neu bauen: `cd art_src/music && python3 sfx.py shinkiro mirage` (braucht scipy, ffmpeg).
 
-# Nächster Schritt: Shinkirō-Variante ab Kapitel II
-Warum: Das Ereignis ist jetzt fertig (Bild, Klang, Lexikon), wird aber nach dem ersten Mal berechenbar. Ab Kapitel II
-(Tiefe ≥ 4) manchmal (z. B. 35 %) zwei echte Items: das zweite trägt einen Preis (ein Herz, wie Teufelsangebot/Blutpreis –
-vorhandenes Preis-System der Pedestals nutzen, falls es eins gibt). Banner/Hinweistext anpassen, uiflow2 erweitern.
+# Erledigt (Runden 106–107, Wunsch von Luca: Spiel war zu leicht, Kostüme veraltet)
+- Runde 106: `entities.flat_dmg` (Wurzel-Ertrag für flachen Schaden), `entities.stack_dmgm` (stärkster Multiplikator voll,
+  weitere 40 %), steilere Gegner-/Boss-HP-Kurve, ganzes Herz ab Kapitel III, mehr Gegner/Champions, weniger Gratis-Items
+  (Laden 2 Items, Schrein/Truhe/Mini-Boss/Dōjō/Geheimraum/2. Schatzkammer seltener). Bericht `balance-check-106-skalierung`.
+  Messwerkzeug (nicht im Repo): Gott-Bot ohne Zusatzschaden, Bosskampfdauer je Ebene – Ziel: nicht unter ~15 s fallen.
+  **Schwierigkeit bleibt Lucas Wunsch: neue Items/Synergien nicht stärker machen, ohne die Kurve nachzumessen.**
+- Runde 107: Kostüme in `art_src/fable/items/costumes.py` neu (Kitsune, Ryū, Oni + Kanabō, Yūrei, Tanuki, Eboshi, Tokin).
+  Bauen: `cd art_src/fable/items && PYTHONPATH=.. python3 costumes.py` (Pillow per `pip install --ignore-installed pillow`).
+  Unveränderte PNGs danach zurücksetzen (Encoder schreibt neu). `costume.OWN` = Merkmale, die eine Figur schon trägt.
 
+# Nächster Schritt: Lucas Rückmeldung zur Schwierigkeit abwarten / Spitze nachziehen
+Warum: Ab Ebene 8 fallen Bosskämpfe im Bot weiter auf ~8 s. Falls Luca es noch zu leicht findet: Boss-HP ab Kapitel V
+anheben (`bosses.py` hpm) oder Feuerrate (`rate`) ebenfalls mit abnehmendem Ertrag. Falls zu schwer: Laden wieder 3 Items.
+Danach: Tengu-Flügel (`wings`) und Kami-Heiligenschein im neuen Stil überarbeiten (die einzigen alten Kostümteile).
+
+# Später: Shinkirō-Variante ab Kapitel II
+Ab Tiefe ≥ 4 manchmal (35 %) zwei echte Items, das zweite kostet ein Herz (Preis-System der Pedestals nutzen).
 # Weitere Ideen
 - Wanddekos: zweite Variante pro Biom (Index 2) für mehr Abwechslung in langen Gängen
 - Spitze (Feuerwerk/Oni-Rausch/Hannya-Zorn ≈ ×4,2) mit `--raum` gegenprüfen, ob sie auch in Räumen dominieren
