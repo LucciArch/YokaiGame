@@ -262,19 +262,27 @@ für Talismane greifen (z. B. `bullet_tick`) – sollen sie auch für Strahl/Hie
 - Symbole: `art_src/fable/items/icons_v18.py` (Muster wie v17). sigtest prüft Sperre, Freischaltung und Wirkung.
 - Balance nicht gemessen (Ladungen 3/4/3/5, moderat).
 
-# Nächster Schritt: Codex-Seite „Aktive Items“
-Warum: Aktive Items erscheinen nirgends im Lexikon/Codex (nur Items); mit den gesperrten Quest-Aktiven sieht man
-nicht, was es freizuschalten gibt. Eine Seite mit allen `ACTIVES` (Symbol, Name, Ladung, Text; gesperrte mit
-„Freischalten: <Erfolg>“) im bestehenden Codex-Muster (`app.py`, Suche nach „Freischalten:“) ergänzen, uiflow2 prüfen.
+# Erledigt (Runden 123–125)
+- Runde 123: Codex zeigt aktive Items hinten im Item-Raster (`ids = ITEM_IDS + ['active:'+a]`, Kupferrahmen, Ladung);
+  gesperrte Quest-Aktive nennen ihren Erfolg. Aktive Items haben keine eigene Entdeckung (alle offen sichtbar).
+- Runde 124: `bosstest.py` nutzt einen eigenen leeren Spielstand (tempfile) – Amaterasu-Assert besteht wieder.
+- Runde 125: Quest `q_geheim3` (3 Geheimräume in einem Lauf, `p.sg['geheim_lauf']` in `Run.reveal_near`) →
+  `mayoiga_wan` (Ebene aufdecken + 2 Gaben). Fix: Quest-Aktive hatten `icon='hammer'/'orb'/…` statt ihrer eigenen PNGs.
+  **Neue aktive Items: `icon` = eigene ID, Symbol in `icons_v18.py` (NAMES ergänzen).**
+
+# Nächster Schritt: Quests Teil 3 (50 Kami-Segen gesamt, Endlose Nacht Schleife 3)
+Warum: Quests mit aktiven Items geben Langzeitziele wie in Isaac; zwei Ideen sind noch offen. Je ein aktives Item
+mit eigenem Symbol (Muster `q_geheim3`: Zähler, `self.achieve`, `ACTIVES[...]['locked']`, Wirkung in `use_active`,
+sigtest-Block am Ende). Mythologie-Ideen: Kami-Segen → „Nusa des Ōharae“ (reinigt Flüche/Gift, kurz Schild),
+Endlose Nacht → „Yatagarasu-Feder“ (dreibeinige Krähe führt: Geschosse folgen kurz dem nächsten Feind).
 
 # Danach
-- bosstest.py: Amaterasu-Assert schlägt mit dem geteilten Test-Spielstand (`/tmp/yokai_test`, nach sigtest/bot) fehl
-  (Phase 2 nach 240 s), mit frischem APPDATA besteht er – Test eigenen leeren Spielstand geben
-- Weitere Quests: 3 Geheimräume in einem Lauf, 50 Kami-Segen gesamt, Endlose Nacht Schleife 3 – je ein aktives Item
-- Balance der Siegel- und Prüfungs-Items mit `tools/synbalance.py` gegenprüfen (Ichi-no-tachi, Ohabari, Miidera, Keppan)
+- Balance der Siegel-, Prüfungs- und Quest-Items mit `tools/synbalance.py` gegenprüfen (Ichi-no-tachi, Ohabari,
+  Miidera, Keppan; Totsuka mit 20 + 4×Schaden auf alle Feinde)
 - Lucas Rückmeldung zur Schwierigkeit weiter beachten (Meister-Startitem macht Läufe leichter – ggf. nur im normalen
   Modus oder dafür Boss-HP leicht anheben)
 - Synergien für die neuen Items (z. B. Fūrin + Biidoro-Splitter mit Yata-Spiegel; Kongō-zue + Senbazuru „Pilgerreise“)
+- Codex: aktive Items im Lauf als „entdeckt“ merken (eigene Liste), falls Spoiler-Schutz gewünscht
 
 # Weitere Ideen
 - Wanddekos: zweite Variante pro Biom (Index 2), Werkzeug walldeco_hi.py steht
