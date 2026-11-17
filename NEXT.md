@@ -198,16 +198,23 @@ für Talismane greifen (z. B. `bullet_tick`) – sollen sie auch für Strahl/Hie
   Bauen: `cd art_src/fable/items && PYTHONPATH=.. python3 costumes.py` (Pillow per `pip install --ignore-installed pillow`).
   Unveränderte PNGs danach zurücksetzen (Encoder schreibt neu). `costume.OWN` = Merkmale, die eine Figur schon trägt.
 
+# Erledigt (Runden 108–109)
+- Runde 108: `costumes.wings(ph, fam, fam2, tip)` – Krähenflügel aus Hand-/Arm-/Schirm- und zwei Reihen Deckfedern
+  (Tengu), weiße Kranichflügel mit dunklen Schwungfeder-Spitzen (`fly_back`); `halo` ist jetzt ein Kaen-Kōhai
+  (Goldreif mit Spiegelpunkten, züngelnde Flammen, unten offen). **Damit sind alle Kostümteile im neuen Stil.**
+  Vorschau im Spiel: Skript mit `g.start_run(ch)`, `p.transforms[:] = [...]`, `g.window` ausschneiden.
+- Runde 109: Shinkirō ab Tiefe 4 zu 35 % mit zwei echten Items (`pd.twin`); nach dem ersten bekommt das zweite
+  `hearts = 1` (zählt nicht als Oni-Handel). uiflow2 prüft das.
+
 # Nächster Schritt: Lucas Rückmeldung zur Schwierigkeit abwarten / Spitze nachziehen
 Warum: Ab Ebene 8 fallen Bosskämpfe im Bot weiter auf ~8 s. Falls Luca es noch zu leicht findet: Boss-HP ab Kapitel V
 anheben (`bosses.py` hpm) oder Feuerrate (`rate`) ebenfalls mit abnehmendem Ertrag. Falls zu schwer: Laden wieder 3 Items.
-Danach: Tengu-Flügel (`wings`) und Kami-Heiligenschein im neuen Stil überarbeiten (die einzigen alten Kostümteile).
+Ohne Rückmeldung: Nutz-Zähler auf dem Endbildschirm („Fuchsgeld brachte 40 Mon“) – kleine Lauf-Statistik, nutzt
+`sigs.nutz_lines(p)` schon fertig.
 
-# Später: Shinkirō-Variante ab Kapitel II
-Ab Tiefe ≥ 4 manchmal (35 %) zwei echte Items, das zweite kostet ein Herz (Preis-System der Pedestals nutzen).
 # Weitere Ideen
+- Ereignisraum Tsukimi: Mondhasen-Mochi gegen Opfergabe (Stil wie `design/ereignisse.md`)
 - Wanddekos: zweite Variante pro Biom (Index 2) für mehr Abwechslung in langen Gängen
 - Spitze (Feuerwerk/Oni-Rausch/Hannya-Zorn ≈ ×4,2) mit `--raum` gegenprüfen, ob sie auch in Räumen dominieren
 - Bogen-Brücke (Hamaya bei Benkei +1,1) nach weiteren Läufen nachmessen
-- Nutz-Zähler auch auf dem Endbildschirm („Fuchsgeld brachte 40 Mon“) als kleine Lauf-Statistik
-- Weitere Ereignisräume aus `design/ereignisse.md`-Stil (z. B. Tsukimi: Mondhasen-Mochi gegen Opfergabe)
+- Tengu-Kappe (Tokin) ist im Spiel sehr klein – ggf. etwas größer zeichnen
