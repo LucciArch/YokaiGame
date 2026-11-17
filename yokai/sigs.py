@@ -127,7 +127,7 @@ TEXT = {
     'tengu_sturm': 'Jeder 6. Wurf entfesselt einen Sturmring um dich',
     'allsehend': 'Markierte Feinde nehmen +30 % Schaden, der Blick lenkt weiter',
     'augen_ueberall': 'Das Handauge trifft markierte Feinde auf jede Entfernung',
-    'mondteich': 'Mondsichel-Talismane lassen Feinde erstarren',
+    'mondteich': 'Mondsichel-Talismane lassen Feinde erstarren und treffen Gebremste 40 % stärker',
     'leben_tod': 'Kills schenken manchmal ½ Geisterherz',
     'suzu': 'Nach der Rolle läuten die Glöckchen (alle 4 s): feindliche Geschosse in der Nähe verlöschen, nahe Feinde fliehen lachend 2 s',
     'iwato': 'Verlöschte Geschosse kehren als Sonnenstrahlen (120 %) zu den Feinden zurück, die Glöckchen läuten schon nach 2,5 s',
@@ -149,7 +149,7 @@ TEXT = {
     'fuchsstern': 'Die Sternkugel schießt drei Sterne',
     'giftnetz': 'Spinnennetze vergiften',
     'papiersturm': 'Jeder 2. Wurf bringt drei Talismane mehr',
-    'mondschnitt': 'Mondsichel-Talismane schneiden tief: Bluten stapelt bis 6',
+    'mondschnitt': 'Mondsichel-Talismane schneiden tief: Bluten stapelt bis 6, dann reißt der nächste Bogen alles auf (300 %)',
     'rattenschwarm': 'Durchbohrende Talismane lassen Ratten auf Feinde los',
     'sonnenspiegel': 'Der Spiegel wirft Geschosse als drei Sonnenstrahlen zurück',
     'goetter_arsenal': 'Jeder Speerstoß schießt auch einen Pfeil Hachimans; Treffsicher wächst doppelt so schnell, bis 35 %',
@@ -607,6 +607,12 @@ def hit_pre(run, e, b, dmg):
             _syn(run, 'allsehend', e.x, e.y, (255, 120, 160))
     if 'ewiger_winter' in S and e.frozen > 0:
         dmg *= 1.5
+    if 'mondteich' in S and b is not None and b.curve and (e.frozen > 0 or e.slowed > 0):
+        dmg *= 1.4   # Mondlicht auf stillem Wasser
+    if 'mondschnitt' in S and b is not None and b.curve and getattr(e, 'sg_bleed', 0) >= 6:
+        e.sg_bleed = 0   # die tiefen Schnitte reißen auf einmal auf
+        dmg *= 3
+        _float(run, e, 'Mondschnitt!', (230, 90, 110))
     if 'gelaechter' in S and getattr(e, 'sg_fear', 0) > 0:
         dmg *= 1.3
     if 'orochi' in S and e.poison > 0:

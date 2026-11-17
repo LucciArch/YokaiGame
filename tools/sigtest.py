@@ -104,5 +104,13 @@ for _ in range(3):
     sigs.on_fire(p, run, [])
 if sum(h.kind == 'strike' and h.owner == 'p' for h in run.hazards) != 1:
     print('FEHLER Sturmfächer-Blitz', len(run.hazards)); bad += 1
+# Mondsichel-Klinge: bei 6 Blutungen reißt der nächste Bogen alles auf (300 %, Runde 93)
+g.start_run('hana', 17); run = g.run; p = run.player
+for iid in ('tsukuyomi', 'kamaitachi_sichel'):
+    p.gain_item(iid, silent=True)
+e = make_boss(run, 'shuten_doji'); run.enemies = [e]; e.sg_bleed = 6
+b = Bullet(e.x, e.y, 0, 0, 1, 2, 1, 'p', (255, 255, 255), {}); b.curve = 1.7
+if sigs.hit_pre(run, e, b, 10) < 29 or e.sg_bleed != 0:
+    print('FEHLER Mondschnitt', e.sg_bleed); bad += 1
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)
