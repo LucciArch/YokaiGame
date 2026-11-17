@@ -272,5 +272,12 @@ run.ebullets[:] = [Bullet(p.x + 20, p.y, -50, 0, 1, 3, 3, 'e', (255, 0, 0), {})]
 nb0 = len(run.pbullets); sigs.on_dash(p, run)
 if run.ebullets or len(run.pbullets) != nb0 + 1:
     print('FEHLER Onusa'); bad += 1
+# Meister-Siegel: alle Siegel einer Figur → Lauf beginnt mit einem ihrer Siegel-Items (Spielstand danach zurücksetzen)
+ach0 = list(g.save['achievements'])
+g.save['achievements'].extend('m_okiku_' + m for m in data.CHAR_UNLOCKS['okiku'])
+g.start_run('okiku', 26)
+if 'meister_okiku' not in g.save['achievements'] or not set(g.run.player.items) & set(data.CHAR_UNLOCKS['okiku'].values()):
+    print('FEHLER Meister'); bad += 1
+g.save['achievements'][:] = ach0; g.save.write()
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)

@@ -721,6 +721,7 @@ for _c, _ms in CHAR_UNLOCKS.items():
     for _m, _n, _d in MARKS:
         if _m in _ms:
             ACHIEVEMENTS.append(('m_%s_%s' % (_c, _m), '%s: %s' % (CHARS[_c]['name'], _n), '%s mit %s' % (_d, CHARS[_c]['name']), ('item', _ms[_m])))
+    ACHIEVEMENTS.append(('meister_' + _c, 'Meister: ' + CHARS[_c]['name'], 'Alle Siegel mit %s – jeder Lauf beginnt mit einem ihrer Siegel-Items' % CHARS[_c]['name'], None))
 
 # Kapitel VII (geheim, nach dem ersten Wahren Sieg): Izanamis Totenpalast tief in Yomi no Kuni
 BIOMES['yomi_oku'] = dict(name='Totenpalast', jp='Yomi no Oku', depth=7, floor=(40, 26, 44), floor_pat='stone',

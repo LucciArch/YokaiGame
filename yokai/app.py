@@ -718,7 +718,8 @@ class Game:
             band = pygame.Surface((182, 14 + 10 * len(mks)), pygame.SRCALPHA)
             band.fill((8, 6, 18, 170))
             s.blit(band, (8, 22))
-            T.add('Siegel %d / %d' % (sum('m_%s_%s' % (cid, mk[0]) in got for mk in mks), len(mks)), 14, 24, 7, (240, 196, 120))
+            T.add('Meister – Start mit Siegel-Item' if 'meister_' + cid in got else
+                  'Siegel %d / %d' % (sum('m_%s_%s' % (cid, mk[0]) in got for mk in mks), len(mks)), 14, 24, 7, (240, 196, 120))
             for k, (m, mn, md) in enumerate(mks):
                 done = 'm_%s_%s' % (cid, m) in got
                 y = 36 + k * 10

@@ -6,7 +6,7 @@ from collections import deque, defaultdict
 from .settings import *
 from . import gfx, props, weapons, audio, sigs, entities
 from .data import (TRINKETS, BIOMES, DEPTH_BIOMES, BOSS_POOL, ITEMS, ITEM_IDS, ACTIVES, ENEMIES, CHAMPIONS, BOSSES,
-                   BOSS_REWARD, CHARS, ACHIEVEMENTS, TRANSFORMS, SYNERGIES, CHAR_ORDER)
+                   BOSS_REWARD, CHARS, ACHIEVEMENTS, TRANSFORMS, SYNERGIES, CHAR_ORDER, CHAR_UNLOCKS)
 from .rooms import generate_floor, build_room_tiles, Room
 from .entities import (Player, Bullet, Enemy, Pickup, Pedestal, Obj, Hazard, Particle, burst, clamp, norm,
                        tile_at, free_tile_pos, ebullet)
@@ -165,6 +165,9 @@ class Run:
             self.player.pose_t = 0.0
             audio.play('pose_' + char_id)
             self.apply_challenge()
+            self.check_meister()                       # auch für Spielstände, die alle Siegel schon vor Runde 117 hatten
+            if not (self.challenge or self.daily) and 'meister_' + char_id in self.save['achievements']:
+                self.player.gain_item(random.choice(list(CHAR_UNLOCKS[char_id].values())), silent=True)   # Meister-Siegel
             if self.relaxed:
                 self.player.maxhp += 2
                 self.player.hp += 2
@@ -2186,6 +2189,12 @@ class Run:
         """Figuren-Siegel (data.MARKS): in Prüfungen gelten eigene Regeln, dort gibt es keine Siegel."""
         if not self.challenge:
             self.achieve('m_%s_%s' % (self.char, m))
+            self.check_meister()
+
+    def check_meister(self):
+        got = self.save['achievements']
+        if all('m_%s_%s' % (self.char, k) in got for k in CHAR_UNLOCKS.get(self.char, {})):
+            self.achieve('meister_' + self.char)
 
     def achieve(self, aid):
         s = self.save
