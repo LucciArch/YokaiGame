@@ -131,7 +131,7 @@ TEXT = {
     'leben_tod': 'Kills schenken manchmal ½ Geisterherz',
     'suzu': 'Nach der Rolle läuten die Glöckchen (alle 4 s): feindliche Geschosse in der Nähe verlöschen, nahe Feinde fliehen lachend 2 s',
     'iwato': 'Verlöschte Geschosse kehren als Sonnenstrahlen (120 %) zu den Feinden zurück, die Glöckchen läuten schon nach 2,5 s',
-    'izanagis_flucht': 'Auch die Rolle wirft Pfirsiche (alle 3 s), Feinde fliehen doppelt so weit und lang',
+    'izanagis_flucht': 'Auch die Rolle wirft Pfirsiche (150 %, alle 3 s), Feinde fliehen doppelt so weit und lang',
     'onmyo_spiegel': 'Der Spiegel wirft jedes 2. Geschoss als Siegel-Explosion zurück',
     'seimei': 'Siegel-Explosion schon nach 3 Treffern, Bann öfter',
     'koi_drache': 'Beschleunigte Talismane werden zu durchbohrenden Drachen',
@@ -175,7 +175,7 @@ TEXT = {
     'sturmfaecher': 'Blitze entfesseln Böen, die Feinde wegschleudern',
     'sturmgott': 'Statik lädt doppelt so schnell, ihr Blitz springt auf drei Feinde',
     'blitzschlag': 'Das Donnerbiest erwacht schon nach 2 Treffern und springt weiter',
-    'orochi': 'Das Grasmäher-Schwert trifft Vergiftete 40 % härter',
+    'orochi': 'Das Grasmäher-Schwert trifft Vergiftete 20 % härter',
     'hannya_zorn': 'Wirst du getroffen, lodert die Hannya: 6 s lang +50 % Schaden und Feuer',
     'oni_tanz': 'Jeder große Schlag schleudert einen Ring aus acht Talismanen',
     'oeyama_bande': 'Wer dich berührt, nimmt doppelten Oni-König-Schaden und taumelt',
@@ -595,7 +595,7 @@ def hit_pre(run, e, b, dmg):
         dmg *= 1.3
     if 'orochi' in S and e.poison > 0:
         _syn(run, 'orochi', e.x, e.y, (150, 235, 110))
-        dmg *= 1.4
+        dmg *= 1.2
     if 'kyudo' in S and b is not None and b.t > 0.45:
         dmg *= 1.6
         _syn(run, 'kyudo', e.x, e.y, (200, 230, 160))
@@ -932,14 +932,14 @@ def ebullet_dt(p, b, dt):
     return dt
 
 
-def _momo(p, run):
+def _momo(p, run, mult=3):
     """Izanagis Pfirsiche: drei Würfe auf die nächsten Feinde, nahe Yokai fliehen."""
     flucht = 'izanagis_flucht' in p.sgs
     st(p)['momo'] = run.time
     foes = sorted((e for e in run.enemies if e.active()), key=lambda e: math.hypot(e.x - p.x, e.y - p.y))
     for k in range(3):
         a = math.atan2(foes[k % len(foes)].y - p.y, foes[k % len(foes)].x - p.x) if foes else k * math.tau / 3
-        b = run.fire_player_bullet(p.x, p.y - 3, a + (k - 1) * 0.12, p.damage() * 3, 170, 4, 1.4, {'pierce': 1})
+        b = run.fire_player_bullet(p.x, p.y - 3, a + (k - 1) * 0.12, p.damage() * mult, 170, 4, 1.4, {'pierce': 1})
         b.col = (255, 170, 140)
     reach = 140 if flucht else 90
     for e in foes:
@@ -957,7 +957,7 @@ def on_dash(p, run):
         _suzu(p, run)
     if 'izanagis_flucht' in S and run.time - g.get('momo', -9) >= 3.0:
         _syn(run, 'izanagis_flucht', p.x, p.y, (255, 170, 140))
-        _momo(p, run)
+        _momo(p, run, 1.5)
     if 'tarnung' in S:
         g['invis'] = 2.6 if 'hara_tsuzumi' in S else 1.3
     if 'hara_tsuzumi' in S:

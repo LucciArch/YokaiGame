@@ -367,7 +367,7 @@ SYNERGIES = [
     dict(id='onmyo_spiegel', name='Onmyō-Spiegel', desc='Pentagramm im Spiegel', items=['seimei_stern', 'yata_kagami'], fx=dict(familiar=1, sig_onmyo_spiegel=1)),
     dict(id='feuerkind', name='Kind des Feuers', desc='Ölschale und Feuerrad', items=['abura_schale', 'kasha_rad'], fx=dict(spd=10, sig_feuerkind=1)),
     dict(id='strassenkatze', name='Herrenlose Katze', desc='Ein Rōnin und eine Katze', items=['ronin_schwur', 'neko_gloeckchen'], fx=dict(dash_dmg=1, sig_strassenkatze=1)),
-    dict(id='orochi_kusanagi', name='Aus dem Schwanz der Orochi', desc='Susanoo fand das Schwert in der Schlange', items=['kusanagi', 'yamata_zahn'], fx=dict(dmgm=1.1, sig_orochi=1)),
+    dict(id='orochi_kusanagi', name='Aus dem Schwanz der Orochi', desc='Susanoo fand das Schwert in der Schlange', items=['kusanagi', 'yamata_zahn'], fx=dict(sig_orochi=1)),
     dict(id='leben_tod', name='Leben und Tod', desc='Izanamis Erbe vereint', items=['izanami_kamm', 'izanami_schleier'], fx=dict(dmgm=1.2, sig_leben_tod=1)),
     dict(id='goetter_arsenal', name='Göttliches Arsenal', desc='Speer und Bogen der Kami', items=['ame_nuboko', 'hachiman_bogen'], fx=dict(crit=0.1, sig_goetter_arsenal=1)),
     dict(id='hanami_picknick', name='Hanami-Picknick', desc='Unter Kirschblüten schmeckt alles besser', items=['onigiri', 'bento', 'umeboshi'], fx=dict(hp=1, clear_heal=0.2, sig_hanami_picknick=1)),
