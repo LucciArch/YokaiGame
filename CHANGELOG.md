@@ -101,6 +101,7 @@
 - Runde 77 – **Strahl mit Ratten und Wasser:** Der Lichtstrahl durchbohrt von Natur aus und weckt deshalb Tessos Schwarm – höchstens eine Ratte pro Strahl. Prallt der Strahl mit einem Abprall-Item an der Wand ab, spritzt das Kappa-Festmahl bremsendes Wasser und Tsunami teilt die Spiegelung in zwei Wellen-Talismane
 - Runde 78 – **Feuerwerk mit Waffen:** Zerplatzt ein Schwerthieb, Sensen-, Speer-, Keulenschlag oder Lichtstrahl mit Sprengsiegel an einem angeschlagenen Feind, sprüht „Feuerwerk über Edo“ jetzt fünf brennende Funken wie bei Talismanen
 - Runde 79 – **Balance Waffen:** Seiten- und Rückhiebe (z. B. mit Kunai) treffen einen großen Feind direkt neben dir nicht mehr doppelt oder dreifach im selben Angriff – Shinobi mit Schwert besiegte Shuten-dōji in 30 s statt rund 60 s. Neues Messwerkzeug `synbalance.py --waffe=…`, Bericht unter `design/balance/balance-check-79-waffen-builds.md`
+- Runde 80 – **Morgenröte:** Wer Amaterasu aus der Himmelsfelsenhöhle zurückgeholt hat, sieht das Titelbild im Morgenlicht – warme Röte über dem Horizont, ein langsam kreisender Strahlenkranz um die Sonne, goldene und rosa Blüten, und die Seelenflammen weichen bis auf eine
 
 ## 1.4.0 – „Hyakki-Update“ (enthält 1.3 „Kapitel-Update“)
 
