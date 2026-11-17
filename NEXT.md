@@ -57,15 +57,21 @@ für Talismane greifen (z. B. `bullet_tick`) – sollen sie auch für Strahl/Hie
 - Runde 74: `Run.LAMP_ITEMS` – Laternen-/Feuer-Items vergrößern und färben das Spielerinnen-Licht.
   Achtung: `ITEMS[i]['icon']` ist meist die Item-ID (eigene Symbole), nicht 'lantern'/'flame'.
 
-# Nächster Schritt: Item-Synergien – Hit-Sigs, die Geschoss-Eigenschaften lesen, bei Waffen
-Warum: Lucas Dauerwunsch „alle Items funktionieren miteinander“. Offen: `mondschnitt` liest `b.curve` (bei Hieben nie
-gesetzt – Sichel-Hiebe könnten als „gebogen“ zählen), `kyudo` liest `b.t > 0.45` (Strahl nie – ferne Strahltreffer
-könnten zählen), `wurfstern` erzeugt bei jedem Hieb-Treffer einen Abpraller (prüfen, ob zu stark gegen Gruppen).
-Ein Test pro Fund in `tools/waffentest.py`.
+# Erledigt (Runden 75–76)
+- Runde 75: `weapons._hit` gibt immer ein Träger-Geschoss (auch ohne Flags) mit `t` (Strahl: along/shotspd → Kyūdō) und
+  `curve` (Hieb mit sig `sichel` → Mondsichel-Klinge). Wurfstern: höchstens ein Abpraller pro Hieb/Strahl (`_ric=9` nach dem
+  ersten Treffer, gilt auch für Kammzinken-/Spiegel-Nebenstrahlen).
+- Runde 76: `Run.LAMP_ACTIVES` (Kitsune-Laterne, Onryō-Kerze) und `LAMP_TRINKETS` (Feuer-Anhänger) zählen fürs Spielerinnen-Licht.
+
+# Nächster Schritt: Item-Synergien – restliche Hit-/Ende-Sigs bei Waffen
+Warum: Lucas Dauerwunsch „alle Items funktionieren miteinander“. Offen in `sigs.hit_post`: `rattenschwarm` liest
+`b.fl.get('pierce')` – der Strahl durchbohrt von Natur aus, sollte er Ratten auslösen (dann gedeckelt, 1 pro Strahl)?
+Dazu `bullet_end`/`bullet_bounce` (Abprall-/Ende-Sigs wie Kappa-Festmahl, Brandung): soll die Strahl-Spiegelung
+an der Wand sie auslösen? Je ein Test in `tools/waffentest.py`, vorher prüfen, dass er auf altem Code fehlschlägt.
 
 # Weitere Ideen
+- Amaterasu-Bossmusik (`art_src/music/`) und Titelbild-Stimmung nach dem Iwato-Sieg (wie 'yomi' in `app.py`)
 - Wanddekos Yashiki/Kawabe/Ōeyama/Shinkai/Enma-chō/Tsukiyomi in Hi-Res überarbeiten (`wall_decos`)
-- Amaterasu-Bossmusik und Titelbild-Stimmung nach dem Iwato-Sieg
 - Mondpalast-Ambiente: fallende Katsura-Blätter, Mondhase als seltener Ereignis-NPC (Mochi-Tausch)
 - Shinkirō als Ereignis: eine Hamaguri spiegelt einen Trugladen vor
-- Kitsune-Laterne (Anhänger) und Onryō-Kerze ebenfalls als Lichtquelle (`LAMP_ITEMS` gilt nur für Items)
+- Balance-Nachmessung (`tools/synbalance.py`) für Waffen-Builds nach den Runden 65–75
