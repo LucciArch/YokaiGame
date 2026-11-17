@@ -82,12 +82,17 @@ def head_anchor(player, frame_idx):
     return base[0] + dx, base[1] + dy
 
 
+# Figuren, die das Merkmal schon selbst tragen (Kuzunohas Fuchsschwänze, Kotarōs Flügel …), bekommen es nicht doppelt
+OWN = {('kuzunoha', 'kitsune_back'), ('kuzunoha', 'kitsune_head'), ('ponpoko', 'tanuki_back'), ('ponpoko', 'tanuki_head'),
+       ('okiku', 'yurei_head'), ('kotaro', 'tengu_back')}
+
+
 def parts_for(player):
     out = []
     for t in player.transforms:
         for suf in ('back', 'head'):
             nm = '%s_%s' % (t, suf)
-            if nm in META:
+            if nm in META and (player.char, nm) not in OWN:
                 out.append(nm)
     if player.f['fly'] and 'tengu' not in player.transforms and 'yurei' not in player.transforms and player.char not in ('okiku', 'kotaro'):
         out.append('fly_back')
