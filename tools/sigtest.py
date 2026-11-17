@@ -272,6 +272,38 @@ run.ebullets[:] = [Bullet(p.x + 20, p.y, -50, 0, 1, 3, 3, 'e', (255, 0, 0), {})]
 nb0 = len(run.pbullets); sigs.on_dash(p, run)
 if run.ebullets or len(run.pbullets) != nb0 + 1:
     print('FEHLER Onusa'); bad += 1
+# Prüfungs-Belohnungen: Fūrin, Keppan, Mii-dera, Nademono, Kongō-zue, Hayate
+g.start_run('hana', 27); run = g.run; p = run.player
+for iid in ('fuurin', 'keppan', 'miidera_kane', 'nademono', 'kongozue', 'hayate_waraji'):
+    p.gain_item(iid, silent=True)
+p.hp = 6; p.spirit = 0; m0 = sigs.dmg_mult(p); p.hp = 2
+if abs(sigs.dmg_mult(p) / m0 - 1.25) > 0.01:
+    print('FEHLER Fuurin Glas'); bad += 1
+p.hp = 6; nb0 = len(run.pbullets); sigs.on_hurt(p, run)
+if len(run.pbullets) != nb0 + 8:
+    print('FEHLER Fuurin Splitter'); bad += 1
+m0 = sigs.dmg_mult(p); sigs.st(p)['pakt'] = 2
+if abs(sigs.dmg_mult(p) / m0 - 1.16) > 0.01:
+    print('FEHLER Keppan'); bad += 1
+e = make_boss(run, 'shuten_doji'); e.spawn_t = 0; e.invuln = False; run.enemies = [e]
+b = Bullet(100, 100, 50, 0, 10, 3, 1, 'p', (255, 255, 255), {})
+hs = []
+for _ in range(10):
+    h0 = e.hp; sigs.hit_post(run, e, b, 1); hs.append(h0 - e.hp)
+if not (hs[9] > 0 and hs[:9] == [0] * 9 and e.slowed > 0):
+    print('FEHLER Mii-dera', hs); bad += 1
+p.iframes = 0; eb = Bullet(p.x, p.y, 0, 0, 1, 3, 1, 'e', (255, 0, 0), {})
+if not sigs.block(p, run, eb) or sigs.block(p, run, eb):
+    print('FEHLER Nademono'); bad += 1
+p.hp = 2; sigs.on_floor(run)
+if p.hp != 3:
+    print('FEHLER Kongozue'); bad += 1
+run.room.cleared = False; run.room_enter_time = run.time
+if not sigs.rate_mult(p) > 1.29:
+    print('FEHLER Hayate'); bad += 1
+rw = {a[0]: a[3] for a in data.ACHIEVEMENTS}
+if any(not rw['ch_' + c['id']] or rw['ch_' + c['id']][0] != 'item' for c in data.CHALLENGES):
+    print('FEHLER Prüfung ohne Item-Belohnung'); bad += 1
 # Meister-Siegel: alle Siegel einer Figur → Lauf beginnt mit einem ihrer Siegel-Items (Spielstand danach zurücksetzen)
 ach0 = list(g.save['achievements'])
 g.save['achievements'].extend('m_okiku_' + m for m in data.CHAR_UNLOCKS['okiku'])

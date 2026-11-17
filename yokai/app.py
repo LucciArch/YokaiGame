@@ -658,6 +658,9 @@ class Game:
             if c['id'] in done:
                 star(s, W - 44, y + 11, (255, 220, 100))
             T.add(CHARS[c['char']]['name'], W - 54, y + 7, 7, (180, 170, 160), 'r')
+        rw = next((a[3] for a in ACHIEVEMENTS if a[0] == 'ch_' + CHALLENGES[self.ch_sel]['id']), None)
+        if rw and rw[0] == 'item':
+            T.add('Belohnung: ' + ITEMS[rw[1]]['name'], W // 2, 278, 7, (240, 210, 140), 'c')
         T.add('Enter – Starten     Esc – Zurück', W // 2, 287, 6, (150, 140, 140), 'c')
         for n in nav:
             if n == 'up': self.ch_sel = (self.ch_sel - 1) % len(CHALLENGES); audio.play('move')

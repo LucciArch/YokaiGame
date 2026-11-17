@@ -323,6 +323,16 @@ I('ushiwaka_fue', 'Ushiwakas Flöte', 'Auf der Gojō-Brücke spielte der junge Y
 I('seimei_ido', 'Seimei-Brunnen', 'Die Quelle, die Seimei mit dem Glockenblumen-Stern öffnete', 'seimei_ido', (140, 120, 220), 'T', ['shikigami'], 3, True, luck=1, sig_seimei_ido=1)
 I('kodomo_kanabo', 'Kinder-Kanabō', 'Klein, aber aus echtem Oni-Eisen', 'kodomo_kanabo', (90, 90, 105), 'T', ['oni'], 3, True, dmg=0.3, sig_kodomo_kanabo=1)
 I('ohabari', 'Ama-no-Ōhabari', 'Das Götterschwert, mit dem Izanagi den Feuergott erschlug', 'ohabari', (255, 240, 150), 'T', ['raijin'], 3, True, dmg=0.2, sig_ohabari=1)
+# Prüfungs-Belohnungen (je Herausforderung ein Item)
+I('fuurin', 'Biidoro-Fūrin', 'Ein gläsernes Windspiel – schön, solange es nicht zerspringt', 'fuurin', (150, 220, 240), 'T', [], 3, True, dmg=0.3, sig_fuurin=1)
+I('abura_age', 'Abura-age', 'Frittierter Tofu – die Lieblingsspeise der Inari-Füchse', 'abura_age', (230, 170, 80), 'T', ['kitsune'], 3, True, luck=1, sig_abura_age=1)
+I('tsukikage', 'Tsukikage', 'Eine Klinge, die nur im Mondschatten zu sehen ist', 'tsukikage', (150, 160, 220), 'T', [], 3, True, dmg=0.2, sig_tsukikage=1)
+I('hayate_waraji', 'Hayate-Waraji', 'Strohsandalen, schnell wie der Sturmwind', 'hayate_waraji', (210, 190, 120), 'T', ['tengu'], 3, True, spd=8, sig_hayate=1)
+I('senryo_bako', 'Senryō-bako', 'Eine Truhe für tausend Goldstücke', 'senryo_bako', (220, 180, 80), 'T', ['tanuki'], 3, True, coins=10, sig_senryo=1)
+I('keppan', 'Keppan', 'Ein Pakt, mit dem eigenen Blut gesiegelt', 'keppan', (200, 50, 50), 'T', ['oni'], 3, True, dmg=0.2, sig_keppan=1)
+I('miidera_kane', 'Glocke von Mii-dera', 'Benkei schleppte sie allein den Berg Hiei hinauf', 'miidera_kane', (120, 150, 110), 'T', [], 3, True, hp=1, sig_miidera=1)
+I('nademono', 'Nademono', 'Eine Papierpuppe, die das Unheil an deiner Stelle trägt', 'nademono', (240, 240, 230), 'T', ['shikigami'], 3, True, spirit=1, sig_nademono=1)
+I('kongozue', 'Kongō-zue', 'Der Stab des Pilgers – Dōgyō ninin, nie allein unterwegs', 'kongozue', (200, 170, 120), 'T', [], 3, True, hp=1, sig_kongozue=1)
 
 ITEM_IDS = ORDER
 
@@ -690,15 +700,15 @@ ACHIEVEMENTS = [
     ('loop1', 'Noch eine Runde', 'Erreiche Schleife 2 in der Endlosen Nacht', None),
     ('library', 'Bücherwurm', 'Besuche ein Schriftrollenarchiv', None),
     ('dojo', 'Meister des Dōjō', 'Besiege die Champions im Dōjō', None),
-    ('ch_glaskanone', 'Prüfung: Glaskanone', 'Bestehe die Prüfung „Glaskanone“', None),
-    ('ch_fuchspfad', 'Prüfung: Der Pfad des Fuchses', 'Bestehe die Prüfung „Der Pfad des Fuchses“', None),
-    ('ch_dunkle_nacht', 'Prüfung: Die dunkelste Nacht', 'Bestehe die Prüfung „Die dunkelste Nacht“', None),
-    ('ch_zeitlauf', 'Prüfung: Wettlauf gegen den Morgen', 'Bestehe die Prüfung „Wettlauf gegen den Morgen“', None),
-    ('ch_kaufmann', 'Prüfung: Der reiche Kaufmann', 'Bestehe die Prüfung „Der reiche Kaufmann“', None),
-    ('ch_oni_pakt', 'Prüfung: Pakt mit dem Teufel', 'Bestehe die Prüfung „Pakt mit dem Teufel“', None),
-    ('ch_bossrush', 'Prüfung: Boss-Ansturm', 'Bestehe die Prüfung „Boss-Ansturm“', None),
-    ('ch_papiermeister', 'Prüfung: Papiermeister', 'Bestehe die Prüfung „Papiermeister“', None),
-    ('ch_langer_weg', 'Prüfung: Der lange Weg', 'Bestehe die Prüfung „Der lange Weg“', None),
+    ('ch_glaskanone', 'Prüfung: Glaskanone', 'Bestehe die Prüfung „Glaskanone“', ('item', 'fuurin')),
+    ('ch_fuchspfad', 'Prüfung: Der Pfad des Fuchses', 'Bestehe die Prüfung „Der Pfad des Fuchses“', ('item', 'abura_age')),
+    ('ch_dunkle_nacht', 'Prüfung: Die dunkelste Nacht', 'Bestehe die Prüfung „Die dunkelste Nacht“', ('item', 'tsukikage')),
+    ('ch_zeitlauf', 'Prüfung: Wettlauf gegen den Morgen', 'Bestehe die Prüfung „Wettlauf gegen den Morgen“', ('item', 'hayate_waraji')),
+    ('ch_kaufmann', 'Prüfung: Der reiche Kaufmann', 'Bestehe die Prüfung „Der reiche Kaufmann“', ('item', 'senryo_bako')),
+    ('ch_oni_pakt', 'Prüfung: Pakt mit dem Teufel', 'Bestehe die Prüfung „Pakt mit dem Teufel“', ('item', 'keppan')),
+    ('ch_bossrush', 'Prüfung: Boss-Ansturm', 'Bestehe die Prüfung „Boss-Ansturm“', ('item', 'miidera_kane')),
+    ('ch_papiermeister', 'Prüfung: Papiermeister', 'Bestehe die Prüfung „Papiermeister“', ('item', 'nademono')),
+    ('ch_langer_weg', 'Prüfung: Der lange Weg', 'Bestehe die Prüfung „Der lange Weg“', ('item', 'kongozue')),
     ('foxfire', 'Kitsunebi-Fänger', 'Fange ein Fuchsfeuer im Inari-Schrein', None),
     ('quirks_all', 'Wanderer der Welten', 'Erlebe die Eigenheiten aller Biome', None),
     ('synergy25', 'Meister der Harmonie', 'Entdecke 25 verschiedene Synergien', None),

@@ -110,6 +110,10 @@ class Run:
         self.time = 0.0
         self.result = None
         self.char = char_id
+        for aid in self.save['achievements']:       # Belohnungen, die erst nach dem Erfolg dazukamen (z. B. Prüfungs-Items)
+            rw = ACH[aid][3] if aid in ACH else None
+            if rw and rw[0] == 'item':
+                self.save.add_to('items', rw[1])
         unlocked = set(self.save['items'])
         self.pool = [i for i in ITEM_IDS if (not ITEMS[i]['locked'] or i in unlocked)]
         self.active_pool = list(ACTIVES.keys())
@@ -1872,6 +1876,7 @@ class Run:
                 pd.hearts = 0
                 if pd.group != 'shinkiro':
                     self.save.stat('oni_deals')
+                    sg = sigs.st(p); sg['pakt'] = sg.get('pakt', 0) + 1   # Keppan zählt Pakte im Lauf
                     if self.save['stats']['oni_deals'] >= 3:
                         self.achieve('akago')
                 for o in self.pedestals:

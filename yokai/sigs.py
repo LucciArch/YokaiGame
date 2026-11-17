@@ -256,6 +256,16 @@ TEXT = {
     'seimei_ido': 'Raum ohne Treffer geräumt: 25 % Chance auf ein Geisterherz',
     'kodomo_kanabo': 'Jeder 8. Treffer ist ein Keulenschlag: 200 % im Umkreis, schleudert Yokai weg',
     'ohabari': 'Treffer: 12 % Chance, dass ein Blitz auf bis zu 3 weitere Feinde springt (80 %)',
+    # Prüfungs-Belohnungen
+    'fuurin': 'Wirst du getroffen, zerspringt das Glas: 8 Splitter (je 120 %); bei nur 1 Herz +25 % Schaden',
+    'abura_age': 'Jeder 12. Kill: ein Inari-Fuchs bringt Abura-age – ½ Herz, bei vollen Herzen 2 Mon',
+    'tsukikage': 'Jeder 6. Wurf ist eine Mondschatten-Klinge: fliegt durch Wände, durchbohrt (150 %)',
+    'hayate': 'Die ersten 8 s in jedem Kampfraum: +30 % Feuerrate',
+    'senryo': 'Erster Laden jeder Ebene: 5 Mon Zinsen je 20 Mon im Beutel (höchstens 15)',
+    'keppan': 'Jeder Oni-Pakt in diesem Lauf: +8 % Schaden (höchstens +40 %)',
+    'miidera': 'Jeder 10. Treffer auf einen Boss läutet die Glocke: 250 % Zusatzschaden, Boss 1 s gebremst',
+    'nademono': 'Alle 20 s fängt die Papierpuppe ein Feindgeschoss ab, das dich treffen würde',
+    'kongozue': 'Jede neue Ebene: ½ Herz; jede 3. Ebene bringt ein Geisterherz',
 }
 
 BULLET_SIGS = ('sichel', 'kammzinken', 'seidenfaden', 'stromauf', 'gross', 'schweben', 'windstoss', 'koi_drache')
@@ -704,6 +714,9 @@ def _siegel_fire(p, run, bullets, g, n, base, dmg, spd, life, size):
     if 'oni_tsuno' in S and p.total_hp() < 4:
         for b in bullets:
             b.fl = dict(b.fl, pierce=1)
+    if 'tsukikage' in S and n % 6 == 0:                  # Mondschatten-Klinge
+        nb = run.fire_player_bullet(p.x, p.y - 3, base, dmg * 1.5, spd * 1.1, 3, life * 1.3, {'pierce': 1, 'spectral': 1})
+        nb.col = (150, 160, 220)
     if 'fue' in S and n % 6 == 0 and bullets:           # Ushiwakas Flötenton
         bullets[0].fl = dict(bullets[0].fl, fue=1)
         bullets[0].col = (150, 210, 130)
@@ -834,6 +847,13 @@ def hit_post(run, e, b, dmg):
         run.damage_enemy(e, dmg * 3, None)
     if 'ohabari' in S and b is not None and not echo and random.random() < 0.12:
         _chain_strikes(run, e, 3, p.damage() * 0.8)
+    if 'miidera' in S and e.is_boss and b is not None and not echo:
+        e.sg_kane = getattr(e, 'sg_kane', 0) + 1
+        if e.sg_kane % 10 == 0:                          # Benkeis Tempelglocke
+            _ring(run, e.x, e.y, (120, 150, 110), 50)
+            _float(run, e, 'Gong!', (170, 200, 150))
+            e.slowed = max(e.slowed, 1.0)
+            run.damage_enemy(e, p.damage() * 2.5, None)
     if 'kodomo_kanabo' in S and b is not None and not echo:
         g['kk'] = g.get('kk', 0) + 1
         if g['kk'] % 8 == 0:                             # Keulenschlag
@@ -989,6 +1009,13 @@ def on_kill(run, e):
         if g['bd'] % 15 == 0:
             p.heal(1)
             _float(run, e, 'Blut', (220, 60, 70))
+    if 'abura_age' in S:
+        g['age'] = g.get('age', 0) + 1
+        if g['age'] % 12 == 0:                           # der Inari-Fuchs bringt Tofu
+            _float(run, e, 'Abura-age', (230, 170, 80))
+            if not p.heal(1):
+                for _ in range(2):
+                    run.spawn_pickup('coin', e.x, e.y)
     if 'hoshi_tama' in S and random.random() < 0.10 + 0.02 * p.s['luck']:
         _float(run, e, 'Hoshi no Tama', (255, 210, 150))
         for k in range(8):                               # Fuchsfeuer-Ring
@@ -1106,6 +1133,11 @@ def on_hurt(p, run):
         p.iframes = max(p.iframes, 3.0)
         _ring(run, p.x, p.y, (210, 200, 180), 50)
         run.banner('Tachi-ōjō', 'Aufrecht bis zum letzten Atemzug', (220, 210, 190))
+    if 'fuurin' in S:                                    # das Glaswindspiel zerspringt
+        seen = set()
+        for k in range(8):
+            nb = run.fire_player_bullet(p.x, p.y, k * math.tau / 8, p.damage() * 1.2, 220, 2.5, 0.6, {'pierce': 1})
+            nb.hit = seen; nb.col = (170, 230, 250)
     if 'gojo' in S:                                      # Benkeis Naginata fegt um ihn
         _blast(run, p.x, p.y, 55, p.damage() * 3, (200, 170, 90), 380)
     g['ts'] = 0
@@ -1180,6 +1212,10 @@ def block(p, run, b):
     if not S or p.iframes > 0:
         return False
     g = st(p)
+    if 'nademono' in S and run.time >= g.get('nade_t', 0):
+        g['nade_t'] = run.time + 20                      # die Papierpuppe trägt das Unheil
+        run.floats.append([p.x, p.y - 20, 'Nademono', (240, 240, 230), 0.8])
+        return True
     if 'rauch' in S:
         for c in g.get('clouds', ()):
             if (b.x - c[0]) ** 2 + (b.y - c[1]) ** 2 < 20 ** 2:
@@ -1436,6 +1472,13 @@ def on_room_enter(run):
     g['ojo_room'] = 0
     g['trug'] = None
     g['ichi'] = g['jizo'] = not run.room.cleared
+    fl = [run.depth, run.stage]
+    if 'senryo' in S and run.room.kind == 'shop' and g.get('senryo') != fl:
+        g['senryo'] = fl                                 # Zinsen der Senryō-Truhe
+        n = min(15, 5 * (p.coins // 20))
+        if n:
+            p.coins = min(99, p.coins + n)
+            run.floats.append([p.x, p.y - 20, '+%d Mon Zinsen' % n, (240, 200, 90), 1.0])
     if 'chochin' in S and not run.room.cleared and any(not e.dead for e in run.enemies):
         n = min(10, 4 + int(p.s['luck']) // 2)          # Fuchsfeuer der Laterne
         for k in range(n):
@@ -1499,6 +1542,11 @@ def on_floor(run):
     g['gokaku'] = 0
     if 'neujahr' in S:
         p.heal(2)
+    if 'kongozue' in S:                                  # Pilgerstab: jede Ebene ein Stück Weg
+        p.heal(1)
+        g['kz'] = g.get('kz', 0) + 1
+        if g['kz'] % 3 == 0:
+            run.spawn_pickup('spirit', p.x, p.y - 20)
     p.recalc()
 
 
@@ -1928,6 +1976,10 @@ def dmg_mult(p):
         m *= 1.3
     if 'reikon' in S:
         m *= 1 + 0.12 * min(4, p.spirit)
+    if 'fuurin' in S and p.total_hp() <= 2:
+        m *= 1.25
+    if 'keppan' in S:
+        m *= 1 + 0.08 * min(5, g.get('pakt', 0))
     if 'gokaku' in S:
         m *= 1 + 0.1 * g.get('gokaku', 0)
     if 'maskenwechsel' in S and g.get('rooms', 0) % 2 == 0:
@@ -1946,6 +1998,8 @@ def rate_mult(p):
     if 'blutdurst' in S and p.run.time < g.get('bd_t', 0):
         m *= 1.3
     if 'tokkuri' in S and p.run.time < g.get('sake_t', 0):
+        m *= 1.3
+    if 'hayate' in S and not p.run.room.cleared and p.run.time - getattr(p.run, 'room_enter_time', -99) < 8:
         m *= 1.3
     if 'maskenwechsel' in S and g.get('rooms', 0) % 2 == 1:
         m *= 1.35

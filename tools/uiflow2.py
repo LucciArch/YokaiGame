@@ -37,6 +37,9 @@ try:
     g.save.data.setdefault('events_seen', []).append('omikuji'); g.save['kuji_seen'][:] = ['kichi', 'kyo']
     g.state = 'lexicon'; g.lex_tab = 2; g.lex_sel = list(g.LEX_EVENTS).index('omikuji'); step([], 2)   # Lose-Zeile zeichnen
     g.save.data['events_seen'].remove('omikuji'); g.save['kuji_seen'][:] = []; g.state = 'title'
+    g.ch_sel = 0; gfx.TEXT.clear(); g.st_challenges(1 / 60, [], [])   # Prüfungen nennen ihre Item-Belohnung
+    assert any(t[0] == 'Belohnung: Biidoro-Fūrin' for t in gfx.TEXT.items), 'Prüfung zeigt Belohnung nicht'
+    g.state = 'title'
     g.save['seen'].remove(jiid)
     menu(0); print('chars', g.state)
     from yokai.data import CHAR_ORDER
