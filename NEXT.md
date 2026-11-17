@@ -134,17 +134,28 @@ für Talismane greifen (z. B. `bullet_tick`) – sollen sie auch für Strahl/Hie
 - Messhinweis: Raum-Test mit 2 Zufalls-Items braucht schon 164 s → Zwei-Item-Synergien stoßen oft an die 180-s-Grenze.
   Ganzer `--raum`-Lauf dauert > 10 min, `--leben` nur 40 s.
 
-# Nächster Schritt: Figuren-Waffe gegen Item-Waffe
-Warum: Nimmt eine Figur mit eigener Waffe (Kenji Schwert, Benkei Speer, Kotaro Fächer, Susanoo Schwert, Akago Keule)
-ein Waffen-Item auf, gewinnt die erste Waffe in `weapons.ORDER` – die Figur verliert ihren Kern (z. B. Kotaro +
-Amaterasu). Vorschlag: Figuren-Waffe hat Vorrang (`weapon_of` prüft zuerst `CHARS[char]['fx']`), das Item gibt dann
-eine kleine Brücke (Laser → Hieb verschießt Lichtstrahl-Funken, Bogen → Pfeil pro Hieb wie beim Arsenal).
-Erst mit `tools/synbalance.py` bzw. einem kurzen Probe-Skript prüfen, welche Paare heute verlieren.
+# Erledigt (Runden 95–96)
+- Runde 95: Figuren-Waffe hat Vorrang (`weapons._own`, `weapon_of`). Ein Waffen-Item wird per `weapons.bridge_of(p)` zum
+  Zusatzangriff in `weapons.fire`: Laser → dünner Strahl 0,7×, Bogen → ein Pfeil 1,2×, Fächer → drei Windstöße 0,45×,
+  Nahkampf-Item an Kotarōs Fächer → Klingenwelle 0,7×. Göttliches Arsenal schießt bei Benkei keinen zweiten Pfeil.
+  waffentest prüft Kotarō+Amaterasu, Kenji+Yumi, Akago+Tengu-Fächer, Benkei+Arsenal. Balance der Brücken nicht gemessen.
+- Fächer-Messung (`--leben`, Shuten-dōji): Talisman 10,4 %, Fächer 4,4 %, Schwert 4,5 % → der Fächer ist nicht
+  eigens schwach, nur der allgemeine Nahkampf-Nachteil des Bots. Idee damit erledigt.
+- Runde 96: Eigene Hi-Res-Wanddekos Chikurin (Taketori-Bambus mit Kaguya + neues Licht `('chikurin', 0)`, Ishidōrō),
+  Inari (Torii vor Senbon-Torii-Gang, Steinfuchs mit Schlüssel), Obakedera (Ofuda, Yūrei-ga). Helfer `_niche`.
+  Vorschau-Trick: Wand-Basis per `walls.wall_set(n)['h']` + `walldeco_hi.wall_decos_hi` mit PIL zusammensetzen.
+  Ohne eigene Zeichnung bleiben: hakaba, kurama, yukiyama, ryugu, uminobe, yomi, takamagahara.
+
+# Nächster Schritt: Synergien am unteren Ende
+Warum: Spielerinnen, die eine Synergie finden, sollen sich belohnt fühlen – vier liegen im Bosskampf unter einem
+Zufalls-Build: grosse_welle ×0,85, tsukumogami ×0,89, hundert_augen ×0,89, tengu_flug ×0,90 (`--leben`). Erst mit
+`python3 tools/synbalance.py shuten_doji 5 grosse_welle,tsukumogami,hundert_augen,tengu_flug --leben` nachmessen
+(Runde 95 hat Waffen geändert), dann je eine Signatur-Verstärkung, die zur Sage passt. Geteilte Trefferliste beachten.
 
 # Weitere Ideen
-- Synergien unten weiter: grosse_welle ×0,85, tsukumogami ×0,89, hundert_augen ×0,89, tengu_flug ×0,90 (`--leben`)
-- Spitze erneut prüfen: feuerwerk/oni_rausch/hannya_zorn ×4,2 – wieder gestiegen seit Runde 87/88?
-- Fächer als Waffe allgemein schwach im Bosskampf (Basis 4,4 % gegen 10,4 % Talisman) – Fächer-Reichweite prüfen
-- Eigene Hi-Res-Wanddekos für die übrigen 10 Biome (chikurin, inari, obakedera, hakaba, kurama, yukiyama, ryugu,
-  uminobe, yomi, takamagahara), je Runde drei
+- Hi-Res-Wanddekos Teil 2: hakaba (Sotoba, Jizō mit Kerze), kurama (Shimenawa, Tengu-Maske), yukiyama (Eiszapfen,
+  Eishöhle mit Augen) – Vorlage `chikurin_hi` usw. in `walldeco_hi.py`, Lichter in `gfx.WALL_LIGHT` beachten
+- Brücken-Balance aus Runde 95 messen (z. B. `synbalance` mit Figur statt 'hana' – braucht einen `--figur=`-Schalter)
+- Spitze erneut prüfen: feuerwerk/oni_rausch/hannya_zorn – wieder gestiegen seit Runde 87/88?
 - Shinkirō als Ereignis: eine Hamaguri spiegelt einen Trugladen vor
+- Figurenbeschreibung im Auswahlmenü: Hinweis, dass Waffen-Items zum Zusatzangriff werden
