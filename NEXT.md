@@ -124,17 +124,27 @@ für Talismane greifen (z. B. `bullet_tick`) – sollen sie auch für Strahl/Hie
 - Runde 92: Sturmfächer – jeder 3. Angriff ein Blitz; Großer Wind – weggewehte Geschosse als Windklinge zurück (`_tf`).
 - Berichte `balance-check-90/91/92`. sigtest prüft Arsenal-Pfeil und Sturmfächer-Blitz.
 
-# Nächster Schritt: Waffen-Verdrängung bei Synergien prüfen
-Warum: Das Arsenal zeigte eine Falle – zwei Items mit verschiedenen Waffen (`w_*`), nur die erste in `weapons.ORDER`
-zählt, das zweite Item verliert seinen Kern. Alle Synergien durchgehen, deren Items zusammen zwei Waffenarten geben
-(auch über `data.py` Zeile ~692, wo Items Waffen-Flags bekommen), und je eine Brücke bauen wie beim Arsenal.
-Danach `synbalance.py shuten_doji 5 --leben` und das untere Ende (Faktor < 0,7) gegen die passende Waffen-Basis prüfen.
+# Erledigt (Runden 93–94): unteres Ende der Kampf-Synergien
+- Waffen-Verdrängung geprüft: nur das Göttliche Arsenal kombiniert zwei Waffen-Items (seit 91 gelöst). Achtung bleibt bei
+  Figuren mit Waffe (Kotaro-Fächer + Amaterasu-Laser → Laser verdrängt Fächer) – das ist allgemein, nicht synergiebezogen.
+- Runde 93: Mondsichel-Klinge – bei 6 Blutungen reißt der nächste Bogen alles auf (300 %, ×0,87 → ×1,45);
+  Mondschein-Teich – Bogen-Talismane +40 % gegen Gebremste (×0,73 → ×1,04). Bushi gegen Schwert-Basis ×1,63: ok.
+- Runde 94: Mokumokuren – Auge ab Radius 4,5, +40 % (×0,72 → ×0,97); Kappa-Festmahl – Abpraller +50 % und bremsend
+  (Boss unverändert ×0,72, weil kaum Abpraller; Sustain-Synergie).
+- Messhinweis: Raum-Test mit 2 Zufalls-Items braucht schon 164 s → Zwei-Item-Synergien stoßen oft an die 180-s-Grenze.
+  Ganzer `--raum`-Lauf dauert > 10 min, `--leben` nur 40 s.
+
+# Nächster Schritt: Figuren-Waffe gegen Item-Waffe
+Warum: Nimmt eine Figur mit eigener Waffe (Kenji Schwert, Benkei Speer, Kotaro Fächer, Susanoo Schwert, Akago Keule)
+ein Waffen-Item auf, gewinnt die erste Waffe in `weapons.ORDER` – die Figur verliert ihren Kern (z. B. Kotaro +
+Amaterasu). Vorschlag: Figuren-Waffe hat Vorrang (`weapon_of` prüft zuerst `CHARS[char]['fx']`), das Item gibt dann
+eine kleine Brücke (Laser → Hieb verschießt Lichtstrahl-Funken, Bogen → Pfeil pro Hieb wie beim Arsenal).
+Erst mit `tools/synbalance.py` bzw. einem kurzen Probe-Skript prüfen, welche Paare heute verlieren.
 
 # Weitere Ideen
-- Synergien am unteren Ende weiter aufwerten (aktuell u. a. mondschein_teich, kappa_fest, mokumokuren ~×0,72)
+- Synergien unten weiter: grosse_welle ×0,85, tsukumogami ×0,89, hundert_augen ×0,89, tengu_flug ×0,90 (`--leben`)
+- Spitze erneut prüfen: feuerwerk/oni_rausch/hannya_zorn ×4,2 – wieder gestiegen seit Runde 87/88?
 - Fächer als Waffe allgemein schwach im Bosskampf (Basis 4,4 % gegen 10,4 % Talisman) – Fächer-Reichweite prüfen
 - Eigene Hi-Res-Wanddekos für die übrigen 10 Biome (chikurin, inari, obakedera, hakaba, kurama, yukiyama, ryugu,
   uminobe, yomi, takamagahara), je Runde drei
-- Mondpalast-Ambiente: fallende Katsura-Blätter, Mondhase als seltener Ereignis-NPC (Mochi-Tausch)
 - Shinkirō als Ereignis: eine Hamaguri spiegelt einen Trugladen vor
-- „Fast komplett“-Synergien auch im Codex: Item-Seite markiert Items, die eine getragene Synergie vervollständigen
