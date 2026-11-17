@@ -22,7 +22,7 @@ class Boss(Enemy):
         self.name = info['name']
         self.title = info['title']
         self.x, self.y = x, y
-        hpm = (1.3 if run.hard else 1.0) * (1 + 0.3 * (run.tier - 1) + 0.07 * (run.tier - 1) ** 2) * run.loop_mult
+        hpm = (1.3 if run.hard else 1.0) * (1 + 0.3 * (run.tier - 1) + 0.07 * (run.tier - 1) ** 2) * run.loop_mult * run.boss_mult
         self.maxhp = self.hp = info['hp'] * hpm
         self.speed = 60
         self.fly = True

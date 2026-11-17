@@ -138,6 +138,7 @@ class Run:
         self.boss_hit = False
         self.bullet_speed_mult = 1.12 if hard else 1.0
         self.loop_mult = 1.0
+        self.boss_mult = 1.0             # Meister-Läufe: Bosse zäher (Runde 131)
         self.kills = 0
         self.rooms_cleared = 0
         self.coins_got = 0
@@ -172,6 +173,7 @@ class Run:
             self.check_meister()                       # auch für Spielstände, die alle Siegel schon vor Runde 117 hatten
             if not (self.challenge or self.daily) and 'meister_' + char_id in self.save['achievements']:
                 self.player.gain_item(random.choice(list(CHAR_UNLOCKS[char_id].values())), silent=True)   # Meister-Siegel
+                self.boss_mult = 1.15                  # Startitem macht Kapitel II–III ~25 % kürzer (Runde 131)
             if self.relaxed:
                 self.player.maxhp += 2
                 self.player.hp += 2
@@ -181,7 +183,7 @@ class Run:
         self.new_floor()
 
     # ---------------------------------------------------------------- Lauf speichern / fortsetzen
-    RUN_KEYS = ('relaxed', 'depth', 'stage', 'floor_no', 'loop', 'loop_mult', 'time', 'kills', 'rooms_cleared', 'coins_got',
+    RUN_KEYS = ('relaxed', 'depth', 'stage', 'floor_no', 'loop', 'loop_mult', 'boss_mult', 'time', 'kills', 'rooms_cleared', 'coins_got',
                 'pool', 'active_pool', '_prev_biome', '_prev_boss', 'oku')
     PLAYER_SKIP = {'run', 'x', 'y', 'iframes', 'dash_t', 'dash_cd', 'dash_dir', 'dash_hit', 'dash_trail', 'shoot_cd',
                    'facing', 'flip', 'moving', 'anim', 'familiars', 'orb_angle', 'orb_hit_cd', 'aura_cd', 'knock',

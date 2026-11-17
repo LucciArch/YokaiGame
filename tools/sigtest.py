@@ -317,7 +317,7 @@ if any(not rw['ch_' + c['id']] or rw['ch_' + c['id']][0] != 'item' for c in data
 ach0 = list(g.save['achievements'])
 g.save['achievements'].extend('m_okiku_' + m for m in data.CHAR_UNLOCKS['okiku'])
 g.start_run('okiku', 26)
-if 'meister_okiku' not in g.save['achievements'] or not set(g.run.player.items) & set(data.CHAR_UNLOCKS['okiku'].values()):
+if 'meister_okiku' not in g.save['achievements'] or not set(g.run.player.items) & set(data.CHAR_UNLOCKS['okiku'].values()) or g.run.boss_mult != 1.15:
     print('FEHLER Meister'); bad += 1
 g.save['achievements'][:] = ach0; g.save.write()
 # Quests: aktive Belohnungen sind gesperrt, bis der Erfolg da ist; beide Aktiv-Wirkungen greifen
