@@ -102,6 +102,7 @@
 - Runde 78 – **Feuerwerk mit Waffen:** Zerplatzt ein Schwerthieb, Sensen-, Speer-, Keulenschlag oder Lichtstrahl mit Sprengsiegel an einem angeschlagenen Feind, sprüht „Feuerwerk über Edo“ jetzt fünf brennende Funken wie bei Talismanen
 - Runde 79 – **Balance Waffen:** Seiten- und Rückhiebe (z. B. mit Kunai) treffen einen großen Feind direkt neben dir nicht mehr doppelt oder dreifach im selben Angriff – Shinobi mit Schwert besiegte Shuten-dōji in 30 s statt rund 60 s. Neues Messwerkzeug `synbalance.py --waffe=…`, Bericht unter `design/balance/balance-check-79-waffen-builds.md`
 - Runde 80 – **Morgenröte:** Wer Amaterasu aus der Himmelsfelsenhöhle zurückgeholt hat, sieht das Titelbild im Morgenlicht – warme Röte über dem Horizont, ein langsam kreisender Strahlenkranz um die Sonne, goldene und rosa Blüten, und die Seelenflammen weichen bis auf eine
+- Runde 81 – **Eigene Musik für Amaterasu:** Die Endbossin von Ama-no-Iwato kämpft nicht mehr zur geteilten Bossmusik, sondern zu „Iwato Kagura“ – erst dunkle Höhle mit Tempelglocke und Hyōshigi, dann Kagura mit Taiko, Shamisen, Kagura-Flöte und Uzumes Suzu-Glöckchen, ein Taiko-Wirbel, wenn der Fels sich bewegt, und schließlich der Sonnenaufgang in heller Yo-Tonleiter mit Shō, Koto und Glocken
 
 ## 1.4.0 – „Hyakki-Update“ (enthält 1.3 „Kapitel-Update“)
 

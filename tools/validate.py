@@ -43,5 +43,9 @@ for k in ('brautschleier', 'zashiki_temari'):
     if data.ITEMS[k]['pools'] != ['Y']: print('event item not exclusive', k); bad += 1
 for a in data.ACHIEVEMENTS:
     if sum(1 for b in data.ACHIEVEMENTS if b[0] == a[0]) > 1: print('ach dup', a[0]); bad += 1
+from yokai.audio import Audio, MUSIC_DIR
+for k, b in data.BIOMES.items():   # Bossmusik wie Run.boss_music (Tiefe = Biom-Tiefe)
+    tr = Audio.track_for(('x', 0, 0, 'boss', b['music'][4] + 100 + b.get('depth', 1)))
+    if not _os.path.exists(_os.path.join(MUSIC_DIR, tr + '.ogg')) or (tr == 'amaterasu') != (k == 'iwato'): print('boss music', k, tr); bad += 1
 print('items',len(data.ITEMS),'syn',len(data.SYNERGIES),'templates',len(rooms.TEMPLATES),'bad',bad)
 sys.exit(1 if bad else 0)

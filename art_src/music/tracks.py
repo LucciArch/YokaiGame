@@ -6,7 +6,8 @@ import os
 import sys
 import time
 
-from score import Song
+from score import Song, SCALES
+import synth as Y
 
 OUT = os.path.join(os.path.dirname(__file__), '..', '..', 'yokai', 'assets', 'music')
 
@@ -264,6 +265,60 @@ def boss_final():
     return s
 
 
+# ============================================================ Endbossin: Ama-no-Iwato (Kagura bis zum Morgen)
+def _suzu(s, bar, e8=0.0, vel=0.35, n=5):
+    """Kagura-Suzu: ein Bündel kleiner Glöckchen, kurz geschüttelt."""
+    for i in range(n):
+        f = s.rng.uniform(2300, 3400)
+        s.mix.add(Y.kane(f, vel * s.rng.uniform(0.6, 1.0), 0.7), s.t(bar, e8) + i * 0.035 + s.rng.uniform(0, 0.012),
+                  0.35, s.rng.uniform(0.1, 0.6), 0.45)
+
+
+def amaterasu():
+    s = Song(126, 50, 'in', 36, seed=1201)
+    # Fels vor der Höhle: Dunkel, Glocke, Uzumes erste Glöckchen
+    s.bonsho(0, vel=0.9)
+    s.windfx(0, 4, 0.16, 380)
+    s.sho([0, 1, 3], 0, 4, octv=0, vel=0.38)
+    for b in range(0, 4):
+        s.drums("h.......h...h...", b, steps_per_beat=4, vel=0.8)
+        _suzu(s, b, 4, vel=0.22 + b * 0.05)
+    # Kagura im Dunkeln: Taiko, Shamisen, Kagura-Bue
+    g1 = "O.s.S.k.O.s.S.kk"
+    g2 = "O.kOS.kSO.OkSSSS"
+    riff = "0,/1 2,/1 1/1 2,/1 0,/1 4,,/1 1/1 0/1"
+    for b in range(4, 16):
+        s.drums(g1 if b % 4 != 3 else g2, b, steps_per_beat=4, vel=0.85)
+        s.shamisen(riff, b, vel=0.62, pan=-0.3)
+        _suzu(s, b, 0, vel=0.3); _suzu(s, b, 4, vel=0.22, n=3)
+    s.drone(0, 4, 12, octv=-1, vel=0.3, cutoff=600)
+    s.wind("4!/3 3/1 2/2 3/2 | 4/8 | 2!/2 3/2 4/2 5/2 | 4-3/8 | 1!/3 2/1 3/4 | 2/4 1/4 | 0/2 1/2 2/2 1/2 | 0/8", 4, 'fue', octv=1, vel=0.78, pan=0.2)
+    s.wind("5!/4 4/4 | 3/8 | 4/2 3/2 2/4 | 1-0/8", 12, 'fue', octv=1, vel=0.8, pan=0.2)
+    # Der Fels bewegt sich: Taiko-Wirbel, Glöckchen werden dichter
+    for b in range(16, 20):
+        s.drums("O.......O.......|" if b < 18 else "O...O...O.O.OOOO", b, steps_per_beat=4, vel=0.95)
+        for k in range(0, 8, 2 if b < 18 else 1):
+            _suzu(s, b, k, vel=0.18 + (b - 16) * 0.06, n=3)
+    s.wind("3/16 | 4/8 5-6/8", 16, 'shaku', octv=1, vel=0.75)
+    # Morgen: die Sonne tritt hervor – helle Yo-Skala, Shō, Koto und Glocken
+    s.scale = SCALES['yo']
+    s.bonsho(20, vel=0.8)
+    s.sho([0, 2, 4, 6], 20, 8, octv=0, vel=0.42)
+    s.sho([1, 3, 5, 7], 28, 8, octv=0, vel=0.4)
+    riff2 = "0,/1 2,/1 4,/1 2,/1 3,/1 2,/1 1,/1 2,/1"
+    for b in range(20, 36):
+        s.drums(g2 if b % 2 else g1, b, steps_per_beat=4, vel=0.9)
+        s.shamisen(riff2, b, vel=0.66, pan=-0.3)
+        _suzu(s, b, 0, vel=0.32)
+        if b % 2 == 0:
+            s.bell(4, b, 0, octv=2, vel=0.22, pan=0.4)
+    s.arp([0, 0, 3, 3, 1, 1, 0, 0] * 2, 20, pattern=(0, 2, 4, 7, 4, 2, 4, 2), octv=0, vel=0.32, per_bar=8, pan=0.35)
+    s.drone(0, 20, 16, octv=-1, vel=0.3, cutoff=900)
+    s.wind(THEME, 20, 'fue', octv=2, vel=0.78, pan=0.2)
+    s.wind("7!/4 8/4 | 9/8 | 8/2 7/2 5/4 | 7/8 | 5!/4 4/4 | 3/4 4/4 | 2/2 3/2 2/2 1/2 | 0/8", 28, 'fue', octv=1, vel=0.8, pan=0.25)
+    return s
+
+
 # ============================================================ Spielende: Shi no Kane
 def gameover():
     s = Song(60, 57, 'hira', 10, seed=1001)
@@ -313,7 +368,7 @@ def matsuri():
 
 
 TRACKS = {'title': title, 'forest': forest, 'temple': temple, 'mountain': mountain, 'sea': sea,
-          'underworld': underworld, 'heaven': heaven, 'boss': boss, 'boss_final': boss_final,
+          'underworld': underworld, 'heaven': heaven, 'boss': boss, 'boss_final': boss_final, 'amaterasu': amaterasu,
           'gameover': gameover, 'victory': victory, 'matsuri': matsuri}
 
 if __name__ == '__main__':
