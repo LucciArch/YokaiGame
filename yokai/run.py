@@ -6,7 +6,7 @@ from collections import deque, defaultdict
 from .settings import *
 from . import gfx, props, weapons, audio, sigs, entities
 from .data import (TRINKETS, BIOMES, DEPTH_BIOMES, BOSS_POOL, ITEMS, ITEM_IDS, ACTIVES, ENEMIES, CHAMPIONS, BOSSES,
-                   BOSS_REWARD, CHARS, ACHIEVEMENTS, TRANSFORMS, SYNERGIES, CHAR_ORDER, CHAR_UNLOCKS)
+                   BOSS_REWARD, CHARS, ACHIEVEMENTS, TRANSFORMS, SYNERGIES, CHAR_ORDER, CHAR_UNLOCKS, CHALLENGES)
 from .rooms import generate_floor, build_room_tiles, Room
 from .entities import (Player, Bullet, Enemy, Pickup, Pedestal, Obj, Hazard, Particle, burst, clamp, norm,
                        tile_at, free_tile_pos, ebullet)
@@ -1453,6 +1453,27 @@ class Run:
                 if e.active():
                     e.slowed = max(e.slowed, 5)
             audio.play('blank', 0.6)
+        elif a == 'matsuri_uchiwa':
+            tg = [e for e in self.enemies if e.active()]
+            random.shuffle(tg)
+            for k in range(5):
+                x, y = (tg[k].x, tg[k].y) if k < len(tg) else (p.x + random.uniform(-90, 90), p.y + random.uniform(-70, 70))
+                col = ((255, 120, 80), (255, 220, 110), (150, 200, 255), (255, 150, 220), (170, 255, 170))[k]
+                sigs._blast(self, x, y, 34, 8 + dmg * 2, col, 120)
+                burst(self, x, y, col, 18, 110, 0.7, 2)
+                for e in tg:
+                    if math.hypot(e.x - x, e.y - y) < 34 + e.r:
+                        e.burn = 3.0
+                        e.burn_dps = max(e.burn_dps, max(1.0, dmg * 0.5))
+            audio.play('boom', 0.5)
+        elif a == 'totsuka':
+            for e in list(self.enemies):
+                if e.active():
+                    self.damage_enemy(e, 20 + dmg * 4, None)
+                    self.slashes.append(dict(kind='w_sword', x=e.x, y=e.y, ang=random.uniform(0, math.tau), r=26, arc=1.6, t=0.0, life=0.2, col=(230, 240, 255)))
+            self.flash_white = 0.2
+            self.shake(6)
+            audio.play('slash')
 
     def use_salt(self):
         p = self.player
@@ -2209,6 +2230,11 @@ class Run:
             seen.append(kind)
         if all(k in seen for k in self.EVENT_KINDS):
             self.achieve('feste')
+        here = sigs.st(self.player).setdefault('feste_lauf', [])   # Liste: p.sg wird als JSON gespeichert
+        if kind not in here:
+            here.append(kind)
+        if len(here) >= 4:
+            self.achieve('q_feste4')
 
     def mark(self, m):
         """Figuren-Siegel (data.MARKS): in Prüfungen gelten eigene Regeln, dort gibt es keine Siegel."""
@@ -2220,6 +2246,8 @@ class Run:
         got = self.save['achievements']
         if all('m_%s_%s' % (self.char, k) in got for k in CHAR_UNLOCKS.get(self.char, {})):
             self.achieve('meister_' + self.char)
+        if all('ch_' + c['id'] in got for c in CHALLENGES):     # auch rückwirkend beim Laufstart
+            self.achieve('q_pruefungen')
 
     def achieve(self, aid):
         s = self.save
@@ -2307,6 +2335,7 @@ class Run:
         s = self.save
         if win and self.challenge:
             self.achieve('ch_' + self.challenge)
+            self.check_meister()
             s.add_to('challenges_done', self.challenge)
         if win:
             s.stat('wins')

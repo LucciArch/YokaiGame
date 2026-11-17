@@ -490,6 +490,8 @@ ACTIVES = {
     # Quest-Belohnungen (gesperrt bis zum Erfolg, siehe ACHIEVEMENTS 'q_*')
     'mondkine': dict(name='Kine des Mondhasen', desc='Ein Mörserschlag betäubt alles in der Nähe', icon='hammer', col=(235, 235, 255), charge=3, locked=True),
     'shiomitsu_tama': dict(name='Shiomitsu-Tama', desc='Ryūjins Flutjuwel spült alle Geschosse fort', icon='orb', col=(90, 170, 255), charge=4, locked=True),
+    'matsuri_uchiwa': dict(name='Matsuri-Uchiwa', desc='Hanabi! Feuerwerk zerplatzt über den Feinden', icon='fan', col=(255, 140, 90), charge=3, locked=True),
+    'totsuka': dict(name='Totsuka no Tsurugi', desc='Die Klinge, die Orochi zerteilte, trifft jeden Feind', icon='sword', col=(220, 230, 250), charge=5, locked=True),
 }
 
 # =====================================================================  CHARAKTERE
@@ -720,6 +722,8 @@ ACHIEVEMENTS = [
     ('synergy25', 'Meister der Harmonie', 'Entdecke 25 verschiedene Synergien', None),
     ('q_mochi', 'Gehilfe des Mondhasen', 'Gelinge dreimal beim Mochitsuki (mindestens 5 Teige gewendet)', ('active', 'mondkine')),
     ('q_nohit5', 'Unberührbar', 'Besiege insgesamt 5 Bosse ohne Treffer', ('active', 'shiomitsu_tama')),
+    ('q_feste4', 'Festnacht', 'Erlebe vier verschiedene Ereignisräume in einem Lauf', ('active', 'matsuri_uchiwa')),
+    ('q_pruefungen', 'Alle Prüfungen', 'Bestehe alle zehn Prüfungen', ('active', 'totsuka')),
 ]
 
 

@@ -39,7 +39,50 @@ def shiomitsu_tama():
     return c
 
 
-NAMES = ['mondkine', 'shiomitsu_tama']
+def matsuri_uchiwa():
+    """Matsuri-Uchiwa: runder Festfächer aus Papier mit rotem Mitsudomoe, Bambusgriff, dahinter zerplatzt ein Hanabi."""
+    c = Cv()
+    for k in range(12):                                                # Feuerwerk hinter dem Fächer
+        a = k / 12 * math.tau
+        x, y = 22 + math.cos(a) * 8, 9 + math.sin(a) * 7
+        c.line([(22 + math.cos(a) * 4, 9 + math.sin(a) * 3.5), (x, y)], 'y' if k % 2 else '9', 1)
+        c.a[int(round(y)), int(round(x))] = 'Y' if k % 2 else 'W'
+    c.form(L(10, 29, 1.4, 14, 19, 1.4), 'cCs', 0, 1, ring='K')         # Bambusgriff
+    c.a[25, 11] = 'C'
+    fan = E(14, 13, 9.5, 9)
+    c.form(fan, 'nvW', 1, 1, ring='K')
+    for k in range(-3, 4):                                             # Rippen
+        c.line([(14, 21), (14 + k * 3, 6)], 'v', 1, only=fan & ~E(14, 13, 5, 5))
+    for k in range(3):                                                 # Mitsudomoe
+        a = k / 3 * math.tau - 0.5
+        x, y = 14 + math.cos(a) * 2.2, 13 + math.sin(a) * 2.2
+        c.fill(E(x, y, 1.9, 1.9), 'R')
+        c.fill(E(14 + math.cos(a + 0.9) * 3.6, 13 + math.sin(a + 0.9) * 3.6, 1.1, 1.1), 'R')
+    c.fill(E(14, 13, 0.7, 0.7), 'q')
+    c.line([(6, 9), (9, 5)], 'W', 1, only=fan)                          # Glanz
+    return c
+
+
+def totsuka():
+    """Totsuka no Tsurugi: gerades Ken mit Doppelschneide aufrecht, am Klingenansatz eine Kerbe (Kusanagi steckte in Orochis Schwanz), Schuppen-Splitter."""
+    c = Cv()
+    bl = PG([(16, 1), (19, 5), (19, 20), (13, 20), (13, 5)])           # Klinge
+    c.form(bl, '123', 0, 1, ring='K')
+    c.line([(16, 3), (16, 19)], 'W', 1)                                 # Grat
+    c.fill(R(14, 6, 15, 19) & bl, '3')
+    c.a[12, 18] = 'K'; c.a[13, 18] = 'K'                                # Scharte
+    c.form(R(9, 20, 23, 22), 'ogy', 0, 1, ring='K')                     # Stichblatt
+    c.form(R(14, 23, 18, 28), 'khH', 0, 1, ring='K')                    # Griff
+    for y in (24, 26):
+        c.line([(15, y), (17, y)], 'o', 1)
+    c.form(E(16, 29.5, 2.4, 1.4), 'ogy', 0, 1, ring='K')                # Knauf
+    for x, y in ((5, 8), (26, 11), (7, 16), (25, 4)):                  # Orochi-Schuppen
+        c.form(PG([(x, y), (x + 2, y - 2), (x + 4, y), (x + 2, y + 2)]), 'FfG', 0, 1, ring='K')
+    sparkle(c, 21, 3, 'W', 'A')
+    return c
+
+
+NAMES = ['mondkine', 'shiomitsu_tama', 'matsuri_uchiwa', 'totsuka']
 
 
 def build():
