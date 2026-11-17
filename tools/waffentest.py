@@ -197,5 +197,19 @@ p.hp = p.maxhp = 6; p.iframes = 0; p.hurt(1)
 for _ in range(30):
     r.update_bullets(1 / 60)
 check(0 < 999 - e.hp <= p.damage() * 1.5 + 0.01, 'Hannya-Ring trifft einen großen Feind mehrfach (%.1f)' % (999 - e.hp))
+# Figuren-Waffe hat Vorrang vor Waffen-Items; das Item wird zum Zusatzangriff
+from yokai import weapons
+for ch, item, ok in (('kotaro', 'amaterasu', lambda r: any(s['kind'] == 'w_laser' for s in r.slashes) and any(getattr(b, 'wind', 0) for b in r.pbullets)),
+                     ('kenji', 'yumi', lambda r: any(s['kind'] == 'w_sword' for s in r.slashes) and sum(getattr(b, 'arrow', 0) for b in r.pbullets) == 1),
+                     ('akago', 'tengu_faecher', lambda r: any(s['kind'] == 'w_club' for s in r.slashes) and sum(getattr(b, 'wind', 0) for b in r.pbullets) == 3),
+                     ('benkei', 'hachiman_bogen', lambda r: sum(getattr(b, 'arrow', 0) for b in r.pbullets) == 1)):
+    g.start_run(ch, 5)
+    r = g.run; p = r.player
+    r.enemies = []; r.pbullets = []; r.slashes = []
+    p.gain_item(item, silent=True)
+    if ch == 'benkei':
+        p.gain_item('ame_nuboko', silent=True)              # Göttliches Arsenal: nur ein Pfeil, nicht zwei
+    p.fire((1, 0))
+    check(weapons.weapon_of(p) == weapons._own(p) and ok(r), '%s + %s: Figuren-Waffe/Zusatzangriff fehlt (%s)' % (ch, item, weapons.weapon_of(p)))
 print('Waffen-Synergien geprüft, Fehler:', bad)
 sys.exit(1 if bad else 0)

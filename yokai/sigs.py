@@ -314,7 +314,7 @@ def on_fire(p, run, bullets):
                 b.fl = dict(b.fl); b.fl['slow'] = 1; b.fl['_frost'] = 1
     if 'goetter_arsenal' in S:
         from . import weapons
-        if weapons.weapon_of(p) == 'w_spear':   # Hachimans Bogen geht sonst im Speer unter
+        if weapons.weapon_of(p) == 'w_spear' and weapons.bridge_of(p) != 'w_bow':   # Bogen geht sonst im Speer unter (Benkei: Brücke schießt schon)
             fl = dict(weapons.shot_flags(p), pierce=1)
             a = run.fire_player_bullet(p.x, p.y - 4, base, dmg * 1.6, spd * 1.7, max(2, size * 0.8), life * 1.4 / 1.7, fl)
             a.arrow = True

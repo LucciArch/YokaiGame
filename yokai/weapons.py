@@ -13,11 +13,27 @@ NAMES = {'w_laser': 'Lichtstrahl', 'w_scythe': 'Sensenwirbel', 'w_sword': 'Schwe
          'w_club': 'Keulenschlag', 'w_bow': 'Pfeile', 'w_fan': 'Windfächer'}
 
 
+def _own(p):
+    """Waffe der Figur (Kenji, Benkei, Kotarō, Susanoo, Akago) – sie hat Vorrang vor Waffen-Items."""
+    from .data import CHARS
+    fx = CHARS[p.char]['fx'] if getattr(p, 'char', None) in CHARS else {}
+    return next((k for k in ORDER if fx.get(k)), None)
+
+
 def weapon_of(p):
+    own = _own(p)
+    if own:
+        return own
     for k in ORDER:
         if p.f[k]:
             return k
     return None
+
+
+def bridge_of(p):
+    """Waffen-Item, das die Figuren-Waffe verdrängen würde: wirkt stattdessen als kleiner Zusatzangriff."""
+    own = _own(p)
+    return next((k for k in ORDER if k != own and p.f[k]), None) if own else None
 
 
 FLAGS = ('homing', 'pierce', 'bounce', 'spectral', 'explode', 'burn', 'slow', 'poison', 'chain', 'split',
@@ -304,6 +320,22 @@ def fire(p, d, wk):
                     b.col = (190, 240, 210)
                 made.append(b)
         audio.play('gust', 0.5)
+    side = bridge_of(p)
+    if side == 'w_laser':                                   # dünner Lichtstrahl zum Hieb/Fächer
+        beam(run, x, y, base, dmg * 0.7, 2, col if fl else (255, 236, 150), fl)
+    elif side == 'w_bow':                                   # ein Pfeil pro Angriff
+        b = run.fire_player_bullet(x, y, base, dmg * 1.2, p.s['shotspd'] * 1.7, max(2, p.s['size'] * 0.8),
+                                   p.s['range'] * 1.4 / (p.s['shotspd'] * 1.7), dict(fl, pierce=1))
+        b.arrow = True
+        made.append(b)
+    elif side == 'w_fan':                                   # drei Windstöße mit Rückstoß
+        for i in (-1, 0, 1):
+            b = run.fire_player_bullet(x, y, base + i * 0.22, dmg * 0.45, p.s['shotspd'] * 1.1, p.s['size'] * 1.2,
+                                       0.42, dict(fl, pierce=1, knock=max(2, fl.get('knock', 0))))
+            b.wind = True
+            made.append(b)
+    elif side:                                              # Nahkampf-Item an Kotarōs Fächer: Klingenwelle
+        wave(base, 0.7)
     for b in made:
         b.big, b.gold = big, gold
         if gold:
