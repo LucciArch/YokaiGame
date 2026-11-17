@@ -942,3 +942,127 @@ def uminobe_hi(name, base):
 
 
 HI['uminobe'] = uminobe_hi
+
+
+# ---- Yomi: Chibiki-iwa versperrt Yomotsu-Hirasaka (Shimenawa, Shikome-Augen im Spalt) / Ikazuchi auf Izanamis Gebeinen
+def _shide(cv, x, y):
+    for k, dx in enumerate((0, 1, 0, 1, 0)):                      # Zickzack-Papierstreifen
+        hr(cv, x + dx, y + k * 2, x + dx + 1, y + k * 2 + 1, '#e8e4d8' if k % 2 else '#c8c0b0')
+    hp(cv, x + 2, y + 9, '#8a8478')
+
+
+def yomi_hi(name, base):
+    st = ('#1a1622', '#3a3440', '#5a5260', '#80788a', '#a8a0b0')
+    a, b = base.copy(), base.copy()
+    Y, X = _g(a)
+    cave = hpoly(a, [(8, 29), (10, 12), (16, 7), (32, 5), (48, 7), (54, 12), (56, 29)])
+    hfill(a, edge(cave), '#2a2430')
+    hfill(a, cave, '#05040a')
+    for (x, y) in ((14, 13), (17, 12)):                           # Yomotsu-shikome lauert im Spalt
+        hp(a, x, y, '#e02a2a'); hp(a, x + 1, y, '#ff6a50')
+    rock = he(a, 33, 20, 19, 10) & (Y <= 29)
+    hfill(a, edge(rock), K)
+    hfill(a, rock, st[3])
+    hfill(a, rock & he(a, 37, 24, 18, 8), st[2])                  # Schattenseite unten rechts
+    hfill(a, rock & he(a, 27, 15, 11, 4.5), st[4])
+    hfill(a, rock & he(a, 24, 14, 5, 2), st[4])
+    hln(a, [(40, 12), (43, 17), (41, 22), (45, 27)], st[0])        # Risse
+    hln(a, [(22, 22), (26, 26)], st[0])
+    for (x, y) in ((16, 26), (19, 27), (50, 25), (47, 28)):       # Flechten
+        hp(a, x, y, '#4a5a3a')
+    rope = lambda x: int(round(15 + 3 * math.sin(math.pi * (x - 14) / 38)))
+    for x in range(14, 53):                                       # gedrehtes Seil
+        y = rope(x)
+        hp(a, x, y - 2, K); hp(a, x, y + 2, K)
+        for d in (-1, 0, 1):
+            hp(a, x, y + d, STRAW[3] if (x + d) % 4 < 2 else STRAW[1])
+    for x in (21, 33, 45):
+        _shide(a, x, rope(x) + 3)
+    # B: Nische, unten Izanamis Gebeine; darauf hockt ein Ikazuchi, Blitze knistern um ihn
+    _niche(b, 14, 50, 6)
+    for x in range(16, 49, 3):                                    # Rippen
+        hln(b, [(x, 29), (x + 2, 24)], BONE[2]); hp(b, x + 2, 24, BONE[3])
+    hfill(b, he(b, 20, 26, 3.5, 2.6), BONE[3]); hp(b, 19, 26, K); hp(b, 21, 26, K)   # Schädel
+    for (x, y) in ((27, 27), (38, 28), (44, 26)):                 # Maden
+        hp(b, x, y, '#d8d0b8')
+    body = hpoly(b, [(26, 25), (27, 17), (31, 13), (36, 13), (40, 17), (41, 25), (37, 23), (33, 25), (30, 23)])
+    head = he(b, 33.5, 11, 4.5, 4)
+    arm = hpoly(b, [(39, 17), (46, 14), (47, 16), (40, 20)]) | hpoly(b, [(28, 17), (22, 20), (22, 22), (29, 20)])
+    m = body | head | arm
+    hfill(b, edge(m), '#3a2a50')
+    hfill(b, m, '#1e1428')
+    hfill(b, m & (X < 31), '#2c1e3a')
+    for (x0, x1) in ((29, 27), (38, 40)):                         # Hörner
+        hln(b, [(x0, 9), (x1, 5)], BONE[3])
+    hp(b, 31, 11, '#ffe24a'); hp(b, 32, 11, '#ffe24a'); hp(b, 35, 11, '#ffe24a'); hp(b, 36, 11, '#ffe24a')
+    hr(b, 31, 13, 36, 14, K); hp(b, 32, 14, BONE[3]); hp(b, 35, 14, BONE[3])   # Maul mit Fängen
+    hfill(b, edge(m) & np.roll(m, 1, 1) & ~np.roll(m, -1, 1) | (edge(m) & np.roll(m, -1, 0) & (Y < 20)), '#7a5ab0')   # Blitzschein am Rand
+    for f in (0, 2):                                              # Krallen
+        hp(b, 47 + f // 2, 13 + f, BONE[3]); hp(b, 21, 21 + f // 2, BONE[3])
+    for pts in (((47, 12), (51, 8), (49, 7), (53, 3)), ((22, 19), (18, 15), (20, 14), (16, 9)),
+                ((36, 7), (39, 4), (37, 3), (40, 0))):            # Blitze
+        hln(b, list(pts), '#fff6a0')
+        hln(b, [(x + 1, y) for (x, y) in pts], '#b89a2a')
+    return [a, b]
+
+
+HI['yomi'] = yomi_hi
+
+
+# ---- Takamagahara: Wolkenpalast mit goldenem Chigi und leuchtendem Tor / Ame-no-Ukihashi mit der Juwelenhellebarde
+def _cloud(cv, cx, cy, w):
+    m = np.zeros(cv.a.shape[:2], bool)
+    for i in range(-w, w + 1, 3):
+        m |= he(cv, cx + i, cy - (2 if i % 2 else 0) + abs(i) // 4, 3.2, 2.6)
+    hfill(cv, edge(m), '#6c70a2')
+    hfill(cv, m, '#d8dcec')
+    hfill(cv, m & ~np.roll(m, 2, 0), '#a4acc8')
+    return m
+
+
+def takamagahara_hi(name, base):
+    a, b = base.copy(), base.copy()
+    Y, X = _g(a)
+    hall = (X >= 18) & (X <= 46) & (Y >= 14) & (Y <= 25)          # weiße Halle mit Pfosten
+    hfill(a, edge(hall), K)
+    hfill(a, hall, WHITE[3])
+    for x in (18, 25, 39, 46):
+        hfill(a, hall & (X >= x) & (X <= x + 1), '#b89060')
+    door = (X >= 29) & (X <= 35) & (Y >= 15) & (Y <= 25)          # Licht bei (32, 16)
+    hfill(a, door, SUN[2]); hfill(a, door & (X >= 31) & (X <= 33), SUN[3])
+    roof = hpoly(a, [(14, 15), (24, 7), (40, 7), (50, 15)])
+    hfill(a, edge(roof), K)
+    hfill(a, roof, '#3a3048')
+    hfill(a, roof & (Y >= 13), '#5a4a62')
+    hln(a, [(14, 15), (50, 15)], GOLD[3])
+    hr(a, 23, 6, 41, 6, GOLD[2])                                  # First
+    for x in (26, 30, 34, 38):                                    # Katsuogi
+        hr(a, x, 4, x + 1, 5, GOLD[3]); hp(a, x, 5, GOLD[1])
+    for s in (-1, 1):                                             # Chigi gekreuzt an beiden Enden
+        x = 32 + s * 9
+        hln(a, [(x - 3 * s, 7), (x + 2 * s, 1)], GOLD[3])
+        hln(a, [(x - 2 * s, 7), (x + 3 * s, 1)], GOLD[1])
+    hr(a, 16, 26, 48, 27, '#b89060')                              # Veranda
+    _cloud(a, 32, 28, 22)
+    # B: zinnoberrote Himmelsbrücke über dem Wolkenmeer; die Juwelenhellebarde tropft Onogoro ins Meer
+    arc = lambda x: int(round(25 - 11 * math.sin(math.pi * (x - 4) / 56)))
+    for x in range(4, 61):
+        y = arc(x)
+        hr(b, x, y, x, y + 2, RED[2]); hp(b, x, y, RED[3]); hp(b, x, y + 3, K)
+        hp(b, x, y - 4, RED[3] if x % 2 else RED[2])              # Geländer
+        if x % 8 == 4:
+            hr(b, x, y - 4, x, y - 1, RED[1]); hp(b, x, y - 5, GOLD[3])   # Pfosten mit Giboshi
+    for x in (16, 48):                                            # Brückenpfeiler in die Wolken
+        hr(b, x, arc(x) + 3, x + 1, 27, RED[1])
+    _cloud(b, 8, 27, 7); _cloud(b, 56, 27, 7)
+    hln(b, [(41, 2), (35, 20)], WOOD[3])                          # Ame-no-Nuboko
+    hln(b, [(42, 2), (36, 20)], WOOD[1])
+    tip = hpoly(b, [(34, 20), (37, 20), (34, 25)])
+    hfill(b, edge(tip), K); hfill(b, tip, SILVER[3])
+    for (x, y) in ((38, 8), (39, 6)):                             # Juwelen am Schaft
+        hp(b, x, y, '#5ae0c0')
+    hp(b, 34, 27, '#9ad0ff'); hp(b, 34, 28, '#d8f0ff')            # Tropfen
+    return [a, b]
+
+
+HI['takamagahara'] = takamagahara_hi

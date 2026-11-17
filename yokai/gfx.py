@@ -728,6 +728,7 @@ WALL_LIGHT = {
     ('takamagahara', 0): (16, 8, (255, 220, 130), 40), ('yashiki', 1): (12, 9, (255, 190, 110), 36),
     ('iwato', 1): (15, 6, FIRE, 48), ('shinkai', 1): (16, 9, SEA, 36), ('enma_cho', 1): (16, 7, FIRE, 48),
     ('tsukiyomi', 0): (16, 9, (200, 215, 255), 38), ('yomi_oku', 1): (15, 9, ONIBI_C, 40),
+    ('yomi', 1): (17, 6, (230, 210, 120), 30),                # Ikazuchis Blitze
 }
 
 
