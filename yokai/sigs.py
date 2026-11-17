@@ -106,7 +106,7 @@ TEXT = {
     'shinsen': 'Gesäuberte Räume geben dreimal so oft Schlüssel, Reinigungssalz heilt ein ganzes Herz',
     'nanakorobi': 'Schlagfolge bis +80 %, Erfolg zählt Räume unter 15 s und stapelt bis 8×',
     'jinmenju': 'Jeder Boss erfüllt zwei Wünsche und heilt dich ganz',
-    'mokumokuren': 'Talismane wachsen weiter und suchen, sobald sie groß sind, ihr Ziel',
+    'mokumokuren': 'Talismane wachsen weiter; sind sie groß, öffnet sich ein Auge: sie suchen ihr Ziel und treffen 40 % stärker',
     'fujin_raijin': 'Der Windsack öffnet sich alle 1,5 Sekunden, und Raijin schlägt in jeden getroffenen Feind ein',
     'erstes_feuer': 'Brennende Feinde explodieren beim Tod',
     'fuchsregen': 'Ein Sonnenregen fällt auf deine Feinde',
@@ -198,7 +198,7 @@ TEXT = {
     'fuchsgeld': 'Münzen sind doppelt so oft fünf wert',
     'wunsch': 'Nach gesäuberten Räumen fallen dreimal so oft Sternschnuppen',
     'tennyo': 'Jeder Kill lässt die Blüte 2 s länger blühen',
-    'kappa_fest': 'Abprallende Talismane spritzen Wasser und bremsen Feinde',
+    'kappa_fest': 'Abprallende Talismane spritzen Wasser und bremsen Feinde, danach treffen sie 50 % stärker',
     'hanami_picknick': 'Bei vollen Herzen +40 % statt +20 %',
     'shogatsu': 'Klebende Feinde sind verflucht: doppelter Schaden',
     'pilger': '+10 % Schaden pro Ebene statt +5 %',
@@ -491,9 +491,10 @@ def bullet_tick(b, run, dt):
     if 'gross' in tags:
         moku = 'mokumokuren' in run.player.sgs
         b.r = min(b.r * (1 + 1.2 * dt), 16 if moku else 12)
-        if moku and b.r > 7 and not b.fl.get('homing'):
+        if moku and b.r > 4.5 and not b.fl.get('homing'):
             _syn(run, 'mokumokuren', b.x, b.y, (245, 240, 225))
             b.fl = dict(b.fl); b.fl['homing'] = 1
+            b.dmg *= 1.4   # das Auge im Papier öffnet sich
     if 'kammzinken' in tags and b.t > 0.2 and not b.fl.get('_kz'):
         b.fl = dict(b.fl); b.fl['_kz'] = 1
         a = math.atan2(b.vy, b.vx)
@@ -565,6 +566,9 @@ def bullet_bounce(run, b):
         for e in run.enemies:
             if e.active() and math.hypot(e.x - b.x, e.y - b.y) < 26 + e.r:
                 e.slowed = max(e.slowed, 2.0)
+        if not b.fl.get('_kf'):   # Tellerwasser: der abgeprallte Talisman trifft schwerer und bremst
+            b.fl = dict(b.fl, _kf=1, slow=1)
+            b.dmg *= 1.5; b.col = (120, 200, 240)
     if 'brandung' in run.player.sgs and not b.fl.get('_br'):
         _syn(run, 'brandung', b.x, b.y, (110, 190, 255))
         b.fl = dict(b.fl); b.fl['_br'] = 1

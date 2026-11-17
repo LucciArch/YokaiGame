@@ -112,5 +112,18 @@ e = make_boss(run, 'shuten_doji'); run.enemies = [e]; e.sg_bleed = 6
 b = Bullet(e.x, e.y, 0, 0, 1, 2, 1, 'p', (255, 255, 255), {}); b.curve = 1.7
 if sigs.hit_pre(run, e, b, 10) < 29 or e.sg_bleed != 0:
     print('FEHLER Mondschnitt', e.sg_bleed); bad += 1
+# Kappa-Festmahl: abgeprallte Talismane treffen einmalig 50 % stärker und bremsen; Mokumokuren: großes Auge +40 % (Runde 94)
+g.start_run('hana', 18); run = g.run; p = run.player
+for iid in ('kappa_gurke', 'kappa_teller', 'shoji_papier', 'geheimkarte'):
+    p.gain_item(iid, silent=True)
+b = Bullet(100, 100, 50, 0, 10, 3, 1, 'p', (255, 255, 255), {})
+sigs.bullet_bounce(run, b); sigs.bullet_bounce(run, b)
+if abs(b.dmg - 15) > 0.01 or not b.fl.get('slow'):
+    print('FEHLER Kappa-Festmahl', b.dmg); bad += 1
+b = Bullet(100, 100, 50, 0, 10, 4.4, 1, 'p', (255, 255, 255), {'sg': ('gross',)})
+for _ in range(10):
+    sigs.bullet_tick(b, run, 0.05)
+if not b.fl.get('homing') or abs(b.dmg - 14) > 0.01:
+    print('FEHLER Mokumokuren', b.dmg, b.r); bad += 1
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)
