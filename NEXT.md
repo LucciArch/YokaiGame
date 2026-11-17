@@ -227,16 +227,24 @@ für Talismane greifen (z. B. `bullet_tick`) – sollen sie auch für Strahl/Hie
   `cd art_src/fable/items && PYTHONPATH=.. python3 icons_v16.py vorschau.png`. sigtest prüft mehrere Siegel-Fähigkeiten.
 - Fix: grabende Gegner (Isonade) steckten unter Felsen fest → Raum unlösbar (bot.py 2 hing auf Ebene 4).
 
-# Nächster Schritt: Figuren-Siegel Welle 3 (himmel = Boss in Takamagahara)
-Warum: Luca will „ganz, ganz viele Unlockables“, je Figur unterschiedliche Items. System steht, pro Welle nur noch
-10 Items (Daten, Sig in `_siegel_fire`/`_siegel_tick`/Haken, Symbol in icons_v16.py, Eintrag in CHAR_UNLOCKS) + Tests.
-Vorschläge (frei anpassbar, mythologisch passend, nicht stärker als bisherige Items – Schwierigkeit beachten):
-hana Tamagushi (Sakaki-Opferzweig: Kami-Segen-Räume heilen), kenji Kesa-giri-Schriftrolle (Diagonalschnitt durchbohrt),
-kuzunoha Hoshi-no-tama (Fuchsjuwel: Glück → Fuchsfeuer-Ring), ponpoko Hachijōjiki-Tuch (Tanuki-Verwandlung in einen Felsen),
-benkei Gojō-Brücke (Feinde, die dich durchqueren wollen, prallen ab), okiku Ido-Kagami (Brunnen-Spiegelbild wirft Geschosse
-zurück), kotarō Sōjōbōs Feder-Fächer (Rolle = Wirbelsturm), seimei Shikigami Jūni-shinshō (12 Wächter im Kreis),
-akago Setsubun-Mame (Bohnen vertreiben Oni – Ironie: Akago wirft sie), susanoo Ame-no-Murakumo-Wolke (Regenwolke folgt).
-Danach Welle 4 (oku: Izanami/Amaterasu) und Welle 5 (oni: Oni-Modus-Sieg) → 50 Siegel-Items.
+# Erledigt (Runden 114–115): Figuren-Siegel Wellen 3–4
+- Runde 114 (himmel): tamagushi, kesagiri, hoshi_tama, tanuki_bayashi, gojo_giboshi, ido_kagami, sojobo_hane,
+  juni_shinsho, setsubun_mame, murakumo. Neuer Helfer `sigs._blast(run, x, y, rad, dmg, col, push)` für Rundumwellen.
+- Runde 115 (oku): kotodama, tsubame_gaeshi, shinoda_blatt, tanuki_tokkuri, nanatsu_dogu, zehnter_teller, hanadaka_men,
+  kikyo_mon, oni_tsuno, kushinada_kushi. Symbole in `icons_v16.py` (NAMES ergänzen), sigtest prüft je 5 pro Welle.
+- Balance nicht gemessen (alle Werte bewusst moderat, Stufe 3). Item-Ideen hatten Namenskonflikte: `hara_tsuzumi` ist
+  schon eine Synergie – vor neuen Sig-Namen `grep -n "'name'" yokai/sigs.py yokai/data.py`.
+
+# Nächster Schritt: Figuren-Siegel Welle 5 (oni = Sieg im Oni-Modus) → dann 50 Siegel-Items
+Warum: letzte Welle des Siegel-Systems, gleiches Muster (Daten in data.py nach `kushinada_kushi`, Regex-Ergänzung in
+CHAR_UNLOCKS, TEXT + Hook in sigs.py, Symbol in icons_v16.py, sigtest). Oni-Modus ist die schwerste Prüfung → Items
+dürfen etwas auffälliger sein (aber Schwierigkeit beachten). Vorschläge: hana Ōnusa (großer Reinigungsstab: Rolle
+reinigt Flüche/Geschosse), kenji Ichi-no-tachi (erster Hieb im Raum 400 %), kuzunoha Kitsunebi-Laterne (Glück →
+Kreis aus Fuchsfeuern), ponpoko Tanuki-Kesa (Mönchsrobe: Verwandlung in Jizō, 2 s unverwundbar, 1×/Raum),
+benkei Kanjinchō (Spendenliste: Ladenpreise −15 %), okiku Sara-yashiki-Brunnen (Geisterherzen heilen mehr),
+kotarō Ushiwaka-Flöte (Gegner kurz bezaubert), seimei Seimei-Brunnen (Kikyō-Quelle: Raum ohne Treffer +Geisterherz),
+akago Oni-Kanabō aus Kindertagen (Rückstoß-Keule), susanoo Ama-no-Ōhabari (Schwert der Götter: Blitz-Ketten).
+Danach: Siegel-Komplettbelohnung je Figur (alle 5 Siegel → Farbvariante oder Startitem).
 
 # Danach: weitere Freischaltungen jenseits der Siegel
 - Herausforderungen je Figur (CHALLENGES hat schon 9) mit Item-Belohnung statt nur Erfolg
