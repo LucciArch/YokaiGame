@@ -214,13 +214,38 @@ für Talismane greifen (z. B. `bullet_tick`) – sollen sie auch für Strahl/Hie
   2: ½ Herz. Erfolg `mochitsuki` („Aitori“), Lexikon, Minikarten-Symbol, `EVENT_KINDS` (Festtagsgast zählt jetzt alle).
   Achtung: `rooms.py` zieht eine Zufallszahl mehr → Karten zu festen Seeds haben sich verschoben.
 
-# Nächster Schritt: Lucas Rückmeldung zur Schwierigkeit abwarten / sonst Wanddekos Variante 2
-Warum: Ab Ebene 8 fallen Bosskämpfe im Bot weiter auf ~8 s. Falls Luca es noch zu leicht findet: Boss-HP ab Kapitel V
-anheben (`bosses.py` hpm) oder Feuerrate (`rate`) mit abnehmendem Ertrag. Falls zu schwer: Laden wieder 3 Items.
-Ohne Rückmeldung: Wanddekos zweite Variante pro Biom (Index 2) – lange Gänge wirken eintönig, Werkzeug
-(`walldeco_hi.py`, Vorschau-Skript aus Runde 96) ist fertig.
+# Erledigt (Runden 112–113, Wunsch von Luca: viele Unlockables wie in Isaac)
+- Runde 112: **Figuren-Siegel** – `data.MARKS` (boss3, sieg, himmel, oku, oni) und `data.CHAR_UNLOCKS[figur][siegel] = item`
+  erzeugen automatisch Erfolge `m_<figur>_<siegel>` mit Item-Belohnung. `Run.mark(m)` (nicht in Prüfungen) wird bei
+  Bosssieg Tiefe 3/6 und beim Laufsieg (sieg, oku bei Tiefe 7, oni im Oni-Modus) aufgerufen. Charakterwahl zeigt
+  „Siegel x / y“ mit Item-Namen (nur Siegel, die schon ein Item haben). Codex nennt bei gesperrten Items die Bedingung.
+  Welle 1 (boss3): haraegushi, zanshin_tsuba, kuzu_blatt, bunbuku_kessel, tausendstes_schwert, neunter_teller,
+  tengu_tsubute, taizan_fukun, ibaraki_arm, yashiori_sake.
+- Runde 113: Welle 2 (sieg): hi_ogi, muramasa, fuchs_trugbild, shigaraki_tanuki, tachi_ojo, tsurube, kakuremino,
+  hoki_naiden, masakari, habakiri. Wurf-Fähigkeiten in `sigs._siegel_fire`, Zeit-Fähigkeiten in `sigs._siegel_tick`.
+- Symbole: `art_src/fable/items/icons_v16.py` (kopiert selbst nach `yokai/assets/items/icons`), Aufruf
+  `cd art_src/fable/items && PYTHONPATH=.. python3 icons_v16.py vorschau.png`. sigtest prüft mehrere Siegel-Fähigkeiten.
+- Fix: grabende Gegner (Isonade) steckten unter Felsen fest → Raum unlösbar (bot.py 2 hing auf Ebene 4).
+
+# Nächster Schritt: Figuren-Siegel Welle 3 (himmel = Boss in Takamagahara)
+Warum: Luca will „ganz, ganz viele Unlockables“, je Figur unterschiedliche Items. System steht, pro Welle nur noch
+10 Items (Daten, Sig in `_siegel_fire`/`_siegel_tick`/Haken, Symbol in icons_v16.py, Eintrag in CHAR_UNLOCKS) + Tests.
+Vorschläge (frei anpassbar, mythologisch passend, nicht stärker als bisherige Items – Schwierigkeit beachten):
+hana Tamagushi (Sakaki-Opferzweig: Kami-Segen-Räume heilen), kenji Kesa-giri-Schriftrolle (Diagonalschnitt durchbohrt),
+kuzunoha Hoshi-no-tama (Fuchsjuwel: Glück → Fuchsfeuer-Ring), ponpoko Hachijōjiki-Tuch (Tanuki-Verwandlung in einen Felsen),
+benkei Gojō-Brücke (Feinde, die dich durchqueren wollen, prallen ab), okiku Ido-Kagami (Brunnen-Spiegelbild wirft Geschosse
+zurück), kotarō Sōjōbōs Feder-Fächer (Rolle = Wirbelsturm), seimei Shikigami Jūni-shinshō (12 Wächter im Kreis),
+akago Setsubun-Mame (Bohnen vertreiben Oni – Ironie: Akago wirft sie), susanoo Ame-no-Murakumo-Wolke (Regenwolke folgt).
+Danach Welle 4 (oku: Izanami/Amaterasu) und Welle 5 (oni: Oni-Modus-Sieg) → 50 Siegel-Items.
+
+# Danach: weitere Freischaltungen jenseits der Siegel
+- Herausforderungen je Figur (CHALLENGES hat schon 9) mit Item-Belohnung statt nur Erfolg
+- „Quests“: z. B. 3 Mochitsuki-Erfolge, alle Ereignisse in einem Lauf, 5 Bosse ohne Treffer → neue aktive Items
+- Alle Siegel einer Figur → kosmetische Belohnung (Farbvariante) oder Bonus-Startitem
+- Lucas Rückmeldung zur Schwierigkeit weiter beachten (Boss-HP ab Kapitel V / Laden 3 Items)
 
 # Weitere Ideen
+- Wanddekos: zweite Variante pro Biom (Index 2), Werkzeug walldeco_hi.py steht
 - Mochitsuki: eigener Klang für den Kine-Schlag (dumpfes Holz auf Teig) statt 'drum' (`art_src/music/sfx.py`)
 - Mondhase ist im Raum recht klein – ggf. größer zeichnen (Canvas 64×60 → 80×72) und Wendezone anpassen
 - Spitze (Feuerwerk/Oni-Rausch/Hannya-Zorn ≈ ×4,2) mit `--raum` gegenprüfen, ob sie auch in Räumen dominieren
