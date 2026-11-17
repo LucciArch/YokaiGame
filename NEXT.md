@@ -104,14 +104,26 @@ für Talismane greifen (z. B. `bullet_tick`) – sollen sie auch für Strahl/Hie
   Ohne eigene Zeichnung (SS=2-Fassung) bleiben noch: chikurin, inari, obakedera, hakaba, kurama, yukiyama, ryugu,
   uminobe, yomi, takamagahara.
 
-# Nächster Schritt: Balance der Talisman-Spitze (Oni-Rausch, Onmyōdō)
-Warum: Laut `balance-check-82-leben` schaffen Oni-Rausch (72 %) und Onmyōdō (71 %) Bossschaden weit über dem Median (13 %).
-`tools/synbalance.py --leben` gezielt für beide laufen lassen, Ursache finden (Stapeln? Kettenreaktion?) und dämpfen,
-ohne die Fähigkeit unsichtbar zu machen. Bericht `design/balance/balance-check-<N>.md`.
+# Erledigt (Runden 87–89): Balance der Synergie-Spitze
+- Runde 87: Onmyōdō – Papierdiener (`_shiki`) laden das Pentagramm nicht nach (Kettenreaktion; 71 → 26 %).
+  Oni-Rausch +45 % statt +60 %, ohne `dmgm` (73 → 44 %). Bericht `balance-check-87`.
+- Runde 88: Feuerwerk – fünf Funken teilen eine Trefferliste, 0,8× Schaden (61 → 44 %). Fūjin-Raijin: Windsack alle
+  1,5 s (57 → 33 %). Bericht `balance-check-88`. sigtest prüft Onmyōdō-Kette und Funken.
+- Runde 89: Drachenkönig Seidenfaden 1,75× (51 → 27 %), Jingi `dmgm` 1,2 (81 → 77 %). Bericht `balance-check-89`.
+- Muster bei allen Ausreißern: mehrere Teilgeschosse/Felder treffen denselben großen Boss. Bei neuen Sigs immer
+  eine geteilte Trefferliste (`b.hit = seen`) oder ein Flag gegen Selbst-Aufladung vorsehen.
+- Methode: `synbalance.py ... --leben`, Vergleich mit Synergie-fx entfernt (Items allein), dann Werte variieren.
+  Achtung: 12 Seeds streuen stark (±5 Punkte), Effekte sind oft nicht linear.
+
+# Nächster Schritt: Balance Orochi-Kusanagi und Izanagis Flucht, Jingi-Blitze prüfen
+Warum: Nach Runde 89 liegen Orochi-Kusanagi (50,4 %) und Izanagis Flucht (47,7 %) an der Spitze (Median 13,4 %).
+Gleiche Methode wie 87–89. Bei Jingi prüfen, ob `run.lightning` → `sigs.on_lightning` Folge-Sigs mehrfach am Boss
+auslöst (Blitze allein heben Jingi von 39 auf 68 %). Danach Gegencheck mit `--waffe=w_sword` für die geänderten fünf.
 
 # Weitere Ideen
-- Eigene Hi-Res-Wanddekos für die übrigen 10 Biome (s. o.), je Runde drei
+- Synergien am unteren Ende (Faktor < 1 gegen Zufall) aufwerten, damit keine Kombination eine Falle ist
+- Eigene Hi-Res-Wanddekos für die übrigen 10 Biome (chikurin, inari, obakedera, hakaba, kurama, yukiyama, ryugu,
+  uminobe, yomi, takamagahara), je Runde drei
 - Mondpalast-Ambiente: fallende Katsura-Blätter, Mondhase als seltener Ereignis-NPC (Mochi-Tausch)
 - Shinkirō als Ereignis: eine Hamaguri spiegelt einen Trugladen vor
-- Tessos Schwarm auch für Hiebe in Gruppen (gedeckelt wie Wurfstern)
 - „Fast komplett“-Synergien auch im Codex: Item-Seite markiert Items, die eine getragene Synergie vervollständigen
