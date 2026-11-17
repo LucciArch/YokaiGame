@@ -130,12 +130,12 @@ def yatagarasu_feder():
     c = Cv()
     c.form(E(20, 11, 9, 9), 'qrR', 1, 1, ring='K')                      # Sonnenscheibe
     c.fill(E(17, 8, 2.4, 1.6), 'e')
-    vane = REL(13, 18, 3.6, 12, -40)                                    # Fahne schräg
+    vane = REL(13, 18, 5.4, 12.5, -40)                                  # Fahne schräg
     c.form(vane, 'khH', 1, 1, ring='K')
-    c.line([(9, 23), (19, 11)], 'J', 1, only=vane)                      # Indigoschimmer
+    c.line([(8, 22), (18, 10)], 'J', 1, only=vane)                      # Indigoschimmer
     c.line([(11, 22), (18, 14)], 'O', 1, only=vane)
     for k in range(3):                                                  # Kerben in der Fahne
-        c.line([(14 + k * 3, 19 - k * 3), (17 + k * 3, 19 - k * 3)], 'K', 1, only=vane)
+        c.line([(9 + k * 4, 22 - k * 5), (13 + k * 4, 25 - k * 5)], 'K', 1, only=vane)
     c.line([(4, 29), (21, 8)], 'K', 2)                                  # Kiel
     c.line([(5, 28), (20, 9)], 'w', 1)
     sparkle(c, 6, 6, 'W', 'Y')
