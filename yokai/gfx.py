@@ -724,7 +724,7 @@ PROP_LIGHT = {
 # Leuchtende Wanddekos: (Biom, Index) -> (x, y im 32x16-Stück, Farbe, Lichtradius)
 WALL_LIGHT = {
     ('chikurin', 0): (15, 10, (255, 225, 140), 26), ('chikurin', 1): (16, 10, (255, 200, 110), 34), ('hakaba', 1): (19, 8, FIRE, 32),
-    ('uminobe', 1): (16, 10, (190, 230, 255), 38), ('jigoku', 0): (16, 12, (255, 90, 30), 44),
+    ('uminobe', 1): (16, 10, (190, 230, 255), 38), ('ryugu', 0): (16, 8, (110, 170, 255), 26), ('jigoku', 0): (16, 12, (255, 90, 30), 44),
     ('takamagahara', 0): (16, 8, (255, 220, 130), 40), ('yashiki', 1): (12, 9, (255, 190, 110), 36),
     ('iwato', 1): (15, 6, FIRE, 48), ('shinkai', 1): (16, 9, SEA, 36), ('enma_cho', 1): (16, 7, FIRE, 48),
     ('tsukiyomi', 0): (16, 9, (200, 215, 255), 38), ('yomi_oku', 1): (15, 9, ONIBI_C, 40),

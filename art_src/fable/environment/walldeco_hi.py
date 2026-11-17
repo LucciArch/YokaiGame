@@ -828,3 +828,117 @@ def yukiyama_hi(name, base):
 
 
 HI['yukiyama'] = yukiyama_hi
+
+
+# ---- Ryūgū: Rundfenster in die Tiefe, durch das ein Ryūgū no tsukai zieht / Otohimes Tamatebako auf Korallen
+def ryugu_hi(name, base):
+    a, b = base.copy(), base.copy()
+    Y, X = _g(a)
+    win = he(a, 32, 16, 12, 11)
+    ring = he(a, 32, 16, 14.5, 13.5) & ~win
+    hfill(a, edge(ring | win), K)
+    hfill(a, ring, GOLD[2])
+    hfill(a, ring & (Y > 18), GOLD[1])
+    hfill(a, ring & (Y < 8), GOLD[3])
+    hfill(a, win, '#0a1a34')
+    hfill(a, win & (Y < 12), '#123058')
+    for x in (25, 33, 40):                                        # Lichtstreifen von oben
+        hln(a, [(x, 6), (x - 3, 18)], '#1a4070')
+    for (x, h) in ((24, 7), (27, 5), (38, 8), (41, 5)):           # Seetang am Fenstergrund
+        for k in range(h):
+            hp(a, x + (k // 2) % 2, 26 - k, '#1c4a34')
+    for i in range(23):                                           # Riemenfisch: silbern, lange rote Rückenflosse
+        x = 21 + i
+        y = int(round(15 + 2.2 * math.sin(i / 3.6)))
+        hr(a, x, y, x, y + 1, SILVER[3] if i % 3 else SILVER[2])
+        hp(a, x, y + 2, SILVER[1])
+        hp(a, x, y - 1, '#e83a3a' if i % 2 else '#a82030')
+    hp(a, 21, 14, '#ff6a50'); hp(a, 20, 13, '#ff6a50'); hp(a, 22, 15, K)    # Kopfkamm, Auge
+    hfill(a, win & ~he(a, 32, 16, 11, 10), '#05101e')             # Glasrand dunkel
+    hfill(a, edge(win) & ~win & (X < 30) & (Y < 10), GOLD[3])
+    hp(a, 26, 8, '#9ad0ff'); hp(a, 25, 9, '#9ad0ff')               # Glanz auf dem Glas
+    # B: Tamatebako – schwarzer Lack, goldene Wellen, rote Schnur, weißer Rauch steigt auf
+    c = ('#3a1020', '#a83a4a', '#d8686a', '#f4a890')              # Edelkoralle, heller als der Lack
+    for (x, y1, h) in ((9, 12, -1), (15, 15, 1), (50, 13, 1), (56, 11, -1)):
+        mid = (y1 + 29) // 2
+        m = np.zeros(a.a.shape[:2], bool)
+        for dx in (0, 1):
+            for (p0, p1) in (((x, 29), (x + h, mid)), ((x + h, mid), (x, y1)), ((x + h, mid), (x - 4 * h, mid - 4)),
+                             ((x, y1 + 4), (x + 3 * h, y1 + 1))):
+                n = max(abs(p1[0] - p0[0]), abs(p1[1] - p0[1]), 1)
+                for i in range(n + 1):
+                    m[int(round(p0[1] + (p1[1] - p0[1]) * i / n)), int(round(p0[0] + (p1[0] - p0[0]) * i / n)) + dx] = True
+        hfill(b, edge(m), K)
+        hfill(b, m, c[1]); hfill(b, m & ~np.roll(m, 1, 1), c[2])
+        for (px, py) in ((x, y1), (x - 4 * h, mid - 4), (x + 3 * h, y1 + 1)):
+            hp(b, px, py, c[3])
+    hr(b, 22, 26, 42, 29, '#2a1418'); hr(b, 22, 26, 42, 26, '#5a2a2a')   # Korallenbank
+    box = hpoly(b, [(23, 17), (41, 17), (41, 26), (23, 26)])
+    lid = hpoly(b, [(22, 14), (42, 14), (42, 17), (22, 17)])
+    hfill(b, edge(box | lid), K)
+    hfill(b, box, '#14101c'); hfill(b, lid, '#1e1828')
+    hr(b, 22, 14, 42, 14, '#3a3048')
+    for x in range(24, 41, 4):                                    # Maki-e-Wellen in Gold
+        hp(b, x, 22, GOLD[2]); hp(b, x + 1, 21, GOLD[3]); hp(b, x + 2, 22, GOLD[2]); hp(b, x + 3, 23, GOLD[1])
+    hr(b, 31, 14, 33, 26, '#c82a2a'); hr(b, 22, 19, 42, 19, '#c82a2a')   # Schnur über Kreuz
+    hr(b, 33, 14, 33, 26, '#7a1018')
+    hfill(b, he(b, 32, 13, 2.2, 1.5), '#e83a3a'); hp(b, 31, 12, '#ff8a6a')   # Knoten
+    hln(b, [(32, 14), (29, 18), (30, 21)], '#e83a3a'); hln(b, [(33, 14), (36, 18), (35, 21)], '#e83a3a')
+    for k, (x, y) in enumerate(((35, 11), (37, 9), (36, 6), (38, 4), (40, 3), (39, 1))):   # Rauch, der altern lässt
+        hfill(b, he(b, x, y, 2 - k * .2, 1.4), '#c8c8d8' if k % 2 else '#e8e8f0')
+    return [a, b]
+
+
+HI['ryugu'] = ryugu_hi
+
+
+# ---- Uminobe: Fischernetz mit gläsernen Ukidama / Funayūrei-Hände mit bodenloser Schöpfkelle unter dem Totenlicht
+def uminobe_hi(name, base):
+    a, b = base.copy(), base.copy()
+    net = ('#2a2630', '#5a5058', '#7a7068')
+    sag = lambda x: 7 + 3 * math.sin(math.pi * x / 63)
+    for x in range(0, 64):                                        # Leine oben
+        hp(a, x, int(round(sag(x))) - 1, '#8a7a5a'); hp(a, x, int(round(sag(x))), '#5a4a3a')
+    for i in range(-2, 8):                                        # Maschen
+        hln(a, [(i * 10, int(sag(max(0, i * 10)))), (i * 10 + 18, 27)], net[1])
+        hln(a, [(i * 10 + 18, int(sag(min(63, i * 10 + 18)))), (i * 10, 27)], net[1])
+    for x in range(0, 64, 3):
+        hp(a, x, 27, net[2]); hp(a, x, 28, net[0])
+    for (x, y, r, cs) in ((12, 15, 3.6, ('#0e4a3a', '#2a8a6a', '#7ad0a8')), (31, 19, 4.2, ('#0e3a5a', '#2a6a9a', '#8ac0e8')),
+                          (49, 14, 3.4, ('#3a4a10', '#7a8a2a', '#d0d88a'))):
+        m = he(a, x, y, r, r)
+        hfill(a, edge(m), K)
+        hfill(a, m, cs[1])
+        hfill(a, m & he(a, x + 1, y + 1, r - 1, r - 1) & ~he(a, x - 1, y - 1, r - 1, r - 1), cs[0])
+        hp(a, x - 1, y - 2, cs[2]); hp(a, x - 2, y - 1, cs[2]); hp(a, x - 1, y - 1, '#ffffff')
+        hln(a, [(x - int(r), y), (x + int(r), y)], '#3a3028')     # Schnurnetz um die Kugel
+        hln(a, [(x, y - int(r)), (x, y + int(r))], '#3a3028')
+    # B: blasses Totenlicht (Licht bei (32, 20)), darunter greifen Hände mit einer bodenlosen Hishaku aus der Gischt
+    hln(b, [(32, 2), (32, 13)], '#5a4a3a')
+    lan = he(b, 32, 19, 5.5, 6)
+    hfill(b, edge(lan), K)
+    hfill(b, lan, '#5a8ab0'); hfill(b, lan & he(b, 31, 18, 3.5, 4), '#b0d8f0')
+    hfill(b, he(b, 32, 19, 1.5, 2.2), '#f0faff')
+    for y in (15, 19, 23):                                        # Rippen der Laterne
+        hfill(b, lan & (_g(b)[0] == y), '#3a5a7a')
+    hr(b, 29, 12, 35, 13, K); hr(b, 29, 25, 35, 26, K)
+    skin, sh = '#a8b8c0', '#6a7a88'
+    for (x0, lean, top) in ((12, 1, 19), (22, -1, 22), (50, 1, 18)):   # Arme aus der Gischt, Finger gespreizt
+        m = hpoly(b, [(x0, 29), (x0 + 3, 29), (x0 + 3 + lean, top + 3), (x0 + lean, top + 3)])
+        m |= he(b, x0 + 1.5 + lean, top + 2, 2.6, 2)
+        for f, dx in enumerate((-3, -1, 1, 3)):
+            ln = 4 if f in (1, 2) else 3
+            for k in range(ln):
+                m[top - k, x0 + 1 + lean + dx + (dx * k) // 4] = True
+        hfill(b, edge(m), K)
+        hfill(b, m, skin); hfill(b, m & ~np.roll(m, -1, 1), sh)
+        hp(b, x0 + 1 + lean, top + 6, sh)
+    hln(b, [(52, 17), (57, 10)], '#6e5a40')                       # Schöpfkelle ohne Boden
+    m = he(b, 58, 8, 2.6, 2) & ~he(b, 58, 8, 1.2, .8)
+    hfill(b, m, '#8a7050'); hp(b, 58, 8, K)
+    for x in range(8, 58, 3):                                     # Gischt am Wandfuß
+        hp(b, x, 28, '#c8e0f0'); hp(b, x + 1, 29, '#7aa0c0')
+    return [a, b]
+
+
+HI['uminobe'] = uminobe_hi
