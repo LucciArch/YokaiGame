@@ -95,14 +95,23 @@ für Talismane greifen (z. B. `bullet_tick`) – sollen sie auch für Strahl/Hie
 - Runde 84: Eigene Hi-Res für Shinkai (Chōchin-anko, Anemonen, Qualle), Enma-chō (Jōhari-Spiegel, Kohlebecken),
   Tsukiyomi (Mondhase mit Mochi, Sichel + Suzu). Übrige Biome nutzen die SS=2-Fassung (glattere Rundungen).
 
-# Nächster Schritt: Synergie-Hinweis im Pausenmenü
-Warum: Lucas Dauerwunsch sind Item-Synergien – 98 Synergien sind aber kaum auffindbar. Im Pausenmenü (Tab Items &
-Werte) anzeigen, welche Synergien mit den getragenen Items nur noch **ein** Item entfernt sind (Item-Name, bei unbekannten
-Synergien „???“ wie `Run.pedestal_extra`). Danach ggf. im Lexikon verlinken. uiflow2 um einen Durchlauf erweitern.
+# Erledigt (Runden 85–86)
+- Runde 85: `Run.near_synergies()` – Pausenmenü „Items & Werte“ zeigt bis zu 4 Synergien, denen nur noch ein Item fehlt
+  („Fast komplett: Name (+ Item)“, unentdeckte als „???“). uiflow2 prüft Logik und Anzeige.
+  Hinweis: uiflow2 druckt „menu play“ (Speichern & Hauptmenü nach Retry) – war schon vorher so, ggf. ansehen.
+- Runde 86: Eigene Hi-Res-Wanddekos für Jigoku (Lavafall, Ketten + Eisenegge), Iwato (Shimenawa, Kagaribi),
+  Yomi no Oku (Misu mit Hand, Tōrō). Lichtpunkte aus `gfx.WALL_LIGHT` bleiben an derselben Stelle.
+  Ohne eigene Zeichnung (SS=2-Fassung) bleiben noch: chikurin, inari, obakedera, hakaba, kurama, yukiyama, ryugu,
+  uminobe, yomi, takamagahara.
+
+# Nächster Schritt: Balance der Talisman-Spitze (Oni-Rausch, Onmyōdō)
+Warum: Laut `balance-check-82-leben` schaffen Oni-Rausch (72 %) und Onmyōdō (71 %) Bossschaden weit über dem Median (13 %).
+`tools/synbalance.py --leben` gezielt für beide laufen lassen, Ursache finden (Stapeln? Kettenreaktion?) und dämpfen,
+ohne die Fähigkeit unsichtbar zu machen. Bericht `design/balance/balance-check-<N>.md`.
 
 # Weitere Ideen
-- Eigene Hi-Res-Wanddekos auch für Yomi no Oku, Iwato, Jigoku (bisher SS=2-Fassung der alten Zeichnung)
+- Eigene Hi-Res-Wanddekos für die übrigen 10 Biome (s. o.), je Runde drei
 - Mondpalast-Ambiente: fallende Katsura-Blätter, Mondhase als seltener Ereignis-NPC (Mochi-Tausch)
 - Shinkirō als Ereignis: eine Hamaguri spiegelt einen Trugladen vor
 - Tessos Schwarm auch für Hiebe in Gruppen (gedeckelt wie Wurfstern)
-- `--leben`-Messung für Talisman-Spitze prüfen (Oni-Rausch 72 %, Onmyōdō 71 % – Median 13 %)
+- „Fast komplett“-Synergien auch im Codex: Item-Seite markiert Items, die eine getragene Synergie vervollständigen
