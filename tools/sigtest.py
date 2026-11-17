@@ -86,5 +86,14 @@ run.pbullets = []
 sigs.bullet_end(run, Bullet(100, 100, 0, 0, 1, 2, 1, 'p', (255, 255, 255), {'explode': 1}))
 if len(run.pbullets) != 5 or len({id(b.hit) for b in run.pbullets}) != 1:
     print('FEHLER Feuerwerk-Funken', len(run.pbullets)); bad += 1
+# Göttliches Arsenal: der Speer (Ame-no-Nuboko) verdrängt Hachimans Bogen, also schießt jeder Stoß einen Pfeil mit (Runde 91)
+from yokai import weapons
+g.start_run('hana', 15); run = g.run; p = run.player
+for iid in ('ame_nuboko', 'hachiman_bogen'):
+    p.gain_item(iid, silent=True)
+run.pbullets = []
+weapons.fire(p, (1, 0), weapons.weapon_of(p))
+if weapons.weapon_of(p) != 'w_spear' or sum(getattr(b, 'arrow', False) for b in run.pbullets) != 1:
+    print('FEHLER Arsenal-Pfeil', weapons.weapon_of(p), len(run.pbullets)); bad += 1
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)

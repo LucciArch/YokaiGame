@@ -4,13 +4,14 @@ Mit --tod: Überlebenszeit ohne Gott-Modus gegen einen Boss, der in Phase 2 fest
 Mit --raum: statt des Bosses drei Wellen zu je 8 Normalgegnern aus dem Gebiet der Tiefe (für Raum-Synergien).
 Mit --leben: ohne Gott-Modus; gemessen wird der Boss-Schaden in % bis zum Tod (Faktor > 1 = mehr Schaden als Zufall),
   damit Effekte „wenn du getroffen wirst“ nur so oft wirken, wie die Herzen reichen.
-Mit --waffe=w_laser (w_sword, w_bow ...): alle Kämpfe mit dieser Angriffsart; Nahkampf läuft zum Ziel und umkreist es."""
+Mit --waffe=w_laser (w_sword, w_bow ...): alle Kämpfe mit dieser Angriffsart.
+Mit Nahkampfwaffe (auch aus Items wie Speer oder Tamahagane) läuft der Bot zum Ziel und umkreist es."""
 import os, sys, math, random
 os.environ['SDL_VIDEODRIVER'] = 'dummy'; os.environ['SDL_AUDIODRIVER'] = 'dummy'
 os.environ['APPDATA'] = os.path.join(os.environ.get('TEMP', '/tmp'), 'yokai_syn')
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 from yokai.app import Game
-from yokai import data, gfx
+from yokai import data, gfx, weapons
 from yokai.bosses import make_boss, CX, CY
 
 TOD = '--tod' in sys.argv
@@ -24,7 +25,7 @@ if RAUM:
     sys.argv.remove('--raum')
 WAFFE = next((a[8:] for a in sys.argv if a.startswith('--waffe=')), None)
 sys.argv = [a for a in sys.argv if not a.startswith('--waffe=')]
-NAH = WAFFE in ('w_sword', 'w_spear', 'w_club', 'w_scythe', 'w_fan')
+MELEE = ('w_sword', 'w_spear', 'w_club', 'w_scythe', 'w_fan')
 BOSS = sys.argv[1] if len(sys.argv) > 1 else 'shuten_doji'
 DEPTH = int(sys.argv[2]) if len(sys.argv) > 2 else 5
 ONLY = sys.argv[3].split(',') if len(sys.argv) > 3 else None   # z. B. onmyodo,feuerwerk
@@ -40,6 +41,7 @@ def fight(items, seed):
         p.gain_item(iid, silent=True)
     if WAFFE:
         p.bonus[WAFFE] = 1; p.recalc()
+    nah = weapons.weapon_of(p) in MELEE   # auch Items wie Speer oder Schwert machen Nahkampf
     if RAUM:
         kinds = data.BIOMES[data.DEPTH_BIOMES[min(DEPTH, 5)][0]]['enemies']
         waves = 3
@@ -65,7 +67,7 @@ def fight(items, seed):
             tgt = b
         hp0 = p.total_hp()
         mv = [math.cos(t * 0.9), math.sin(t * 1.3)]
-        if NAH:   # auf Hiebweite heran, dann seitlich ausweichen
+        if nah:   # auf Hiebweite heran, dann seitlich ausweichen
             dx, dy = tgt.x - p.x, tgt.y - p.y
             mv = [dx, dy] if math.hypot(dx, dy) > 34 + getattr(tgt, 'r', 0) else [-dy, dx]
         inp = {'move': mv, 'shoot': [tgt.x - p.x, tgt.y - p.y], 'dash': int(t * 60) % 120 == 0,

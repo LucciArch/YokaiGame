@@ -121,7 +121,7 @@ TEXT = {
     'jingi': 'Alle 5 s richten die Insignien die drei stärksten Feinde',
     'gewittersturm': 'Weggewehte Geschosse rufen manchmal einen Blitz',
     'neun_flammen': 'Der Neunerfächer besteht aus suchendem Fuchsfeuer',
-    'kranichschwarm': 'Für je drei gefaltete Kraniche fliegt ein Kranich mehr',
+    'kranichschwarm': 'Zwei Kraniche fliegen, für je drei gefaltete einer mehr',
     'himmelsbote': 'Im Laufen stößt die Krähe doppelt so oft herab',
     'kyudo': 'Weit geflogene Talismane treffen 60 % stärker',
     'tengu_sturm': 'Jeder 6. Wurf entfesselt einen Sturmring um dich',
@@ -152,7 +152,7 @@ TEXT = {
     'mondschnitt': 'Mondsichel-Talismane schneiden tief: Bluten stapelt bis 6',
     'rattenschwarm': 'Durchbohrende Talismane lassen Ratten auf Feinde los',
     'sonnenspiegel': 'Der Spiegel wirft Geschosse als drei Sonnenstrahlen zurück',
-    'goetter_arsenal': 'Treffsicher wächst doppelt so schnell, bis 35 %',
+    'goetter_arsenal': 'Jeder Speerstoß schießt auch einen Pfeil Hachimans; Treffsicher wächst doppelt so schnell, bis 35 %',
     'geisterlicht': 'Zwei Irrlichter pro Kill, sie fliegen durch Wände',
     'faehrmann': 'Jeder 12. Kill: der Fährmann zahlt ½ Geisterherz',
     'ewiger_winter': 'Erstarrte Feinde nehmen +50 % Schaden, Gebremste erstarren öfter',
@@ -312,6 +312,13 @@ def on_fire(p, run, bullets):
             if 'mondteich' in S:
                 _syn(run, 'mondteich', p.x, p.y, (170, 230, 255))
                 b.fl = dict(b.fl); b.fl['slow'] = 1; b.fl['_frost'] = 1
+    if 'goetter_arsenal' in S:
+        from . import weapons
+        if weapons.weapon_of(p) == 'w_spear':   # Hachimans Bogen geht sonst im Speer unter
+            fl = dict(weapons.shot_flags(p), pierce=1)
+            a = run.fire_player_bullet(p.x, p.y - 4, base, dmg * 1.6, spd * 1.7, max(2, size * 0.8), life * 1.4 / 1.7, fl)
+            a.arrow = True
+            _syn(run, 'goetter_arsenal', p.x, p.y, (255, 220, 150))
     if 'sonne_mond' in S:
         sun = n % 2 == 0
         for b in bullets:
@@ -1284,7 +1291,7 @@ def tick(p, run, dt):
         elif key == 'kranichflug':
             tgt = _nearest(run, p.x, p.y, 260)
             if tgt:
-                k = 1 + (min(3, g.get('cranes', 0) // 3) if 'kranichschwarm' in S else 0)
+                k = 2 + min(3, g.get('cranes', 0) // 3) if 'kranichschwarm' in S else 1
                 if k > 1:
                     _syn(run, 'kranichschwarm', p.x, p.y, (250, 250, 255))
                 for i in range(k):

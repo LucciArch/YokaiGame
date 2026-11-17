@@ -112,6 +112,7 @@
 - Runde 88 – **Balance Feuerwerk und Fūjin-Raijin:** Die fünf Hanabi-Funken treffen jeden Feind nur noch einmal (dafür doppelt so stark) – vorher prasselten alle fünf auf denselben Boss (61 % → 44 %). Fūjins Windsack mit Raijins Trommel öffnet sich alle 1,5 statt jede Sekunde (57 % → 33 %)
 - Runde 89 – **Balance Drachenkönig und Sanshu no Jingi:** Der Seidenfaden des Drachenkönigs schneidet 1,75× statt doppelt – durchbohrende Talismane spannten im Boss so viele Fäden, dass er fast viermal so stark war wie seine Items (51 % → 27 %). Die drei Throninsignien geben +20 % statt +40 % Schaden und bleiben die stärkste Synergie (81 % → 77 %)
 - Runde 90 – **Balance Orochi und Izanagis Flucht:** Das Grasmäher-Schwert trifft Vergiftete um 20 % statt 40 % härter und verliert den zusätzlichen Schadensbonus – das Gift des Orochi-Zahns lag fast immer auf dem Boss (50 % → 40 %). Izanagis Rollen-Pfirsiche werfen mit 150 % statt 300 % (48 % → 38 %); die Pfirsiche bei Treffern bleiben unverändert
+- Runde 91 – **Göttliches Arsenal und Kranichschwarm aufgewertet:** Mit Ame-no-Nuboko und Hachimans Bogen schießt jetzt jeder Speerstoß zusätzlich einen göttlichen Pfeil – vorher ging der Bogen im Speer unter. Beim Kranichschwarm fliegen immer mindestens zwei Papierkraniche, für je drei gefaltete einer mehr. Das Balance-Werkzeug lässt Nahkampf-Builds jetzt auch ohne Schalter herankommen
 
 ## 1.4.0 – „Hyakki-Update“ (enthält 1.3 „Kapitel-Update“)
 
