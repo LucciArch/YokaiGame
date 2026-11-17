@@ -293,6 +293,16 @@ I('kakuremino', 'Kakuremino', 'Der Strohmantel der Tengu macht unsichtbar', 'kak
 I('hoki_naiden', 'Hoki Naiden', 'Seimeis geheimes Buch der Yin-Yang-Kunst', 'hoki_naiden', (110, 130, 200), 'T', ['shikigami'], 3, True, shotspd=20, sig_hoki=1)
 I('masakari', 'Kintarōs Masakari', 'Die Axt des Bergkindes, das mit Bären rang', 'masakari', (220, 120, 60), 'T', ['oni'], 3, True, dmg=0.3, sig_masakari=1)
 I('habakiri', 'Ame-no-Habakiri', 'Das Zehn-Faust-Schwert, das die Orochi zerschnitt', 'habakiri', (190, 220, 255), 'T', ['raijin'], 3, True, dmg=0.4, sig_habakiri=1)
+I('tamagushi', 'Tamagushi', 'Ein Sakaki-Zweig mit Shide, den Göttern dargebracht', 'tamagushi', (110, 180, 90), 'T', ['kami'], 3, True, luck=1, sig_tamagushi=1)
+I('kesagiri', 'Kesa-giri-Rolle', 'Der Schnitt von der Schulter bis zur Hüfte', 'kesagiri', (220, 220, 235), 'T', [], 3, True, dmg=0.3, sig_kesagiri=1)
+I('hoshi_tama', 'Hoshi no Tama', 'Das Sternjuwel, in dem ein Fuchs seine Seele verwahrt', 'hoshi_tama', (255, 210, 150), 'T', ['kitsune'], 3, True, luck=1, sig_hoshi_tama=1)
+I('tanuki_bayashi', 'Tanuki-bayashi', 'Im Garten des Shōjō-ji trommeln die Tanuki im Mondlicht', 'tanuki_bayashi', (170, 120, 80), 'T', ['tanuki'], 3, True, hp=1, sig_bayashi=1)
+I('gojo_giboshi', 'Giboshi der Gojō-Brücke', 'Hier stellte Benkei sich Ushiwakamaru in den Weg', 'gojo_giboshi', (200, 170, 90), 'T', [], 3, True, hp=1, sig_gojo=1)
+I('ido_kagami', 'Brunnenspiegel', 'Im Wasser des Brunnens zählt jemand Teller', 'ido_kagami', (150, 190, 230), 'T', ['yurei'], 3, True, spirit=1, sig_ido_kagami=1)
+I('sojobo_hane', 'Sōjōbōs Feder', 'Eine Feder des Tengu-Königs vom Kurama', 'sojobo_hane', (90, 90, 110), 'T', ['tengu'], 3, True, spd=6, sig_tengu_wirbel=1)
+I('juni_shinsho', 'Jūni-Shinshō', 'Die zwölf Himmelsgeneräle dienten Seimei als Shikigami', 'juni_shinsho', (230, 200, 120), 'T', ['shikigami'], 3, True, rate=0.1, sig_juni=1)
+I('setsubun_mame', 'Setsubun-Bohnen', '„Oni wa soto, fuku wa uchi!“', 'setsubun_mame', (210, 170, 110), 'T', ['oni'], 3, True, luck=1, sig_mame=1)
+I('murakumo', 'Ame-no-Murakumo', 'Die Wolke, die stets über der Orochi hing', 'murakumo', (150, 160, 190), 'T', ['raijin'], 3, True, dmg=0.2, sig_murakumo=1)
 
 ITEM_IDS = ORDER
 
@@ -682,10 +692,10 @@ MARKS = [('boss3', 'Kapitel III', 'Besiege einen Boss in Kapitel III'),
          ('oku', 'Yomi / Iwato', 'Besiege Izanami oder Amaterasu'),
          ('oni', 'Oni-Modus', 'Gewinne im Oni-Modus')]
 CHAR_UNLOCKS = {
-    'hana': {'boss3': 'haraegushi', 'sieg': 'hi_ogi'}, 'kenji': {'boss3': 'zanshin_tsuba', 'sieg': 'muramasa'}, 'kuzunoha': {'boss3': 'kuzu_blatt', 'sieg': 'fuchs_trugbild'},
-    'ponpoko': {'boss3': 'bunbuku_kessel', 'sieg': 'shigaraki_tanuki'}, 'benkei': {'boss3': 'tausendstes_schwert', 'sieg': 'tachi_ojo'}, 'okiku': {'boss3': 'neunter_teller', 'sieg': 'tsurube'},
-    'kotaro': {'boss3': 'tengu_tsubute', 'sieg': 'kakuremino'}, 'seimei': {'boss3': 'taizan_fukun', 'sieg': 'hoki_naiden'}, 'akago': {'boss3': 'ibaraki_arm', 'sieg': 'masakari'},
-    'susanoo': {'boss3': 'yashiori_sake', 'sieg': 'habakiri'},
+    'hana': {'boss3': 'haraegushi', 'sieg': 'hi_ogi', 'himmel': 'tamagushi'}, 'kenji': {'boss3': 'zanshin_tsuba', 'sieg': 'muramasa', 'himmel': 'kesagiri'}, 'kuzunoha': {'boss3': 'kuzu_blatt', 'sieg': 'fuchs_trugbild', 'himmel': 'hoshi_tama'},
+    'ponpoko': {'boss3': 'bunbuku_kessel', 'sieg': 'shigaraki_tanuki', 'himmel': 'tanuki_bayashi'}, 'benkei': {'boss3': 'tausendstes_schwert', 'sieg': 'tachi_ojo', 'himmel': 'gojo_giboshi'}, 'okiku': {'boss3': 'neunter_teller', 'sieg': 'tsurube', 'himmel': 'ido_kagami'},
+    'kotaro': {'boss3': 'tengu_tsubute', 'sieg': 'kakuremino', 'himmel': 'sojobo_hane'}, 'seimei': {'boss3': 'taizan_fukun', 'sieg': 'hoki_naiden', 'himmel': 'juni_shinsho'}, 'akago': {'boss3': 'ibaraki_arm', 'sieg': 'masakari', 'himmel': 'setsubun_mame'},
+    'susanoo': {'boss3': 'yashiori_sake', 'sieg': 'habakiri', 'himmel': 'murakumo'},
 }
 for _c, _ms in CHAR_UNLOCKS.items():
     for _m, _n, _d in MARKS:

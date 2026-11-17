@@ -226,6 +226,16 @@ TEXT = {
     'hoki': 'Jeder 6. Wurf ist ein Papiervogel, der Feinde durchbohrend verfolgt (120 %)',
     'masakari': 'Jeder 5. Wurf ist eine Axt, die alles durchschlägt und zurückkehrt (250 %)',
     'habakiri': 'Jeder 8. Treffer: Habakiri-Schnitt mit 300 % Schaden oder 4 % des Feindlebens (der höhere Wert)',
+    'tamagushi': 'Jeder 3. Raum ohne Treffer: die Kami nehmen das Opfer an – ½ Herz',
+    'kesagiri': 'Jeder 4. Wurf: zwei durchbohrende Klingen schneiden schräg (je 120 %)',
+    'hoshi_tama': 'Jeder Kill: 10 % (+2 % je Glück) Chance auf einen Fuchsfeuer-Ring – 8 brennende Flammen (60 %)',
+    'bayashi': 'Stehst du still, trommelst du: alle 2 s eine Schallwelle – 150 % im Umkreis, stößt Yokai weg',
+    'gojo': 'Wirst du getroffen, fegt die Naginata um dich: 300 % im Umkreis, schleudert Yokai weg',
+    'ido_kagami': 'Alle 3 s fängt der Brunnenspiegel ein Feindgeschoss nahe dir und wirft es zurück (150 %)',
+    'tengu_wirbel': 'Die Rolle entfacht einen Wirbelsturm: 120 % im Umkreis, nahe Feindgeschosse verweht',
+    'juni': 'Jeder 12. Wurf: die zwölf Himmelsgeneräle – zwölf Talismane im Kreis (je 60 %)',
+    'mame': 'Jeder 3. Wurf streut drei geröstete Bohnen (40 %); getroffene Yokai fliehen 1 s',
+    'murakumo': 'Eine Gewitterwolke folgt dir: alle 2 s ein Blitz auf den nächsten Feind (100 %)',
 }
 
 BULLET_SIGS = ('sichel', 'kammzinken', 'seidenfaden', 'stromauf', 'gross', 'schweben', 'windstoss', 'koi_drache')
@@ -275,6 +285,18 @@ def _chain_strikes(run, src, n, dmg):
 
 def _float(run, e, txt, col):
     run.floats.append([e.x, e.y - 16, txt, col, 0.6])
+
+
+def _blast(run, x, y, rad, dmg, col, push=0):
+    """Welle um (x, y): jeder Feind im Umkreis einmal getroffen, Nicht-Bosse weggestoßen."""
+    _ring(run, x, y, col, rad)
+    for e in list(run.enemies):
+        d = math.hypot(e.x - x, e.y - y)
+        if e.active() and d < rad + e.r:
+            run.damage_enemy(e, dmg, None)
+            if push and not e.is_boss:
+                e.kx += (e.x - x) / (d or 1) * push
+                e.ky += (e.y - y) / (d or 1) * push
 
 
 _SYN_NAME = {}
@@ -631,6 +653,19 @@ def _siegel_fire(p, run, bullets, g, n, base, dmg, spd, life, size):
         b.r *= 1.3
         b.col = (220, 120, 60)
         b.fl = dict(b.fl, boomerang=1, pierce=1)
+    if 'kesagiri' in S and n % 4 == 0:                   # Diagonalschnitt
+        for da in (-0.6, 0.6):
+            nb = run.fire_player_bullet(p.x, p.y - 3, base + da, dmg * 1.2, spd * 1.1, 3, life, {'pierce': 1})
+            nb.col = (230, 230, 245)
+    if 'juni' in S and n % 12 == 0:                      # Jūni-Shinshō
+        for k in range(12):
+            nb = run.fire_player_bullet(p.x, p.y - 3, base + k * math.pi / 6, dmg * 0.6, spd * 0.8, 2.5, life, {})
+            nb.col = (230, 200, 120)
+    if 'mame' in S and n % 3 == 0:                       # Oni wa soto!
+        for _ in range(3):
+            nb = run.fire_player_bullet(p.x, p.y - 3, base + random.uniform(-0.45, 0.45), dmg * 0.4,
+                                        spd * random.uniform(0.75, 1.0), 1.5, life * 0.7, {'mame': 1})
+            nb.col = (210, 170, 110)
 
 
 def bullet_end(run, b):
@@ -747,6 +782,8 @@ def hit_post(run, e, b, dmg):
         return
     g = st(p)
     echo = getattr(run, '_echo', False)   # Schaden von Bodenfeuer, Blitz oder Explosion
+    if b is not None and b.fl.get('mame') and not e.is_boss:
+        e.sg_fear = max(getattr(e, 'sg_fear', 0), 1.0)
     if 'treffsicher' in S:
         hi = 'goetter_arsenal' in S
         g['ts'] = min(0.35 if hi else 0.2, g.get('ts', 0) + (0.04 if hi else 0.02))
@@ -886,6 +923,11 @@ def on_kill(run, e):
         if g['bd'] % 15 == 0:
             p.heal(1)
             _float(run, e, 'Blut', (220, 60, 70))
+    if 'hoshi_tama' in S and random.random() < 0.10 + 0.02 * p.s['luck']:
+        _float(run, e, 'Hoshi no Tama', (255, 210, 150))
+        for k in range(8):                               # Fuchsfeuer-Ring
+            nb = run.fire_player_bullet(e.x, e.y, k * math.pi / 4, p.damage() * 0.6, 120, 3, 0.9, {'burn': 1})
+            nb.col = (120, 200, 255)
     if 'zanshin' in S:
         g['zs'] = min(5, g.get('zs', 0) + 1) if run.time - g.get('zs_t', -9) < 2.0 else 1
         g['zs_t'] = run.time
@@ -987,6 +1029,8 @@ def on_hurt(p, run):
         p.iframes = max(p.iframes, 3.0)
         _ring(run, p.x, p.y, (210, 200, 180), 50)
         run.banner('Tachi-ōjō', 'Aufrecht bis zum letzten Atemzug', (220, 210, 190))
+    if 'gojo' in S:                                      # Benkeis Naginata fegt um ihn
+        _blast(run, p.x, p.y, 55, p.damage() * 3, (200, 170, 90), 380)
     g['ts'] = 0
     if 'hannya_zorn' in S:
         g['hannya'] = 6.0
@@ -1136,6 +1180,9 @@ def on_dash(p, run):
     g = st(p)
     if 'doppelgaenger' in S:                             # Kuzunohas Spiegelbild bleibt stehen
         g['trug'] = [p.x, p.y, 3.0]
+    if 'tengu_wirbel' in S:                              # Sōjōbōs Feder: Wirbelsturm
+        _blast(run, p.x, p.y, 45, p.damage() * 1.2, (180, 190, 210), 260)
+        run.ebullets[:] = [b for b in run.ebullets if math.hypot(b.x - p.x, b.y - p.y) > 45]
     if 'chagama' in S:                                   # Bunbuku-Chagama: kurz ein heißer Teekessel
         p.iframes = max(p.iframes, 0.8)
         g['kessel'] = 0.8
@@ -1290,6 +1337,10 @@ def on_room_clear(run):
         if g['ewig'] >= 5:
             g['ewig'] = 0
             p.heal(1)
+    if 'tamagushi' in S and not g.get('room_hit'):
+        g['tama'] = g.get('tama', 0) + 1
+        if g['tama'] % 3 == 0 and p.heal(1):
+            run.floats.append([p.x, p.y - 20, 'Tamagushi', (110, 180, 90), 0.8])
     if 'opfergabe' in S and random.random() < (0.1 + 0.01 * luck) * (3 if 'shinsen' in S else 1):
         run.spawn_pickup('key', p.x, p.y - 20)
         if 'shinsen' in S:
@@ -1688,6 +1739,32 @@ def _siegel_tick(p, run, dt, S, g):
             run.particles.append(Particle(tr[0] + random.uniform(-5, 5), tr[1] - random.uniform(0, 14), 0, -12, 0.35, (255, 170, 90), 2))
     if 'kakuremino' in S and g.get('still', 0) >= 1.0 and run.time - g.get('fire_t', -9) >= 1.0:
         g['invis'] = max(g.get('invis', 0), 0.1)
+    if 'bayashi' in S:                                   # Tanuki-bayashi: Bauchtrommel im Stillstand
+        g['bay'] = g.get('bay', 0) + dt if g.get('still', 0) > 0.3 else 0
+        if g['bay'] >= 2.0 and any(e.active() for e in run.enemies):
+            g['bay'] = 0
+            _blast(run, p.x, p.y, 60, p.damage() * 1.5, (170, 120, 80), 300)
+    if 'ido_kagami' in S:
+        g['ido'] = g.get('ido', 0) + dt
+        if g['ido'] >= 3.0:
+            eb = min(run.ebullets, key=lambda b: math.hypot(b.x - p.x, b.y - p.y), default=None)
+            tgt = run.nearest_enemy(p.x, p.y)
+            if eb and tgt and math.hypot(eb.x - p.x, eb.y - p.y) < 50:
+                g['ido'] = 0
+                run.ebullets.remove(eb)
+                nb = run.fire_player_bullet(eb.x, eb.y, math.atan2(tgt.y - eb.y, tgt.x - eb.x), p.damage() * 1.5, 220, 3, 1.5, {})
+                nb.col = (150, 190, 230)
+                _ring(run, eb.x, eb.y, (150, 190, 230), 12)
+    if 'murakumo' in S:                                  # Gewitterwolke über dem Kopf
+        g['mk'] = g.get('mk', 0) + dt
+        if random.random() < 0.3:
+            from .entities import Particle
+            run.particles.append(Particle(p.x + random.uniform(-9, 9), p.y - 26 + random.uniform(-3, 3), 0, 4, 0.5, (110, 115, 140), 3))
+        e = _nearest(run, p.x, p.y, 160) if g['mk'] >= 2.0 else None
+        if e:
+            g['mk'] = 0
+            run.zap(p.x, p.y - 26, e.x, e.y)
+            run.lightning(e.x, e.y, p.damage())
     if g.get('kessel', 0) > 0 and random.random() < 0.4:
         from .entities import Particle
         run.particles.append(Particle(p.x + random.uniform(-5, 5), p.y - 8, 0, -30, 0.4, (225, 225, 220), 2))

@@ -371,10 +371,177 @@ def habakiri():
     c.fill(E(26, 22, 1, 1), 'q')
     return c
 
+
+def tamagushi():
+    """Tamagushi: Sakaki-Zweig mit glänzenden Blättern, daran weiße Zickzack-Shide."""
+    c = Cv()
+    c.form(L(5, 29, 1.4, 25, 5, 1.0), 'jdD', 1, 1, ring='K')         # Zweig
+    for cx, cy, deg in ((9, 21, -70), (14, 22, 20), (13, 15, -60), (19, 16, 25), (18, 9, -55), (24, 9, 30), (23, 4, -40)):
+        c.form(REL(cx, cy, 4.2, 2.2, deg), 'FfG', 1, 1, ring='K')
+    for cx, cy in ((9, 21), (13, 15), (18, 9)):
+        c.a[cy - 1, cx] = 'l'
+    pts = [(16, 13), (20, 16), (16, 19), (20, 22), (16, 25), (19, 28)]  # Shide
+    c.line(pts, 'W', 2)
+    c.line(pts[1::2], 'v', 1)
+    c.form(E(15, 13, 1.6, 1.4), 'qrR', 0, 1, ring='K')                 # Knoten
+    sparkle(c, 27, 22, 'W', 'Y')
+    return c
+
+
+def kesagiri():
+    """Kesa-giri-Rolle: halb geöffnete Schriftrolle, quer darüber ein roter Diagonalschnitt."""
+    c = Cv()
+    c.form(R(6, 7, 26, 24), 'cCs', 1, 1, ring='K')                    # Papier
+    c.form(R(3, 5, 7, 26), 'jdD', 1, 1, ring='K')                     # Stäbe
+    c.form(R(25, 5, 29, 26), 'jdD', 1, 1, ring='K')
+    c.form(R(4, 4, 6, 6) | R(4, 25, 6, 27) | R(26, 4, 28, 6) | R(26, 25, 28, 27), 'ogy', 0, 1, ring='K')
+    for x in (10, 13, 16):                                             # Schriftspalten
+        for y in range(10, 22, 3):
+            c.a[y, x] = 'k'
+    c.line([(8, 22), (24, 9)], 'q', 3)                                 # Diagonalschnitt
+    c.line([(8, 22), (24, 9)], 'R', 1)
+    c.line([(5, 25), (8, 22)], 'W', 1)
+    sparkle(c, 24, 9, 'W', 'R')
+    return c
+
+
+def hoshi_tama():
+    """Hoshi no Tama: zwiebelförmiges Juwel mit Spitze, darin ein blaues Fuchsfeuer, umweht von Flammen."""
+    c = Cv()
+    for x0, d in ((6, -1), (26, 1)):                                    # umwehende Flammen
+        fl = E(x0, 22, 2.6, 3) | PG([(x0 - 2, 21), (x0 + 2 * d, 13), (x0 + 2, 21)])
+        c.form(fl, '789', 0, 1, ring='K')
+    jewel = E(16, 20, 8.5, 8) | PG([(9, 17), (16, 3), (23, 17)])
+    c.form(jewel, 'nvW', 2, 1, ring='K')
+    c.fill(E(16, 21, 6, 5.5), 'w')
+    flame = E(16, 23, 3.4, 3.2) | PG([(13, 22), (16, 13), (19, 22)])  # Fuchsfeuer im Inneren
+    c.form(flame, 'zaA', 0, 1)
+    c.fill(E(16, 24, 1.4, 1.4), 'W')
+    c.form(R(11, 27, 21, 29), 'ogy', 0, 1, ring='K')                   # Fassung
+    sparkle(c, 21, 8, 'W', 'Y')
+    return c
+
+
+def tanuki_bayashi():
+    """Tanuki-bayashi: runder Tanuki-Bauch, zwei Pfoten schlagen die Trommel, Schallbögen, Vollmond."""
+    c = Cv()
+    c.form(E(26, 5, 3.8, 3.8), 'gyY', 0, 1, ring='K')                  # Mond
+    belly = E(16, 22, 9.5, 7.5)
+    c.form(belly, 'jdD', 2, 1, ring='K')
+    c.form(E(16, 23, 6.5, 5.2), 'cCs', 1, 1)                           # Trommelbauch
+    c.a[23, 16] = 'd'
+    for x in (11, 21):                                                 # Ohren
+        c.form(E(x, 5, 2, 2), 'jdD', 0, 1, ring='K')
+    head = E(16, 10, 6, 5)
+    c.form(head, 'jdD', 1, 1, ring='K')
+    c.fill(E(16, 10, 4.6, 1.6) & head, 'k')                            # Augenmaske
+    c.a[10, 14] = 'W'; c.a[10, 18] = 'W'
+    c.fill(E(16, 13, 2.2, 1.4), 's')
+    c.a[13, 16] = 'K'
+    for x, y in ((7, 18), (25, 18)):                                   # trommelnde Pfoten
+        c.form(E(x, y, 2.6, 2.2), 'khH', 1, 1, ring='K')
+    for r in (0, 3):                                                   # Schallbögen
+        c.line([(4 - r * 0.6, 21), (2 - r * 0.6, 24), (4 - r * 0.6, 27)], 'y', 1)
+        c.line([(28 + r * 0.6, 21), (30 + r * 0.4, 24), (28 + r * 0.6, 27)], 'y', 1)
+    return c
+
+
+def gojo_giboshi():
+    """Giboshi der Gojō-Brücke: zwiebelförmige Bronzekappe auf rot lackiertem Pfosten, dahinter eine Naginata."""
+    c = Cv()
+    c.line([(4, 29), (27, 4)], 'jdD'[1], 2)                            # Naginata-Schaft
+    c.form(PG([(23, 9), (27, 3), (30, 1), (28, 6)]), '23W', 0, 1, ring='K')
+    post = R(11, 17, 21, 30)
+    c.form(post, 'qrR', 2, 1, ring='K')
+    c.form(R(10, 15, 22, 18), 'ogy', 1, 1, ring='K')                   # Kragen
+    cap = E(16, 11, 6, 5) | PG([(11, 10), (16, 2), (21, 10)])
+    c.form(cap, 'Ffo', 2, 1, ring='K')                                 # Bronze mit Grünspan
+    c.fill(E(14, 10, 1.4, 2.4), 'y')
+    c.form(E(16, 2.5, 1.5, 1.5), 'ogy', 0, 1, ring='K')
+    c.line([(11, 23), (21, 23)], 'q', 1)
+    return c
+
+
+def ido_kagami():
+    """Brunnenspiegel: steinerne Brunnenfassung von oben, im Wasser spiegelt ein zerbrochener Teller."""
+    c = Cv()
+    rim = E(16, 17, 13, 11)
+    c.form(rim, '012', 2, 1, ring='K')
+    for k in range(8):                                                 # Steinfugen
+        a = k * math.pi / 4
+        c.line([(16 + 9.5 * math.cos(a), 17 + 7.8 * math.sin(a)), (16 + 12.5 * math.cos(a), 17 + 10.5 * math.sin(a))], '0', 1)
+    water = E(16, 17, 9, 7.5)
+    c.form(water, 'zaA', 1, 0, ring='K')
+    c.fill(water & ~E(16, 18, 8, 6.5), 'z')
+    plate = E(16, 17, 5, 3.6)
+    c.form(plate, 'nvW', 1, 1)
+    c.fill(E(16, 17, 2.6, 1.8), 'a')
+    c.line([(15, 14), (17, 17), (16, 20)], 'z', 1)                     # Sprung
+    for x, y in ((9, 15), (23, 19)):
+        c.a[y, x] = 'W'
+    return c
+
+
+def sojobo_hane():
+    """Sōjōbōs Feder: große schwarze Schwungfeder mit hellem Kiel, umweht von Windwirbeln."""
+    c = Cv()
+    for r, ch in ((11, 'w'), (7, 'v')):                                # Wirbel
+        pts = [(16 + r * math.cos(t / 6), 16 + r * 0.8 * math.sin(t / 6)) for t in range(0, 26)]
+        c.line(pts, ch, 1)
+    vane = REL(15, 17, 13, 4.5, -45) & ~REL(23, 7, 4, 3, -45)
+    c.form(vane, 'khH', 2, 1, ring='K')
+    for k in range(-3, 4):                                             # Fahnenkerben
+        c.a[17 + k * 3 - 1 if 0 <= 17 + k * 3 - 1 < 32 else 0, 15 + k * 3 if 0 <= 15 + k * 3 < 32 else 0] = 'h'
+    c.line([(5, 27), (24, 8)], 'B', 1)                                 # Kiel
+    c.line([(3, 29), (6, 26)], 'i', 2)
+    return c
+
+
+def juni_shinsho():
+    """Jūni-Shinshō: zwölf goldene Generalsflammen im Kreis um Seimeis Kikyō-Stern."""
+    c = Cv()
+    c.form(E(16, 16, 7, 7), 'IJO', 1, 1, ring='K')
+    star = [(16 + 5 * math.cos(-math.pi / 2 + k * 4 * math.pi / 5), 16 + 5 * math.sin(-math.pi / 2 + k * 4 * math.pi / 5)) for k in range(6)]
+    c.line(star, 'W', 1)
+    for k in range(12):
+        a = k * math.pi / 6
+        x, y = 16 + 12.5 * math.cos(a), 16 + 12.5 * math.sin(a)
+        c.form(E(x, y, 2.1, 2.1), 'ogy' if k % 3 else 'qrR', 0, 1, ring='K')
+    return c
+
+
+def setsubun_mame():
+    """Setsubun-Bohnen: hölzerne Masu voller gerösteter Sojabohnen, einige fliegen heraus."""
+    c = Cv()
+    c.form(PG([(4, 15), (28, 15), (25, 29), (7, 29)]), 'jdD', 2, 1, ring='K')   # Masu
+    c.form(PG([(4, 15), (28, 15), (26, 18), (6, 18)]), 'dDt', 0, 1, ring='K')
+    for x in range(7, 26, 3):                                          # Bohnenhaufen
+        c.form(E(x, 14 - (x % 2), 1.8, 1.5), 'dDt', 0, 1, ring='K')
+    for x, y in ((9, 6), (16, 3), (23, 7), (27, 11)):                  # fliegende Bohnen
+        c.form(E(x, y, 1.8, 1.5), 'dDt', 0, 1, ring='K')
+    c.line([(12, 22), (20, 22)], 't', 1)
+    c.form(E(16, 23, 2, 1.6), 'qrR', 0, 1)                             # Glückszeichen
+    return c
+
+
+def murakumo():
+    """Ame-no-Murakumo: geballte Gewitterwolke, darunter ein Blitz, der in ein Schwert übergeht."""
+    c = Cv()
+    cloud = E(9, 11, 6, 5) | E(17, 8, 7, 6) | E(24, 12, 6, 5) | R(5, 11, 28, 16)
+    c.form(cloud, '012', 2, 1, ring='K')
+    c.fill(cloud & E(16, 15, 13, 2.2), '0')
+    bolt = PG([(17, 16), (13, 23), (16, 23), (12, 30), (21, 21), (18, 21), (21, 16)])
+    c.form(bolt, 'gyY', 0, 1, ring='K')
+    for x, y in ((7, 19), (25, 20), (27, 25), (6, 25)):                # Regen
+        c.line([(x, y), (x - 1, y + 3)], 'a', 1)
+    return c
+
 NAMES = ['haraegushi', 'zanshin_tsuba', 'kuzu_blatt', 'bunbuku_kessel', 'tausendstes_schwert', 'neunter_teller',
          'tengu_tsubute', 'taizan_fukun', 'ibaraki_arm', 'yashiori_sake',
          'hi_ogi', 'muramasa', 'fuchs_trugbild', 'shigaraki_tanuki', 'tachi_ojo', 'tsurube', 'kakuremino', 'hoki_naiden',
-         'masakari', 'habakiri']
+         'masakari', 'habakiri',
+         'tamagushi', 'kesagiri', 'hoshi_tama', 'tanuki_bayashi', 'gojo_giboshi', 'ido_kagami', 'sojobo_hane',
+         'juni_shinsho', 'setsubun_mame', 'murakumo']
 
 
 def build():

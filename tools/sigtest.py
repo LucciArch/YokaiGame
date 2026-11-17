@@ -196,5 +196,28 @@ sigs.on_dash(p, run); n0 = len(run.pbullets)
 sigs.on_fire(p, run, [Bullet(100, 100, 50, 0, 10, 3, 1, 'p', (255, 255, 255), {})])
 if len(run.pbullets) - n0 != 1:
     print('FEHLER Fuchs-Trugbild', len(run.pbullets) - n0); bad += 1
+# Welle „Takamagahara“: Kesa-giri, Jūni-Shinshō, Gojō-Brücke, Tamagushi, Murakumo
+g.start_run('hana', 23); run = g.run; p = run.player
+for iid in ('kesagiri', 'juni_shinsho', 'gojo_giboshi', 'tamagushi', 'murakumo'):
+    p.gain_item(iid, silent=True)
+ns = []
+for _ in range(12):
+    n0 = len(run.pbullets); sigs.on_fire(p, run, [Bullet(100, 100, 50, 0, 10, 3, 1, 'p', (255, 255, 255), {})]); ns.append(len(run.pbullets) - n0)
+if ns[3] != 2 or ns[11] != 14 or ns[0] != 0:
+    print('FEHLER Kesa-giri/Juni', ns); bad += 1
+e = make_boss(run, 'shuten_doji'); e.x, e.y = p.x + 30, p.y; e.spawn_t = 0; e.invuln = False; run.enemies = [e]; h0 = e.hp
+p.iframes = 0; p.hp = 6; p.spirit = 0; p.hurt(1)
+if not e.hp < h0:
+    print('FEHLER Gojo'); bad += 1
+run.hazards = []
+for _ in range(25):
+    sigs.tick(p, run, 0.1)
+if not any(h.kind == 'strike' for h in run.hazards):
+    print('FEHLER Murakumo'); bad += 1
+p.hp = 2; sigs.st(p)['room_hit'] = False
+for _ in range(3):
+    sigs.on_room_clear(run)
+if p.hp != 3:
+    print('FEHLER Tamagushi', p.hp); bad += 1
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)
