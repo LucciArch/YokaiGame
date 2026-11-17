@@ -60,7 +60,9 @@ def _hit(run, e, hx, hy, dmg, ang, fl, t=0.0, curve=0):
     b.t, b.curve = t, curve
     run.damage_enemy(e, dmg, b)
     if b.fl.get('explode') and e.hp <= dmg * 3:            # Sprengsiegel: Treffer zerplatzen
+        from . import sigs
         run.explode(hx, hy, 22, dmg * 0.7, 'p')
+        sigs.bullet_end(run, b)                             # Ende-Fähigkeiten der Sprengsiegel (Feuerwerk über Edo)
 
 
 def _aim(run, x, y, ang, cone, reach, taken=None):

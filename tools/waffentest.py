@@ -170,5 +170,13 @@ p.fire((1, 0))
 check('kappa_fest' in sigs.st(p).get('syn_seen', []), 'Strahl-Spiegelung weckt Kappa-Festmahl nicht')
 check(sum(1 for b in r.pbullets if b.fl.get('_br')) == 2, 'Strahl-Spiegelung weckt Brandung nicht genau einmal')
 random.random = _rnd
+# Feuerwerk über Edo: zerplatzende Sprengsiegel-Hiebe sprühen brennende Funken
+r, p, e, _ = sword_hit({'feuerwerk'}, explode=1)
+check(sum(1 for b in r.pbullets if b.fl.get('burn')) == 0, 'Feuerwerk zündet ohne Explosion')
+r, p = setup(w_sword=1, explode=1)
+p.sgs = {'feuerwerk'}
+e = Enemy(r, 'nurikabe', p.x + 20, p.y - 4); r.enemies.append(e); e.spawn_t = 0; e.hp = 1
+p.fire((1, 0))
+check(sum(1 for b in r.pbullets if b.fl.get('burn')) == 5, 'Feuerwerk: Sprengsiegel-Hieb sprüht keine fünf Funken')
 print('Waffen-Synergien geprüft, Fehler:', bad)
 sys.exit(1 if bad else 0)
