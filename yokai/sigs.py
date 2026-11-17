@@ -202,6 +202,7 @@ TEXT = {
     'hanami_picknick': 'Bei vollen Herzen +40 % statt +20 %',
     'shogatsu': 'Klebende Feinde sind verflucht: doppelter Schaden',
     'pilger': '+10 % Schaden pro Ebene statt +5 %',
+    'misogi': 'Salz verwandelt alle Feindgeschosse im Raum in Shide (bis 12, je 60 %); die Rolle reinigt weiter (90, bis 8)',
     'henro': 'Jede neue Ebene faltet zwei Kraniche, jede 2. Ebene bringt ein Geisterherz',
     'sommerwind': 'Die Rolle wirft acht Federn, die weiter fliegen',
     'fest_der_laternen': 'Treffer entzünden doppelt so oft den Boden, die Flammen brennen länger',
@@ -1311,6 +1312,20 @@ def _momo(p, run, mult=3):
     _ring(run, p.x, p.y, (255, 170, 140), reach * 0.6)
 
 
+def _shide(p, run, rad, n, mult):
+    """Feindgeschosse im Umkreis werden zu Shide-Streifen, die auf den nächsten Feind zurückfliegen."""
+    near = [b for b in run.ebullets if math.hypot(b.x - p.x, b.y - p.y) < rad]
+    run.ebullets[:] = [b for b in run.ebullets if b not in near]
+    for b in near[:n]:
+        tgt = _nearest(run, b.x, b.y, 300)
+        a = math.atan2(tgt.y - b.y, tgt.x - b.x) if tgt else math.atan2(-b.vy, -b.vx)
+        nb = run.fire_player_bullet(b.x, b.y, a, p.damage() * mult, 220, 2.5, 1.0, {})
+        nb.col = (245, 245, 235)
+    if near:
+        _ring(run, p.x, p.y, (245, 245, 235), min(rad, 120))
+    return len(near[:n])
+
+
 def on_dash(p, run):
     S = p.sgs
     if not S:
@@ -1321,15 +1336,7 @@ def on_dash(p, run):
     if 'hanadaka' in S:
         g['hd'] = 3
     if 'onusa' in S:                                     # Ōnusa: Geschosse werden zu Shide
-        near = [b for b in run.ebullets if math.hypot(b.x - p.x, b.y - p.y) < 60]
-        run.ebullets[:] = [b for b in run.ebullets if b not in near]
-        for b in near[:6]:
-            tgt = _nearest(run, b.x, b.y, 300)
-            a = math.atan2(tgt.y - b.y, tgt.x - b.x) if tgt else math.atan2(-b.vy, -b.vx)
-            nb = run.fire_player_bullet(b.x, b.y, a, p.damage() * 0.4, 220, 2.5, 1.0, {})
-            nb.col = (245, 245, 235)
-        if near:
-            _ring(run, p.x, p.y, (245, 245, 235), 60)
+        _shide(p, run, *((90, 8) if 'misogi' in S else (60, 6)), 0.4)
     if 'tengu_wirbel' in S:
         _blast(run, p.x, p.y, 45, p.damage() * 1.2, (180, 190, 210), 260)
         run.ebullets[:] = [b for b in run.ebullets if math.hypot(b.x - p.x, b.y - p.y) > 45]
@@ -1581,6 +1588,9 @@ def on_chest(run, pk):
 
 
 def on_salt(p, run):
+    if 'misogi' in p.sgs:   # Misogi: das Salz reinigt den ganzen Raum, jedes Geschoss wird zum Shide
+        if _shide(p, run, 999, 12, 0.6):
+            _syn(run, 'misogi', p.x, p.y, (245, 245, 235))
     if 'reinigung' in p.sgs:
         p.heal(2 if 'shinsen' in p.sgs else 1)
         if 'shinsen' in p.sgs:

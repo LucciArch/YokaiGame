@@ -370,6 +370,15 @@ for iid in ('kongozue', 'senbazuru'):
 sigs.st(p)['cranes'] = 3; sigs.on_floor(run)
 if 'henro' not in p.sgs or sigs.st(p)['cranes'] != 5 or not any('Henro' in l for l in sigs.nutz_lines(p)):
     print('FEHLER Henro'); bad += 1
+# Misogi (Ōnusa + Reinigungssalz): Salz macht alle Feindgeschosse im Raum zu Shide
+g.start_run('hana', 34); run = g.run; p = run.player
+for iid in ('onusa', 'kiyome_sack'):
+    p.gain_item(iid, silent=True)
+run.ebullets[:] = []
+run.ebullets += [Bullet(p.x + 200, p.y + k * 3, -50, 0, 1, 3, 5, 'e', (255, 0, 0)) for k in range(15)]
+n0 = len(run.pbullets); p.salts = 1; run.use_salt()
+if 'misogi' not in p.sgs or run.ebullets or len(run.pbullets) - n0 != 12:
+    print('FEHLER Misogi', len(run.pbullets) - n0); bad += 1
 # Quests Teil 3: 50 Kami-Gaben → Nusa, Schleife 3 → Yatagarasu-Feder
 g.save['stats']['kami_deals'] = 49
 pd = Pedestal(data.ITEM_IDS[0], p.x, p.y + 6); pd.shrine = 'kami'; pd.cool = 0; run.pedestals = [pd]; run.collect()
