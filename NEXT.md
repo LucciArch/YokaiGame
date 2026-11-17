@@ -115,13 +115,24 @@ für Talismane greifen (z. B. `bullet_tick`) – sollen sie auch für Strahl/Hie
 - Methode: `synbalance.py ... --leben`, Vergleich mit Synergie-fx entfernt (Items allein), dann Werte variieren.
   Achtung: 12 Seeds streuen stark (±5 Punkte), Effekte sind oft nicht linear.
 
-# Nächster Schritt: Balance Orochi-Kusanagi und Izanagis Flucht, Jingi-Blitze prüfen
-Warum: Nach Runde 89 liegen Orochi-Kusanagi (50,4 %) und Izanagis Flucht (47,7 %) an der Spitze (Median 13,4 %).
-Gleiche Methode wie 87–89. Bei Jingi prüfen, ob `run.lightning` → `sigs.on_lightning` Folge-Sigs mehrfach am Boss
-auslöst (Blitze allein heben Jingi von 39 auf 68 %). Danach Gegencheck mit `--waffe=w_sword` für die geänderten fünf.
+# Erledigt (Runden 90–92): Balance Spitze und unteres Ende
+- Runde 90: Orochi-Kusanagi Vergiftete 1,2× ohne dmgm (50 → 40 %), Izanagis Flucht Rollen-Pfirsiche 150 % (`_momo(mult)`;
+  48 → 38 %). Jingi-Blitze: `run.lightning` trifft einmal, `_echo` blockt Folge-Sigs – keine Mehrfachauslösung.
+- Runde 91: **Messfehler** – synbalance lief nur mit `--waffe=` an Nahkampf heran; jetzt nach `weapons.weapon_of(p)`.
+  Nahkampf ist im `--leben`-Maß benachteiligt → Vergleich mit `--waffe=w_sword`/`w_fan`-Basis. Göttliches Arsenal:
+  Speerstoß schießt Hachiman-Pfeil (Speer verdrängte den Bogen). Kranichschwarm: immer ≥ 2 Kraniche.
+- Runde 92: Sturmfächer – jeder 3. Angriff ein Blitz; Großer Wind – weggewehte Geschosse als Windklinge zurück (`_tf`).
+- Berichte `balance-check-90/91/92`. sigtest prüft Arsenal-Pfeil und Sturmfächer-Blitz.
+
+# Nächster Schritt: Waffen-Verdrängung bei Synergien prüfen
+Warum: Das Arsenal zeigte eine Falle – zwei Items mit verschiedenen Waffen (`w_*`), nur die erste in `weapons.ORDER`
+zählt, das zweite Item verliert seinen Kern. Alle Synergien durchgehen, deren Items zusammen zwei Waffenarten geben
+(auch über `data.py` Zeile ~692, wo Items Waffen-Flags bekommen), und je eine Brücke bauen wie beim Arsenal.
+Danach `synbalance.py shuten_doji 5 --leben` und das untere Ende (Faktor < 0,7) gegen die passende Waffen-Basis prüfen.
 
 # Weitere Ideen
-- Synergien am unteren Ende (Faktor < 1 gegen Zufall) aufwerten, damit keine Kombination eine Falle ist
+- Synergien am unteren Ende weiter aufwerten (aktuell u. a. mondschein_teich, kappa_fest, mokumokuren ~×0,72)
+- Fächer als Waffe allgemein schwach im Bosskampf (Basis 4,4 % gegen 10,4 % Talisman) – Fächer-Reichweite prüfen
 - Eigene Hi-Res-Wanddekos für die übrigen 10 Biome (chikurin, inari, obakedera, hakaba, kurama, yukiyama, ryugu,
   uminobe, yomi, takamagahara), je Runde drei
 - Mondpalast-Ambiente: fallende Katsura-Blätter, Mondhase als seltener Ereignis-NPC (Mochi-Tausch)
