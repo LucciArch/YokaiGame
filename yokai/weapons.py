@@ -181,9 +181,9 @@ def beam(run, x, y, ang, dmg, width=4, col=(255, 236, 150), fl=None, bounces=Non
                 continue
             perp = abs(px_ * dy - py_ * dx)
             if perp <= hr + width:
-                _hit(run, e, hx, hy, dmg * (1 + 0.6 * along / 460 if 'stromauf' in S else 1), ang, fl,
+                _hit(run, e, hx, hy, dmg * (1 + 0.6 * along / 460 if 'stromauf' in S else 1), ang, dict(fl, pierce=1),
                      t=along / max(1, run.player.s['shotspd']))
-                fl = dict(fl, _ric=9)                       # Wurfstern: nur ein Abpraller pro Strahl
+                fl = dict(fl, _ric=9, _rat=1)               # Wurfstern/Tessos Schwarm: nur der erste Treffer pro Strahl
                 break
     _path_sigs(run, S, x, y, dx, dy, L, width, dmg)
     if 'kammzinken' in S and not fl.get('_kz') and L > 60:   # der Strahl spaltet sich wie Kammzinken
@@ -192,8 +192,13 @@ def beam(run, x, y, ang, dmg, width=4, col=(255, 236, 150), fl=None, bounces=Non
             beam(run, x + dx * L * 0.5, y + dy * L * 0.5, ang + da, dmg * 0.6, max(2, width * 0.7), col, kf, 0)
     run.slashes.append(dict(kind='w_laser', x=x, y=y, ang=ang, r=L, arc=0, t=0.0, life=0.12, col=col, w=width))
     if wall and bounces > 0:                                # Spiegelung: Einfallswinkel = Ausfallswinkel
+        from . import sigs
         ex, ey = x + dx * (L - 4), y + dy * (L - 4)
-        beam(run, ex, ey, math.atan2(-dy if wall[1] else dy, -dx if wall[0] else dx), dmg * 0.8, width, col, fl, bounces - 1)
+        na = math.atan2(-dy if wall[1] else dy, -dx if wall[0] else dx)
+        cb = _carrier(ex, ey, na, dmg, fl)
+        cb.r = width
+        sigs.bullet_bounce(run, cb)                         # Abprall-Fähigkeiten (Kappa-Festmahl, Brandung); _br bleibt im fl
+        beam(run, ex, ey, na, dmg * 0.8, width, col, cb.fl, bounces - 1)
 
 
 def shot_angles(p, base):

@@ -98,6 +98,7 @@
 - Runde 74 – **Laternen leuchten:** Kitsune-bi, Yūrei-Laterne, Onibi-Ring, Feuer von Yomi, Chōchin-Feuer, Hōzuki-Laterne, Feuerrad des Kasha und Glut des Kagutsuchi machen dein Licht in dunklen Räumen größer (bis drei Stufen) und färben es in der Farbe der zuletzt gefundenen Flamme
 - Runde 75 – **Treffer-Fähigkeiten auch für Hieb und Strahl:** Mit Tsukuyomis Mondsichel zählen Schwert-, Sensen-, Speer- und Keulenhiebe als Sichelschnitte – die Mondsichel-Klinge lässt sie tief bluten (bis 6). Kyūdō verstärkt ferne Lichtstrahl-Treffer um 60 % wie weit geflogene Talismane. Shuriken lassen jetzt auch von Hieb und Strahl einen Wurfstern abprallen – einen pro Angriff, damit Hiebe in Gruppen nicht ausufern
 - Runde 76 – **Mehr Licht:** Kitsune-Laterne und Kerze der Onryō in der Hand sowie der Feuer-Anhänger machen dein Licht in dunklen Räumen größer, wie die Laternen-Items; ihre Farbe zeigt sich, solange du kein Laternen-Item trägst – die Onryō leuchtet jetzt von Anfang an violett
+- Runde 77 – **Strahl mit Ratten und Wasser:** Der Lichtstrahl durchbohrt von Natur aus und weckt deshalb Tessos Schwarm – höchstens eine Ratte pro Strahl. Prallt der Strahl mit einem Abprall-Item an der Wand ab, spritzt das Kappa-Festmahl bremsendes Wasser und Tsunami teilt die Spiegelung in zwei Wellen-Talismane
 
 ## 1.4.0 – „Hyakki-Update“ (enthält 1.3 „Kapitel-Update“)
 

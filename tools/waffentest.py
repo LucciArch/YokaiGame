@@ -1,5 +1,6 @@
 """Waffen-Items wirken mit den Wurf-Items zusammen: Mehrfachwurf, Zielsuche, Rückwurf, Feuer, Abprall."""
-import os, sys, math
+import os, sys, math, random
+_rnd = random.random
 os.environ['SDL_VIDEODRIVER'] = 'dummy'; os.environ['SDL_AUDIODRIVER'] = 'dummy'
 os.environ['APPDATA'] = os.path.join(os.environ.get('TEMP', '/tmp'), 'yokai_test')
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
@@ -154,5 +155,20 @@ base = r.collect_lights()[0][2]
 p.active, p.trinket = 'kitsune_laterne', 'am_hi'
 lx, ly, lr, lc = r.collect_lights()[0]
 check(lr == base + 32 and lc == (255, 140, 40), 'Kitsune-Laterne/Feuer-Anhänger leuchten nicht')
+# Tessos Schwarm: der Strahl durchbohrt von Natur aus, höchstens eine Ratte pro Strahl
+random.random = lambda: 0.0
+r, p = setup(w_laser=1)
+p.sgs = {'rattenschwarm'}
+for dx in (40, 80, 120):
+    e = Enemy(r, 'nurikabe', p.x + dx, p.y - 4); r.enemies.append(e); e.spawn_t = 0; e.hp = e.maxhp = 999
+p.fire((1, 0))
+check(sum(1 for b in r.pbullets if b.fl.get('_rat')) == 1, 'Tessos Schwarm + Strahl: nicht genau eine Ratte')
+# Spiegelung des Strahls an der Wand weckt Abprall-Fähigkeiten (Kappa-Festmahl, Brandung)
+r, p = setup(w_laser=1, bounce=1)
+p.sgs = {'kappa_fest', 'brandung'}
+p.fire((1, 0))
+check('kappa_fest' in sigs.st(p).get('syn_seen', []), 'Strahl-Spiegelung weckt Kappa-Festmahl nicht')
+check(sum(1 for b in r.pbullets if b.fl.get('_br')) == 2, 'Strahl-Spiegelung weckt Brandung nicht genau einmal')
+random.random = _rnd
 print('Waffen-Synergien geprüft, Fehler:', bad)
 sys.exit(1 if bad else 0)
