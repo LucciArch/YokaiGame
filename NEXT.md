@@ -69,14 +69,22 @@ für Talismane greifen (z. B. `bullet_tick`) – sollen sie auch für Strahl/Hie
 - Runde 78: `weapons._hit` ruft bei zerplatzenden Sprengsiegel-Treffern `sigs.bullet_end` (Feuerwerk über Edo).
   Bewusst offen: Strahl-Ende ohne Treffer löst keine Ende-Sigs aus (wäre Funken-Spam bei jedem Strahl).
 
-# Nächster Schritt: Balance-Nachmessung Waffen-Builds
-Warum: Seit Runde 65 übernehmen Waffen fast alle Wurf-Fähigkeiten – Strahl/Hieb könnten jetzt zu stark sein.
-`tools/synbalance.py` um Waffen (w_laser, w_sword, w_bow) erweitern, Schaden pro Sekunde gegen Talisman-Builds
-vergleichen, Ausreißer (> 2× Median) dämpfen; Bericht nach `design/balance/`.
+# Erledigt (Runden 79–80)
+- Runde 79: `tools/synbalance.py --waffe=w_sword|w_laser|w_bow` (Nahkampf läuft heran). Bericht
+  `design/balance/balance-check-79-waffen-builds.md`: Waffen ≈ 1,4–1,85× Talisman, kein pauschales Dämpfen nötig.
+  Fehler behoben: Seiten-/Rückhiebe trafen große Feinde mehrfach pro Angriff (`weapons.melee(seen=…)`, waffentest).
+  Offen: „Wenn du getroffen wirst“-Synergien (Hannya-Zorn, Gericht, Oni-Tanz, Unbeugsam) wirken im Gott-Modus-Bot
+  mit Schwert übermächtig – Messartefakt, erst mit Lebensgrenze nachmessen.
+- Runde 80: Titelbild-Stimmung `'iwato'` in `App.draw_night` (Morgenröte `_dawn`, Strahlenkranz, Vorrang vor 'yomi').
+
+# Nächster Schritt: Amaterasu-Bossmusik
+Warum: Die Endbossin von Ama-no-Iwato kämpft noch zur geteilten Bossmusik; ein eigenes Stück (Kagura-Flöte, Suzu-Glöckchen,
+Taiko, das in Phase 3 „aufgeht“) macht das geheime Ende besonders. Offline synthetisieren in `art_src/music/`
+(wie die anderen Stücke), nach `yokai/assets/music` legen und in der Musikwahl für Boss `amaterasu` eintragen.
 
 # Weitere Ideen
-- Amaterasu-Bossmusik (`art_src/music/`) und Titelbild-Stimmung nach dem Iwato-Sieg (wie 'yomi' in `app.py`)
+- Nahkampf-Messung mit Lebensgrenze (`synbalance.py --tod --waffe=w_sword`), dann Treffer-Auslöser-Synergien prüfen
+- Tessos Schwarm auch für Hiebe in Gruppen (gedeckelt wie Wurfstern) – Balance-Messung liegt jetzt vor
 - Wanddekos Yashiki/Kawabe/Ōeyama/Shinkai/Enma-chō/Tsukiyomi in Hi-Res überarbeiten (`wall_decos`)
 - Mondpalast-Ambiente: fallende Katsura-Blätter, Mondhase als seltener Ereignis-NPC (Mochi-Tausch)
 - Shinkirō als Ereignis: eine Hamaguri spiegelt einen Trugladen vor
-- Tessos Schwarm auch für Hiebe in Gruppen (gedeckelt wie Wurfstern) – erst nach der Balance-Messung
