@@ -488,10 +488,11 @@ ACTIVES = {
     'horagai': dict(name='Horagai', desc='Der Muschelhornruf lähmt alle Yokai', icon='shell', col=(240, 210, 190), charge=3),
     'tengu_uchiwa': dict(name='Tengu-Uchiwa', desc='Ein Windstoß fegt alles fort', icon='fan', col=(60, 140, 60), charge=2),
     # Quest-Belohnungen (gesperrt bis zum Erfolg, siehe ACHIEVEMENTS 'q_*')
-    'mondkine': dict(name='Kine des Mondhasen', desc='Ein Mörserschlag betäubt alles in der Nähe', icon='hammer', col=(235, 235, 255), charge=3, locked=True),
-    'shiomitsu_tama': dict(name='Shiomitsu-Tama', desc='Ryūjins Flutjuwel spült alle Geschosse fort', icon='orb', col=(90, 170, 255), charge=4, locked=True),
-    'matsuri_uchiwa': dict(name='Matsuri-Uchiwa', desc='Hanabi! Feuerwerk zerplatzt über den Feinden', icon='fan', col=(255, 140, 90), charge=3, locked=True),
-    'totsuka': dict(name='Totsuka no Tsurugi', desc='Die Klinge, die Orochi zerteilte, trifft jeden Feind', icon='sword', col=(220, 230, 250), charge=5, locked=True),
+    'mondkine': dict(name='Kine des Mondhasen', desc='Ein Mörserschlag betäubt alles in der Nähe', icon='mondkine', col=(235, 235, 255), charge=3, locked=True),
+    'shiomitsu_tama': dict(name='Shiomitsu-Tama', desc='Ryūjins Flutjuwel spült alle Geschosse fort', icon='shiomitsu_tama', col=(90, 170, 255), charge=4, locked=True),
+    'matsuri_uchiwa': dict(name='Matsuri-Uchiwa', desc='Hanabi! Feuerwerk zerplatzt über den Feinden', icon='matsuri_uchiwa', col=(255, 140, 90), charge=3, locked=True),
+    'totsuka': dict(name='Totsuka no Tsurugi', desc='Die Klinge, die Orochi zerteilte, trifft jeden Feind', icon='totsuka', col=(220, 230, 250), charge=5, locked=True),
+    'mayoiga_wan': dict(name='Mayoiga-Wan', desc='Die Schale aus dem verborgenen Haus zeigt den Weg und füllt sich', icon='mayoiga_wan', col=(200, 70, 60), charge=4, locked=True),
 }
 
 # =====================================================================  CHARAKTERE
@@ -724,6 +725,7 @@ ACHIEVEMENTS = [
     ('q_nohit5', 'Unberührbar', 'Besiege insgesamt 5 Bosse ohne Treffer', ('active', 'shiomitsu_tama')),
     ('q_feste4', 'Festnacht', 'Erlebe vier verschiedene Ereignisräume in einem Lauf', ('active', 'matsuri_uchiwa')),
     ('q_pruefungen', 'Alle Prüfungen', 'Bestehe alle zehn Prüfungen', ('active', 'totsuka')),
+    ('q_geheim3', 'Mayoiga', 'Entdecke drei Geheimräume in einem Lauf', ('active', 'mayoiga_wan')),
 ]
 
 

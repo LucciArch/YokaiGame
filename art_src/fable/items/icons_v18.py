@@ -82,7 +82,32 @@ def totsuka():
     return c
 
 
-NAMES = ['mondkine', 'shiomitsu_tama', 'matsuri_uchiwa', 'totsuka']
+def mayoiga_wan():
+    """Mayoiga-Wan: rote Lackschale voll Reis mit Goldrand, dahinter im Nebel das verborgene Strohdachhaus aus dem Tōno monogatari."""
+    c = Cv()
+    c.form(R(17, 9, 28, 14), 'jdD', 1, 0, ring='K')                    # Hauswand
+    c.fill(R(21, 11, 23, 14), 'k')                                      # dunkle Tür
+    c.a[11, 26] = 'Y'                                                   # Licht im Fenster
+    c.form(PG([(14, 10), (19, 3), (26, 3), (31, 10)]), 'cCs', 1, 1, ring='K')   # Strohdach
+    c.line([(19, 5), (26, 5)], 'c', 1)
+    for x, y in ((2, 9), (7, 7), (11, 12)):                             # Nebelschwaden
+        c.line([(x, y), (x + 3, y)], 'n', 1)
+    c.form(R(10, 27, 18, 29), 'qrR', 0, 1, ring='K')                    # Fuß
+    bowl = E(14, 19, 11, 8.5) & R(0, 19, 31, 31)
+    c.form(bowl, 'qrR', 2, 1, ring='K')                                 # Lackschale
+    c.line([(5, 23), (9, 26)], 'e', 1, only=bowl)                       # Glanz
+    c.form(E(14, 23.5, 2, 2), 'ogy', 0, 1)                              # Goldmon
+    rice = E(14, 18, 9, 5) & R(0, 12, 31, 19)
+    c.form(rice, 'vwW', 1, 1, ring='K')                                 # Reisberg
+    for x, y in ((10, 16), (14, 14), (17, 17), (12, 18)):
+        c.a[y, x] = 'v'
+    c.line([(3, 19), (25, 19)], 'y', 1)                                 # Goldrand
+    for x in (11, 16):                                                  # Dampf: der Reis geht nie aus
+        c.line([(x, 11), (x - 1, 9), (x, 7)], 'W', 1)
+    return c
+
+
+NAMES = ['mondkine', 'shiomitsu_tama', 'matsuri_uchiwa', 'totsuka', 'mayoiga_wan']
 
 
 def build():

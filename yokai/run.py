@@ -526,6 +526,10 @@ class Run:
                 self.banner('Geheimraum entdeckt!', 'Ein verborgener Pfad öffnet sich', (230, 210, 150))
                 self.save.stat('secrets')
                 self.achieve('secret')
+                g = sigs.st(self.player)
+                g['geheim_lauf'] = g.get('geheim_lauf', 0) + 1
+                if g['geheim_lauf'] >= 3:
+                    self.achieve('q_geheim3')
                 if self.save['stats'].get('secrets', 0) >= 10:
                     self.achieve('secret10')
 
@@ -1466,6 +1470,14 @@ class Run:
                         e.burn = 3.0
                         e.burn_dps = max(e.burn_dps, max(1.0, dmg * 0.5))
             audio.play('boom', 0.5)
+        elif a == 'mayoiga_wan':   # Tōno monogatari: Wer aus dem Mayoiga eine Schale mitnimmt, dem geht der Reis nie aus
+            for r in self.rooms.values():
+                r.revealed = r.seen = True
+            for k in range(2):
+                self.spawn_pickup(random.choice(('heart', 'key', 'salt', 'coin5')), p.x, p.y)
+            burst(self, p.x, p.y, (240, 230, 210), 20, 70, 0.8, 3)
+            self.banner('Mayoiga-Wan', 'Der Weg zum verborgenen Haus liegt offen', (230, 200, 160))
+            audio.play('unlock')
         elif a == 'totsuka':
             for e in list(self.enemies):
                 if e.active():

@@ -347,6 +347,22 @@ for a in ('mondkine', 'shiomitsu_tama', 'matsuri_uchiwa', 'totsuka'):
     run.use_active()
     if not e.hp < h0 or (a == 'shiomitsu_tama' and (run.ebullets or not e.slowed)) or (a == 'mondkine' and not e.frozen):
         print('FEHLER Aktiv', a); bad += 1
+# q_geheim3: drei Geheimräume in einem Lauf → Mayoiga-Wan deckt die Ebene auf und gibt zwei Gaben
+from yokai.settings import DOOR_POS
+sigs.st(p)['geheim_lauf'] = 2
+r0 = run.room
+for rr in run.rooms.values():
+    hid = [d for d, n in rr.doors.items() if run.rooms[n].kind == 'secret' and not run.rooms[n].revealed]
+    if hid:
+        run.room = rr; run.reveal_near(*DOOR_POS[hid[0]], 999); break
+run.room = r0
+if 'q_geheim3' not in g.save['achievements'] or 'mayoiga_wan' not in run.active_pool:
+    print('FEHLER Quest q_geheim3'); bad += 1
+for rr in run.rooms.values():
+    rr.revealed = False
+p.active = 'mayoiga_wan'; p.charge = 9; n0 = len(run.pickups); run.use_active()
+if not all(rr.revealed for rr in run.rooms.values()) or len(run.pickups) != n0 + 2:
+    print('FEHLER Aktiv mayoiga_wan'); bad += 1
 g.save['achievements'][:] = ach0; g.save['items'][:] = it0; g.save['stats'].clear(); g.save['stats'].update(st0); g.save.write()
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)
