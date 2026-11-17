@@ -251,6 +251,10 @@ class Run:
                 p.gain_item(i, silent=True)
             p.maxhp = 2
             p.hp = 2
+        elif c == 'verbannung':                    # Susanoo, aus dem Himmel verstoßen: nur Geisterherzen
+            p.spirit_only = True
+            p.spirit = min(24, p.maxhp + p.spirit)
+            p.maxhp = p.hp = 0
         elif c == 'papiermeister':
             p.bonus['familiar'] = 3
             p.bonus['homing'] = 1

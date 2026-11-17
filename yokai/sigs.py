@@ -265,6 +265,7 @@ TEXT = {
     'keppan': 'Jeder Oni-Pakt in diesem Lauf: +8 % Schaden (höchstens +40 %)',
     'miidera': 'Jeder 10. Treffer auf einen Boss läutet die Glocke: 250 % Zusatzschaden, Boss 1 s gebremst',
     'nademono': 'Alle 20 s fängt die Papierpuppe ein Feindgeschoss ab, das dich treffen würde',
+    'mino': 'Wirst du getroffen, bricht ein Gewitter los: Blitze auf die 3 nächsten Feinde (je 120 %)',
     'kongozue': 'Jede neue Ebene: ½ Herz; jede 3. Ebene bringt ein Geisterherz',
 }
 
@@ -1133,6 +1134,15 @@ def on_hurt(p, run):
         p.iframes = max(p.iframes, 3.0)
         _ring(run, p.x, p.y, (210, 200, 180), 50)
         run.banner('Tachi-ōjō', 'Aufrecht bis zum letzten Atemzug', (220, 210, 190))
+    if 'mino' in S:                                      # Susanoos Regen: Blitze auf die nächsten Feinde
+        done = set()
+        for _ in range(3):
+            e = _nearest(run, p.x, p.y, 220, lambda o: id(o) not in done)
+            if not e:
+                break
+            done.add(id(e))
+            run.zap(p.x, p.y - 20, e.x, e.y)
+            run.lightning(e.x, e.y, p.damage() * 1.2)
     if 'fuurin' in S:                                    # das Glaswindspiel zerspringt
         seen = set()
         for k in range(8):

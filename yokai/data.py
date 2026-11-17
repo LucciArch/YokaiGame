@@ -332,6 +332,7 @@ I('senryo_bako', 'Senryō-bako', 'Eine Truhe für tausend Goldstücke', 'senryo_
 I('keppan', 'Keppan', 'Ein Pakt, mit dem eigenen Blut gesiegelt', 'keppan', (200, 50, 50), 'T', ['oni'], 3, True, dmg=0.2, sig_keppan=1)
 I('miidera_kane', 'Glocke von Mii-dera', 'Benkei schleppte sie allein den Berg Hiei hinauf', 'miidera_kane', (120, 150, 110), 'T', [], 3, True, hp=1, sig_miidera=1)
 I('nademono', 'Nademono', 'Eine Papierpuppe, die das Unheil an deiner Stelle trägt', 'nademono', (240, 240, 230), 'T', ['shikigami'], 3, True, spirit=1, sig_nademono=1)
+I('aokusa_mino', 'Aokusa-Mino', 'Im Grasmantel wanderte der verbannte Susanoo durch den Regen', 'aokusa_mino', (110, 150, 80), 'T', ['raijin'], 3, True, spirit=2, sig_mino=1)
 I('kongozue', 'Kongō-zue', 'Der Stab des Pilgers – Dōgyō ninin, nie allein unterwegs', 'kongozue', (200, 170, 120), 'T', [], 3, True, hp=1, sig_kongozue=1)
 
 ITEM_IDS = ORDER
@@ -642,6 +643,7 @@ CHALLENGES = [
     dict(id='oni_pakt', name='Pakt mit dem Teufel', char='akago', desc='Drei Oni-Items, aber nur ein Herzcontainer.', goal=5),
     dict(id='bossrush', name='Boss-Ansturm', char='benkei', desc='Nur Bosskämpfe – nach jedem Boss ein Item.', goal=6),
     dict(id='papiermeister', name='Papiermeister', char='seimei', desc='Du schießt nicht – nur deine Shikigami kämpfen.', goal=5),
+    dict(id='verbannung', name='Verbannt aus Takamagahara', char='susanoo', desc='Nur Geisterherzen – keine Heilung, kein Herzcontainer.', goal=5),
     dict(id='langer_weg', name='Der lange Weg', char='okiku', desc='Alle zehn Ebenen bis Kapitel V – ohne Läden, Oni-Pakte kosten doppelt.', goal=5),
 ]
 
@@ -709,6 +711,7 @@ ACHIEVEMENTS = [
     ('ch_bossrush', 'Prüfung: Boss-Ansturm', 'Bestehe die Prüfung „Boss-Ansturm“', ('item', 'miidera_kane')),
     ('ch_papiermeister', 'Prüfung: Papiermeister', 'Bestehe die Prüfung „Papiermeister“', ('item', 'nademono')),
     ('ch_langer_weg', 'Prüfung: Der lange Weg', 'Bestehe die Prüfung „Der lange Weg“', ('item', 'kongozue')),
+    ('ch_verbannung', 'Prüfung: Verbannt aus Takamagahara', 'Bestehe die Prüfung „Verbannt aus Takamagahara“', ('item', 'aokusa_mino')),
     ('foxfire', 'Kitsunebi-Fänger', 'Fange ein Fuchsfeuer im Inari-Schrein', None),
     ('quirks_all', 'Wanderer der Welten', 'Erlebe die Eigenheiten aller Biome', None),
     ('synergy25', 'Meister der Harmonie', 'Entdecke 25 verschiedene Synergien', None),

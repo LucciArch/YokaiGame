@@ -645,23 +645,23 @@ class Game:
         T = gfx.TEXT
         done = set(self.save['challenges_done'])
         self.page_head('Herausforderungen', 'seal_chal', '%d / %d bestanden' % (len(done), len(CHALLENGES)))
-        self.veil(s, (22, 32, W - 44, len(CHALLENGES) * 26 + 6))
+        self.veil(s, (22, 32, W - 44, len(CHALLENGES) * 24 + 6))
         for i, c in enumerate(CHALLENGES):
-            y = 34 + i * 26
+            y = 34 + i * 24
             sel = i == self.ch_sel
             if sel:
                 self.brush_sel(('chal', i), W // 2 + 16, y + 10, W - 120, dt)
             spr = gfx.mini(sheets.frame(c['char'], 0, 0, 1), 19)
             s.blit(spr, (46 - spr.get_width() // 2, y + 2))
             T.add(c['name'], 58, y + 2, 9, (255, 230, 150) if sel else (220, 210, 200))
-            T.add(c['desc'], 58, y + 13, 6, (210, 200, 190))
+            T.add(c['desc'], 58, y + 12, 6, (210, 200, 190))
             if c['id'] in done:
                 star(s, W - 44, y + 11, (255, 220, 100))
             T.add(CHARS[c['char']]['name'], W - 54, y + 7, 7, (180, 170, 160), 'r')
         rw = next((a[3] for a in ACHIEVEMENTS if a[0] == 'ch_' + CHALLENGES[self.ch_sel]['id']), None)
         if rw and rw[0] == 'item':
-            T.add('Belohnung: ' + ITEMS[rw[1]]['name'], W // 2, 278, 7, (240, 210, 140), 'c')
-        T.add('Enter – Starten     Esc – Zurück', W // 2, 287, 6, (150, 140, 140), 'c')
+            T.add('Belohnung: ' + ITEMS[rw[1]]['name'], W // 2, 279, 7, (240, 210, 140), 'c')
+        T.add('Enter – Starten     Esc – Zurück', W // 2, 291, 6, (150, 140, 140), 'c')
         for n in nav:
             if n == 'up': self.ch_sel = (self.ch_sel - 1) % len(CHALLENGES); audio.play('move')
             elif n == 'down': self.ch_sel = (self.ch_sel + 1) % len(CHALLENGES); audio.play('move')

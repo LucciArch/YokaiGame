@@ -301,6 +301,15 @@ if p.hp != 3:
 run.room.cleared = False; run.room_enter_time = run.time
 if not sigs.rate_mult(p) > 1.29:
     print('FEHLER Hayate'); bad += 1
+# Prüfung Verbannung: Susanoo nur mit Geisterherzen; Aokusa-Mino ruft Blitze
+g.start_run('susanoo', 28, challenge='verbannung'); run = g.run; p = run.player
+if not (p.spirit_only and p.maxhp == 0 and p.spirit == 6 and not p.heal(2)):
+    print('FEHLER Verbannung', p.maxhp, p.spirit); bad += 1
+p.gain_item('aokusa_mino', silent=True)
+e = make_boss(run, 'shuten_doji'); e.spawn_t = 0; e.invuln = False; e.x, e.y = p.x + 40, p.y; run.enemies = [e]
+nh = len(run.hazards); sigs.on_hurt(p, run)
+if len(run.hazards) != nh + 1:
+    print('FEHLER Aokusa-Mino'); bad += 1
 rw = {a[0]: a[3] for a in data.ACHIEVEMENTS}
 if any(not rw['ch_' + c['id']] or rw['ch_' + c['id']][0] != 'item' for c in data.CHALLENGES):
     print('FEHLER Prüfung ohne Item-Belohnung'); bad += 1

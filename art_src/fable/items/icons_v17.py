@@ -189,8 +189,28 @@ def kongozue():
     return c
 
 
+def aokusa_mino():
+    """Aokusa-Mino: grüner Grasmantel in Fransenlagen, Sugegasa darüber, Regen und ein Blitz."""
+    c = Cv()
+    for x, y in ((4, 6), (8, 12), (3, 18), (27, 9), (28, 17), (25, 3)):   # Regen
+        c.line([(x, y), (x - 1, y + 3)], 'a', 1)
+    for k, (y0, y1, w0, w1) in enumerate(((10, 17, 6, 9), (15, 23, 8, 11), (21, 29, 10, 12))):
+        layer = PG([(16 - w0, y0), (16 + w0, y0), (16 + w1, y1), (16 - w1, y1)])
+        c.form(layer, 'FfG' if k % 2 else 'cCs', 1, 1, ring='K')
+        for x in range(16 - w1 + 1, 16 + w1, 2):                       # Grasfransen
+            c.line([(x, y1 - 3), (x, y1)], 'F' if k % 2 else 'c', 1, only=layer)
+    hat = PG([(5, 10), (16, 2), (27, 10)])                             # Sugegasa
+    c.form(hat, 'cCs', 1, 1, ring='K')
+    c.line([(6, 10), (26, 10)], 'c', 1)
+    for x in (11, 16, 21):
+        c.line([(16, 3), (x, 9)], 'c', 1)
+    bolt = PG([(26, 12), (30, 12), (28, 16), (30, 16), (24, 23), (26, 18), (24, 18)])   # Blitz vor dem Mantel
+    c.form(bolt, 'ygY', 0, 1, ring='K')
+    return c
+
+
 NAMES = ['fuurin', 'abura_age', 'tsukikage', 'hayate_waraji', 'senryo_bako', 'keppan', 'miidera_kane', 'nademono',
-         'kongozue']
+         'kongozue', 'aokusa_mino']
 
 
 def build():
