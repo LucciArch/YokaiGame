@@ -243,21 +243,31 @@ für Talismane greifen (z. B. `bullet_tick`) – sollen sie auch für Strahl/Hie
   eigenen Siegel-Item (nicht Prüfung/Tageslauf). Charakterwahl zeigt „Meister“.
 - Runde 118: eigener Klang `kine` (art_src/music/sfx.py, 2 Varianten) für den Kine-Schlag beim Mochitsuki.
 
-# Nächster Schritt: Herausforderungen je Figur mit Item-Belohnung
-Warum: Das Siegel-System ist komplett; das nächste große Freischalt-Ziel wie in Isaac sind Prüfungen mit Belohnung.
-`CHALLENGES` (data.py) hat 9 Prüfungen – jede bekommt eine Item-Belohnung (neues Item, eigene sig + Symbol in einer
-neuen Datei `art_src/fable/items/icons_v17.py` nach Muster von icons_v16.py), dazu 1–2 neue Prüfungen für Figuren ohne
-eigene (z. B. Okiku „Nur Geisterherzen“, Susanoo „Sturm: ständiger Wind“). Belohnung über ACHIEVEMENTS ('item', id).
+# Erledigt (Runden 119–120): Prüfungen mit Item-Belohnung
+- Runde 119: Alle Prüfungen geben ein Item (`ACHIEVEMENTS` 'ch_<id>' → ('item', …)): fuurin, abura_age, tsukikage,
+  hayate_waraji, senryo_bako, keppan (Zähler `sg['pakt']` in `Run` beim Oni-Handel), miidera_kane, nademono (in
+  `sigs.block`), kongozue. Symbole `art_src/fable/items/icons_v17.py` (gleiches Muster wie v16). `Run.__init__` vergibt
+  Item-Belohnungen schon erreichter Erfolge rückwirkend. Prüfungsmenü zeigt „Belohnung: …“ (uiflow2 prüft das).
+- Runde 120: Prüfung `verbannung` (Susanoo, `spirit_only`, nur Geisterherzen) mit Belohnung `aokusa_mino` (sig `mino`).
+  Jede Figur hat jetzt eine Prüfung (10). Menüzeilen 24 px statt 26 – für eine 11. Prüfung muss das Menü scrollen.
+- Balance der neuen Items nicht gemessen (moderat gewählt, Stufe 3).
+
+# Nächster Schritt: „Quests“ – Meilenstein-Erfolge mit aktiven Items als Belohnung
+Warum: Siegel und Prüfungen sind komplett; Isaac-artige Langzeitziele fehlen noch für die Ereignisräume und Bosse.
+Vorschläge (je Erfolg ein neues **aktives** Item, `ACTIVES` in data.py, Symbol in einer neuen `icons_v18.py`):
+3× Mochitsuki-Erfolg (Zähler in `save['stats']`) → Kine (Hammerschlag-Aktiv); alle Ereignisse in einem Lauf →
+Matsuri-Uchiwa; 5 Bosse ohne Treffer (Zähler zu 'nohit') → Kagami-mochi; 10 Prüfungen bestanden → ein starkes
+Abschluss-Item. Vorher prüfen, wie aktive Items Ladung/Wirkung definieren (`ACTIVES`, `entities.use_active`).
 
 # Danach
-- „Quests“: z. B. 3 Mochitsuki-Erfolge, alle Ereignisse in einem Lauf, 5 Bosse ohne Treffer → neue aktive Items
-- Balance der neuen Siegel-Items mit `tools/synbalance.py` gegenprüfen (Ichi-no-tachi, Ohabari, Sarayashiki-Brunnen)
+- Balance der Siegel- und Prüfungs-Items mit `tools/synbalance.py` gegenprüfen (Ichi-no-tachi, Ohabari, Miidera, Keppan)
 - Lucas Rückmeldung zur Schwierigkeit weiter beachten (Meister-Startitem macht Läufe leichter – ggf. nur im normalen
   Modus oder dafür Boss-HP leicht anheben)
+- Synergien für die neuen Items (z. B. Fūrin + Biidoro-Splitter mit Yata-Spiegel; Kongō-zue + Senbazuru „Pilgerreise“)
 
 # Weitere Ideen
 - Wanddekos: zweite Variante pro Biom (Index 2), Werkzeug walldeco_hi.py steht
 - Mondhase ist im Raum recht klein – ggf. größer zeichnen (Canvas 64×60 → 80×72) und Wendezone anpassen
 - Spitze (Feuerwerk/Oni-Rausch/Hannya-Zorn ≈ ×4,2) mit `--raum` gegenprüfen, ob sie auch in Räumen dominieren
-- Bogen-Brücke (Hamaya bei Benkei +1,1) nach weiteren Läufen nachmessen
 - Tengu-Kappe (Tokin) ist im Spiel sehr klein – ggf. etwas größer zeichnen
+- Prüfungen: Bestenzeit je Prüfung im Menü anzeigen
