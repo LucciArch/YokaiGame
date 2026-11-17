@@ -77,14 +77,23 @@ für Talismane greifen (z. B. `bullet_tick`) – sollen sie auch für Strahl/Hie
   mit Schwert übermächtig – Messartefakt, erst mit Lebensgrenze nachmessen.
 - Runde 80: Titelbild-Stimmung `'iwato'` in `App.draw_night` (Morgenröte `_dawn`, Strahlenkranz, Vorrang vor 'yomi').
 
-# Nächster Schritt: Amaterasu-Bossmusik
-Warum: Die Endbossin von Ama-no-Iwato kämpft noch zur geteilten Bossmusik; ein eigenes Stück (Kagura-Flöte, Suzu-Glöckchen,
-Taiko, das in Phase 3 „aufgeht“) macht das geheime Ende besonders. Offline synthetisieren in `art_src/music/`
-(wie die anderen Stücke), nach `yokai/assets/music` legen und in der Musikwahl für Boss `amaterasu` eintragen.
+# Erledigt (Runden 81–82)
+- Runde 81: Bossstück `amaterasu` („Iwato Kagura“, `art_src/music/tracks.py`, Suzu-Helfer `_suzu`, Skalenwechsel
+  `s.scale = SCALES['yo']` zum Sonnenaufgang). `Audio.track_for` erkennt den Iwato-Boss am Seed 164 (57 + 100 + Tiefe 7);
+  `validate.py` prüft für jedes Biom, dass die Bossmusik existiert und nur Iwato `amaterasu` spielt.
+  Hinweis: `write_ogg` lässt eine `.wav` neben der `.ogg` liegen – nicht committen.
+- Runde 82: `synbalance.py --leben` (Bossschaden in % bis zum Tod, ohne Gott-Modus). Hannya-Ring (`hurt_ring`) und
+  Daruma-Splitter (`daruma_geist`) teilen sich eine Trefferliste (`b.hit = seen`), 1,5× statt 1,2× Schaden.
+  Bericht `design/balance/balance-check-82-leben.md`. Treffer-Auslöser-Frage aus Check 79 damit geklärt.
+
+# Nächster Schritt: Wanddekos in Hi-Res (Yashiki, Kawabe, Ōeyama)
+Warum: Figuren, Requisiten und Objekte sind alle Hi-Res; die Wanddekos (`wall_decos`) dieser Biome sind noch
+in einfacher Pixeldichte und fallen neben den neuen Requisiten ab. Wie die Requisiten in
+`art_src/fable/environment/` zeichnen, Lichter ggf. in `gfx.WALL_LIGHT` eintragen. Danach Shinkai/Enma-chō/Tsukiyomi.
 
 # Weitere Ideen
-- Nahkampf-Messung mit Lebensgrenze (`synbalance.py --tod --waffe=w_sword`), dann Treffer-Auslöser-Synergien prüfen
-- Tessos Schwarm auch für Hiebe in Gruppen (gedeckelt wie Wurfstern) – Balance-Messung liegt jetzt vor
-- Wanddekos Yashiki/Kawabe/Ōeyama/Shinkai/Enma-chō/Tsukiyomi in Hi-Res überarbeiten (`wall_decos`)
 - Mondpalast-Ambiente: fallende Katsura-Blätter, Mondhase als seltener Ereignis-NPC (Mochi-Tausch)
 - Shinkirō als Ereignis: eine Hamaguri spiegelt einen Trugladen vor
+- Tessos Schwarm auch für Hiebe in Gruppen (gedeckelt wie Wurfstern)
+- `--leben`-Messung für Talisman-Spitze prüfen (Oni-Rausch 72 %, Onmyōdō 71 % – Median 13 %)
+- Synergie-Hinweis im Pausenmenü: welche Item-Paare zu einer Synergie fehlen (Lexikon-Verknüpfung)
