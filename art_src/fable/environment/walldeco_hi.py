@@ -234,3 +234,129 @@ def oeyama_hi(name, base):
 
 
 HI['oeyama'] = oeyama_hi
+
+
+# ---- Shinkai: Chōchin-anko im Felsloch / leuchtender Anemonengarten mit Qualle
+def shinkai_hi(name, base):
+    a, b = base.copy(), base.copy()
+    Y, X = _g(a)
+    hole = he(a, 31, 20, 19, 9)
+    hfill(a, edge(hole), '#22304a')
+    hfill(a, hole, K)
+    jaw = hpoly(a, [(17, 22), (44, 19), (46, 25), (20, 27)])      # Unterkiefer, kaum sichtbar
+    hfill(a, jaw & hole, '#11192b')
+    hfill(a, edge(jaw) & hole & (Y < 23), '#22304a')
+    for i, x in enumerate(range(20, 44, 3)):                      # Nadelzähne oben und unten
+        hln(a, [(x, 21 - (i % 2)), (x + 1, 24)], WHITE[2])
+        hp(a, x + 1, 25, WHITE[1])
+    hr(a, 19, 17, 22, 19, '#c8ee78')                              # bleiches Auge
+    hp(a, 21, 18, K)
+    hp(a, 19, 17, '#f0ffc0')
+    hln(a, [(27, 13), (32, 9), (38, 8), (43, 10)], '#3a5470')     # Angel
+    hfill(a, he(a, 44, 12, 2.2, 2.2), '#ffe24a')                  # Leuchtköder mit Hof
+    hfill(a, edge(he(a, 44, 12, 2.2, 2.2)) & ~hole, '#7a7a30')
+    hp(a, 43, 11, '#fffbc0')
+    for (x, top, h) in ((10, 14, 1), (19, 10, -1), (29, 16, 1), (39, 12, -1), (49, 15, 1)):
+        for k in range(3):                                        # Stiele mit Leuchtringen
+            hln(b, [(x + k, 29), (x + k + h, top + 3)], GLOW[k])
+        cx = x + 1 + h
+        hfill(b, he(b, cx, top + 3, 2.5, 1.5), GLOW[2])           # Mundscheibe
+        for (dx, dy) in ((-5, 1), (-4, -2), (-2, -4), (0, -5), (2, -4), (4, -2), (5, 1)):   # Tentakelkrone
+            hln(b, [(cx, top + 2), (cx + dx * 2 // 3, top + 2 + dy * 2 // 3), (cx + dx, top + 2 + dy)], GLOW[2])
+            hp(b, cx + dx, top + 2 + dy, GLOW[3])
+    jel = he(b, 56, 9, 3.5, 2.5) & (_g(b)[0] <= 9)                # kleine Qualle
+    hfill(b, jel, '#6a4a9a')
+    hfill(b, jel & (_g(b)[0] <= 7), '#b090e0')
+    for x in (54, 56, 58):
+        hln(b, [(x, 10), (x + (1 if x > 56 else 0), 14)], '#8a6ab8')
+    return [a, b]
+
+
+# ---- Enma-chō: Jōhari no Kagami mit Seelenbild / Kohlebecken an Ketten
+def enma_hi(name, base):
+    a, b = base.copy(), base.copy()
+    Y, X = _g(a)
+    m = he(a, 31.5, 18, 10, 8.5)
+    ring = he(a, 31.5, 18, 12.5, 11) & ~m
+    hfill(a, edge(ring | m), K)
+    hfill(a, ring, GOLD[2])
+    hfill(a, ring & (Y > 20), GOLD[1])
+    hfill(a, ring & (Y < 12), GOLD[3])
+    for ang in range(0, 360, 30):                                 # Flammenzacken im Rahmen
+        import math
+        x = int(round(31.5 + 12 * math.cos(math.radians(ang))))
+        y = int(round(18 + 10.5 * math.sin(math.radians(ang))))
+        hp(a, x, y, LAVA[3] if y < 18 else GOLD[0])
+    hfill(a, m, WHITE[0])
+    hfill(a, m & (X + Y < 46), WHITE[1])
+    soul = he(a, 33, 15, 2.5, 2.5) | hpoly(a, [(30, 17), (36, 17), (38, 25), (28, 25)])
+    hfill(a, soul & m, '#8a3a4a')                                 # gespiegelte Sünderseele
+    hp(a, 32, 15, '#ffd0a0')
+    hp(a, 34, 15, '#ffd0a0')
+    hln(a, [(25, 19), (31, 12)], WHITE[3])                        # Glanz
+    hln(a, [(28, 22), (33, 16)], WHITE[2])
+    hr(a, 26, 29, 37, 30, GOLD[0])                                # Sockel
+    hr(a, 29, 28, 34, 28, GOLD[1])
+    # B: Kohlebecken an zwei Ketten
+    for x in (21, 42):
+        for y in range(9, 19):
+            hp(b, x + (y % 2), y, IRON[2] if y % 2 else IRON[1])
+    bowl = hpoly(b, [(20, 19), (43, 19), (40, 25), (23, 25)])
+    hfill(b, edge(bowl), K)
+    hfill(b, bowl, IRON[1])
+    hfill(b, bowl & (Y == 19), IRON[3])
+    hfill(b, bowl & (Y >= 23), IRON[0])
+    for x in range(24, 40, 4):
+        hp(b, x, 21, IRON[3])
+    hr(b, 29, 26, 34, 28, IRON[1])                                # Fuß
+    fl = hpoly(b, [(22, 19), (25, 11), (27, 15), (30, 6), (33, 13), (36, 8), (38, 14), (41, 19)])
+    hfill(b, fl, LAVA[1])
+    hfill(b, fl & ~np.roll(fl, 2, 0) | (fl & (Y >= 16)), LAVA[2])
+    inner = hpoly(b, [(26, 19), (29, 13), (31, 16), (33, 11), (35, 15), (37, 19)])
+    hfill(b, inner, LAVA[3])
+    hfill(b, inner & (Y >= 17), '#ffe8a0')
+    for (x, y) in ((24, 7), (35, 4), (40, 9)):                    # Funken
+        hp(b, x, y, LAVA[3])
+    return [a, b]
+
+
+# ---- Tsukiyomi: Vollmondfenster mit Mochi-Hase / Mondsichel-Wappen mit Suzu
+def tsukiyomi_hi(name, base):
+    s = SILVER
+    a, b = base.copy(), base.copy()
+    Y, X = _g(a)
+    m = he(a, 31.5, 18.5, 11, 9.5)
+    hfill(a, edge(edge(m)), K)
+    hfill(a, edge(m), s[1])
+    hfill(a, m, '#c8d0e0')
+    hfill(a, m & ~np.roll(np.roll(m, -1, 1), -1, 0), s[2])       # Schatten unten rechts
+    for (cx, cy, r) in ((26, 15, 1.5), (36, 22, 2), (34, 13, 1)):   # Mondmeere
+        hfill(a, he(a, cx, cy, r, r) & m, '#a8b4c8')
+    rab = he(a, 27.5, 22, 4, 3.5) | he(a, 24, 17.5, 2.6, 2.3) \
+        | hpoly(a, [(23, 16), (25, 8), (27, 9), (25, 16)]) | hpoly(a, [(25, 16), (29, 10), (30, 11), (26, 17)])
+    hfill(a, rab & m, '#343c5c')                                  # Hase mit langen Ohren
+    hp(a, 23, 17, '#c8d0e0')
+    usu = hpoly(a, [(33, 22), (40, 22), (39, 27), (34, 27)])       # Mörser
+    hfill(a, usu & m, s[0])
+    hfill(a, he(a, 36.5, 21.5, 3, 1.3) & m, '#f4f4fa')             # Mochi
+    hln(a, [(29, 19), (34, 15)], s[0])                             # Stößel (Kine)
+    hln(a, [(30, 19), (35, 15)], s[0])
+    hr(a, 33, 13, 37, 15, s[0])
+    # B: Mondsichel-Wappen zwischen zwei Suzu an roten Schnüren
+    cres = he(b, 32, 18, 9, 9) & ~he(b, 36.5, 16, 8, 8)
+    hfill(b, edge(cres), s[0])
+    hfill(b, cres, '#d8dcec')
+    hfill(b, cres & (X + Y > 50), s[2])
+    for x in (12, 51):
+        hr(b, x, 9, x, 19, RED[2])
+        hp(b, x + 1, 12, RED[3])
+        bell = he(b, x, 22, 2.5, 2.5)
+        hfill(b, edge(bell), K)
+        hfill(b, bell, GOLD[2])
+        hp(b, x - 1, 21, GOLD[3])
+        hr(b, x - 1, 23, x + 1, 23, GOLD[0])
+        hp(b, x, 25, K)
+    return [a, b]
+
+
+HI.update(shinkai=shinkai_hi, enma_cho=enma_hi, tsukiyomi=tsukiyomi_hi)
