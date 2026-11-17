@@ -270,19 +270,25 @@ für Talismane greifen (z. B. `bullet_tick`) – sollen sie auch für Strahl/Hie
   `mayoiga_wan` (Ebene aufdecken + 2 Gaben). Fix: Quest-Aktive hatten `icon='hammer'/'orb'/…` statt ihrer eigenen PNGs.
   **Neue aktive Items: `icon` = eigene ID, Symbol in `icons_v18.py` (NAMES ergänzen).**
 
-# Nächster Schritt: Quests Teil 3 (50 Kami-Segen gesamt, Endlose Nacht Schleife 3)
-Warum: Quests mit aktiven Items geben Langzeitziele wie in Isaac; zwei Ideen sind noch offen. Je ein aktives Item
-mit eigenem Symbol (Muster `q_geheim3`: Zähler, `self.achieve`, `ACTIVES[...]['locked']`, Wirkung in `use_active`,
-sigtest-Block am Ende). Mythologie-Ideen: Kami-Segen → „Nusa des Ōharae“ (reinigt Flüche/Gift, kurz Schild),
-Endlose Nacht → „Yatagarasu-Feder“ (dreibeinige Krähe führt: Geschosse folgen kurz dem nächsten Feind).
+# Erledigt (Runden 126–127)
+- Runde 126: Quests `q_kami50` (Stat `kami_deals` ≥ 50, Prüfung im Kami-Schrein-Zweig von `Run.collect`) → `nusa`
+  (Fluch bannen, Geschosse löschen, ½ Geisterherz, 3 s iframes) und `q_loop3` (`go_deeper`, `self.loop >= 2`) →
+  `yatagarasu_feder` (`p.temp` 8 s homing+pierce). Symbole in `icons_v18.py`. sigtest prüft Auslöser und Wirkung.
+- Runde 127: Synergie `henro` (kongozue + senbazuru): `on_floor` +2 Kraniche, Geisterherz jede 2. statt 3. Ebene,
+  Zähler in `nutz_lines`.
+
+# Nächster Schritt: Balance der Siegel-, Prüfungs- und Quest-Items
+Warum: Seit Runde 112 kamen viele starke Belohnungen dazu (Ichi-no-tachi, Ohabari, Miidera, Keppan, Totsuka mit
+20 + 4×Schaden auf alle Feinde, Yatagarasu-Feder, Nusa), keine wurde gemessen. Mit `tools/synbalance.py` bzw. einem
+kurzen Messlauf (Aktiv-Schaden pro Ladung gegen Boss-HP Kapitel 3/5) gegenprüfen und Ausreißer anpassen.
 
 # Danach
-- Balance der Siegel-, Prüfungs- und Quest-Items mit `tools/synbalance.py` gegenprüfen (Ichi-no-tachi, Ohabari,
-  Miidera, Keppan; Totsuka mit 20 + 4×Schaden auf alle Feinde)
 - Lucas Rückmeldung zur Schwierigkeit weiter beachten (Meister-Startitem macht Läufe leichter – ggf. nur im normalen
   Modus oder dafür Boss-HP leicht anheben)
-- Synergien für die neuen Items (z. B. Fūrin + Biidoro-Splitter mit Yata-Spiegel; Kongō-zue + Senbazuru „Pilgerreise“)
+- Weitere Synergien für neue Items (z. B. Fuurin + Biidoro-Splitter mit Yata-Spiegel; Nusa als aktives Item
+  ist schon da – evtl. Synergie Onusa-Signatur + Kiyome-Sack „Misogi“)
 - Codex: aktive Items im Lauf als „entdeckt“ merken (eigene Liste), falls Spoiler-Schutz gewünscht
+- Yatagarasu-Feder-Symbol: Fahne etwas breiter zeichnen (wirkt im Spiel schmal)
 
 # Weitere Ideen
 - Wanddekos: zweite Variante pro Biom (Index 2), Werkzeug walldeco_hi.py steht
