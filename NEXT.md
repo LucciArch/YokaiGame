@@ -159,16 +159,25 @@ für Talismane greifen (z. B. `bullet_tick`) – sollen sie auch für Strahl/Hie
   `pip install --ignore-installed pillow` (System-PIL ist kaputt).
   Ohne eigene Zeichnung bleiben: ryugu, uminobe, yomi, takamagahara.
 
-# Nächster Schritt: Balance der Waffen-Brücken (Runde 95)
-Warum: Seit Runde 95 wird ein Waffen-Item bei Figuren mit eigener Waffe zum Zusatzangriff – das betrifft jeden Lauf mit
-Kenji, Benkei, Kotarō, Susanoo oder Akago, ist aber nie gemessen. `tools/synbalance.py` bekommt einen Schalter
-`--figur=<id>` (statt fest 'hana'), dann je Figur mit/ohne Waffen-Item vergleichen (z. B. Kotarō + `w_laser`,
-Kenji + `w_bow`). Ziel: das Item soll sich lohnen (≥ ×1,1 gegenüber zwei Zufalls-Items), aber nicht die Figur ersetzen.
+# Erledigt (Runden 99–100)
+- Runde 99: `tools/synbalance.py --figur=<id>` misst jedes Waffen-Item (+ Zufalls-Item) gegen zwei Zufalls-Items, mit
+  Spalte „ohne“ (Brücke per `weapons.bridge_of = lambda p: None` abgeschaltet); dritter Positionsparameter filtert Items.
+  Brücken bringen +0,1 … +1,1. Fächer-Brücke war zu schwach → 0,65× / 0,5 s. Bericht `balance-check-99-waffen-bruecken`.
+  Kotarō bleibt insgesamt niedrig (Bot-Nachteil Nahkampf/Fächer). Messung dauert ~15 min pro Figur (5 parallel ok).
+- Runde 100: Eigene Hi-Res-Wanddekos Ryūgū (Rundfenster mit Riemenfisch + neues Licht `('ryugu', 0)`, Tamatebako mit Rauch
+  zwischen Edelkorallen) und Uminobe (Netz mit Ukidama, Funayūrei-Hände + Hishaku unter dem Totenlicht `('uminobe', 1)`).
+  Vorschau-Skript wie Runde 96/98; `pip install --ignore-installed pillow` nötig.
+  Ohne eigene Zeichnung bleiben: yomi, takamagahara.
+
+# Nächster Schritt: Hi-Res-Wanddekos Teil 5 (yomi, takamagahara)
+Warum: Danach hat jedes Biom eigene Wandbilder in doppelter Pixeldichte; nur noch zwei Biome nutzen die SS=2-Fassung.
+yomi: Yomotsu-Hirasaka-Steinblock mit Shimenawa / Ikazuchi (Donnergott, der aus Izanamis Leib kriecht) in einer Nische.
+takamagahara: Wolkenpalast mit goldenem Dach / Ame-no-Ukihashi (schwebende Himmelsbrücke) – Licht `('takamagahara', 0)`
+bei (16, 8) beibehalten. Funktionen in `art_src/fable/environment/walldeco_hi.py` (`HI[...]`), Bau mit `hi.py`.
 
 # Weitere Ideen
-- Hi-Res-Wanddekos Teil 4: ryugu (Korallentor, Otohime-Tamatebako), uminobe (Netz mit Glaskugeln, Funayūrei-Hände),
-  yomi (Yomotsu-Steinblock, Ikazuchi), takamagahara (Wolkenpalast, Ame-no-Ukihashi)
 - Nutz-Synergien (Fuchsgeld, Glückliches Haus, Wunsch, Shinsen) im Pausenmenü mit sichtbarem Zähler belohnen
 - Shinkirō als Ereignis: eine Hamaguri spiegelt einen Trugladen vor
 - Figurenbeschreibung im Auswahlmenü: Hinweis, dass Waffen-Items zum Zusatzangriff werden
 - Spitze (Feuerwerk/Oni-Rausch/Hannya-Zorn ≈ ×4,2) mit `--raum` gegenprüfen, ob sie auch in Räumen dominieren
+- Bogen-Brücke (Hamaya bei Benkei +1,1) nach weiteren Läufen nachmessen
