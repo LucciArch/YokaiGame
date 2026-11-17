@@ -1127,10 +1127,11 @@ class Game:
         T = gfx.TEXT
         seen = set(self.save['seen'])
         unlocked = set(self.save['items'])
-        ids = ITEM_IDS
+        # Aktive Items hängen hinten an (eigener Rahmen); sie haben keine Entdeckung, nur Sperre
+        ids = ITEM_IDS + ['active:' + a for a in ACTIVES]
         cols = 16
         self.veil(s, (14, 22, W - 28, 176))
-        self.page_head('Codex der Items', 'seal_codex', '%d / %d entdeckt' % (len([i for i in ids if i in seen]), len(ids)))
+        self.page_head('Codex der Items', 'seal_codex', '%d / %d entdeckt' % (len(seen & set(ITEM_IDS)), len(ITEM_IDS)))
         rows_vis = 7
         sel_row = self.codex_sel // cols
         top = max(0, min(sel_row - 3, (len(ids) - 1) // cols - rows_vis + 1))
@@ -1140,9 +1141,17 @@ class Game:
                 continue
             x, y = 24 + c * 27, 32 + (r - top) * 23
             sel = i == self.codex_sel
+            act = ACTIVES.get(iid[7:]) if iid.startswith('active:') else None
             pygame.draw.rect(s, (60, 44, 60) if sel else (34, 26, 40), (x - 1, y - 1, 24, 22))
-            if sel:
-                pygame.draw.rect(s, (255, 210, 120), (x - 1, y - 1, 24, 22), 1)
+            if sel or act:
+                pygame.draw.rect(s, (255, 210, 120) if sel else (150, 90, 60), (x - 1, y - 1, 24, 22), 1)
+            if act:
+                if act.get('locked') and iid[7:] not in unlocked:
+                    pygame.draw.rect(s, (110, 90, 70), (x + 6, y + 9, 10, 8))
+                    pygame.draw.circle(s, (110, 90, 70), (x + 11, y + 9), 4, 1)
+                else:
+                    gfx.draw_icon(s, act['icon'], act['col'], x + 11, y + 10)
+                continue
             it = ITEMS[iid]
             if iid in seen:
                 gfx.draw_icon(s, it['icon'], it['col'], x + 11, y + 10)
@@ -1156,10 +1165,19 @@ class Game:
                 else:
                     T.add('?', x + 11, y + 3, 9, (120, 110, 130), 'c')
         iid = ids[self.codex_sel]
-        it = ITEMS[iid]
+        act = ACTIVES.get(iid[7:]) if iid.startswith('active:') else None
+        it = ITEMS.get(iid)
         syn = [sy for sy in SYNERGIES if iid in sy['items']] if iid in seen else []
         self.veil(s, (12, 198, W - 24, 96), 190)
-        if iid in seen:
+        if act and act.get('locked') and iid[7:] not in unlocked:
+            T.add('Gesperrt (aktives Item)', 28, 206, 11, (200, 150, 150))
+            how = next((a[2] for a in ACHIEVEMENTS if a[3] == ('active', iid[7:])), None)
+            T.add('Freischalten: ' + (how or 'durch einen Erfolg'), 28, 224, 8, (210, 200, 190))
+        elif act:
+            T.add(act['name'], 28, 206, 11, act['col'])
+            T.add('„%s“' % act['desc'], 28, 222, 8, (230, 225, 210))
+            T.add('Aktives Item – lädt sich in %d Räumen auf, Taste E zum Einsetzen' % act['charge'], 28, 236, 7, (180, 210, 240))
+        elif iid in seen:
             T.add(it['name'], 28, 206, 11, it['col'])
             T.add('„%s“' % it['desc'], 28, 222, 8, (230, 225, 210))
             T.add(', '.join(fx_lines(it['fx'])), 28, 236, 7, (180, 210, 240))

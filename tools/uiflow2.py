@@ -39,6 +39,12 @@ try:
     g.save.data['events_seen'].remove('omikuji'); g.save['kuji_seen'][:] = []; g.state = 'title'
     g.ch_sel = 0; gfx.TEXT.clear(); g.st_challenges(1 / 60, [], [])   # Prüfungen nennen ihre Item-Belohnung
     assert any(t[0] == 'Belohnung: Biidoro-Fūrin' for t in gfx.TEXT.items), 'Prüfung zeigt Belohnung nicht'
+    from yokai.data import ACTIVES   # Codex: aktive Items hinten, gesperrte nennen ihren Erfolg
+    n = len(ITEM_IDS); g.codex_sel = n + list(ACTIVES).index('totsuka'); gfx.TEXT.clear(); g.st_codex(1 / 60, [], [])
+    assert any(t[0].startswith('Freischalten: Bestehe') or t[0] == 'Gesperrt (aktives Item)' for t in gfx.TEXT.items), 'Codex zeigt gesperrtes aktives Item nicht'
+    g.codex_sel = n; gfx.TEXT.clear(); g.st_codex(1 / 60, [], [])
+    assert any(t[0] == ACTIVES['ofuda_sturm']['name'] for t in gfx.TEXT.items), 'Codex zeigt aktives Item nicht'
+    g.st_codex(1 / 60, [], ['down']); assert g.codex_sel < n + len(ACTIVES)
     g.state = 'title'
     g.save['seen'].remove(jiid)
     menu(0); print('chars', g.state)
