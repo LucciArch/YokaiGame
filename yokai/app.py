@@ -912,6 +912,12 @@ class Game:
                     self._wrap(sy['desc'] + '  –  ' + ', '.join(fx_lines(sy['fx'])), 140, 208, W - 170, 7, (230, 225, 210))
                 x += w + gfx.text_w(', ', 7)
             y += 13
+        near = run.near_synergies()
+        if near:
+            seen = set(self.save['synergies_seen'])
+            txt = ', '.join('%s (+ %s)' % (sy['name'] if sy['id'] in seen else '???', ITEMS[iid]['name'])
+                            for sy, iid in near[:4]) + (' …' if len(near) > 4 else '')
+            y = self._wrap('Fast komplett: ' + txt, 30, y, W - 70, 7, (200, 170, 230)) + 2
         if p.transforms:
             self._wrap('Transformationen: ' + ', '.join(TRANSFORMS[t]['name'] for t in p.transforms), 30, y, W - 70, 7, (180, 220, 255))
 

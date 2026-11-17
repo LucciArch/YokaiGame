@@ -3,6 +3,7 @@ os.environ['SDL_VIDEODRIVER']='dummy'; os.environ['SDL_AUDIODRIVER']='dummy'; os
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 import pygame
 from yokai.app import Game
+from yokai import gfx
 g = Game()
 K = lambda k: pygame.event.Event(pygame.KEYDOWN, key=k, mod=0, unicode='', scancode=0)
 def step(ev, n=1):
@@ -39,7 +40,11 @@ try:
     menu(0); print('chars', g.state); step([K(pygame.K_RETURN)], 200); print('play', g.state)
     for k in (pygame.K_e, pygame.K_q, pygame.K_SPACE): step([K(k)], 20)
     step([K(pygame.K_ESCAPE)], 5); print('pause', g.state)
-    g.sel = 1; step([K(pygame.K_RETURN)], 5); step([K(pygame.K_RETURN)], 5)
+    nsy = next(sy for sy in SYNERGIES if len(sy['items']) >= 2); g.run.player.items[:] = nsy['items'][:-1]
+    assert (nsy, nsy['items'][-1]) in g.run.near_synergies(), 'Pausenmenü kennt fast komplette Synergie nicht'
+    g.sel = 1; step([K(pygame.K_RETURN)], 5)
+    g.draw_itemlist(g.screen); assert any(t[0].startswith('Fast komplett') for t in gfx.TEXT.items), 'Pausenmenü zeigt fast komplette Synergien nicht'
+    step([K(pygame.K_RETURN)], 5)
     g.sel = 2; step([K(pygame.K_RETURN)], 5); print('opts', g.state); step([K(pygame.K_ESCAPE)], 5); print('back', g.state)
     g.sel = 3; step([K(pygame.K_RETURN)], 5); step([K(pygame.K_RETURN)], 60); print('over', g.state)
     step([K(pygame.K_r)], 60); print('retry', g.state)

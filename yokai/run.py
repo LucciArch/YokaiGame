@@ -2320,6 +2320,16 @@ class Run:
         self.bg = bg
         self.bg_dirty = False
 
+    def near_synergies(self):
+        """Synergien, denen nur noch ein Item fehlt: [(Synergie, fehlendes Item)] – für das Pausenmenü."""
+        have = set(self.player.items)
+        out = []
+        for sy in SYNERGIES:
+            miss = [i for i in sy['items'] if i not in have]
+            if len(miss) == 1 and sy['id'] not in self.player.synergies:
+                out.append((sy, miss[0]))
+        return out
+
     def pedestal_extra(self, iid):
         """Hinweis im Tooltip: vervollständigt dieses Item eine Synergie oder Transformation?"""
         if iid.startswith('active:') or iid not in ITEMS:
