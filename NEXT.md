@@ -180,15 +180,22 @@ für Talismane greifen (z. B. `bullet_tick`) – sollen sie auch für Strahl/Hie
 - Hinweis: Lokaler `main` im Container kann ein fremder alter Klon sein (keine gemeinsame Geschichte mit origin/main) –
   dann auf einem Zweig von `origin/main` arbeiten und mit `git push origin HEAD:main` pushen.
 
-# Nächster Schritt: Nutz-Synergien sichtbar machen
-Warum: Fuchsgeld, Glückliches Haus, Wunsch erfüllt, Shinsen, Reich wie ein Kaufmann, Totenfähre wirken unsichtbar – der
-Spieler merkt kaum, dass die Synergie etwas tut. Im Pausenmenü „Items & Werte“ pro aktiver Nutz-Synergie einen Zähler
-zeigen (z. B. „Fuchsgeld: 12 Mon extra“, „Totenfähre: 23/40 Kills“), gezählt in `run`/`player` an der Stelle, wo die
-jeweilige sig_-Fähigkeit in `yokai/sigs.py` greift. uiflow2 um eine Prüfung erweitern.
+# Erledigt (Runden 104–105)
+- Runde 104: `sigs._gain(p, key, n)` zählt in `st(p)['nutz']`, `sigs.nutz_lines(p)` liefert die Zeilen fürs Pausenmenü
+  („Items & Werte“, unter „Fast komplett“): Fuchsgeld (Mon extra), Glückliches Haus (Krüge mehr), Wunsch erfüllt
+  (Sternschnuppen), Shinsen (Schlüssel/Herzen), Kaufmann (aktueller Münz-Schaden), Totenfähre (x/40 Kills bzw. Münze bereit).
+  uiflow2 prüft Text und Anzeige. Neue Nutz-Synergien dort eintragen.
+- Runde 105: SFX `shinkiro` (Ausatmen) und `mirage` (Trugbild zerfließt / Muschel schließt) in `art_src/music/sfx.py`,
+  gespielt in `run.py`. Neu bauen: `cd art_src/music && python3 sfx.py shinkiro mirage` (braucht scipy, ffmpeg).
+
+# Nächster Schritt: Shinkirō-Variante ab Kapitel II
+Warum: Das Ereignis ist jetzt fertig (Bild, Klang, Lexikon), wird aber nach dem ersten Mal berechenbar. Ab Kapitel II
+(Tiefe ≥ 4) manchmal (z. B. 35 %) zwei echte Items: das zweite trägt einen Preis (ein Herz, wie Teufelsangebot/Blutpreis –
+vorhandenes Preis-System der Pedestals nutzen, falls es eins gibt). Banner/Hinweistext anpassen, uiflow2 erweitern.
 
 # Weitere Ideen
-- Shinkirō-Variante ab Kapitel II: manchmal zwei echte Items, aber das zweite kostet ein Herz (Wahl mit Preis)
 - Wanddekos: zweite Variante pro Biom (Index 2) für mehr Abwechslung in langen Gängen
 - Spitze (Feuerwerk/Oni-Rausch/Hannya-Zorn ≈ ×4,2) mit `--raum` gegenprüfen, ob sie auch in Räumen dominieren
 - Bogen-Brücke (Hamaya bei Benkei +1,1) nach weiteren Läufen nachmessen
-- Eigener Klang für das Shinkirō (gläsernes Flimmern beim Betreten, „Plopp“ beim Zerfließen)
+- Nutz-Zähler auch auf dem Endbildschirm („Fuchsgeld brachte 40 Mon“) als kleine Lauf-Statistik
+- Weitere Ereignisräume aus `design/ereignisse.md`-Stil (z. B. Tsukimi: Mondhasen-Mochi gegen Opfergabe)
