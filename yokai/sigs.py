@@ -226,7 +226,7 @@ TEXT = {
     'kakuremino': 'Stehst du 1 s still, ohne zu werfen, wirst du unsichtbar – Yokai greifen dich nicht an',
     'hoki': 'Jeder 6. Wurf ist ein Papiervogel, der Feinde durchbohrend verfolgt (120 %)',
     'masakari': 'Jeder 5. Wurf ist eine Axt, die alles durchschlägt und zurückkehrt (250 %)',
-    'habakiri': 'Jeder 8. Treffer: Habakiri-Schnitt mit 300 % Schaden oder 4 % des Feindlebens (der höhere Wert)',
+    'habakiri': 'Jeder 8. Treffer: Habakiri-Schnitt mit 300 % Schaden oder 4 % des Feindlebens (Bosse 1 %; der höhere Wert)',
     'tamagushi': 'Jeder 3. Raum ohne Treffer: die Kami nehmen das Opfer an – ½ Herz',
     'kesagiri': 'Jeder 4. Wurf: zwei durchbohrende Klingen schneiden schräg (je 120 %)',
     'hoshi_tama': 'Jeder Kill: 10 % (+2 % je Glück) Chance auf einen Fuchsfeuer-Ring – 8 brennende Flammen (60 %)',
@@ -895,7 +895,7 @@ def hit_post(run, e, b, dmg):
             g['hb'] = 0
             _float(run, e, 'Habakiri!', (190, 220, 255))
             _sparks(run, e.x, e.y, ((190, 220, 255), (255, 255, 255)), 10, 120)
-            run.damage_enemy(e, max(p.damage() * 3, e.maxhp * 0.04), None)
+            run.damage_enemy(e, max(p.damage() * 3, e.maxhp * (0.01 if e.is_boss else 0.04)), None)   # Bosse: 4 % war ×3 (balance-check-128)
     if 'yashiori' in S and (e.is_boss or e.champ) and run.time >= getattr(e, 'sg_ys', -9):
         e.sg_ys, e.sg_drunk = run.time + 8, run.time + 3
         e.slowed = max(e.slowed, 3.0)

@@ -7,6 +7,7 @@ Mit --leben: ohne Gott-Modus; gemessen wird der Boss-Schaden in % bis zum Tod (F
 Mit --waffe=w_laser (w_sword, w_bow ...): alle Kämpfe mit dieser Angriffsart.
 Mit --figur=kenji (benkei, kotaro ...): alle Kämpfe mit dieser Figur; dann wird statt der Synergien jedes Waffen-Item
   (+ ein Zufalls-Item) gemessen – bei Figuren mit eigener Waffe also die Waffen-Brücke (weapons.bridge_of).
+Mit --items: die IDs im dritten Parameter sind Items; jedes wird mit einem Zufalls-Item gegen zwei Zufalls-Items gemessen.
 Mit Nahkampfwaffe (auch aus Items wie Speer oder Tamahagane) läuft der Bot zum Ziel und umkreist es."""
 import os, sys, math, random
 os.environ['SDL_VIDEODRIVER'] = 'dummy'; os.environ['SDL_AUDIODRIVER'] = 'dummy'
@@ -16,6 +17,9 @@ from yokai.app import Game
 from yokai import data, gfx, weapons
 from yokai.bosses import make_boss, CX, CY
 
+ITEMS = '--items' in sys.argv
+if ITEMS:
+    sys.argv.remove('--items')
 TOD = '--tod' in sys.argv
 if TOD:
     sys.argv.remove('--tod')
@@ -92,7 +96,7 @@ def fight(items, seed):
     return (100 * (1 - b.hp / b.maxhp) if LEBEN else t), hits, run.player
 
 
-SEEDS = tuple(range(11, 23)) if TOD or FIGUR else tuple(range(11, 17)) if RAUM else (11, 12, 13)   # Überleben und Räume streuen stärker
+SEEDS = tuple(range(11, 23)) if TOD or FIGUR or ITEMS else tuple(range(11, 17)) if RAUM else (11, 12, 13)   # Überleben und Räume streuen stärker
 pool = [i for i in data.ITEM_IDS if not data.ITEMS[i].get('active')]
 base = {}
 for n in (2, 3):
@@ -110,7 +114,12 @@ if FIGUR:   # Waffen-Items + je ein Zufalls-Item: mit Brücke gegen dasselbe ohn
         weapons.bridge_of = bridge
         t = sum(r[0] for r in rs) / len(rs); h = sum(r[1] for r in rs) / len(rs)
         out.append((t / base[2][0], h - base[2][1], '%s ohne ×%.2f' % (wid, sum(r0) / len(r0) / base[2][0]), t))
-for sy in ([] if FIGUR else data.SYNERGIES):
+for iid in (ONLY if ITEMS else []):
+    its = [[iid, random.Random(s * 13).choice([i for i in pool if i != iid])] for s in SEEDS]
+    rs = [fight(it, s) for it, s in zip(its, SEEDS)]
+    t = sum(r[0] for r in rs) / len(rs); h = sum(r[1] for r in rs) / len(rs)
+    out.append((t / base[2][0], h - base[2][1], iid, t))
+for sy in ([] if FIGUR or ITEMS else data.SYNERGIES):
     if ONLY and sy['id'] not in ONLY:
         continue
     rs = [fight(sy['items'], s) for s in SEEDS]
