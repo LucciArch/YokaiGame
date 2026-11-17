@@ -146,16 +146,29 @@ für Talismane greifen (z. B. `bullet_tick`) – sollen sie auch für Strahl/Hie
   Vorschau-Trick: Wand-Basis per `walls.wall_set(n)['h']` + `walldeco_hi.wall_decos_hi` mit PIL zusammensetzen.
   Ohne eigene Zeichnung bleiben: hakaba, kurama, yukiyama, ryugu, uminobe, yomi, takamagahara.
 
-# Nächster Schritt: Synergien am unteren Ende
-Warum: Spielerinnen, die eine Synergie finden, sollen sich belohnt fühlen – vier liegen im Bosskampf unter einem
-Zufalls-Build: grosse_welle ×0,85, tsukumogami ×0,89, hundert_augen ×0,89, tengu_flug ×0,90 (`--leben`). Erst mit
-`python3 tools/synbalance.py shuten_doji 5 grosse_welle,tsukumogami,hundert_augen,tengu_flug --leben` nachmessen
-(Runde 95 hat Waffen geändert), dann je eine Signatur-Verstärkung, die zur Sage passt. Geteilte Trefferliste beachten.
+# Erledigt (Runden 97–98)
+- Runde 97: unteres Ende aufgewertet (`--leben`, Shuten-dōji): Tsukumogami – jede Rolle wirft zwei Papierpuppen (in
+  `sigs.on_dash`, ×0,89 → ×1,07); Hundert Augen – `e.sg_eyes` stapelt pro Treffer bis 6, +20 % + 6 %/Auge (×0,89 → ×1,05);
+  Tsunami – Rückflut: Abpraller und Teilstücke (70 %) zielsuchend (×0,85 → ×0,99); Tengu-Flug – `g['tengu_f']` vier
+  durchbohrende Federn 200 % nach der Rolle (×0,90 → ×1,09; reagiert stark nichtlinear). Bericht `balance-check-97`.
+- Gesamtmessung danach: Spitze unverändert (Feuerwerk/Oni-Rausch/Hannya-Zorn ≈ 43–44 %, wie nach Runde 88). Unteres
+  Ende sind nur Nutz-Synergien (Geld, Schlüssel, Sternschnuppen) und Nahkampf (gegen Schwert-Basis ok).
+- Runde 98: Eigene Hi-Res-Wanddekos Hakaba (Sotoba + Higanbana, Jizō mit Kerze – Licht `('hakaba', 1)` jetzt (19, 8)),
+  Kurama (Shimenawa, Hanadaka-Tengu-Maske), Yukiyama (Eiszapfen, Eishöhle mit Yuki-onna). Helfer `_higanbana`.
+  Vorschau: Skript wie in Runde 96 (Wand-Basis + `wall_decos_hi`, ×6 vergrößert). Python braucht ggf.
+  `pip install --ignore-installed pillow` (System-PIL ist kaputt).
+  Ohne eigene Zeichnung bleiben: ryugu, uminobe, yomi, takamagahara.
+
+# Nächster Schritt: Balance der Waffen-Brücken (Runde 95)
+Warum: Seit Runde 95 wird ein Waffen-Item bei Figuren mit eigener Waffe zum Zusatzangriff – das betrifft jeden Lauf mit
+Kenji, Benkei, Kotarō, Susanoo oder Akago, ist aber nie gemessen. `tools/synbalance.py` bekommt einen Schalter
+`--figur=<id>` (statt fest 'hana'), dann je Figur mit/ohne Waffen-Item vergleichen (z. B. Kotarō + `w_laser`,
+Kenji + `w_bow`). Ziel: das Item soll sich lohnen (≥ ×1,1 gegenüber zwei Zufalls-Items), aber nicht die Figur ersetzen.
 
 # Weitere Ideen
-- Hi-Res-Wanddekos Teil 2: hakaba (Sotoba, Jizō mit Kerze), kurama (Shimenawa, Tengu-Maske), yukiyama (Eiszapfen,
-  Eishöhle mit Augen) – Vorlage `chikurin_hi` usw. in `walldeco_hi.py`, Lichter in `gfx.WALL_LIGHT` beachten
-- Brücken-Balance aus Runde 95 messen (z. B. `synbalance` mit Figur statt 'hana' – braucht einen `--figur=`-Schalter)
-- Spitze erneut prüfen: feuerwerk/oni_rausch/hannya_zorn – wieder gestiegen seit Runde 87/88?
+- Hi-Res-Wanddekos Teil 4: ryugu (Korallentor, Otohime-Tamatebako), uminobe (Netz mit Glaskugeln, Funayūrei-Hände),
+  yomi (Yomotsu-Steinblock, Ikazuchi), takamagahara (Wolkenpalast, Ame-no-Ukihashi)
+- Nutz-Synergien (Fuchsgeld, Glückliches Haus, Wunsch, Shinsen) im Pausenmenü mit sichtbarem Zähler belohnen
 - Shinkirō als Ereignis: eine Hamaguri spiegelt einen Trugladen vor
 - Figurenbeschreibung im Auswahlmenü: Hinweis, dass Waffen-Items zum Zusatzangriff werden
+- Spitze (Feuerwerk/Oni-Rausch/Hannya-Zorn ≈ ×4,2) mit `--raum` gegenprüfen, ob sie auch in Räumen dominieren
