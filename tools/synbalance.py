@@ -2,6 +2,8 @@
 Aufruf: python tools/synbalance.py [boss] [tiefe] [ids]  –  Ausgabe sortiert nach Tempo (Faktor < 1 = schneller als Zufall).
 Mit --tod: Überlebenszeit ohne Gott-Modus gegen einen Boss, der in Phase 2 festgehalten wird (Faktor > 1 = zäher als Zufall).
 Mit --raum: statt des Bosses drei Wellen zu je 8 Normalgegnern aus dem Gebiet der Tiefe (für Raum-Synergien).
+Mit --leben: ohne Gott-Modus; gemessen wird der Boss-Schaden in % bis zum Tod (Faktor > 1 = mehr Schaden als Zufall),
+  damit Effekte „wenn du getroffen wirst“ nur so oft wirken, wie die Herzen reichen.
 Mit --waffe=w_laser (w_sword, w_bow ...): alle Kämpfe mit dieser Angriffsart; Nahkampf läuft zum Ziel und umkreist es."""
 import os, sys, math, random
 os.environ['SDL_VIDEODRIVER'] = 'dummy'; os.environ['SDL_AUDIODRIVER'] = 'dummy'
@@ -14,6 +16,9 @@ from yokai.bosses import make_boss, CX, CY
 TOD = '--tod' in sys.argv
 if TOD:
     sys.argv.remove('--tod')
+LEBEN = '--leben' in sys.argv
+if LEBEN:
+    sys.argv.remove('--leben')
 RAUM = '--raum' in sys.argv
 if RAUM:
     sys.argv.remove('--raum')
@@ -74,9 +79,12 @@ def fight(items, seed):
             if p.dead or run.result:
                 break
             continue
-        p.hp = p.maxhp; p.dead = False; run.result = None
+        if LEBEN and (p.dead or run.result == 'dead'):
+            return 100 * (1 - b.hp / b.maxhp), hits, run.player
+        if not LEBEN:
+            p.hp = p.maxhp; p.dead = False; run.result = None
         gfx.TEXT.clear(); gfx.HI.clear()
-    return t, hits, run.player
+    return (100 * (1 - b.hp / b.maxhp) if LEBEN else t), hits, run.player
 
 
 SEEDS = tuple(range(11, 23)) if TOD else tuple(range(11, 17)) if RAUM else (11, 12, 13)   # Überleben und Räume streuen stärker
@@ -85,7 +93,7 @@ base = {}
 for n in (2, 3):
     rs = [fight(random.Random(s * 7 + n).sample(pool, n), s) for s in SEEDS for _ in range(2)]
     base[n] = (sum(r[0] for r in rs) / len(rs), sum(r[1] for r in rs) / len(rs))
-    print('Zufall %d Items: %.1f s, %.1f Treffer' % (n, *base[n]))
+    print('Zufall %d Items: %.1f %s, %.1f Treffer' % (n, base[n][0], '%' if LEBEN else 's', base[n][1]))
 out = []
 for sy in data.SYNERGIES:
     if ONLY and sy['id'] not in ONLY:
@@ -95,5 +103,5 @@ for sy in data.SYNERGIES:
     bt, bh = base[min(3, len(sy['items']))]
     t = sum(r[0] for r in rs) / len(rs); h = sum(r[1] for r in rs) / len(rs)
     out.append((t / bt, h - bh, sy['id'], t))
-for f, dh, sid, t in sorted(out, reverse=TOD):
-    print('%-16s Zeit ×%.2f (%5.1f s)  Treffer %+5.1f' % (sid, f, t, dh))
+for f, dh, sid, t in sorted(out, reverse=TOD or LEBEN):
+    print('%-16s %s ×%.2f (%5.1f %s)  Treffer %+5.1f' % (sid, 'Schaden' if LEBEN else 'Zeit', f, t, '%' if LEBEN else 's', dh))

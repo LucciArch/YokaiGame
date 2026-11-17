@@ -828,9 +828,10 @@ def on_hurt(p, run):
                 e.ky += (e.y - p.y) / max(d, 1) * 420
         if 'daruma_geist' in S:
             _syn(run, 'daruma_geist', p.x, p.y, (255, 210, 90))
+            seen = set()                       # Splitter treffen jeden Feind nur einmal
             for i in range(8):
-                b = run.fire_player_bullet(p.x, p.y - 3, i / 8 * math.tau, p.damage() * 1.2, 220, 3, 0.8, {'pierce': 1})
-                b.col = (255, 210, 90)
+                b = run.fire_player_bullet(p.x, p.y - 3, i / 8 * math.tau, p.damage() * 1.5, 220, 3, 0.8, {'pierce': 1})
+                b.col = (255, 210, 90); b.hit = seen
     if 'momo' in S:
         _momo(p, run)
     if 'a_un' in S:

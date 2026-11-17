@@ -561,9 +561,10 @@ class Player:
         audio.play('hurt')
         burst(run, self.x, self.y, (230, 50, 60), 14, 90)
         if self.f['hurt_ring']:
+            seen = set()                       # der Ring trifft jeden Feind nur einmal, auch aus nächster Nähe
             for i in range(12):
                 a = i / 12 * math.tau
-                run.fire_player_bullet(self.x, self.y, a, self.damage() * 1.2, self.s['shotspd'], self.s['size'], 0.9, {'pierce': 1})
+                run.fire_player_bullet(self.x, self.y, a, self.damage() * 1.5, self.s['shotspd'], self.s['size'], 0.9, {'pierce': 1}).hit = seen
         if self.f['hurt_dmg']:
             self.hurt_buff = 6.0
         sigs.on_hurt(self, run)

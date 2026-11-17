@@ -189,5 +189,13 @@ def big_hit(**f):
 
 plain, side = big_hit(), big_hit(side=1)
 check(plain > 0 and abs(side - plain) < 0.01, 'Schwert + Seitenwurf trifft denselben Feind mehrfach (%.1f / %.1f)' % (side, plain))
+# Hannya-Ring bei Treffer: ein großer Feind direkt daneben wird nur einmal getroffen, nicht von allen 12 Geschossen
+r, p = setup(hurt_ring=1)
+e = Enemy(r, 'nurikabe', p.x + 14, p.y); r.enemies.append(e); e.spawn_t = 0
+e.hp = e.maxhp = 999; e.r = 30
+p.hp = p.maxhp = 6; p.iframes = 0; p.hurt(1)
+for _ in range(30):
+    r.update_bullets(1 / 60)
+check(0 < 999 - e.hp <= p.damage() * 1.5 + 0.01, 'Hannya-Ring trifft einen großen Feind mehrfach (%.1f)' % (999 - e.hp))
 print('Waffen-Synergien geprüft, Fehler:', bad)
 sys.exit(1 if bad else 0)
