@@ -292,19 +292,31 @@ für Talismane greifen (z. B. `bullet_tick`) – sollen sie auch für Strahl/Hie
   7–12 s. Bericht `design/balance/balance-check-131-meister.md`. Messskript: Bot mit `dmg=1`, `Run.update`
   umwickeln und Zeit im Bossraum mit lebenden Gegnern je `floor_no` summieren (~4 min für 8 Läufe).
 
-# Nächster Schritt: Synergie für Belohnungs-Items
-Warum: Siegel-, Prüfungs- und Quest-Items haben noch keine Synergien untereinander; Kombinationen sind der Kern des
-Wiederspielwerts. Vorschlag: Fūrin + Biidoro-Splitter + Yata-Spiegel (Klang/Glas/Licht) oder Hi-ōgi + Sonnen-Item –
-eigene `sig_*` in `yokai/sigs.py`, Eintrag in `SYNERGIES`, sigtest-Prüfung, danach mit `synbalance.py` messen.
+# Erledigt (Runden 133–134): Synergien für Belohnungs-Items
+- Runde 133: `kagura` (hi_ogi + uzume_suzu, sig `kagura`): Suzu alle 2,5 s, im Tanz (4 s ohne Treffer) 6 Sakaki-Blätter
+  50 % aus `sigs._suzu` (×1,28). `sarayashiki` (neunter_teller + zehnter_teller, sig `okiku`): zehnter Teller jeden
+  9. Kill und nach Okikus Klage um die Spielerin, Helfer `sigs._teller` (×1,38).
+- Runde 134: `gojo_ohashi` (gojo_giboshi + ushiwaka_fue, sig `gojo_bashi`): Flötenton jeden 4. Wurf, Treffer → Naginata-
+  `_blast` 80 % am Ziel, alle 1,5 s (in `hit_post`; erst ×2,06 mit 120 %/1 s, gedämpft auf ×1,55).
+- Messung jeweils `synbalance.py shuten_doji 5 <id> --leben` (Iwato ×1,45 als Vergleich).
+
+# Nächster Schritt: weitere Synergien für Belohnungs-Items (Teil 2)
+Warum: Siegel-/Prüfungs-Items sind jetzt 60 Stück, aber erst 4 haben Synergien untereinander (plus Henro/Misogi).
+Mythologisch naheliegende, noch freie Paare (vorher `grep "items=\[" yokai/data.py` prüfen):
+- Orochi: habakiri + yashiori_sake (Susanoo berauscht und zerschneidet die Schlange)
+- Seimei: kikyo_mon + seimei_ido oder hoki_naiden + juni_shinsho
+- Okikus Brunnen: okiku_ido + tsurube / ido_kagami
+- Benkei: tausendstes_schwert + nanatsu_dogu, tachi_ojo + miidera_kane
+- Kuzunoha: kuzu_blatt + shinoda_blatt / fuchs_trugbild
+Je Synergie: `SYNERGIES`-Eintrag, `TEXT`, sig in `yokai/sigs.py`, sigtest-Fall, `synbalance --leben` (Ziel ≤ ~×1,6).
 
 # Danach
 - Ebene 9–10 ohne Meister noch ~10 s Bosszeit – nach Lucas Spieltest ggf. weiter anheben
-- Codex: aktive Items im Lauf als „entdeckt“ merken, falls Spoiler-Schutz gewünscht
 - Hi-ōgi (×1,53) und Masakari (×1,35) beobachten – oberer Rand der Siegel-Items
 
 # Weitere Ideen
 - Wanddekos: zweite Variante pro Biom (Index 2), Werkzeug walldeco_hi.py steht
 - Mondhase ist im Raum recht klein – ggf. größer zeichnen (Canvas 64×60 → 80×72) und Wendezone anpassen
-- Spitze (Feuerwerk/Oni-Rausch/Hannya-Zorn ≈ ×4,2) mit `--raum` gegenprüfen, ob sie auch in Räumen dominieren
-- Tengu-Kappe (Tokin) ist im Spiel sehr klein – ggf. etwas größer zeichnen
+- Spitze (Feuerwerk/Oni-Rausch/Hannya-Zorn ≈ ×4,2) mit `--raum` gegenprüfen
 - Prüfungen: Bestenzeit je Prüfung im Menü anzeigen
+- Codex: aktive Items im Lauf als „entdeckt“ merken
