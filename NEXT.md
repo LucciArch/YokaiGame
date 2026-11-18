@@ -392,10 +392,23 @@ für Talismane greifen (z. B. `bullet_tick`) – sollen sie auch für Strahl/Hie
 - „Nur Items“-Wrapper liegt nicht im Repo: Skript, das `data.SYNERGIES[..]['fx'] = {}` für die IDs setzt und dann
   `runpy.run_path('tools/synbalance.py')` aufruft.
 
-# Nächster Schritt: `synbalance --nur-items` + Kikyō-Mon neu messen
-Warum: Jede Messung der letzten 12 Runden brauchte den Wrapper von Hand; als Option spart er Zeit und Fehler.
-Danach Kikyō-Mon nach dem Pentagramm-Fix (Runde 161) messen: `synbalance x 2 kikyo_mon --items`; ist es spürbar
-schwächer als die übrigen Siegel-Items, den Pentagramm-Schaden 250 % → 300 %.
+# Erledigt (Runden 165–166)
+- Runde 165: `synbalance.py ... --nur-items` misst jede Synergie zusätzlich mit leerem `fx` (Spalte „nur Items ×…“) –
+  ersetzt den Hand-Wrapper. Kikyō-Mon nach dem Fix: kappa_ou 2 `--items` ×0,63 (Masakari/Hi-ōgi ×0,59, Habakiri ×0,64,
+  Hoki Naiden ×0,71) → kein Nachbessern.
+- Runde 166: Jūni-Shinshō war mit ×0,87 das schwächste Siegel-Item (radialer Ring, kaum Treffer am Boss). Jetzt
+  umzingeln die 12 Talismane den nächsten Feind (Radius 60, nach innen, je 50 %, gestaffelt `delay`) → ×0,69.
+  Ohne Feind und bei Shikigami-Tsukai (`juni_tori`) bleibt der alte Ring.
+
+- Messung aller 50 Siegel-Items (kappa_ou 2 `--items`, nach Runde 166): Kampf-Items ×0,59 (Masakari) bis ×0,85
+  (Ido-Kagami). Bei ×1,03 liegen Schutz-/Raum-/Münz-Items (Tamagushi, Tachi-ōjō, Tsurube, Kesa …) – Bossmaß sieht sie nicht.
+  Grenzfälle ×0,91–0,99 mit Kampfanteil: zanshin_tsuba, yashiori_sake, kakuremino, onusa, hoshi_tama, kuzu_blatt,
+  ushiwaka_fue, oni_tsuno, tausendstes_schwert, bunbuku_kessel, ichi_no_tachi.
+
+# Nächster Schritt: Grenzfälle mit `--raum` gegenmessen
+Warum: Die elf Grenzfälle oben könnten im Bosskampf nur zu wenig zeigen (Kills, Rolle, Stillstand) – oder wirklich
+schwach sein. `python tools/synbalance.py kappa_ou 3 zanshin_tsuba,oni_tsuno,... --items --raum` (~6 min); was auch
+dort ≥ ×0,95 liegt, behutsam stärken (eine Zahl pro Item, sigtest-Erwartungen mitziehen). Vergleich: Zufall = ×1,00.
 
 # Danach
 - Ebene 9–10 ohne Meister noch ~10 s Bosszeit – nach Lucas Spieltest ggf. weiter anheben
