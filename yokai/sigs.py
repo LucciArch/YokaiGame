@@ -217,6 +217,7 @@ TEXT = {
     'hoten': 'Das Norito kommt schon jeden 12. Wurf, und bis zu 8 vergehende Feindgeschosse werden Sakaki-Blätter, die Yokai treffen (je 60 %)',
     'kintaro': 'Jeder Axttreffer zählt vierfach für den Keulenschlag, und die Keule trifft weiter (55 px statt 40)',
     'kurama': 'Sōjōbōs Wirbel wird größer (65 px), und jedes verwehte Feindgeschoss wird eine weitere Windklinge (bis +3)',
+    'rashomon': 'Der Oni-Arm packt alle 2 s statt 2,5 s – unter 2 Herzen sogar jede Sekunde mit 250 %',
     'ataka': 'Tachi-ōjō hält schon bei 1 Herz und 4 s lang, und alle Yokai im Raum erstarren 2 s (Bosse ½ s) vor Benkeis Blick',
     'utage': 'Jeder Trommelschlag zählt wie zwei Münzen für den Tokkuri, und im Sake-Rausch trommelst du auch im Gehen – lauter und weiter (200 %)',
     'senbon': 'Benkeis Waffen kommen schon jeden 5. Wurf, und jeder ihrer Treffer zählt für die Schwertjagd wie ein Kill',
@@ -2023,12 +2024,15 @@ def _siegel_tick(p, run, dt, S, g):
                 e.frozen = max(e.frozen, 0.4)
     if 'ibaraki' in S:
         g['ibar'] = g.get('ibar', 0) + dt
-        e = _nearest(run, p.x, p.y, 150) if g['ibar'] >= 2.5 else None
+        zorn = 'rashomon' in S and p.total_hp() < 4      # Rashōmon: der Oni holt sich im Zorn seinen Arm zurück
+        e = _nearest(run, p.x, p.y, 150) if g['ibar'] >= (1.0 if zorn else 2.0 if 'rashomon' in S else 2.5) else None
         if e:
             g['ibar'] = 0
             d = math.hypot(e.x - p.x, e.y - p.y) or 1
+            if zorn:
+                _syn(run, 'rashomon', e.x, e.y, (200, 80, 70))
             _sparks(run, e.x, e.y, ((200, 80, 70), (240, 130, 100), (90, 30, 30)), 9, 90)
-            run.damage_enemy(e, p.damage() * 2.0, None)
+            run.damage_enemy(e, p.damage() * (2.5 if zorn else 2.0), None)
             if not e.is_boss:
                 e.kx += (e.x - p.x) / d * 420
                 e.ky += (e.y - p.y) / d * 420

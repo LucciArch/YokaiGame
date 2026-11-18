@@ -570,5 +570,14 @@ for k in range(5):
 sigs.on_dash(p, run)
 if 'kurama' not in p.sgs or run.ebullets or sigs.st(p).get('hd') != 6:
     print('FEHLER Kurama-Lehre', len(run.ebullets), sigs.st(p).get('hd')); bad += 1
+# Rashōmon (Ibaraki-dōjis Arm + Oni-Horn): unter 2 Herzen packt der Arm jede Sekunde mit 250 %
+g.start_run('akago', 52); run = g.run; p = run.player
+for iid in ('ibaraki_arm', 'oni_tsuno'):
+    p.gain_item(iid, silent=True)
+e = Enemy(run, 'gaki', p.x + 60, p.y); e.spawn_t = 0; e.hp = e.maxhp = 999; run.enemies = [e]
+p.hp = 2; p.spirit = 0; sigs.st(p)['ibar'] = 0
+sigs.tick(p, run, 1.05)
+if 'rashomon' not in p.sgs or sigs.st(p).get('ibar') != 0 or e.hp >= 999:
+    print('FEHLER Rashōmon', sigs.st(p).get('ibar'), e.hp); bad += 1
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)

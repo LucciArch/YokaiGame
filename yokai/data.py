@@ -473,6 +473,7 @@ SYNERGIES = [
     dict(id='shojoji_utage', name='Shōjō-ji no Utage', desc='Shō, shō, Shōjō-ji – im Mondlicht trommeln die Tanuki, und der Sake geht nie aus', items=['tanuki_bayashi', 'tanuki_tokkuri'], fx=dict(sig_utage=1)),
     dict(id='kintaro', name='Kintarō', desc='Das Bergkind mit Axt und Keule – es rang mit Bären und wurde Raikōs Gefolgsmann', items=['masakari', 'kodomo_kanabo'], fx=dict(sig_kintaro=1)),
     dict(id='kurama_lehre', name='Kurama-Lehre', desc='Nachts auf dem Kurama lehrte der Tengu-König den jungen Ushiwaka die Kunst des Windes', items=['sojobo_hane', 'hanadaka_men'], fx=dict(sig_kurama=1)),
+    dict(id='rashomon', name='Rashōmon', desc='Watanabe no Tsuna schlug den Arm ab – im Zorn kehrt Ibaraki-dōji zurück, ihn zu holen', items=['ibaraki_arm', 'oni_tsuno'], fx=dict(sig_rashomon=1)),
     dict(id='henro', name='Henro', desc='Dōgyō ninin – Pilgerstab und Kraniche wandern mit dir', items=['kongozue', 'senbazuru'], fx=dict(luck=1, sig_henro=1)),
 ]
 
