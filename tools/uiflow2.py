@@ -116,9 +116,11 @@ try:
     g.state = 'lexicon'; g.lex_tab = 2; step([], 2); g.state = 'play'
     assert 'mochitsuki' in g.save.data['events_seen']; g.save.data['events_seen'].remove('mochitsuki'); g.save['achievements'].remove('mochitsuki')
     run.enter_room(start, 'n'); step([], 20); p.iframes = 0
-    for ach in ('iwato', 'sutoku'):   # Titelstimmungen nach den Kapitel-VII/VIII-Siegen zeichnen
+    for ach in ('iwato', 'sutoku', 'masakado'):   # Titelstimmungen nach den Kapitel-VII/VIII/IX-Siegen zeichnen
         g.save['achievements'].append(ach); g.draw_night(g.screen)
-    g.save['achievements'].remove('iwato'); g.save['achievements'].remove('sutoku')
+    g.t = 5.0; g.draw_night(g.screen)             # Masakados Haupt mitten im Flug
+    for ach in ('iwato', 'sutoku', 'masakado'):
+        g.save['achievements'].remove(ach)
     for k in (pygame.K_e, pygame.K_q, pygame.K_SPACE): step([K(k)], 20)
     step([K(pygame.K_ESCAPE)], 5); print('pause', g.state)
     nsy = next(sy for sy in SYNERGIES if len(sy['items']) >= 2); g.run.player.items[:] = nsy['items'][:-1]
