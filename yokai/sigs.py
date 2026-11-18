@@ -213,6 +213,7 @@ TEXT = {
     'yakumo': 'Jede Kamm-Stufe lässt die Gewitterwolke schneller blitzen (bis 1,8×); ab 4 Stufen springt der Blitz auf einen zweiten Feind',
     'koishikuba': 'Der Fuchsnebel liegt in jedem Raum, auch nach Treffern, und entzündet die Yokai mit Fuchsfeuer – so verfallen sie dem Fuchszauber',
     'yoto': 'Im Blutdurst schneidet Kesa-giri schon jeden 2. Wurf, mit blutroten Klingen (150 %)',
+    'ganryu': 'Der erste Hieb kehrt alle 8 s im Raum zurück und schnellt als Schwalbenschnitt zu zwei weiteren Feinden (je 100 %)',
     'henro': 'Jede neue Ebene faltet zwei Kraniche, jede 2. Ebene bringt ein Geisterherz',
     'sommerwind': 'Die Rolle wirft acht Federn, die weiter fliegen',
     'fest_der_laternen': 'Treffer entzünden doppelt so oft den Boden, die Flammen brennen länger',
@@ -875,6 +876,18 @@ def hit_post(run, e, b, dmg):
         _float(run, e, 'Ichi-no-tachi!', (220, 220, 235))
         _sparks(run, e.x, e.y, ((235, 235, 250), (160, 160, 180)), 8, 100)
         run.damage_enemy(e, dmg * 3, None)
+        if 'ganryu' in S:                                # Ganryūjima: der Hieb wendet wie die Schwalbe
+            g['ichi_t'] = run.time
+            _syn(run, 'ganryu', e.x, e.y, (90, 110, 160))
+            seen = [e]
+            for _ in range(2):
+                o = _nearest(run, e.x, e.y, 200, lambda o: o not in seen)
+                if not o:
+                    break
+                seen.append(o)
+                nb = run.fire_player_bullet(e.x, e.y, math.atan2(o.y - e.y, o.x - e.x), p.damage(), 260, 2.5, 0.8, {})
+                nb.col = (90, 110, 160)
+                nb.hit.add(e)
     if 'ohabari' in S and b is not None and not echo and random.random() < 0.12:
         _chain_strikes(run, e, 3, p.damage() * 0.8)
     if 'miidera' in S and e.is_boss and b is not None and not echo:
@@ -1037,6 +1050,15 @@ def hit_post(run, e, b, dmg):
                 _syn(run, 'ninja', e.x, e.y, (200, 200, 220))
 
 
+def _jagd(p, run, e, g):
+    """Schwertjagd: jeder 30. Kill (oder Senbon-Treffer) +0,2 Schaden, bis +2."""
+    g['jagd'] = g.get('jagd', 0) + 1
+    if g['jagd'] % 30 == 0 and g.get('jagd_b', 0) < 2.0:
+        g['jagd_b'] = round(g.get('jagd_b', 0) + 0.2, 2)
+        p.recalc()
+        _float(run, e, 'Klinge Nr. %d' % (g['jagd'] // 30), (210, 220, 240))
+
+
 def on_kill(run, e):
     p = run.player
     S = p.sgs
@@ -1072,11 +1094,7 @@ def on_kill(run, e):
         g['zs'] = min(5, g.get('zs', 0) + 1) if run.time - g.get('zs_t', -9) < 2.0 else 1
         g['zs_t'] = run.time
     if 'schwertjagd' in S:
-        g['jagd'] = g.get('jagd', 0) + 1
-        if g['jagd'] % 30 == 0 and g.get('jagd_b', 0) < 2.0:
-            g['jagd_b'] = round(g.get('jagd_b', 0) + 0.2, 2)
-            p.recalc()
-            _float(run, e, 'Klinge Nr. %d' % (g['jagd'] // 30), (210, 220, 240))
+        _jagd(p, run, e, g)
     if 'irrlicht' in S:
         tgt = _nearest(run, e.x, e.y, 200, lambda o: o is not e)
         a = math.atan2(tgt.y - e.y, tgt.x - e.x) if tgt else random.uniform(0, math.tau)
@@ -1764,6 +1782,8 @@ def tick(p, run, dt):
         if g.get(k, 0) > 0:
             g[k] -= dt
     _siegel_tick(p, run, dt, S, g)
+    if 'ganryu' in S and not g.get('ichi') and not run.room.cleared and run.time - g.get('ichi_t', -99) >= 8:
+        g['ichi'] = True                                 # Ganryūjima: der erste Hieb kehrt zurück
     if p.moving:
         g['still'] = 0
     else:

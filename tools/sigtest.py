@@ -491,5 +491,19 @@ sigs.st(p)['shots'] = 1; sigs.st(p)['bd_t'] = run.time + 2; run.pbullets = []
 sigs.on_fire(p, run, [])
 if 'yoto' not in p.sgs or sum(1 for b in run.pbullets if b.col == (200, 60, 70)) != 2:
     print('FEHLER Yōtō Muramasa', [b.col for b in run.pbullets]); bad += 1
+# Ganryūjima (Tsubame-gaeshi + Ichi-no-tachi): erster Hieb kehrt nach 8 s zurück, Schwalbenschnitte zu zwei Feinden
+g.start_run('kenji', 45); run = g.run; p = run.player
+for iid in ('tsubame_gaeshi', 'ichi_no_tachi'):
+    p.gain_item(iid, silent=True)
+es = [Enemy(run, 'gaki', p.x + 40 + 30 * k, p.y) for k in range(3)]
+for x in es:
+    x.spawn_t = 0; x.hp = x.maxhp = 999
+run.enemies = es; run.room.cleared = False; run.pbullets = []; sigs.st(p)['ichi'] = True
+b = run.fire_player_bullet(p.x, p.y, 0, 1, 100, 2, 1, {})
+sigs.hit_post(run, es[0], b, 1)
+n1 = len(run.pbullets) - 1
+run.time += 8.1; sigs.tick(p, run, 0.1)
+if 'ganryu' not in p.sgs or n1 < 2 or not sigs.st(p).get('ichi'):
+    print('FEHLER Ganryūjima', n1, sigs.st(p).get('ichi')); bad += 1
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)
