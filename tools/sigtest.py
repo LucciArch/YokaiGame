@@ -731,5 +731,29 @@ gg = sigs.st(p); gg['ojo'] = 3.0; sigs.tick(p, run, 0.01); h1 = e.hp
 sigs.tick(p, run, 0.01); h2 = e.hp; run.time += 1.0; sigs.tick(p, run, 0.01)
 if 'koromogawa' not in p.sgs or not (h1 < 99999 and h2 == h1 and e.hp < h2):
     print('FEHLER Koromogawa', h1, h2, e.hp); bad += 1
+# Tsukumogami (Welle 1): Biwa, Chōchin-obake, Bake-zōri, Ittan-momen, Kosode-no-te
+g.start_run('hana', 67); run = g.run; p = run.player
+for iid in ('biwa_bokuboku', 'chochin_obake', 'bake_zori', 'ittan_momen', 'kosode_te'):
+    p.gain_item(iid, silent=True)
+gg = sigs.st(p); run.pbullets = []
+sigs._siegel_fire(p, run, [], gg, 5, 0, 10, 100, 1, 2)
+if sum(1 for b in run.pbullets if b.fl.get('pierce')) != 3:
+    print('FEHLER Biwa', len(run.pbullets)); bad += 1
+e = Enemy(run, 'gaki', p.x + 60, p.y); e.spawn_t = 0; e.hp = e.maxhp = 99999; run.enemies = [e]
+b = run.fire_player_bullet(p.x, p.y, 0, 1, 100, 2, 1, {})
+for k in range(10):
+    sigs.hit_post(run, e, b, 1)
+    if k == 5 and e.burn <= 0:
+        print('FEHLER Chochin-obake'); bad += 1
+if e.frozen < 1.4 or e.hp >= 99999:
+    print('FEHLER Ittan-momen', e.frozen); bad += 1
+e.frozen = 0; h0 = e.hp; sigs.on_hurt(p, run)
+if e.frozen <= 0 or e.hp >= h0:
+    print('FEHLER Kosode-no-te'); bad += 1
+random.seed(1); nb0 = len(run.pbullets)
+for _ in range(20):
+    sigs.on_kill(run, e)
+if not any(b.fl.get('homing') for b in run.pbullets[nb0:]):
+    print('FEHLER Bake-zori'); bad += 1
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)

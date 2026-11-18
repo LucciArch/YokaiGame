@@ -334,6 +334,12 @@ I('miidera_kane', 'Glocke von Mii-dera', 'Benkei schleppte sie allein den Berg H
 I('nademono', 'Nademono', 'Eine Papierpuppe, die das Unheil an deiner Stelle trägt', 'nademono', (240, 240, 230), 'T', ['shikigami'], 3, True, spirit=1, sig_nademono=1)
 I('aokusa_mino', 'Aokusa-Mino', 'Im Grasmantel wanderte der verbannte Susanoo durch den Regen', 'aokusa_mino', (110, 150, 80), 'T', ['raijin'], 3, True, spirit=2, sig_mino=1)
 I('kongozue', 'Kongō-zue', 'Der Stab des Pilgers – Dōgyō ninin, nie allein unterwegs', 'kongozue', (200, 170, 120), 'T', [], 3, True, hp=1, sig_kongozue=1)
+# ---- Tsukumogami: Hausgeräte, die nach hundert Jahren eine Seele bekommen
+I('biwa_bokuboku', 'Biwa-bokuboku', 'Eine hundertjährige Laute klagt um ihren toten Spieler', 'biwa_bokuboku', (150, 100, 60), 'T', [], 3, dmg=0.2, sig_biwa=1)
+I('chochin_obake', 'Chōchin-obake', 'Die alte Papierlaterne reißt das Maul auf und leckt', 'chochin_obake', (230, 200, 130), 'T', [], 2, sig_chochin_obake=1)
+I('bake_zori', 'Bake-zōri', 'Weggeworfene Sandalen rennen nachts singend durchs Haus', 'bake_zori', (200, 180, 110), 'T', [], 2, spd=8, sig_bake_zori=1)
+I('ittan_momen', 'Ittan-momen', 'Ein Ballen Baumwolle, der nachts Wanderer umwickelt', 'ittan_momen', (235, 235, 245), 'T', ['yurei'], 3, sig_ittan=1)
+I('kosode_te', 'Kosode-no-te', 'Aus dem Ärmel eines Totenkimonos greift eine bleiche Hand', 'kosode_te', (140, 80, 190), 'T', ['yurei'], 3, sig_kosode=1)
 
 ITEM_IDS = ORDER
 

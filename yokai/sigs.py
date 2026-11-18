@@ -301,6 +301,12 @@ TEXT = {
     'nademono': 'Alle 20 s fängt die Papierpuppe ein Feindgeschoss ab, das dich treffen würde',
     'mino': 'Wirst du getroffen, bricht ein Gewitter los: Blitze auf die 3 nächsten Feinde (je 120 %)',
     'kongozue': 'Jede neue Ebene: ½ Herz; jede 3. Ebene bringt ein Geisterherz',
+    # Tsukumogami
+    'biwa': 'Jeder 5. Wurf: die Saiten klagen – 3 Klangwellen im Fächer (je 70 %, durchbohren)',
+    'chochin_obake': 'Jeder 6. Treffer: die Laterne leckt zu – 120 % Zusatzschaden, das Ziel brennt 3 s',
+    'bake_zori': 'Kill: 30 % Chance, dass eine Sandale zum nächsten Feind rennt und zutritt (150 %, sucht ihr Ziel)',
+    'ittan': 'Jeder 10. Treffer: die Stoffbahn wickelt das Ziel ein – 150 %, 1,5 s gefesselt (Bosse 0,4 s)',
+    'kosode': 'Wirst du getroffen, greifen 2 bleiche Hände nach den nächsten Feinden: je 200 %, 1 s festgehalten',
 }
 
 BULLET_SIGS = ('sichel', 'kammzinken', 'seidenfaden', 'stromauf', 'gross', 'schweben', 'windstoss', 'koi_drache')
@@ -792,6 +798,10 @@ def _siegel_fire(p, run, bullets, g, n, base, dmg, spd, life, size):
     if 'tsukikage' in S and n % 6 == 0:                  # Mondschatten-Klinge
         nb = run.fire_player_bullet(p.x, p.y - 3, base, dmg * 1.5, spd * 1.1, 3, life * 1.3, {'pierce': 1, 'spectral': 1})
         nb.col = (150, 160, 220)
+    if 'biwa' in S and n % 5 == 0:                      # Biwa-bokuboku: die Saiten klagen
+        for da in (-0.3, 0, 0.3):
+            nb = run.fire_player_bullet(p.x, p.y - 3, base + da, dmg * 0.7, spd * 0.9, 3, life, {'pierce': 1})
+            nb.col = (200, 160, 100)
     if 'fue' in S and n % (4 if 'gojo_bashi' in S or 'shanao' in S else 6) == 0 and bullets:           # Ushiwakas Flötenton
         bullets[0].fl = dict(bullets[0].fl, fue=1, pierce=1)   # Yoshitsunes leichter Schritt: der Ton fliegt durch
         bullets[0].dmg *= 1.5
@@ -956,6 +966,21 @@ def hit_post(run, e, b, dmg):
             _float(run, e, 'Gong!', (170, 200, 150))
             e.slowed = max(e.slowed, 1.0)
             run.damage_enemy(e, p.damage() * 2.5, None)
+    if 'chochin_obake' in S and b is not None and not echo:
+        g['cho'] = g.get('cho', 0) + 1
+        if g['cho'] >= 6:                                # die Laterne leckt zu
+            g['cho'] = 0
+            _float(run, e, 'Bero!', (230, 90, 70))
+            e.burn = max(e.burn, 3.0)
+            e.burn_dps = max(e.burn_dps, max(1.0, p.damage() * 0.3))
+            run.damage_enemy(e, p.damage() * 1.2, None)
+    if 'ittan' in S and b is not None and not echo:
+        g['itt'] = g.get('itt', 0) + 1
+        if g['itt'] >= 10:                               # die Stoffbahn wickelt sich um das Ziel
+            g['itt'] = 0
+            _ring(run, e.x, e.y, (235, 235, 245), 18)
+            e.frozen = max(e.frozen, 0.4 if e.is_boss else 1.5)
+            run.damage_enemy(e, p.damage() * 1.5, None)
     if 'kodomo_kanabo' in S and b is not None and not echo:
         axt = b.fl.get('axt')                            # Kintarō: Axttreffer zählen vierfach, Schlag weiter
         g['kk'] = g.get('kk', 0) + (4 if axt else 1)
@@ -1151,6 +1176,9 @@ def on_kill(run, e):
             if not p.heal(1):
                 for _ in range(2):
                     run.spawn_pickup('coin', e.x, e.y)
+    if 'bake_zori' in S and random.random() < 0.3:      # die Sandale rennt los
+        nb = run.fire_player_bullet(e.x, e.y, random.uniform(0, math.tau), p.damage() * 1.5, 170, 3, 1.6, {'homing': 1})
+        nb.col = (200, 180, 110)
     gy = 'gyoretsu' in S                                 # Kitsunebi no Gyōretsu: Laterne und Juwel zusammen
     if 'hoshi_tama' in S and random.random() < (0.15 + 0.02 * p.s['luck']) * (2 if gy else 1):
         _float(run, e, 'Hoshi no Tama', (255, 210, 150))
@@ -1284,6 +1312,16 @@ def on_hurt(p, run):
         for k in range(8):
             nb = run.fire_player_bullet(p.x, p.y, k * math.tau / 8, p.damage() * 1.2, 220, 2.5, 0.6, {'pierce': 1})
             nb.hit = seen; nb.col = (170, 230, 250)
+    if 'kosode' in S:                                    # Kosode-no-te: Hände greifen aus dem Ärmel
+        done = set()
+        for _ in range(2):
+            e = _nearest(run, p.x, p.y, 200, lambda o: id(o) not in done)
+            if not e:
+                break
+            done.add(id(e))
+            _ring(run, e.x, e.y, (220, 210, 190), 16)
+            e.frozen = max(e.frozen, 0.3 if e.is_boss else 1.0)
+            run.damage_enemy(e, p.damage() * 2, None)
     if 'gojo' in S:                                      # Benkeis Naginata fegt um ihn
         _blast(run, p.x, p.y, 75 if 'koromogawa' in S else 55, p.damage() * 3, (200, 170, 90), 380)
     g['ts'] = 0
