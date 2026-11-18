@@ -797,5 +797,14 @@ eb = Bullet(p.x, p.y, 0, 0, 1, 3, 1, 'e', (255, 0, 0), {})
 bl = [sigs.block(p, run, eb) for _ in range(14)]
 if not (bl == ([False] * 6 + [True]) * 2 and len(run.pbullets) == 14 and all(b.fl.get('homing') for b in run.pbullets)):
     print('FEHLER Kagemusha', bl, len(run.pbullets)); bad += 1
+# Onryō-Bund: Kagemusha schon jedes 5. Geschoss, die Onibi wenden als Blut-Sutra mit 150 %
+p.gain_item('sutoku_sutra', silent=True); p.iframes = 0; run.pbullets = []; sigs.st(p)['kage'] = 0
+bl = [sigs.block(p, run, eb) for _ in range(10)]
+ob = run.pbullets[0] if run.pbullets else None
+d0 = ob.dmg if ob else 0
+if ob:
+    ob.t = 0.7; sigs.bullet_tick(ob, run, 0.016)
+if not ('onryo' in p.sgs and bl == ([False] * 4 + [True]) * 2 and len(run.pbullets) == 14 and ob.fl.get('_su') and abs(ob.dmg - d0 * 1.5) < 0.01):
+    print('FEHLER Onryo-Bund', p.sgs, bl, len(run.pbullets)); bad += 1
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)
