@@ -414,19 +414,26 @@ für Talismane greifen (z. B. `bullet_tick`) – sollen sie auch für Strahl/Hie
 - Runde 168: Codex speichert aktive Items als `'active:<id>'` in `save['seen']` (Aufheben, Start-Item der Figur);
   unentdeckte zeigen „?“, Sockel zeigt „Neu!“, Zähler/Statistik zählen aktive Items mit. uiflow2 prüft beides.
 
-# Nächster Schritt: Ushiwakas Flöte offensiver machen
-Warum: Im Boss- (×0,9x) und Raummaß (×1,05) das schwächste Kampf-Siegel ohne Sonderrolle; Verwirrung allein hilft
-im Zeitmaß nicht. Idee: Der Flötenton-Wurf trifft mit +50 % und durchbohrt (Yoshitsunes leichter Schritt), oder jeder
-6. Wurf fächert zu drei Tönen auf. Messen mit `synbalance.py kappa_ou 3 ushiwaka_fue --items` und `--raum`.
+# Erledigt (Runden 169–170)
+- Runde 169: Ushiwakas Flötenton (jeder 6. Wurf) +50 % Schaden und `pierce` → kappa_ou 3 `--items` ×0,98 → ×0,87,
+  `--raum` ×1,05 → ×0,92. sigtest (Gojō-Ōhashi) prüft pierce und dmg 1,5.
+- Runde 170: `synbalance --raum` ruft je Welle `sigs.on_room_enter` (Welle = neuer Raum; ältere --raum-Zahlen sind
+  damit nicht 1:1 vergleichbar). Ichi-no-tachi blieb so bei ×1,03 → neu: erster Treffer je Feind +50 % (`e.sg_ichi`)
+  → `--raum` ×0,92, Boss ×0,85. sigtest-Schwelle auf 35.
+
+# Nächster Schritt: Neue Item-Welle „Tsukumogami“ (Teil 1)
+Warum: Alle 132 Synergien haben eigene Fähigkeiten, die Kampf-Siegel liegen im Feld – frischer Fundstoff bringt jetzt
+am meisten Wiederspielwert. Teil 1: 4–5 Items aus beseelten Hausgeräten (Kasa-obake, Chōchin-obake, Bake-zōri,
+Ittan-momen, Kosode-no-te), je mit eigener `sig_*`-Wirkung in `yokai/sigs.py`, Icons in `art_src/` (Hi-Res, handgesetzt),
+Lexikon-Text in `yokai/bestiary.py`; in Pools einbinden, sigtest je Item. Teil 2: 3–4 Synergien dazu.
 
 # Danach
+- Kakuremino, Oni-Horn, Yashiori einmal mit `--raum` (jetzt mit Raum-Eintritt) und `--still`/`--leben` gegenmessen
 - Ebene 9–10 ohne Meister noch ~10 s Bosszeit – nach Lucas Spieltest ggf. weiter anheben
 - Hi-ōgi (×1,53) und Masakari (×1,35) beobachten – oberer Rand der Siegel-Items
-- Alle 132 Synergien haben ein `sig_`-Flag – neue Synergien-Wellen nur noch mit neuen Items
 
 # Weitere Ideen
-- `synbalance --raum`: Option, `on_room_enter` je Welle aufzurufen (dann misst es auch Ichi-no-tachi / Raum-Eintritt)
 - Wanddekos: zweite Variante pro Biom (Index 2), Werkzeug walldeco_hi.py steht
 - Mondhase ist im Raum recht klein – ggf. größer zeichnen (Canvas 64×60 → 80×72) und Wendezone anpassen
 - Lexikon-Seite „Synergien“ mit Filter nach Figur
-- Neue Item-Welle (z. B. Tsukumogami-Hausgeräte) samt Synergien – bringt frischen Fundstoff für Wiederspielwert
+- Ereignisraum „Tsukumogami-Markt“ passend zur neuen Item-Welle
