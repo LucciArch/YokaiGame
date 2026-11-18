@@ -474,5 +474,14 @@ for _ in range(12):
     sigs.tick(p, run, 0.1)
 if 'yakumo' not in p.sgs or sum(1 for h in run.hazards if h.kind == 'strike') < 2:
     print('FEHLER Yakumo Tatsu', [h.kind for h in run.hazards]); bad += 1
+# Koishikuba (Kuzu-Blatt + Shinoda-Blatt): Fuchsnebel in jedem Raum, auch nach Treffern, mit Fuchsfeuer
+g.start_run('hana', 43); run = g.run; p = run.player
+for iid in ('kuzu_blatt', 'shinoda_blatt'):
+    p.gain_item(iid, silent=True)
+e = Enemy(run, 'gaki', p.x + 60, p.y); e.spawn_t = 0; run.enemies = [e]; run.room.cleared = False
+sigs.st(p)['shinoda'] = False
+sigs.on_room_enter(run)
+if 'koishikuba' not in p.sgs or not getattr(e, 'sg_conf', 0) > 0 or not e.burn > 0:
+    print('FEHLER Koishikuba', getattr(e, 'sg_conf', 0), e.burn); bad += 1
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)

@@ -464,6 +464,7 @@ SYNERGIES = [
     dict(id='ido_no_yurei', name='Ido no Yūrei', desc='Eimer und Brunnen – aus dem kalten Wasser steigt Okiku', items=['okiku_ido', 'tsurube'], fx=dict(spirit=1, sig_ido_reikon=1)),
     dict(id='shikigami_tsukai', name='Shikigami-Tsukai', desc='Das geheime Buch und die zwölf Generäle – Seimeis Papiervögel', items=['hoki_naiden', 'juni_shinsho'], fx=dict(sig_juni_tori=1)),
     dict(id='yakumo_tatsu', name='Yakumo Tatsu', desc='Achtfach steigen die Wolken über Izumo – Susanoos Lied für Kushinada', items=['murakumo', 'kushinada_kushi'], fx=dict(sig_yakumo=1)),
+    dict(id='koishikuba', name='Koishikuba', desc='„Wenn du mich vermisst …“ – Kuzunohas Abschied liegt als Nebel über jedem Raum', items=['kuzu_blatt', 'shinoda_blatt'], fx=dict(sig_koishikuba=1)),
     dict(id='henro', name='Henro', desc='Dōgyō ninin – Pilgerstab und Kraniche wandern mit dir', items=['kongozue', 'senbazuru'], fx=dict(luck=1, sig_henro=1)),
 ]
 

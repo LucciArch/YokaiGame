@@ -211,6 +211,7 @@ TEXT = {
     'ido_reikon': 'Das Brunnenwasser trifft alle Feinde (25 % je Geisterherz, höchstens 100 %) und gibt schon jeden 2. Raum ½ Geisterherz',
     'juni_tori': 'Die zwölf Himmelsgeneräle kommen schon jeden 8. Wurf – als Papiervögel, die Feinde verfolgen',
     'yakumo': 'Jede Kamm-Stufe lässt die Gewitterwolke schneller blitzen (bis 1,8×); ab 4 Stufen springt der Blitz auf einen zweiten Feind',
+    'koishikuba': 'Der Fuchsnebel liegt in jedem Raum, auch nach Treffern, und entzündet die Yokai mit Fuchsfeuer – so verfallen sie dem Fuchszauber',
     'henro': 'Jede neue Ebene faltet zwei Kraniche, jede 2. Ebene bringt ein Geisterherz',
     'sommerwind': 'Die Rolle wirft acht Federn, die weiter fliegen',
     'fest_der_laternen': 'Treffer entzünden doppelt so oft den Boden, die Flammen brennen länger',
@@ -1511,11 +1512,17 @@ def on_room_enter(run):
     g['syn_seen'] = []
     if 'maskenzug' not in S:
         g['parade'] = 0
-    if 'shinoda' in S and g.get('shinoda') and not run.room.cleared:
+    koi = 'koishikuba' in S                              # Koishikuba: der Nebel kommt immer und trägt Fuchsfeuer
+    if 'shinoda' in S and (g.get('shinoda') or koi) and not run.room.cleared:
         g['shinoda'] = False                             # Fuchsnebel aus dem Shinoda-Wald
         for e in run.enemies:
             if not e.is_boss:
                 e.sg_conf = max(getattr(e, 'sg_conf', 0), 3.0)
+                if koi:
+                    e.burn = max(e.burn, 3.0)
+                    e.burn_dps = max(e.burn_dps, max(1.0, p.damage() * 0.3))
+        if koi and run.enemies:
+            _syn(run, 'koishikuba', p.x, p.y, (255, 170, 90))
         _ring(run, p.x, p.y, (200, 150, 70), 90)
     g['room_hit'] = False
     g['bluete'] = 0
