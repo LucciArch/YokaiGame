@@ -269,3 +269,4 @@
 - Runde 163 – **Neue Synergie „Koromogawa“** (Giboshi der Gojō-Brücke + Tachi-ōjō): Die Naginata fegt weiter (75 statt 55 px); solange du bei Tachi-ōjō aufrecht stehst, fegt sie jede Sekunde mit 150 %
 - Runde 164 – **Ichigeki Hissatsu** verstärkt: Tötet der erste Hieb, ist er sofort wieder bereit – ein Hieb, ein Tod, Feind um Feind
 - Runde 165 – Entwicklung: `tools/synbalance.py --nur-items` misst jede Synergie zusätzlich ohne ihre Fähigkeit (gleiche Seeds). Kikyō-Mon nach dem Pentagramm-Fix neu gemessen: ×0,63 – im Feld der Siegel-Items (Masakari/Hi-ōgi ×0,59, Habakiri ×0,64), kein Nachbessern nötig.
+- Runde 166 – **Jūni-Shinshō** überarbeitet: Die zwölf Himmelsgeneräle umzingeln jetzt den nächsten Feind und stoßen von allen Seiten zu (je 50 %) statt als Ring nach außen zu fliegen, wo meist nur ein oder zwei trafen. Gemessen ×0,69 statt ×0,87 – jetzt im Feld der Siegel-Items. Mit Hoki Naiden (Shikigami-Tsukai) bleiben es verfolgende Papiervögel.

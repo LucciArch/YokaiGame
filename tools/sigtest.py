@@ -1,5 +1,5 @@
 """Prüft jede Item-Signatur einzeln: Lauf starten, nur dieses Item geben, 40 s spielen (Gott-Modus), Speichern/Laden."""
-import os, sys, json, random
+import os, sys, json, math, random
 os.environ['SDL_VIDEODRIVER'] = 'dummy'; os.environ['SDL_AUDIODRIVER'] = 'dummy'
 os.environ['APPDATA'] = os.path.join(os.environ.get('TEMP', '/tmp'), 'yokai_test')
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
@@ -452,6 +452,15 @@ p.spirit = 2; sigs.st(p)['tsurube'] = 1; sigs.st(p)['tsr'] = 1; h0 = e.hp
 sigs.tick(p, run, 0.016)
 if 'ido_reikon' not in p.sgs or not e.hp < h0 or p.spirit != 3:
     print('FEHLER Ido no Yūrei', h0 - e.hp, p.spirit); bad += 1
+# Jūni-Shinshō: mit Feind im Raum umzingeln die zwölf Talismane ihn und fliegen auf ihn zu
+g.start_run('hana', 40); run = g.run; p = run.player
+p.gain_item('juni_shinsho', silent=True)
+e = Enemy(run, 'gaki', p.x + 80, p.y); e.spawn_t = 0; run.enemies = [e]
+for _ in range(12):
+    n0 = len(run.pbullets); sigs.on_fire(p, run, [Bullet(100, 100, 50, 0, 10, 3, 1, 'p', (255, 255, 255), {})])
+nb = run.pbullets[n0:]
+if len(nb) != 12 or any(math.hypot(b.x - e.x, b.y - e.y) > 61 or (e.x - b.x) * b.vx + (e.y - b.y) * b.vy <= 0 for b in nb):
+    print('FEHLER Jūni-Shinshō umzingelt nicht', len(nb)); bad += 1
 # Shikigami-Tsukai (Hoki Naiden + Jūni-Shinshō): Generäle jeden 8. Wurf als verfolgende Papiervögel
 g.start_run('hana', 41); run = g.run; p = run.player
 for iid in ('hoki_naiden', 'juni_shinsho'):

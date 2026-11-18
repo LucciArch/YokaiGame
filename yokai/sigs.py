@@ -267,7 +267,7 @@ TEXT = {
     'gojo': 'Wirst du getroffen, fegt die Naginata um dich: 300 % im Umkreis, schleudert Yokai weg',
     'ido_kagami': 'Alle 3 s fängt der Brunnenspiegel ein Feindgeschoss nahe dir und wirft es zurück (150 %)',
     'tengu_wirbel': 'Die Rolle entfacht einen Wirbelsturm: 120 % im Umkreis, nahe Feindgeschosse verweht',
-    'juni': 'Jeder 12. Wurf: die zwölf Himmelsgeneräle – zwölf Talismane im Kreis (je 60 %)',
+    'juni': 'Jeder 12. Wurf: die zwölf Himmelsgeneräle umzingeln den nächsten Feind – zwölf Talismane stoßen von allen Seiten zu (je 50 %)',
     'mame': 'Jeder 3. Wurf streut drei geröstete Bohnen (40 %); getroffene Yokai fliehen 1 s',
     'murakumo': 'Eine Gewitterwolke folgt dir: alle 2 s ein Blitz auf den nächsten Feind (100 %)',
     'kotodama': 'Jeder 16. Wurf spricht ein Norito: alle Feindgeschosse im Raum vergehen',
@@ -744,9 +744,15 @@ def _siegel_fire(p, run, bullets, g, n, base, dmg, spd, life, size):
     if 'juni' in S and n % (8 if tori else 12) == 0:     # Jūni-Shinshō
         if tori:
             _syn(run, 'juni_tori', p.x, p.y, (235, 235, 250))
+        e = None if tori else run.nearest_enemy(p.x, p.y)
         for k in range(12):
-            nb = run.fire_player_bullet(p.x, p.y - 3, base + k * math.pi / 6, dmg * 0.6, spd * 0.8, 2.5,
-                                        life * (1.5 if tori else 1), {'homing': 1} if tori else {})
+            a = base + k * math.pi / 6
+            if e:                                        # die Generäle umzingeln den nächsten Feind und stoßen nach innen
+                nb = run.fire_player_bullet(e.x + math.cos(a) * 60, e.y + math.sin(a) * 60, a + math.pi, dmg * 0.5,
+                                            spd * 0.8, 2.5, life, {}, delay=k * 0.02)
+            else:
+                nb = run.fire_player_bullet(p.x, p.y - 3, a, dmg * 0.6, spd * 0.8, 2.5,
+                                            life * (1.5 if tori else 1), {'homing': 1} if tori else {})
             nb.col = (235, 235, 250) if tori else (230, 200, 120)
     mm = 'mamemaki' in S                                 # Mamemaki: das Oni-Horn treibt die Bohnen
     if 'mame' in S and n % (2 if mm else 3) == 0:        # Oni wa soto!
