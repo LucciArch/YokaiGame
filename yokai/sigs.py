@@ -205,6 +205,7 @@ TEXT = {
     'misogi': 'Salz verwandelt alle Feindgeschosse im Raum in Shide (bis 12, je 60 %); die Rolle reinigt weiter (90, bis 8)',
     'kagura': 'Die Rolle läutet die Suzu alle 2,5 s; läutet sie im Tanz, wirbeln 6 Sakaki-Blätter (je 50 %) auf die Feinde',
     'okiku': 'Okiku zählt nur bis neun: der zehnte Teller zerspringt schon beim 9. Kill und nach jedem neunten Wurf um dich',
+    'gojo_bashi': 'Jeder 4. Wurf ist ein Flötenton; trifft er, fegt Benkeis Naginata um das Ziel (80 %, höchstens alle 1,5 s)',
     'henro': 'Jede neue Ebene faltet zwei Kraniche, jede 2. Ebene bringt ein Geisterherz',
     'sommerwind': 'Die Rolle wirft acht Federn, die weiter fliegen',
     'fest_der_laternen': 'Treffer entzünden doppelt so oft den Boden, die Flammen brennen länger',
@@ -727,7 +728,7 @@ def _siegel_fire(p, run, bullets, g, n, base, dmg, spd, life, size):
     if 'tsukikage' in S and n % 6 == 0:                  # Mondschatten-Klinge
         nb = run.fire_player_bullet(p.x, p.y - 3, base, dmg * 1.5, spd * 1.1, 3, life * 1.3, {'pierce': 1, 'spectral': 1})
         nb.col = (150, 160, 220)
-    if 'fue' in S and n % 6 == 0 and bullets:           # Ushiwakas Flötenton
+    if 'fue' in S and n % (4 if 'gojo_bashi' in S else 6) == 0 and bullets:           # Ushiwakas Flötenton
         bullets[0].fl = dict(bullets[0].fl, fue=1)
         bullets[0].col = (150, 210, 130)
 
@@ -850,6 +851,10 @@ def hit_post(run, e, b, dmg):
         e.sg_fear = max(getattr(e, 'sg_fear', 0), 1.0)
     if b is not None and b.fl.get('fue') and not e.is_boss:
         e.sg_conf = max(getattr(e, 'sg_conf', 0), 2.0)
+    if b is not None and b.fl.get('fue') and 'gojo_bashi' in S and not echo and run.time - g.get('gojo_t', -9) >= 1.5:
+        g['gojo_t'] = run.time                           # auf den Flötenton schwingt Benkeis Naginata
+        _syn(run, 'gojo_bashi', e.x, e.y, (200, 170, 90))
+        _blast(run, e.x, e.y, 35, p.damage() * 0.8, (200, 170, 90), 160)
     if 'ichi' in S and b is not None and not echo and g.get('ichi'):
         g['ichi'] = False                                # Ichi-no-tachi: der erste Hieb
         _float(run, e, 'Ichi-no-tachi!', (220, 220, 235))

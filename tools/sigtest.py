@@ -410,5 +410,15 @@ sigs.st(p)['shots'] = 9; n0 = len(run.pbullets); sigs.on_fire(p, run, []); n1 = 
 sigs.st(p)['zt'] = 8; e = make_boss(run, 'shuten_doji'); e.x, e.y = p.x + 40, p.y; sigs.on_kill(run, e)
 if 'okiku' not in p.sgs or n1 - n0 < 10 or len(run.pbullets) - n1 != 10:
     print('FEHLER Sarayashiki', n1 - n0, len(run.pbullets) - n1); bad += 1
+# Gojō-Ōhashi (Giboshi + Ushiwakas Flöte): Flötenton jeden 4. Wurf, Treffer löst die Naginata aus (1×/s)
+g.start_run('hana', 37); run = g.run; p = run.player
+for iid in ('gojo_giboshi', 'ushiwaka_fue'):
+    p.gain_item(iid, silent=True)
+bl = [Bullet(p.x, p.y, 100, 0, 1, 3, 1, 'p', (255, 255, 255))]
+sigs.st(p)['shots'] = 3; sigs.on_fire(p, run, bl)
+e = make_boss(run, 'shuten_doji'); e.spawn_t = 0; e.x, e.y = p.x + 60, p.y; run.enemies = [e]
+run.time = 30.0; h0 = e.hp; sigs.hit_post(run, e, bl[0], 1); h1 = e.hp; sigs.hit_post(run, e, bl[0], 1)
+if 'gojo_bashi' not in p.sgs or not bl[0].fl.get('fue') or not h1 < h0 or e.hp != h1:
+    print('FEHLER Gojō-Ōhashi', h0 - h1, h1 - e.hp); bad += 1
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)
