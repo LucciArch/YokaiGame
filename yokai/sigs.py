@@ -216,6 +216,7 @@ TEXT = {
     'ganryu': 'Der erste Hieb kehrt alle 8 s im Raum zurück und schnellt als Schwalbenschnitt zu zwei weiteren Feinden (je 100 %)',
     'hoten': 'Das Norito kommt schon jeden 12. Wurf, und bis zu 8 vergehende Feindgeschosse werden Sakaki-Blätter, die Yokai treffen (je 60 %)',
     'kintaro': 'Jeder Axttreffer zählt vierfach für den Keulenschlag, und die Keule trifft weiter (55 px statt 40)',
+    'kurama': 'Sōjōbōs Wirbel wird größer (65 px), und jedes verwehte Feindgeschoss wird eine weitere Windklinge (bis +3)',
     'ataka': 'Tachi-ōjō hält schon bei 1 Herz und 4 s lang, und alle Yokai im Raum erstarren 2 s (Bosse ½ s) vor Benkeis Blick',
     'utage': 'Jeder Trommelschlag zählt wie zwei Münzen für den Tokkuri, und im Sake-Rausch trommelst du auch im Gehen – lauter und weiter (200 %)',
     'senbon': 'Benkeis Waffen kommen schon jeden 5. Wurf, und jeder ihrer Treffer zählt für die Schwertjagd wie ein Kill',
@@ -1414,8 +1415,14 @@ def on_dash(p, run):
     if 'onusa' in S:                                     # Ōnusa: Geschosse werden zu Shide
         _shide(p, run, *((90, 8) if 'misogi' in S else (60, 6)), 0.4)
     if 'tengu_wirbel' in S:
-        _blast(run, p.x, p.y, 45, p.damage() * 1.2, (180, 190, 210), 260)
-        run.ebullets[:] = [b for b in run.ebullets if math.hypot(b.x - p.x, b.y - p.y) > 45]
+        kurama = 'kurama' in S                           # Kurama-Lehre: größerer Wirbel, Verwehtes wird Windklinge
+        rad = 65 if kurama else 45
+        _blast(run, p.x, p.y, rad, p.damage() * 1.2, (180, 190, 210), 260)
+        n0 = len(run.ebullets)
+        run.ebullets[:] = [b for b in run.ebullets if math.hypot(b.x - p.x, b.y - p.y) > rad]
+        if kurama and n0 > len(run.ebullets):
+            _syn(run, 'kurama', p.x, p.y, (200, 230, 220))
+            g['hd'] = g.get('hd', 0) + min(3, n0 - len(run.ebullets))
     if 'chagama' in S:                                   # Bunbuku-Chagama: kurz ein heißer Teekessel
         p.iframes = max(p.iframes, 0.8)
         g['kessel'] = 0.8

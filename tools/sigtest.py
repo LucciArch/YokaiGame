@@ -560,5 +560,15 @@ sigs.hit_post(run, e, b, 1); kk1 = sigs.st(p).get('kk')
 sigs.hit_post(run, e, b, 1)
 if 'kintaro' not in p.sgs or not b.fl.get('axt') or kk1 != 4 or sigs.st(p).get('kk') != 0 or e.hp >= 999:
     print('FEHLER Kintarō', b.fl, kk1, sigs.st(p).get('kk'), e.hp); bad += 1
+# Kurama-Lehre (Sōjōbōs Feder + Hanadaka-Maske): größerer Wirbel, verwehte Geschosse werden Windklingen
+g.start_run('kotaro', 51); run = g.run; p = run.player
+for iid in ('sojobo_hane', 'hanadaka_men'):
+    p.gain_item(iid, silent=True)
+run.enemies = []
+for k in range(5):
+    run.ebullets.append(Bullet(p.x + 55, p.y + k, 0, 0, 1, 3, 1, 'e', (255, 0, 0), {}))
+sigs.on_dash(p, run)
+if 'kurama' not in p.sgs or run.ebullets or sigs.st(p).get('hd') != 6:
+    print('FEHLER Kurama-Lehre', len(run.ebullets), sigs.st(p).get('hd')); bad += 1
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)
