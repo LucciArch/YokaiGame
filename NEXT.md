@@ -351,22 +351,34 @@ für Talismane greifen (z. B. `bullet_tick`) – sollen sie auch für Strahl/Hie
   Kessel 1,2 s. ×1,12.
 - Testumgebung: `python -m pip install pygame-ce numpy` (das nackte `pip` zeigt auf ein anderes Python).
 
-# Nächster Schritt: Kotarō-Synergie mit stillstehendem Bot
-Warum: tengu_tsubute + kakuremino ist das letzte offensichtliche Siegel-Paar ohne Synergie, aber Kakuremino
-(Unsichtbarkeit im Stillstand) ist mit dem dauernd laufenden Bosstest-Bot nicht messbar.
-- Zuerst `synbalance --still` (Bot steht, zielt nur) einbauen; damit auch `utage` (Runde 146) nachmessen.
-- Dann `kotaro` („Unsichtbarer Steinwurf“: im Kakuremino fallen Tengu-Steine doppelt so oft).
-Je Synergie: `SYNERGIES`, `TEXT`, sig, sigtest-Fall, `synbalance shuten_doji 5 <id> --leben`; Aufschlag ≤ ~×1,5.
+# Erledigt (Runden 153–155): Synergien für Siegel-Items Teil 8
+- Runde 153: `kotaro` (tengu_tsubute + kakuremino, sig `kotaro`): unsichtbar Steine alle 1,5 s mit 200 %.
+  Neu: `synbalance --still` (Bot steht, wirft 2 s ja/2 s nein). Gegen Shuten-dōji schafft der stehende Bot nichts →
+  `synbalance x 2 kotaro --still --raum`: ×0,69 gegen ×0,99 nur Items. `utage` dort ×0,41 (Trommel wirkt im Stand stark).
+- Runde 154: `oharae` (haraegushi + onusa, sig `oharae`): Rolle schwingt alle 4 s den Haraegushi (8 %, Bosse 200 % Schaden
+  statt Prozent – 2 % Bossleben war ×3,2). ×1,41 gegen ×1,18.
+- Runde 155: `totsuka` (habakiri + ohabari, sig `totsuka`): Habakiri-Schnitt → Blitz aufs Ziel + Kette auf 3 (je 100 %).
+  Boss (kappa_ou 2) ≈ neutral, `--raum` Tiefe 3 ×0,58.
+- Hinweis: `synbalance --leben` ist bei Shuten-dōji Tiefe 5 sehr verrauscht (Bot stirbt nach 3 Treffern, ~4 % Schaden);
+  für Treffer-Effekte besser `kappa_ou 2` ohne --leben gegenprüfen.
+
+# Nächster Schritt: Hi-ōgi-Synergie oder Siegel-Lücken schließen
+Warum: Ohne Synergie unter den Siegel-Items sind noch hi_ogi (hana), zanshin_tsuba (kenji), fuchs_trugbild (kuzunoha),
+tanuki_kesa (ponpoko), gojo_giboshi (benkei, nur alte Gojō-Synergie mit Flag), ido_kagami (okiku), ushiwaka_fue (kotaro),
+taizan_fukun (seimei). Je ein Paar mit einem anderen Item derselben Figur bauen, z. B.
+- `zanshin_tsuba` + `ichi_no_tachi` (Kenji): erster Hieb stapelt sofort 3 Zanshin-Stufen
+- `ido_kagami` + ein Okiku-Item: Spiegel fängt 2 Geschosse
+- `hi_ogi` vorsichtig (schon ×1,53 allein)
+Je Synergie: `SYNERGIES`, `TEXT`, sig, sigtest-Fall, Messung; Aufschlag ≤ ~×1,5.
 
 # Danach
 - Ebene 9–10 ohne Meister noch ~10 s Bosszeit – nach Lucas Spieltest ggf. weiter anheben
 - Hi-ōgi (×1,53) und Masakari (×1,35) beobachten – oberer Rand der Siegel-Items
 
 # Weitere Ideen
-- `synbalance`: Option für stillstehenden Bot (Trommel/Kakuremino-Synergien messbar machen)
 - `synbalance --raum`: Option, `on_room_enter` nach dem Spawnen der ersten Welle aufzurufen (für Nebel-/Eintritts-Synergien)
+- `synbalance --leben` stabiler machen (mehr Seeds oder schwächere Tiefe als Standard)
 - Wanddekos: zweite Variante pro Biom (Index 2), Werkzeug walldeco_hi.py steht
 - Mondhase ist im Raum recht klein – ggf. größer zeichnen (Canvas 64×60 → 80×72) und Wendezone anpassen
-- Spitze (Feuerwerk/Oni-Rausch/Hannya-Zorn ≈ ×4,2) mit `--raum` gegenprüfen
 - Prüfungen: Bestenzeit je Prüfung im Menü anzeigen
 - Codex: aktive Items im Lauf als „entdeckt“ merken
