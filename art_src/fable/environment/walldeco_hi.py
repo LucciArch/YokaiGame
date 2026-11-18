@@ -1209,3 +1209,83 @@ def kubizuka_hi(name, base):
 
 
 HI['kubizuka'] = kubizuka_hi
+
+
+# ---- Dazaifu: Pflaumenzweig mit Tanzaku über dem Zaun / Nische mit liegendem Bronze-Ochsen (Goshingyū), darüber ein Tōrō
+PLUM = ('#5a1430', '#a02a48', '#e05a74', '#ffb4c0')
+BRONZE = ('#12221f', '#1c3230', '#2e4c44', '#4a6c5a', '#7aa088')
+
+
+def _ume_hi(cv, cx, cy, white=False):
+    """Fünfblättrige Pflaumenblüte, 7 Hi-Pixel breit, mit goldenen Staubblättern."""
+    pal = ('#6a6070', '#c8c0d0', '#f4f0ff') if white else PLUM[1:]
+    m = he(cv, cx, cy, 1.6, 1.6)
+    for k in range(5):
+        t = -np.pi / 2 + k * 2 * np.pi / 5
+        m = m | he(cv, cx + 2.2 * np.cos(t), cy + 2.2 * np.sin(t), 1.5, 1.5)
+    hfill(cv, edge(m), PLUM[0])
+    hfill(cv, m, pal[1])
+    Y, X = _g(cv)
+    hfill(cv, m & (X + Y <= cx + cy - 1), pal[2])                 # Mondlicht von oben links
+    hp(cv, cx, cy, GOLD[3]); hp(cv, cx - 1, cy, PLUM[0]); hp(cv, cx + 1, cy, PLUM[0]); hp(cv, cx, cy + 1, PLUM[0])
+
+
+def dazaifu_hi(name, base):
+    a, b = base.copy(), base.copy()
+    Y, X = _g(a)
+    bark, dark = '#2a1820', '#100a12'
+    branch = [(0, 7), (10, 10), (18, 9), (28, 4), (38, 8), (46, 13), (56, 9), (63, 10)]
+    for dy, c in ((-2, K), (2, K), (-1, '#4a2c34'), (0, bark), (1, dark)):   # knorriger Ast, drei Hi-Pixel dick
+        hln(a, [(x, y + dy) for x, y in branch], c)
+    for twig in ([(28, 4), (33, 0)], [(46, 13), (49, 19)], [(10, 10), (7, 15)]):
+        hln(a, [(x + 1, y) for x, y in twig], K); hln(a, [(x - 1, y) for x, y in twig], K); hln(a, twig, bark)
+    for k, (x, y) in enumerate(((4, 4), (21, 5), (33, 1), (49, 18), (58, 6))):
+        _ume_hi(a, x, y, white=(k == 2))                         # eine weiße Blüte – Tobiume
+    for (x, y) in ((15, 7), (42, 10), (8, 14)):                  # Knospen
+        hp(a, x, y, PLUM[1]); hp(a, x, y - 1, PLUM[2]); hp(a, x + 1, y, PLUM[0])
+    for x, top in ((12, 12), (36, 9), (54, 11)):                 # Tanzaku mit Tenjins Abschiedsgedicht
+        hln(a, [(x + 2, top), (x + 2, top + 3)], '#c8b890')
+        tz = (X >= x) & (X <= x + 4) & (Y >= top + 4) & (Y <= top + 15)
+        hfill(a, edge(tz), K); hfill(a, tz, PAPER[2]); hfill(a, tz & (X == x + 4), PAPER[1]); hfill(a, tz & (X == x), PAPER[3])
+        for y in range(top + 6, top + 14, 3):                    # Kana in Tusche
+            hp(a, x + 2, y, '#1c121c'); hp(a, x + 1 + (y % 2) * 2, y + 1, '#1c121c')
+    for (x, y) in ((24, 16), (44, 24), (30, 22), (60, 20)):      # fallende Blütenblätter
+        hp(a, x, y, PLUM[2]); hp(a, x + 1, y, PLUM[3])
+    # B: Nische mit liegendem Bronze-Ochsen auf Steinsockel, darüber brennt ein Tōrō (Licht bei 38, 12)
+    nm = (X >= 16) & (X <= 46) & (Y >= 6) & (Y <= 29) & ~(((X == 16) | (X == 46)) & (Y == 6))
+    hfill(b, nm, K)
+    hfill(b, nm & he(b, 38, 13, 9, 8), '#1e140e'); hfill(b, nm & he(b, 38, 13, 6, 5), '#2c1c10')   # warmer Schein
+    s = STONE
+    ped = (X >= 19) & (X <= 43) & (Y >= 26) & (Y <= 29)
+    hfill(b, edge(ped), K); hfill(b, ped, s[1]); hr(b, 19, 26, 43, 26, s[2])
+    br = BRONZE
+    body = he(b, 33, 22, 9, 4.0) & (Y <= 25)                     # liegender Leib
+    hump = he(b, 28, 19.5, 4.5, 3.0)                             # Widerrist
+    head = he(b, 21.5, 19.5, 3.4, 3.2)                           # erhobener Kopf, blickt zur Pforte
+    snout = he(b, 19, 22, 2.4, 1.8)
+    ox = body | hump | head | snout
+    hfill(b, edge(ox), K)
+    hfill(b, ox, br[2])
+    hfill(b, ox & (Y <= 19), br[3])
+    hfill(b, ox & (X >= 38) & (Y >= 22), br[1])
+    hfill(b, head & (X >= 23), br[1])                            # Hals-Schatten trennt Kopf und Leib
+    hfill(b, snout, br[3]); hp(b, 17, 22, K); hp(b, 18, 21, br[4]); hp(b, 19, 21, br[4])   # blankgeriebenes Maul
+    hp(b, 20, 19, '#e8c050'); hp(b, 21, 19, K)                    # Auge glimmt im Laternenlicht
+    for hx0, d in ((20, -1), (23, 1)):                            # kurze, nach vorn gebogene Hörner
+        horn = [(hx0, 16), (hx0 + d, 15), (hx0 + 2 * d, 15)]
+        hln(b, [(x, y - 1) for x, y in horn], K); hln(b, [(x + 1, y) for x, y in horn], K); hln(b, horn, br[4])
+    hln(b, [(27, 25), (31, 24), (35, 25)], K)                    # untergeschlagenes Vorderbein
+    hln(b, [(28, 24), (31, 23)], br[3])
+    hln(b, [(41, 21), (43, 23), (42, 25)], K)                    # Schwanz
+    for (x, y) in ((30, 18), (34, 21), (27, 21), (37, 23), (25, 20)):   # Patina
+        hp(b, x, y, br[4] if (x + y) % 2 else '#3a6a58')
+    hr(b, 33, 9, 43, 9, K); hr(b, 34, 8, 42, 8, s[2])            # Tōrō-Dach
+    hp(b, 38, 7, s[2]); hp(b, 38, 6, K)
+    fire = (X >= 35) & (X <= 41) & (Y >= 10) & (Y <= 15)
+    hfill(b, edge(fire), K); hfill(b, fire, '#6a3010')
+    hfill(b, he(b, 38, 12.5, 1.6, 2.2), '#ffb050'); hp(b, 38, 12, '#fff0c0')
+    hr(b, 35, 16, 41, 16, s[1]); hr(b, 37, 17, 39, 19, s[1])     # Laternensockel
+    return [a, b]
+
+
+HI['dazaifu'] = dazaifu_hi
