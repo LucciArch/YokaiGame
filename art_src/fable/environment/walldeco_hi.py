@@ -1066,3 +1066,75 @@ def takamagahara_hi(name, base):
 
 
 HI['takamagahara'] = takamagahara_hi
+
+
+# ---- Shiramine: zerrissene Blut-Sutren am Querbalken mit Krähen-Tengu / Gorintō des Verbannten mit Groll-Feuer
+BLOOD = ('#3a0812', '#5a0e1a', '#8a1c2a', '#c03040', '#ff8a7a')
+
+
+def shiramine_hi(name, base):
+    import random
+    a, b = base.copy(), base.copy()
+    Y, X = _g(a)
+    r = random.Random('shiramine-hi')
+    hr(a, 4, 8, 59, 8, K); hr(a, 4, 9, 59, 12, WOOD[2]); hr(a, 4, 9, 59, 9, WOOD[3]); hr(a, 4, 13, 59, 13, K)
+    for x in range(6, 58, 7):                                     # Maserung
+        hr(a, x, 11, x + 2, 11, WOOD[1])
+    for (x0, ln) in ((8, 13), (19, 8), (30, 16), (41, 10)):     # Sutren-Streifen, unten ausgerissen
+        bot = [14 + ln - (1 if (i * 5 + x0) % 3 == 0 else 0) - (2 if i == 2 else 0) for i in range(7)]
+        for i in range(7):
+            x = x0 + i
+            hr(a, x, 14, x, bot[i], PAPER[3] if i < 5 else PAPER[2])
+            hp(a, x, bot[i] + 1, K)
+        hr(a, x0 - 1, 14, x0 - 1, max(bot), K); hr(a, x0 + 7, 14, x0 + 7, max(bot), K)
+        hr(a, x0, 14, x0 + 6, 14, PAPER[1])                         # Knick am Balken
+        for y in range(16, min(bot) - 1, 3):                      # mit Blut geschriebene Zeilen
+            hr(a, x0 + 2, y, x0 + 4, y, BLOOD[2])
+            hp(a, x0 + 3 + r.choice((-1, 0, 1)), y + 1, BLOOD[2])
+            hp(a, x0 + 3, y, BLOOD[3])
+    for y in range(24, 31):                                       # Blut tropft vom längsten Streifen
+        hp(a, 33, y, BLOOD[2] if y < 29 else BLOOD[3])
+    hp(a, 33, 31, BLOOD[1])
+    # Krähen-Tengu auf dem Balkenende
+    body = he(a, 54, 4, 5, 3) | he(a, 49, 5, 3, 2)
+    hfill(a, edge(body), K); hfill(a, body, '#141020')
+    hfill(a, body & (Y <= 3), '#2a2a48')
+    hpoly_m = hpoly(a, [(58, 3), (62, 4), (58, 5)])
+    hfill(a, hpoly_m, '#3a3428')
+    hp(a, 56, 3, BLOOD[4]); hp(a, 55, 3, BLOOD[3])                # rotes Auge
+    for x in (52, 55):
+        hr(a, x, 7, x, 7, '#3a3428')
+    for x in (46, 47, 48):                                        # Schwanzfedern
+        hp(a, x, 6 + (x == 46), '#2a2a48')
+    # B: Gorintō in der Felsnische, daneben ein schwebendes Groll-Feuer (Licht bei 40, 10)
+    nm = (X >= 16) & (X <= 46) & (Y >= 6) & (Y <= 29) & ~(((X == 16) | (X == 46)) & (Y == 6))
+    hfill(b, nm, K)
+    hfill(b, nm & (abs(X - 40) + abs(Y - 11) < 9) & ~(abs(X - 40) + abs(Y - 11) < 5), '#200a12')
+    s = STONE
+    chi = (X >= 22) & (X <= 35) & (Y >= 23) & (Y <= 29)           # Chi: Würfel
+    sui = he(b, 28.5, 19.5, 6, 3.6)                               # Sui: Kugel
+    ka = hpoly(b, [(20, 16), (24, 12), (33, 12), (37, 16)])        # Ka: Dach mit aufgebogenen Traufen
+    fu = he(b, 28.5, 11, 3.5, 2.2) & (Y >= 10)                    # Fū: Halbmond
+    ku = he(b, 28.5, 8, 2, 2.5)                                   # Kū: Juwel
+    allm = chi | sui | ka | fu | ku
+    hfill(b, edge(allm), K)
+    hfill(b, allm, s[2])
+    hfill(b, allm & (X <= 25), s[3])                              # Mondlicht von links
+    hfill(b, allm & (X >= 33), s[1])
+    hfill(b, chi & (Y == 23), s[3]); hfill(b, ka & (Y == 16), s[1])
+    hfill(b, edge(sui) & chi, K)
+    hfill(b, chi & (Y >= 28) & ((X + Y) % 3 > 0), MOSS[1])        # Moos am Sockel
+    hp(b, 23, 27, MOSS[2]); hp(b, 34, 26, MOSS[1])
+    hr(b, 27, 24, 30, 28, PAPER[3]); hr(b, 30, 24, 30, 28, PAPER[1])   # Ofuda mit Blutsiegel
+    hr(b, 28, 25, 29, 25, BLOOD[2]); hr(b, 28, 27, 29, 27, BLOOD[2]); hp(b, 28, 26, BLOOD[3])
+    fire = hpoly(b, [(37, 13), (38, 8), (40, 10), (41, 4), (43, 9), (44, 7), (44, 13), (40, 15)])
+    hfill(b, edge(fire), BLOOD[0])
+    hfill(b, fire, BLOOD[2])
+    hfill(b, hpoly(b, [(38, 13), (40, 9), (41, 7), (43, 12), (40, 14)]), BLOOD[3])
+    hfill(b, he(b, 40.5, 12, 1.5, 1.5), BLOOD[4])
+    for (x, y) in ((36, 6), (45, 3), (42, 1)):                    # Funken
+        hp(b, x, y, BLOOD[3])
+    return [a, b]
+
+
+HI['shiramine'] = shiramine_hi

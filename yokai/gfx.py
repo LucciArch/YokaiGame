@@ -729,6 +729,7 @@ WALL_LIGHT = {
     ('iwato', 1): (15, 6, FIRE, 48), ('shinkai', 1): (16, 9, SEA, 36), ('enma_cho', 1): (16, 7, FIRE, 48),
     ('tsukiyomi', 0): (16, 9, (200, 215, 255), 38), ('yomi_oku', 1): (15, 9, ONIBI_C, 40),
     ('yomi', 1): (17, 6, (230, 210, 120), 30),                # Ikazuchis Blitze
+    ('shiramine', 1): (20, 6, (235, 70, 80), 34),             # Groll-Feuer am Gorintō
 }
 
 

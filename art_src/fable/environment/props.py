@@ -1483,4 +1483,26 @@ def wall_decos(name, base):
         b2.rect(15, 9, 16, 10, ONIBI[3])
         b2.vl(15, 8, 11, IRON[0])
         b2.rect(12, 13, 19, 13, IRON[2])
+    elif name == 'shiramine':
+        blood = ('#5a0e1a', '#8a1c2a', '#c03040')            # zerrissene Blut-Sutren am Querbalken, Krähe darauf
+        a.rect(3, 2, 28, 3, WOOD[2])
+        a.hl(3, 28, 2, WOOD[3])
+        a.hl(3, 28, 4, K)
+        for x, ln in ((6, 8), (12, 6), (18, 9)):
+            a.rect(x, 5, x + 3, 4 + ln, PAPER[2])
+            a.vl(x + 3, 5, 4 + ln, PAPER[1])
+            a.px(x + 1, 4 + ln, base.get(x + 1, 4 + ln))
+            for y in range(6, 3 + ln, 2):
+                a.px(x + 1 + (y // 2) % 2, y, blood[1])
+        a.vl(19, 14, 15, blood[2])
+        a.rect(23, 0, 26, 1, K)                              # Krähe
+        a.px(27, 0, K); a.px(26, 0, blood[2]); a.px(22, 1, K)
+        niche(b, 9, 22, 5)                                   # Gorintō mit Groll-Feuer
+        s = STONE
+        b.rect(11, 12, 16, 13, s[1]); b.hl(11, 16, 12, s[2])
+        b.rect(12, 10, 15, 11, s[2]); b.px(12, 10, s[3])
+        b.hl(11, 16, 9, s[1]); b.hl(12, 15, 8, s[2])
+        b.rect(13, 7, 14, 7, s[2]); b.px(13, 6, s[3])
+        b.px(15, 13, blood[1])
+        b.grid(18, 5, ".a.\naba\n.a.", dict(a=blood[2], b='#ff8a7a'))
     return [a, b]
