@@ -486,16 +486,20 @@ Ohne Video-Werkzeug NICHT wieder selbst Szenen malen.
 - Runde 184: Item `masakado_kage` (Kagemusha, Pool B, hp+1, sig `kagemusha` in `sigs.block`: jedes 7. treffende Geschoss →
   sieben suchende Onibi je 80 %). Symbol `art_src/fable/items/icons_v21.py`. sigtest + bosstest prüfen.
 
-# Nächster Schritt: Feinschliff Kubizuka
-Warum: Kapitel IX ist spielbar, aber noch nicht so eigen wie Shiramine.
-1. Hi-Res-Wanddeko `walldeco_hi.kubizuka_hi` (Sotoba mit Bonji-Schrift, Froschnische mit Onibi) + `WALL_LIGHT` prüfen;
-   gebaut mit `hi.py` (setzt alle Biome neu, ist deterministisch).
-2. Titelstimmung `masakado` in `App.draw_night` (wie `sutoku` in Runde 178: bleicher Mond, Onibi, fliegendes Haupt am Himmel).
-3. Synergie mit Kagemusha (z. B. `masakado_kage` + `sutoku_sutra` = „Drei große Onryō“ Teil 1, oder + Yabusame-/Bogen-Item).
-4. Masakado-Balance beobachten (bosstest ~16 Treffer, 44 s – deutlich leichter als Sutoku mit ~74 Treffern).
+# Erledigt (Runden 185–187): Feinschliff Kubizuka
+- Runde 185: Titelstimmung `masakado` in `App.draw_night` (bleicher Mond, Onibi-Funken, fliegendes Haupt `App.HEAD`); uiflow2 zeichnet sie
+- Runde 186: `walldeco_hi.kubizuka_hi` (Sotoba mit Bonji + Shide, Steinfrosch mit rotem Latz, Onibi); `WALL_LIGHT` → (20, 4)
+- Runde 187: Synergie Onryō-Bund (`masakado_kage` + `sutoku_sutra`, `sig_onryo`); sigtest prüft
+
+# Nächster Schritt: Sugawara no Michizane (dritter großer Onryō)
+Warum: Sutoku und Masakado stehen, der Onryō-Bund nennt schon „zwei der drei“ – der dritte schließt die Reihe.
+1. Boss `michizane` (Hi-Res, handgesetzt): Hofgewand, Shaku, Raijin-Wolke; Phasen: Pflaumenblüten-Fächer (Tobiume),
+   Blitzschläge auf markierte Felder (Seiryōden-Brand), zuletzt Donnerwolke über der Arena. Bosstest erweitern.
+2. Pforte/Kapitel X (z. B. nach Masakado-Sieg im Kubizuka, Biom „Dazaifu“ mit Pflaumenbäumen und Ochsenstatuen).
+3. Belohnungs-Item + Synergie „Drei große Onryō“ (alle drei Boss-Items).
+4. Masakado-Balance weiter beobachten (bosstest ~16 Treffer, 44 s – deutlich leichter als Sutoku mit ~74).
 
 # Danach (Story)
-- Danach Sugawara no Michizane (Raijin-Onryō, Blitze, Pflaumenblüten) als dritter großer Onryō
 - Je Figur ein eigenes Story-Kapitel (`ENDINGS` in `epilogue.py` als Knoten im Baum, Bedingung `char_wins`)
 - Iwato erst nach Yomi öffnen (strengerer Pfad wie Isaac), oder Kapitel VII je nach gewähltem Weg
 
