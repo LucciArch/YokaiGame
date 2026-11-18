@@ -1,0 +1,63 @@
+<title>{{TITLE}}</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=block">
+<style>
+  /* Schattenspiel-Bühne: schwarzer Saal, Leinwand mittig, schmale Steuerleiste darunter. Bewusst nur dunkel. */
+  :root { --bg: #0d0604; --bar: #1b0d07; --ink: #f1dfc0; --dim: #b49a7c; --accent: #e8a24a; color-scheme: dark;
+          --ui: "IM Fell English", Georgia, serif; }
+  html, body { height: 100%; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--ui); display: flex; flex-direction: column;
+         padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 12px; box-sizing: border-box; gap: 10px; }
+  #stage { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; }
+  canvas { display: block; background: #000; max-width: 100%; max-height: 100%; aspect-ratio: 16 / 9; width: 100%; height: auto; }
+  #bar { display: flex; align-items: center; gap: 12px; background: var(--bar); border-radius: 6px; padding: 8px 12px; flex-wrap: wrap; }
+  #bar button { background: none; border: 1px solid var(--dim); color: var(--ink); font: inherit; font-size: 16px; border-radius: 4px; padding: 4px 12px; cursor: pointer; min-width: 44px; min-height: 36px; }
+  #bar button:focus-visible, #scrub:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  #bar button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+  #scrub { flex: 1; min-width: 120px; accent-color: var(--accent); }
+  #time { font-variant-numeric: tabular-nums; color: var(--dim); font-size: 15px; min-width: 92px; text-align: right; }
+</style>
+<div id="stage"><canvas id="cv" width="1280" height="720" aria-label="{{TITLE}} – Schattenspiel"></canvas></div>
+<div id="bar">
+  <button id="play" aria-label="Abspielen">▶</button>
+  <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Zeitleiste">
+  <span id="time">0,0 / 0,0 s</span>
+  <button id="snd" aria-pressed="true" aria-label="Ton an oder aus">Ton an</button>
+  <button id="loop" aria-pressed="true" aria-label="Endlosschleife">Schleife</button>
+</div>
+<script>
+{{LIBS}}
+</script>
+<script>
+{{SCENE}}
+</script>
+<script>
+(function () {
+  const cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+  const W = 1280, Hh = 720;
+  let t = 0, playing = false, sound = true, loop = true, last = 0, stopSound = null;
+  window.DURATION = DURATION; window.scoreSound = scoreSound;
+  const draw = (tt) => { ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; ctx.filter = 'none'; explainer(ctx, W, Hh, tt); };
+  window.seek = (tt) => { t = Math.max(0, Math.min(DURATION, tt)); draw(t); ui(); };
+  const fmt = (v) => v.toFixed(1).replace('.', ',');
+  function ui() { scrub.value = Math.round(t / DURATION * 1000); time.textContent = fmt(t) + ' / ' + fmt(DURATION) + ' s'; play.textContent = playing ? '❚❚' : '▶'; play.setAttribute('aria-label', playing ? 'Pause' : 'Abspielen'); }
+  function startSound() { stopSnd(); if (sound && playing) stopSound = SOUND.live(scoreSound, t, { voiceover: false }); }
+  function stopSnd() { if (stopSound) { stopSound(); stopSound = null; } }
+  function frame(now) {
+    if (playing) {
+      t += Math.min(0.1, (now - last) / 1000);
+      if (t >= DURATION) { if (loop) { t = 0; startSound(); } else { t = DURATION; playing = false; stopSnd(); } }
+      draw(t); ui();
+    }
+    last = now; requestAnimationFrame(frame);
+  }
+  play.onclick = () => { playing = !playing; if (playing) { if (t >= DURATION) t = 0; startSound(); } else stopSnd(); ui(); };
+  scrub.oninput = () => { t = scrub.value / 1000 * DURATION; stopSnd(); draw(t); ui(); if (playing) startSound(); };
+  snd.onclick = () => { sound = !sound; snd.setAttribute('aria-pressed', sound); snd.textContent = sound ? 'Ton an' : 'Ton aus'; if (sound) startSound(); else stopSnd(); };
+  loop.onclick = () => { loop = !loop; loop.setAttribute('aria-pressed', loop); };
+  const specs = ['400 118px "Libre Baskerville"', '400 72px "IM Fell English"', 'italic 400 58px "IM Fell English"', 'italic 400 40px "IM Fell English"'];
+  Promise.all(specs.map((f) => document.fonts.load(f, 'AaZzÄäÖöÜüß09ō'))).catch(() => {}).then(() => document.fonts.ready).then(() => {
+    window.READY = true; draw(window.START_T || 2.4); t = 0; ui(); requestAnimationFrame((n) => { last = n; frame(n); });
+  });
+})();
+</script>
