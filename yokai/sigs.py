@@ -225,7 +225,7 @@ TEXT = {
     'taizan_sai': 'Das Pentagramm schließt sich schon nach 4 Treffern; nach dem Ritual tilgen 12 Pentagramme die Schuld – kein Malus mehr, und das Ritual ist wieder bereit',
     'kage_kitsune': 'Das Fuchs-Trugbild bleibt 4,5 s statt 3 s und wirft brennendes Fuchsfeuer (70 % statt 50 %)',
     'mizukagami': 'Der Brunnenspiegel fängt bis zu 3 Feindgeschosse auf einmal (Umkreis 70 statt 50) und wirft sie als kaltes Brunnenwasser zurück (bremst)',
-    'ichigeki': 'Der erste Hieb weckt sofort 3 Stufen Kampfgeist (+24 %), und Zanshin hält 3 s statt 2 s wach',
+    'ichigeki': 'Der erste Hieb weckt sofort 3 Stufen Kampfgeist (+24 %), Zanshin hält 3 s statt 2 s wach – und tötet der erste Hieb, ist er sofort wieder bereit',
     'totsuka': 'Jeder Habakiri-Schnitt ruft den Donner des Ōhabari: ein Blitz auf das Ziel (100 %), der auf bis zu 3 weitere Feinde springt',
     'oharae': 'Höchstens alle 4 s schwingt die Rolle auch den Haraegushi: alle Yokai im Raum verlieren 8 % ihres Lebens (Bosse 200 % Schaden)',
     'kotaro': 'Unsichtbar im Kakuremino fallen die Tengu-Steine doppelt so oft (alle 1,5 s) und härter (200 %)',
@@ -921,6 +921,8 @@ def hit_post(run, e, b, dmg):
         if 'ichigeki' in S:                              # Ichigeki: nach dem ersten Hieb bleibt der Geist wach
             _syn(run, 'ichigeki', e.x, e.y, (200, 170, 90))
             g['zs'], g['zs_t'] = max(3, g.get('zs', 0)), run.time
+            if e.hp <= 0:                                # ein Hieb, ein Tod: die Klinge ist sofort wieder bereit
+                g['ichi'] = True
         if 'ganryu' in S:                                # Ganryūjima: der Hieb wendet wie die Schwalbe
             g['ichi_t'] = run.time
             _syn(run, 'ganryu', e.x, e.y, (90, 110, 160))

@@ -267,3 +267,4 @@
 - Runde 161 – **Neue Synergie „Taizan-Fukun-Sai“** (Taizan-Fukun-Ritual + Kikyō-Mon): Das Pentagramm schließt sich schon nach 4 Treffern; nach dem Ritual tilgen 12 Pentagramme die Schuld – der Schadensmalus endet, und das Ritual ist wieder bereit. Fehler behoben: Der Pentagramm-Schaden des Kikyō-Mon zählte selbst als Treffer fürs nächste Pentagramm.
 - Runde 162 – **Neue Synergie „Sakaki-mai“** (Hi-ōgi der Miko + Tamagushi): Im Kagura-Tanz bremsen die Sakaki-Blätter die Getroffenen, und schon jeder 2. statt 3. Raum ohne Treffer bringt ½ Herz
 - Runde 163 – **Neue Synergie „Koromogawa“** (Giboshi der Gojō-Brücke + Tachi-ōjō): Die Naginata fegt weiter (75 statt 55 px); solange du bei Tachi-ōjō aufrecht stehst, fegt sie jede Sekunde mit 150 %
+- Runde 164 – **Ichigeki Hissatsu** verstärkt: Tötet der erste Hieb, ist er sofort wieder bereit – ein Hieb, ein Tod, Feind um Feind

@@ -650,6 +650,10 @@ sigs.hit_post(run, e, run.fire_player_bullet(p.x, p.y, 0, 1, 100, 2, 1, {}), 1)
 m1 = sigs.dmg_mult(p); run.time += 2.5; m2 = sigs.dmg_mult(p)
 if 'ichigeki' not in p.sgs or abs(m1 / m0 - 1.24) > 0.01 or abs(m2 - m1) > 0.01:
     print('FEHLER Ichigeki Hissatsu', m0, m1, m2); bad += 1
+e2 = Enemy(run, 'gaki', p.x + 60, p.y); e2.spawn_t = 0; e2.hp = e2.maxhp = 1; run.enemies = [e2]
+sigs.st(p)['ichi'] = True; sigs.hit_post(run, e2, run.fire_player_bullet(p.x, p.y, 0, 1, 100, 2, 1, {}), 1)
+if not sigs.st(p)['ichi']:
+    print('FEHLER Ichigeki: Kill lädt den ersten Hieb nicht neu', e2.hp); bad += 1
 # Mizukagami (Brunnenspiegel + Brunnen von Banchō Sarayashiki): der Spiegel fängt bis zu 3 Geschosse
 g.start_run('okiku', 60); run = g.run; p = run.player
 for iid in ('ido_kagami', 'okiku_ido'):
