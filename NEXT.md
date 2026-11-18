@@ -382,22 +382,29 @@ für Talismane greifen (z. B. `bullet_tick`) – sollen sie auch für Strahl/Hie
 - Fix: Kikyō-Pentagramm-Schaden lief ohne `run._echo` und zählte selbst fürs nächste Pentagramm (effektiv jeder 4. statt 5.).
   Kikyō-Mon und Seimei-Jinja sind dadurch etwas schwächer – beim nächsten Messen beobachten.
 
-# Nächster Schritt: hi_ogi und Gojō
-Warum: Letzte Siegel-Items ohne eigene Synergie-Fähigkeit: `hi_ogi` (Hana) – vorsichtig, schon ×1,53 allein – und
-`gojo_giboshi` (Benkei; `gojo_ohashi` gibt nur hp + altes Flag `sig_gojo_bashi`). Vorschläge:
-- `hi_ogi` + ein schwächeres Hana-Item, Effekt eher Kontrolle/Komfort statt Schaden
-- `gojo_giboshi` + `nanatsu_dogu` oder `tachi_ojo` (Benkei)
-Danach Kikyō-Mon nach dem Fix neu messen (`synbalance --items kikyo_mon`).
-Je Synergie: `SYNERGIES`, `TEXT`, sig, sigtest-Fall, Messung; Aufschlag ≤ ~×1,5.
+# Erledigt (Runden 162–164): Synergien für Siegel-Items Teil 11 – alle Siegel-Items haben jetzt eine
+- Runde 162: `sakaki_mai` (hi_ogi + tamagushi, sig `sakaki_mai`): Tanz-Blätter bremsen (`slow`), Tamagushi heilt jeden
+  2. statt 3. Raum ohne Treffer. Bewusst Kontrolle/Komfort (Hi-ōgi schon ×1,53): kappa_ou 2 ×0,63 gegen ×0,59 nur Items.
+- Runde 163: `koromogawa` (gojo_giboshi + tachi_ojo, sig `koromogawa`): Naginata 75 px; während Tachi-ōjō jede Sekunde
+  150 % (`g['kg_t']`). kappa_ou 2 ×0,62 gegen ×0,63, --leben ×1,64 gegen ×1,64 (Boss stirbt so oder so – gesättigt).
+- Runde 164: `ichigeki` verstärkt – Kill durch den ersten Hieb lädt ihn neu. --raum kappa_ou 3 ×1,04 gegen ×1,07
+  (Messung zeigt kaum Wirkung; der Bot trifft mit dem ersten Hieb selten einen tödlichen Treffer).
+- „Nur Items“-Wrapper liegt nicht im Repo: Skript, das `data.SYNERGIES[..]['fx'] = {}` für die IDs setzt und dann
+  `runpy.run_path('tools/synbalance.py')` aufruft.
+
+# Nächster Schritt: `synbalance --nur-items` + Kikyō-Mon neu messen
+Warum: Jede Messung der letzten 12 Runden brauchte den Wrapper von Hand; als Option spart er Zeit und Fehler.
+Danach Kikyō-Mon nach dem Pentagramm-Fix (Runde 161) messen: `synbalance x 2 kikyo_mon --items`; ist es spürbar
+schwächer als die übrigen Siegel-Items, den Pentagramm-Schaden 250 % → 300 %.
 
 # Danach
 - Ebene 9–10 ohne Meister noch ~10 s Bosszeit – nach Lucas Spieltest ggf. weiter anheben
 - Hi-ōgi (×1,53) und Masakari (×1,35) beobachten – oberer Rand der Siegel-Items
-- `ichigeki` ist schwach – ggf. zusätzlich: Kill durch den ersten Hieb lädt ihn sofort neu
+- Alle 132 Synergien haben ein `sig_`-Flag – neue Synergien-Wellen nur noch mit neuen Items
 
 # Weitere Ideen
-- `synbalance --nur-items`: den Wrapper als Option einbauen (Synergie-fx leeren, gleiche Seeds)
 - `synbalance --raum`: Option, `on_room_enter` nach dem Spawnen der ersten Welle aufzurufen (für Nebel-/Eintritts-Synergien)
 - Wanddekos: zweite Variante pro Biom (Index 2), Werkzeug walldeco_hi.py steht
 - Mondhase ist im Raum recht klein – ggf. größer zeichnen (Canvas 64×60 → 80×72) und Wendezone anpassen
 - Codex: aktive Items im Lauf als „entdeckt“ merken
+- Neue Siegel-Synergien sichtbar machen: Lexikon-Seite „Synergien“ mit Filter nach Figur
