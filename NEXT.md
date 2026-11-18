@@ -318,14 +318,20 @@ für Talismane greifen (z. B. `bullet_tick`) – sollen sie auch für Strahl/Hie
 - Runde 140: `koishikuba` (kuzu_blatt + shinoda_blatt, sig `koishikuba`): Fuchsnebel jeden Raum (auch nach Treffern),
   Nicht-Bosse brennen 3 s (30 %). `synbalance --raum` misst das nicht (Wellen kommen nach `on_room_enter`, beide 180 s).
 
-# Nächster Schritt: Belohnungs-Synergien Teil 4
-Warum: Kenji und Benkei haben noch fünf Siegel-Items ohne Partner; Sagen-Paare tragen den Wiederspielwert.
+# Erledigt (Runden 141–143): Synergien für Belohnungs-Items Teil 4
+- Runde 141: `yoto_muramasa` (muramasa + kesagiri, sig `yoto`): im Blutdurst (`g['bd_t']`) Kesa-giri jeden 2. Wurf, rot, 150 %. ×1,18.
+- Runde 142: `ganryujima` (tsubame_gaeshi + ichi_no_tachi, sig `ganryu`): `g['ichi']` lädt in `tick` nach 8 s neu
+  (`g['ichi_t']`), danach zwei Schwalbenschnitte (100 %). ×1,09.
+- Runde 143: `senbon_gari` (tausendstes_schwert + nanatsu_dogu, sig `senbon`): Waffe jeden 5. Wurf, Treffer mit `fl['senbon']`
+  zählen über `sigs._jagd` für die Schwertjagd. ×0,99 im Bosstest (wächst über den Lauf, Bossmaß sieht das nicht).
+
+# Nächster Schritt: Belohnungs-Synergien Teil 5
+Warum: Noch einige Siegel-Items ohne Sagen-Partner; jede Synergie ist ein neuer Grund, eine Figur weiterzuspielen.
 Freie Paare (vorher `grep "items=\[" yokai/data.py` prüfen):
-- Benkei: tausendstes_schwert + nanatsu_dogu (999 Klingen + sieben Waffen), tachi_ojo + kanjincho?
-- Kenji: muramasa + kesagiri, tsubame_gaeshi + ichi_no_tachi (Kojirō / Musashi)
-- Hana: tamagushi + kotodama
-Je Synergie: `SYNERGIES`-Eintrag, `TEXT`, sig in `yokai/sigs.py`, sigtest-Fall, `synbalance shuten_doji 5 <id> --leben`
-und zum Vergleich mit `fx=dict()` (Items allein); Synergie-Aufschlag ≤ ~×1,5.
+- Hana: tamagushi + kotodama (Opferzweig + Norito)
+- Benkei: tachi_ojo + kanjincho (stehend sterben / Ataka-Wegliste)
+- Ponpoko: tanuki_bayashi + tanuki_tokkuri; Kuzunoha: hoshi_tama + kitsune_chochin
+Je Synergie: `SYNERGIES`, `TEXT`, sig, sigtest-Fall, `synbalance shuten_doji 5 <id> --leben`; Aufschlag ≤ ~×1,5.
 
 # Danach
 - Ebene 9–10 ohne Meister noch ~10 s Bosszeit – nach Lucas Spieltest ggf. weiter anheben
