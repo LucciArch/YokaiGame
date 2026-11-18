@@ -505,5 +505,16 @@ n1 = len(run.pbullets) - 1
 run.time += 8.1; sigs.tick(p, run, 0.1)
 if 'ganryu' not in p.sgs or n1 < 2 or not sigs.st(p).get('ichi'):
     print('FEHLER Ganryūjima', n1, sigs.st(p).get('ichi')); bad += 1
+# Senbon-gari (Tausendstes Schwert + Sieben Waffen): Waffe jeden 5. Wurf, Treffer zählen für die Schwertjagd
+g.start_run('benkei', 46); run = g.run; p = run.player
+for iid in ('tausendstes_schwert', 'nanatsu_dogu'):
+    p.gain_item(iid, silent=True)
+sigs.st(p)['shots'] = 4; sigs.st(p)['jagd'] = 29
+b = run.fire_player_bullet(p.x, p.y, 0, 1, 100, 2, 1, {})
+sigs.on_fire(p, run, [b])
+e = Enemy(run, 'gaki', p.x + 40, p.y); e.spawn_t = 0; e.hp = e.maxhp = 999; run.enemies = [e]
+sigs.hit_post(run, e, b, 1)
+if 'senbon' not in p.sgs or not b.fl.get('senbon') or sigs.st(p).get('jagd_b', 0) != 0.2:
+    print('FEHLER Senbon-gari', b.fl, sigs.st(p).get('jagd_b')); bad += 1
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)

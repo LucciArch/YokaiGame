@@ -214,6 +214,7 @@ TEXT = {
     'koishikuba': 'Der Fuchsnebel liegt in jedem Raum, auch nach Treffern, und entzündet die Yokai mit Fuchsfeuer – so verfallen sie dem Fuchszauber',
     'yoto': 'Im Blutdurst schneidet Kesa-giri schon jeden 2. Wurf, mit blutroten Klingen (150 %)',
     'ganryu': 'Der erste Hieb kehrt alle 8 s im Raum zurück und schnellt als Schwalbenschnitt zu zwei weiteren Feinden (je 100 %)',
+    'senbon': 'Benkeis Waffen kommen schon jeden 5. Wurf, und jeder ihrer Treffer zählt für die Schwertjagd wie ein Kill',
     'henro': 'Jede neue Ebene faltet zwei Kraniche, jede 2. Ebene bringt ein Geisterherz',
     'sommerwind': 'Die Rolle wirft acht Federn, die weiter fliegen',
     'fest_der_laternen': 'Treffer entzünden doppelt so oft den Boden, die Flammen brennen länger',
@@ -726,12 +727,13 @@ def _siegel_fire(p, run, bullets, g, n, base, dmg, spd, life, size):
     if 'kotodama' in S and n % 16 == 0 and run.ebullets:  # Norito
         run.clear_ebullets()
         _ring(run, p.x, p.y, (240, 230, 200), 70)
-    if 'nanatsu' in S and n % 7 == 0 and bullets:        # eine der sieben Waffen
+    senbon = 'senbon' in S                               # Senbon-gari: Benkei greift öfter zur Waffe
+    if 'nanatsu' in S and n % (5 if senbon else 7) == 0 and bullets:  # eine der sieben Waffen
         b = bullets[0]
         b.dmg *= 2.0
         b.r *= 1.5
         b.col = (170, 170, 190)
-        b.fl = dict(b.fl, pierce=1)
+        b.fl = dict(b.fl, pierce=1, senbon=1) if senbon else dict(b.fl, pierce=1)
     if g.get('hd', 0) > 0:                               # Hanadaka: Windklingen nach der Rolle
         g['hd'] -= 1
         for b in bullets:
@@ -888,6 +890,8 @@ def hit_post(run, e, b, dmg):
                 nb = run.fire_player_bullet(e.x, e.y, math.atan2(o.y - e.y, o.x - e.x), p.damage(), 260, 2.5, 0.8, {})
                 nb.col = (90, 110, 160)
                 nb.hit.add(e)
+    if b is not None and b.fl.get('senbon') and 'schwertjagd' in S:
+        _jagd(p, run, e, g)                              # Senbon-gari: jeder Waffentreffer ist eine erbeutete Klinge
     if 'ohabari' in S and b is not None and not echo and random.random() < 0.12:
         _chain_strikes(run, e, 3, p.damage() * 0.8)
     if 'miidera' in S and e.is_boss and b is not None and not echo:
