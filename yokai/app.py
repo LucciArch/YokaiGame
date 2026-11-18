@@ -6,7 +6,7 @@ import random
 import sys
 import pygame
 from .settings import *
-from . import gfx, audio, sheets, art, bestiary, props, sigs
+from . import gfx, audio, sheets, art, bestiary, props, sigs, story
 from .save import Save
 from .data import (MARKS, CHAR_UNLOCKS, BOSS_REWARD, ITEMS, ITEM_IDS, CHARS, CHAR_ORDER, ACHIEVEMENTS, ACTIVES, SYNERGIES, TRANSFORMS, BOSSES,
                    BIOMES, CHALLENGES, ENEMIES)
@@ -447,7 +447,7 @@ class Game:
         return im
 
     # ================================================================  Zustände
-    MENU = ['Neuer Lauf', 'Tägliche Prüfung', 'Herausforderungen', 'Codex der Items', 'Yōkai-Lexikon', 'Erfolge', 'Statistik', 'Steuerung', 'Optionen', 'Beenden']
+    MENU = ['Neuer Lauf', 'Tägliche Prüfung', 'Herausforderungen', 'Geschichte', 'Codex der Items', 'Yōkai-Lexikon', 'Erfolge', 'Statistik', 'Steuerung', 'Optionen', 'Beenden']
 
     def st_title(self, dt, events, nav):
         s = self.screen
@@ -456,6 +456,9 @@ class Game:
         T = gfx.TEXT
         # Einblendung beim Start: erst die Nacht, dann das Logo, dann das Menü; jede Taste kürzt ab
         it = self._intro = self.__dict__.get('_intro', 0) + dt
+        if it > 1.0 and self.save['stats']['runs'] and story.pending(self.save):   # neu erreichtes Kapitel der Geschichte
+            self.play_story(story.pending(self.save), 'title')
+            return
         if nav:
             it = self._intro = max(it, 2.1)
         if it < 1.4:
@@ -599,6 +602,11 @@ class Game:
         if m == 'Neuer Lauf':
             self.state = 'chars'
             self.char_sel = CHAR_ORDER.index(self.last_char) if self.last_char in CHAR_ORDER else 0
+            if 'prolog' not in self.save.data.get('story_seen', []):   # erster Lauf: erst der Prolog
+                self.play_story(['prolog'], 'chars')
+        elif m == 'Geschichte':
+            self.state = 'storytree'
+            self.story_sel = 0
         elif m == 'Tägliche Prüfung':
             self.start_daily()
         elif m == 'Herausforderungen':
@@ -1494,6 +1502,32 @@ class Game:
             T.add(line, x, y, size, col)
             y += lh
         return y
+
+    def play_story(self, ids, back):
+        self.scene = story.Cutscene(self, ids)
+        self.scene_back = back
+        self.state = 'scene'
+
+    def st_scene(self, dt, events, nav):
+        gfx.HI_MODE = True
+        if self.scene.frame(self.screen, dt, nav):
+            self.scene = None
+            gfx.HI.clear()
+            self.state = self.scene_back
+
+    def st_storytree(self, dt, events, nav):
+        s = self.screen
+        self.menu_bg(s)
+        n = sum(story.unlocked(self.save, c) for c in story.ORDER)
+        self.page_head('Geschichte', 'seal_ach', '%d / %d Kapitel' % (n, len(story.ORDER)))
+        story.draw_tree(self, s, self.story_sel)
+        for nv in nav:
+            if nv in ('left', 'up'): self.story_sel = (self.story_sel - 1) % len(story.ORDER); audio.play('move')
+            elif nv in ('right', 'down'): self.story_sel = (self.story_sel + 1) % len(story.ORDER); audio.play('move')
+            elif nv == 'ok' and story.unlocked(self.save, story.ORDER[self.story_sel]):
+                audio.play('select')
+                self.play_story([story.ORDER[self.story_sel]], 'storytree')
+            elif nv == 'back': self.state = 'title'
 
     def st_achievements(self, dt, events, nav):
         s = self.screen

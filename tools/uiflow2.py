@@ -16,7 +16,23 @@ try:
     g.save.data.pop('news_seen', None)
     g.state = 'title'; step([], 3); step([K(pygame.K_SPACE)], 3)
     assert g.save.data.get('news_seen') == VERSION, 'Neuigkeiten-Fenster lässt sich nicht schließen'
-    for i in (3,4,5,6,7):
+    from yokai import story
+    g.save.data['story_seen'] = []; g.save['stats']['runs'] = 1; g.save['stats']['wins'] = 1
+    g.state = 'title'; g._intro = 5; step([], 2)
+    assert g.state == 'scene' and g.scene.ids == ['morgen'], 'Neues Kapitel startet nicht auf dem Titel'
+    step([K(pygame.K_RETURN)], 2); step([K(pygame.K_RETURN)], 2)   # Text fertig, nächste Tafel
+    assert g.scene.k == 1, 'Zwischensequenz blättert nicht'
+    step([K(pygame.K_ESCAPE)], 2)
+    assert g.state == 'title' and 'morgen' in g.save.data['story_seen'], 'Zwischensequenz lässt sich nicht überspringen'
+    g.save.data['story_seen'] = [c[0] for c in story.CHAPTERS if c[0] != 'prolog']   # Rest des Tests: nichts mehr fällig
+    menu(3); assert g.state == 'storytree', 'Story-Baum öffnet nicht'
+    step([K(pygame.K_RETURN)], 2); assert g.state == 'scene', 'Story-Baum spielt kein Kapitel ab'
+    step([K(pygame.K_ESCAPE)], 2); assert g.state == 'storytree'
+    for sc in ('mond', 'morgen', 'stern', 'yomi', 'sonne', 'feuer', 'siegel', 'schatten'):
+        for t in (0.1, 3.0, 9.0):
+            story.draw_scene(g.screen, sc, t, g.save)
+    g.save.data['story_seen'].remove('prolog'); g.state = 'title'
+    for i in (4,5,6,7,8):
         menu(i); s=g.state
         for k in (pygame.K_RIGHT, pygame.K_DOWN, pygame.K_LEFT, pygame.K_UP): step([K(k)], 3)
         step([K(pygame.K_ESCAPE)], 3); print(s, '->', g.state)
@@ -49,7 +65,8 @@ try:
     g.st_codex(1 / 60, [], ['down']); assert g.codex_sel < n + len(ACTIVES)
     g.state = 'title'
     g.save['seen'].remove(jiid)
-    menu(0); print('chars', g.state)
+    menu(0); assert g.state == 'scene' and g.scene.ids == ['prolog'], 'Erster Lauf zeigt keinen Prolog'
+    step([K(pygame.K_ESCAPE)], 2); print('chars', g.state)
     from yokai.data import CHAR_ORDER
     sel0 = g.char_sel; g.char_sel = CHAR_ORDER.index('kenji'); g.save['chars'].append('kenji'); step([], 2); g.st_chars(1 / 60, [], g.menu_keys([]))
     assert any('Zusatzangriff' in t[0] for t in gfx.TEXT.items), 'Figurenwahl nennt Waffen-Brücke nicht'

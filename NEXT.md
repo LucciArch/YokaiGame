@@ -421,20 +421,42 @@ für Talismane greifen (z. B. `bullet_tick`) – sollen sie auch für Strahl/Hie
   damit nicht 1:1 vergleichbar). Ichi-no-tachi blieb so bei ×1,03 → neu: erster Treffer je Feind +50 % (`e.sg_ichi`)
   → `--raum` ×0,92, Boss ×0,85. sigtest-Schwelle auf 35.
 
-# Nächster Schritt: Neue Item-Welle „Tsukumogami“ (Teil 1)
-Warum: Alle 132 Synergien haben eigene Fähigkeiten, die Kampf-Siegel liegen im Feld – frischer Fundstoff bringt jetzt
-am meisten Wiederspielwert. Teil 1: 4–5 Items aus beseelten Hausgeräten (Kasa-obake, Chōchin-obake, Bake-zōri,
-Ittan-momen, Kosode-no-te), je mit eigener `sig_*`-Wirkung in `yokai/sigs.py`, Icons in `art_src/` (Hi-Res, handgesetzt),
-Lexikon-Text in `yokai/bestiary.py`; in Pools einbinden, sigtest je Item. Teil 2: 3–4 Synergien dazu.
+# Erledigt (Runden 171–173)
+- Runde 171: Tsukumogami Teil 1 – `biwa_bokuboku`, `chochin_obake`, `bake_zori`, `ittan_momen`, `kosode_te` (Pool T,
+  nicht gesperrt, Symbole `art_src/fable/items/icons_v19.py`). kappa_ou 2 `--items`: Biwa ×0,65, Kosode ×0,75,
+  Chōchin ×0,80, Ittan ×0,89, Bake-zōri ×0,97 (wirkt bei Kills – Bossmaß sieht das kaum; ggf. `--raum` messen).
+  Achtung: Item-ID `karakasa` ist vergeben (alter Schirm), deshalb kein Kasa-obake-Item.
+- Runde 172: Synergien `hoichi` (Biwa + Juzu), `furisode_kaji` (Kosode + Chōchin-obake), `dogu_yagyo` (Bake-zōri + Ittan).
+- Runde 173 (Wunsch von Luca: Story-Progression wie Isaac): `yokai/story.py` – 8 Kapitel mit Bedingung auf dem
+  Spielstand (`save['story_seen']`), prozedural gezeichnete Szenen (`draw_scene`), `Cutscene`, Story-Baum
+  (`draw_tree`, Menü „Geschichte“, `App.st_storytree`/`st_scene`/`play_story`). Neue Kapitel spielen auf dem Titel,
+  sobald `pending()` etwas meldet (nach Läufen); Prolog beim ersten „Neuer Lauf“. uiflow2 prüft alles.
+  Bestehendes Gating (schon vorher da): erster Sieg nur bis Kapitel V, danach Himmel (VI), nach wahrem Sieg Yomi/Iwato (VII).
 
-# Danach
-- `--raum` mit Raum-Eintritt (Lauf 169–170): Oni-Horn ×1,03, Yashiori ×1,04, Kakuremino ×1,07 – Sonderrollen
-  (wenig Leben / Champion / Stillstand); bei Bedarf mit `--leben` bzw. `--still` gegenmessen
-- Ebene 9–10 ohne Meister noch ~10 s Bosszeit – nach Lucas Spieltest ggf. weiter anheben
-- Hi-ōgi (×1,53) und Masakari (×1,35) beobachten – oberer Rand der Siegel-Items
+# Wartet auf Luca: KI-Videos für die Zwischensequenzen
+In dieser Sitzung gab es kein Video-Werkzeug. Vorgeschlagen (Plugin-Verzeichnis, eigenes Konto/Guthaben nötig):
+„Cinematic AI Video Maker“, „AI Video & Image Generator by Clipwave“, „AI Video Editor & Timeline“ (ManyMotions).
+Sobald eines aktiv ist (`ListPlugins` prüfen): je Kapitel (Szenen-Schlüssel in `story.CHAPTERS`: mond, morgen, stern,
+yomi, sonne, feuer, siegel, schatten) ein Video erzeugen, als MP4 nach `yokai/assets/story/<szene>.mp4`, Wiedergabe
+in `Cutscene.frame` (pygame kann kein MP4 → z. B. beim Build in JPG-Einzelbilder zerlegen oder `imageio`/`cv2`;
+Größe im PyInstaller-Build beachten). Abweichung von „alles selbst erzeugt“ nur hierfür – Lucas ausdrücklicher Wunsch.
+Ohne Video-Werkzeug NICHT wieder selbst Szenen malen.
+
+# Nächster Schritt: Story Teil 2 – Geheimer Boss nach „Der Schatten hinter dem Morgen“
+Warum: Luca wünscht sich Isaac-artige Progression mit geheimen Bossen und Zwischensequenzen nach dem Endboss. Das
+Kapitel `schatten` kündigt den Gegner schon an. Plan: neuer Boss (folkloretreu, z. B. **Sutoku-in** – der verbannte
+Kaiser, der als großer Onryō/Ō-Tengu zurückkehrt, einer der „drei großen Onryō“), Hi-Res-Sprite in `art_src/`
+(handgesetzt), eigenes Biom/Kapitel VIII (Portal nach Izanami bzw. Amaterasu, nur wenn `story.unlocked(save,'schatten')`),
+Boss-Muster in `yokai/bosses.py`, Eintrag in `bestiary.BOSS_LORE`, neues Kapitel `wahres_ende` mit eigener Szene und
+Epilog-Text (`epilogue.py`), Figuren-Siegel ggf. später. bosstest/uiflow2 erweitern.
+
+# Danach (Story)
+- Zweiter geheimer Boss über eine besondere Bedingung (z. B. Kapitel-I-Boss ohne Treffer → Masakados Haupt erscheint)
+- Je Figur ein eigenes Story-Kapitel (`ENDINGS` in `epilogue.py` als Knoten im Baum, Bedingung `char_wins`)
+- Iwato erst nach Yomi öffnen (strengerer Pfad wie Isaac), oder Kapitel VII je nach gewähltem Weg
 
 # Weitere Ideen
-- Wanddekos: zweite Variante pro Biom (Index 2), Werkzeug walldeco_hi.py steht
-- Mondhase ist im Raum recht klein – ggf. größer zeichnen (Canvas 64×60 → 80×72) und Wendezone anpassen
-- Lexikon-Seite „Synergien“ mit Filter nach Figur
+- Tsukumogami Teil 3: Ungaikyō, Kyōrinrin, Zorigami als Items
+- `--raum`-Gegenmessung Oni-Horn ×1,03, Yashiori ×1,04, Kakuremino ×1,07 mit `--leben`/`--still`
+- Hi-ōgi (×1,53) und Masakari (×1,35) beobachten
 - Ereignisraum „Tsukumogami-Markt“ passend zur neuen Item-Welle
