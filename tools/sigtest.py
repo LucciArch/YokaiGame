@@ -591,5 +591,17 @@ if mame:
     sigs.hit_post(run, e, mame[0], 1)
 if 'mamemaki' not in p.sgs or len(mame) != 4 or getattr(e, 'sg_fear', 0) != 2.0:
     print('FEHLER Mamemaki', len(mame), getattr(e, 'sg_fear', 0)); bad += 1
+# Kitsunebi no Gyōretsu (Hoshi no Tama + Kitsune-Chōchin): Ring doppelt so oft, Flammen suchen ihr Ziel
+g.start_run('kuzunoha', 54); run = g.run; p = run.player
+for iid in ('hoshi_tama', 'kitsune_chochin'):
+    p.gain_item(iid, silent=True)
+random.seed(5); ring = 0
+for _ in range(200):
+    e = Enemy(run, 'gaki', p.x + 60, p.y); e.spawn_t = 0; run.enemies = [e]; n0 = len(run.pbullets)
+    sigs.on_kill(run, e)
+    fire = [b for b in run.pbullets[n0:] if b.fl.get('burn')]
+    ring += len(fire) >= 8 and all(b.fl.get('homing') for b in fire)
+if 'gyoretsu' not in p.sgs or not 0.18 * 200 < ring < 0.6 * 200:
+    print('FEHLER Kitsunebi no Gyōretsu', ring); bad += 1
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)

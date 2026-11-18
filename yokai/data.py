@@ -475,6 +475,7 @@ SYNERGIES = [
     dict(id='kurama_lehre', name='Kurama-Lehre', desc='Nachts auf dem Kurama lehrte der Tengu-König den jungen Ushiwaka die Kunst des Windes', items=['sojobo_hane', 'hanadaka_men'], fx=dict(sig_kurama=1)),
     dict(id='rashomon', name='Rashōmon', desc='Watanabe no Tsuna schlug den Arm ab – im Zorn kehrt Ibaraki-dōji zurück, ihn zu holen', items=['ibaraki_arm', 'oni_tsuno'], fx=dict(sig_rashomon=1)),
     dict(id='mamemaki', name='Mamemaki', desc='„Oni wa soto!“ – mit dem Horn des Oni in der Hand fliegen die Setsubun-Bohnen doppelt so dicht', items=['setsubun_mame', 'oni_tsuno'], fx=dict(sig_mamemaki=1)),
+    dict(id='kitsunebi_gyoretsu', name='Kitsunebi no Gyōretsu', desc='Die Laterne leuchtet, das Sternjuwel antwortet – in langen Reihen ziehen die Fuchsfeuer übers Feld', items=['hoshi_tama', 'kitsune_chochin'], fx=dict(sig_gyoretsu=1)),
     dict(id='henro', name='Henro', desc='Dōgyō ninin – Pilgerstab und Kraniche wandern mit dir', items=['kongozue', 'senbazuru'], fx=dict(luck=1, sig_henro=1)),
 ]
 

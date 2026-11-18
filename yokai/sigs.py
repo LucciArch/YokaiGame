@@ -218,6 +218,7 @@ TEXT = {
     'kintaro': 'Jeder Axttreffer zählt vierfach für den Keulenschlag, und die Keule trifft weiter (55 px statt 40)',
     'kurama': 'Sōjōbōs Wirbel wird größer (65 px), und jedes verwehte Feindgeschoss wird eine weitere Windklinge (bis +3)',
     'rashomon': 'Der Oni-Arm packt alle 2 s statt 2,5 s – unter 2 Herzen sogar jede Sekunde mit 250 %',
+    'gyoretsu': 'Der Fuchsfeuer-Ring des Sternjuwels kommt doppelt so oft, und seine Flammen suchen ihr Ziel wie die der Laterne',
     'mamemaki': 'Die Bohnen fliegen schon jeden 2. Wurf, vier statt drei, und getroffene Yokai fliehen 2 s',
     'ataka': 'Tachi-ōjō hält schon bei 1 Herz und 4 s lang, und alle Yokai im Raum erstarren 2 s (Bosse ½ s) vor Benkeis Blick',
     'utage': 'Jeder Trommelschlag zählt wie zwei Münzen für den Tokkuri, und im Sake-Rausch trommelst du auch im Gehen – lauter und weiter (200 %)',
@@ -1105,10 +1106,14 @@ def on_kill(run, e):
             if not p.heal(1):
                 for _ in range(2):
                     run.spawn_pickup('coin', e.x, e.y)
-    if 'hoshi_tama' in S and random.random() < 0.10 + 0.02 * p.s['luck']:
+    gy = 'gyoretsu' in S                                 # Kitsunebi no Gyōretsu: Laterne und Juwel zusammen
+    if 'hoshi_tama' in S and random.random() < (0.10 + 0.02 * p.s['luck']) * (2 if gy else 1):
         _float(run, e, 'Hoshi no Tama', (255, 210, 150))
+        if gy:
+            _syn(run, 'gyoretsu', e.x, e.y, (255, 170, 90))
         for k in range(8):                               # Fuchsfeuer-Ring
-            nb = run.fire_player_bullet(e.x, e.y, k * math.pi / 4, p.damage() * 0.6, 120, 3, 0.9, {'burn': 1})
+            nb = run.fire_player_bullet(e.x, e.y, k * math.pi / 4, p.damage() * 0.6, 120, 3, 1.5 if gy else 0.9,
+                                        {'burn': 1, 'homing': 1} if gy else {'burn': 1})
             nb.col = (120, 200, 255)
     if 'zehnter' in S:
         g['zt'] = g.get('zt', 0) + 1
