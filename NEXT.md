@@ -342,12 +342,20 @@ für Talismane greifen (z. B. `bullet_tick`) – sollen sie auch für Strahl/Hie
   +1 Windklinge (`g['hd']`, max +3). ×1,36.
 - Runde 149: `rashomon` (ibaraki_arm + oni_tsuno, sig `rashomon`): Oni-Arm alle 2 s, unter 2 Herzen jede Sekunde mit 250 %. ×1,40.
 
-# Nächster Schritt: Belohnungs-Synergien Teil 7
-Warum: Noch freie Siegel-Items ohne Sagen-Partner (Stand Runde 149):
-- Kotarō: tengu_tsubute + kakuremino („Unsichtbarer Steinwurf“: im Kakuremino fallen Steine doppelt so oft) –
-  vorher `synbalance` um stillstehenden Bot erweitern, sonst nicht messbar
-- Akago: setsubun_mame (z. B. + oni_tsuno oder + kodomo_kanabo „Mamemaki“: Bohnen lassen Oni erstarren)
-- Kuzunoha: hoshi_tama + kitsune_chochin; Ponpoko: bunbuku_kessel + shigaraki_tanuki
+# Erledigt (Runden 150–152): Synergien für Belohnungs-Items Teil 7
+- Runde 150: `mamemaki` (setsubun_mame + oni_tsuno, sig `mamemaki`): Bohnen jeden 2. Wurf, 4 statt 3, Flucht 2 s. ×1,22
+  (erster Versuch mit 5 Bohnen ×1,77 – zu stark).
+- Runde 151: `kitsunebi_gyoretsu` (hoshi_tama + kitsune_chochin, sig `gyoretsu`): Fuchsfeuer-Ring doppelt so oft,
+  Flammen zielsuchend, Lebensdauer 1,5 s. Bosstest ×0,83 (keine Kills), `--raum` ×1,10.
+- Runde 152: `morinji` (bunbuku_kessel + shigaraki_tanuki, sig `morinji`): Rolle → 3 s Glückssträhne (`g['gold_t']`),
+  Kessel 1,2 s. ×1,12.
+- Testumgebung: `python -m pip install pygame-ce numpy` (das nackte `pip` zeigt auf ein anderes Python).
+
+# Nächster Schritt: Kotarō-Synergie mit stillstehendem Bot
+Warum: tengu_tsubute + kakuremino ist das letzte offensichtliche Siegel-Paar ohne Synergie, aber Kakuremino
+(Unsichtbarkeit im Stillstand) ist mit dem dauernd laufenden Bosstest-Bot nicht messbar.
+- Zuerst `synbalance --still` (Bot steht, zielt nur) einbauen; damit auch `utage` (Runde 146) nachmessen.
+- Dann `kotaro` („Unsichtbarer Steinwurf“: im Kakuremino fallen Tengu-Steine doppelt so oft).
 Je Synergie: `SYNERGIES`, `TEXT`, sig, sigtest-Fall, `synbalance shuten_doji 5 <id> --leben`; Aufschlag ≤ ~×1,5.
 
 # Danach
