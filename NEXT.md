@@ -477,16 +477,22 @@ Ohne Video-Werkzeug NICHT wieder selbst Szenen malen.
   `BOSSES['masakado']` hp 2600, `BOSS_REWARD['masakado'] = None`, Lexikon-Eintrag. bosstest: ~37 Treffer (Sutoku ~41).
   **Noch nicht erreichbar** – keine Pforte, kein Biom.
 
-# Nächster Schritt: Kubizuka-Pforte + Kapitel IX (Story Teil 3, Fortsetzung)
-Warum: Masakado existiert, ist aber im Spiel noch nicht erreichbar.
-1. Biom `kubizuka` (depth 9): Palette in `environment/biomes.py` (nächtliches Ōtemachi-Gräberfeld: Steinlaternen, Grabhügel
-   mit Gorintō, Kampfer-Bäume, bleiches Onibi), Requisiten in `props.rocks`, `build.py kubizuka` + `hi.py`, nach
-   `yokai/assets/env/kubizuka` kopieren; `BIOMES/DEPTH_BIOMES/BOSS_POOL[9]` in `data.py`.
-2. Pforte `Obj('kubizuka')` im Shiramine-Bossraum (depth 8), nur wenn Sutoku schon einmal besiegt war (`sutoku_wins` ≥ 1 vor
-   diesem Lauf) – `boss_room_rewards`, `interact` (`go_deeper(9)`), `end_run` (`masakado_wins`, Erfolg `masakado`),
-   `floor_label` „IX“, Epilog `STORY_KUBIZUKA`, Story-Knoten. bosstest wie „Shiramine-Pforte OK“.
-3. Danach: Boss-Item (z. B. „Kagemusha-Spiegel“: Schattendoppelgänger als Familiar), Bossmusik `tracks.masakado`,
-   Titelstimmung, Wanddeko.
+# Erledigt (Runden 182–184): Kapitel IX Kubizuka
+- Runde 182: Biom `kubizuka` (depth 9; Palette `environment/biomes.py`, Requisiten in `props.rocks` – Onibi-Steinlaterne,
+  Itabi-Grabstein, Steinfrösche; Wanddekos in `props.wall_decos` – Sotoba, Froschnische; Hi-Res nur hochskaliert über
+  `walldeco_hi`-Fallback). Pforte `Obj('kubizuka')` im Shiramine-Bossraum, wenn `stats.sutoku_wins` ≥ 1. Sieg: `masakado_wins`,
+  Erfolg `masakado`, `STORY_KUBIZUKA`, Story-Knoten `kubizuka` (rechts neben `wahres_ende`). bosstest „Kubizuka-Pforte OK“.
+- Runde 183: Bossmusik `tracks.masakado`; Biom-Musikseed 50 (Boss-Seed 159; 168 war schon Tsukiyomi). validate prüft.
+- Runde 184: Item `masakado_kage` (Kagemusha, Pool B, hp+1, sig `kagemusha` in `sigs.block`: jedes 7. treffende Geschoss →
+  sieben suchende Onibi je 80 %). Symbol `art_src/fable/items/icons_v21.py`. sigtest + bosstest prüfen.
+
+# Nächster Schritt: Feinschliff Kubizuka
+Warum: Kapitel IX ist spielbar, aber noch nicht so eigen wie Shiramine.
+1. Hi-Res-Wanddeko `walldeco_hi.kubizuka_hi` (Sotoba mit Bonji-Schrift, Froschnische mit Onibi) + `WALL_LIGHT` prüfen;
+   gebaut mit `hi.py` (setzt alle Biome neu, ist deterministisch).
+2. Titelstimmung `masakado` in `App.draw_night` (wie `sutoku` in Runde 178: bleicher Mond, Onibi, fliegendes Haupt am Himmel).
+3. Synergie mit Kagemusha (z. B. `masakado_kage` + `sutoku_sutra` = „Drei große Onryō“ Teil 1, oder + Yabusame-/Bogen-Item).
+4. Masakado-Balance beobachten (bosstest ~16 Treffer, 44 s – deutlich leichter als Sutoku mit ~74 Treffern).
 
 # Danach (Story)
 - Danach Sugawara no Michizane (Raijin-Onryō, Blitze, Pflaumenblüten) als dritter großer Onryō
