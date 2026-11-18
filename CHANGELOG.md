@@ -268,3 +268,4 @@
 - Runde 162 – **Neue Synergie „Sakaki-mai“** (Hi-ōgi der Miko + Tamagushi): Im Kagura-Tanz bremsen die Sakaki-Blätter die Getroffenen, und schon jeder 2. statt 3. Raum ohne Treffer bringt ½ Herz
 - Runde 163 – **Neue Synergie „Koromogawa“** (Giboshi der Gojō-Brücke + Tachi-ōjō): Die Naginata fegt weiter (75 statt 55 px); solange du bei Tachi-ōjō aufrecht stehst, fegt sie jede Sekunde mit 150 %
 - Runde 164 – **Ichigeki Hissatsu** verstärkt: Tötet der erste Hieb, ist er sofort wieder bereit – ein Hieb, ein Tod, Feind um Feind
+- Runde 165 – Entwicklung: `tools/synbalance.py --nur-items` misst jede Synergie zusätzlich ohne ihre Fähigkeit (gleiche Seeds). Kikyō-Mon nach dem Pentagramm-Fix neu gemessen: ×0,63 – im Feld der Siegel-Items (Masakari/Hi-ōgi ×0,59, Habakiri ×0,64), kein Nachbessern nötig.

@@ -10,6 +10,8 @@ Mit --figur=kenji (benkei, kotaro ...): alle Kämpfe mit dieser Figur; dann wird
 Mit --still: der Bot steht (keine Bewegung, keine Rolle) und wirft im Wechsel 2 s ja, 2 s nein – für Stillstand-Synergien
   wie Trommel/Kakuremino; am besten mit --leben, denn stehend schafft er den Boss kaum in 180 s.
 Mit --items: die IDs im dritten Parameter sind Items; jedes wird mit einem Zufalls-Item gegen zwei Zufalls-Items gemessen.
+Mit --nur-items: jede Synergie zusätzlich ohne ihre Wirkung (fx leer) messen – Spalte „nur Items“ zeigt, was die
+  Fähigkeit selbst beiträgt (gleiche Seeds, gleiche Baseline).
 Mit Nahkampfwaffe (auch aus Items wie Speer oder Tamahagane) läuft der Bot zum Ziel und umkreist es."""
 import os, sys, math, random
 os.environ['SDL_VIDEODRIVER'] = 'dummy'; os.environ['SDL_AUDIODRIVER'] = 'dummy'
@@ -19,6 +21,9 @@ from yokai.app import Game
 from yokai import data, gfx, weapons
 from yokai.bosses import make_boss, CX, CY
 
+NUR = '--nur-items' in sys.argv
+if NUR:
+    sys.argv.remove('--nur-items')
 ITEMS = '--items' in sys.argv
 if ITEMS:
     sys.argv.remove('--items')
@@ -136,6 +141,12 @@ for sy in ([] if FIGUR or ITEMS else data.SYNERGIES):
     assert sy['id'] in rs[0][2].synergies, sy['id'] + ' wird nicht ausgelöst'
     bt, bh = base[min(3, len(sy['items']))]
     t = sum(r[0] for r in rs) / len(rs); h = sum(r[1] for r in rs) / len(rs)
-    out.append((t / bt, h - bh, sy['id'], t))
+    name = sy['id']
+    if NUR:
+        fx, sy['fx'] = sy['fx'], {}
+        r0 = [fight(sy['items'], s)[0] for s in SEEDS]
+        sy['fx'] = fx
+        name += ' nur Items ×%.2f' % (sum(r0) / len(r0) / bt)
+    out.append((t / bt, h - bh, name, t))
 for f, dh, sid, t in sorted(out, reverse=TOD or LEBEN):
     print('%-28s %s ×%.2f (%5.1f %s)  Treffer %+5.1f' % (sid, 'Schaden' if LEBEN else 'Zeit', f, t, '%' if LEBEN else 's', dh))
