@@ -145,6 +145,7 @@ BOSS_LORE = {
     'kagutsuchi': ('迦具土', 'Der Gott des Feuers, dessen Geburt seine Mutter Izanami tötete. Sein Vater erschlug ihn – aus seinem Blut entstanden weitere Götter.'),
     'fujin': ('風神', 'Der Gott des Windes, grünhäutig und wild, mit einem gewaltigen Sack voller Stürme über den Schultern. Er tritt stets mit seinem Bruder Raijin auf – so malte ihn Tawaraya Sōtatsu auf seinen berühmten Wandschirm.'),
     'sutoku': ('崇徳院', 'Der Kaiser, der im Hōgen-Aufstand unterlag und nach Sanuki verbannt wurde. Dort schrieb er Sutren mit seinem eigenen Blut; als der Hof sie zurückwies, schwor er, zum großen Dämon Japans zu werden. Man sagt, er wurde zum König der Tengu – einer der drei großen Onryō neben Sugawara no Michizane und Taira no Masakado.'),
+    'masakado': ('平将門', 'Der Krieger aus dem Osten, der sich gegen den Hof erhob und sich zum „Neuen Kaiser“ ausrief. Er fiel durch einen Pfeil in die Schläfe; sein Haupt wurde in Kyōto zur Schau gestellt, doch es verweste nicht, hielt die Augen offen und knirschte mit den Zähnen. Eines Nachts flog es nach Osten, um seinen Körper zu suchen. Wo es niederfiel, steht bis heute der Kubizuka in Tokio. Man sagt, er hatte sieben Doppelgänger – nur der echte warf einen Schatten.'),
     'mikaboshi': ('天津甕星', 'Der böse Stern des Himmels, ein Gott, der sich als Einziger nicht der Herrschaft der himmlischen Götter beugte.'),
 }
 

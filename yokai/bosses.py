@@ -2707,6 +2707,165 @@ class Sutoku(Boss):
         gfx.draw_glow(s, int(self.x), int(self.y + 10), 34, (200, 30, 40), int(40 + 30 * k))
 
 
+class Masakado(Boss):
+    """Taira no Masakado, der „Neue Kaiser“ des Ostens – geheimer Boss (Kubizuka-Sage).
+    Sein abgeschlagenes Haupt verweste nicht, knirschte mit den Zähnen und flog von Kyōto zurück nach Osten.
+    Phase 1: Reiterpfeile von den Rändern, Yabusame-Fächer, Sturmangriff. Phase 2: das Haupt fliegt – Bögen voller Onibi,
+    knirschende Kiefer aus Kugelreihen. Phase 3: sieben Kagemusha – nur der echte wirft einen Schatten."""
+    sheet = ('boss_masakado', 1, None)
+    r = 14
+    ARROW = (220, 200, 150)
+    ONIBI = (120, 210, 240)
+    BLOOD = (200, 40, 50)
+
+    def setup(self):
+        self.y = CY - 30
+        self.P2 = 0.65
+        self.dash = None
+        self.decoys = []            # Positionen der Schattendoppelgänger (Phase 3)
+        self.shuffle_t = 0.0
+        self.attacks = ['riders', 'yabusame', 'charge']
+        self.attacks2 = ['swoop', 'gnash', 'riders', 'onibi']
+
+    def hitboxes(self):
+        f = -1 if self.p.x < self.x else 1      # Haupt sitzt vorn, der Feuerschweif hinten trifft nicht
+        return [(self.x + 12 * f, self.y - 6, 16)]
+
+    def on_phase2(self):
+        self.run.banner('Das Haupt fliegt nach Osten', '„Wo ist mein Körper? Kommt her, schlagt noch einmal!“', (140, 210, 240), big=True)
+        self.ring(20, 70, 0, self.ONIBI, 3)
+
+    def update(self, dt):
+        super().update(dt)
+        if self.phase == 2 and not self.dead and self.hp < self.maxhp * 0.3:
+            self.phase = 3
+            self.attacks = ['gnash', 'onibi', 'riders', 'shadows']
+            self.rest *= 0.9
+            self.extra_dark = 40
+            self.shuffle()
+            run = self.run
+            run.banner('Die sieben Kagemusha', 'Nur einer von ihnen wirft einen Schatten', (170, 170, 220), big=True)
+            audio.play('roar')
+            run.shake(10)
+        if self.decoys and not self.dead:
+            self.shuffle_t -= dt
+            if self.shuffle_t <= 0:
+                self.shuffle()
+
+    def shuffle(self):
+        """Die Doppelgänger tauschen die Plätze: sieben Plätze im Kreis, der echte nimmt einen davon zufällig ein."""
+        off = random.random() * math.tau
+        pts = [(CX + math.cos(off + i * math.tau / 7) * 120, CY - 10 + math.sin(off + i * math.tau / 7) * 70) for i in range(7)]
+        k = random.randrange(7)
+        self.x, self.y = pts.pop(k)
+        self.decoys = pts
+        self.shuffle_t = 4.0
+        for x, y in pts + [(self.x, self.y)]:
+            self.run.particles.append(Particle(x, y, 0, -20, 0.5, (90, 90, 150), 6))
+
+    def a_riders(self):
+        """Reiterpfeile: unsichtbare Reiter galoppieren an zwei Rändern entlang und schießen quer durch die Arena."""
+        top = random.random() < 0.5
+        n = 9 + 2 * self.phase
+        for i in range(n):
+            x = RX + RW * (i + 0.5) / n
+            self.fire_t = self.t
+            ebullet(self.run, x, RY + 4 if top else RY + RH - 4, math.pi / 2 if top else -math.pi / 2, 120, self.ARROW, 2)
+            if self.phase > 1:
+                ebullet(self.run, RX + RW - x, RY + RH - 4 if top else RY + 4, -math.pi / 2 if top else math.pi / 2, 100, self.ARROW, 2)
+            if i % 3 == 0:
+                audio.play('eshot', 0.5)
+            yield 0.12
+        yield 0.7
+
+    def a_yabusame(self):
+        """Yabusame: drei gezielte Pfeilfächer im Vorbeireiten."""
+        for k in range(3):
+            self.fan(5, 0.14, 150, self.ARROW, r=2)
+            yield 0.45
+        yield 0.5
+
+    def a_charge(self):
+        """Sturmangriff des Reiterheers: das Haupt prescht auf die Spielerin zu und lässt Funken zurück."""
+        audio.play('roar', 0.5)
+        yield 0.5
+        self.dash = (self.p.x, self.p.y)
+        for k in range(8):
+            ebullet(self.run, self.x, self.y, random.random() * math.tau, 40, self.BLOOD, 3)
+            yield 0.08
+        self.dash = None
+        self.ring(12, 80, random.random(), self.ARROW, 2)
+        yield 0.7
+
+    def a_swoop(self):
+        """Das fliegende Haupt: ein weiter Bogen durch die Arena, hinter ihm bleibt Onibi stehen und treibt dann auf die Spielerin zu."""
+        bs = []
+        for k in range(14):
+            self.fire_t = self.t
+            bs.append(ebullet(self.run, self.x, self.y, random.random() * math.tau, 12, self.ONIBI, 4))
+            yield 0.1
+        yield 0.3
+        for b in bs:
+            if not b.dead:
+                a = math.atan2(self.p.y - b.y, self.p.x - b.x)
+                b.vx, b.vy = math.cos(a) * 95, math.sin(a) * 95
+        audio.play('eshot', 0.7)
+        yield 0.6
+
+    def a_gnash(self):
+        """Zähneknirschen: zwei Kugelreihen von links und rechts schlagen zusammen wie Kiefer – mit einer Lücke."""
+        gap = self.p.y + random.uniform(-20, 20)
+        for k in range(2):
+            for j in range(12):
+                y = RY + 8 + j * (RH - 16) / 11
+                if abs(y - gap) < 22:
+                    continue
+                ebullet(self.run, RX + 4, y, 0, 85, (230, 220, 190), 3)
+                ebullet(self.run, RX + RW - 4, y, math.pi, 85, (230, 220, 190), 3)
+            self.fire_t = self.t
+            audio.play('eshot', 0.7)
+            gap += random.choice((-40, 40))
+            yield 1.1
+        yield 0.4
+
+    def a_onibi(self):
+        """Onibi-Ring, der zweite dreht gegenläufig."""
+        for k in range(2):
+            self.ring(16 + 2 * self.phase, 75, k * 0.2, self.ONIBI, 3, curve=0.6 if k else -0.6)
+            yield 0.6
+        yield 0.4
+
+    def a_shadows(self):
+        """Alle sieben schießen: jeder Kagemusha einen kleinen Fächer – nur die Lücke zum echten ist sicher."""
+        for x, y in self.decoys + [(self.x, self.y)]:
+            self.fan(3, 0.25, 80, (150, 150, 200), x=x, y=y)
+        yield 1.2
+
+    def move(self, dt):
+        if self.dash:
+            if self.goto(self.dash[0], self.dash[1], 220, dt):
+                self.dash = None
+            self.clamp_pos(24)
+        elif self.decoys:
+            pass                                # Kagemusha stehen still, bis sie die Plätze tauschen
+        elif self.phase == 1:
+            self.x = CX + math.sin(self.t * 0.5) * 90
+            self.y = CY - 34 + math.sin(self.t * 1.1) * 14
+        else:                                   # das Haupt fliegt eine Acht durch die Arena
+            self.x = CX + math.sin(self.t * 0.7) * 150
+            self.y = CY - 10 + math.sin(self.t * 1.4) * 60
+
+    def render_under(self, s, t):
+        k = 0.5 + 0.5 * math.sin(t * 3)
+        gfx.draw_glow(s, int(self.x), int(self.y), 30, (90, 180, 230), int(40 + 25 * k))
+
+    def draw(self, s, t):
+        super().draw(s, t)
+        if self.decoys and not self.dead and self.spawn_t <= 0:   # Kagemusha: gleiches Bild, aber ohne Schatten und ohne Treffer-Aufblitzen
+            for i, (x, y) in enumerate(self.decoys):
+                sheets.blit_center(s, self.sheet[0], x, y - 4 + math.sin(t * 2.2 + i) * 1.2, sheets.hdir(self.p.x - x), self.af(self.sheet[0], t, 7, i))
+
+
 BOSS_CLASSES = {
     'omukade': Omukade, 'kappa_ou': KappaOu, 'jorogumo': Jorogumo,
     'gashadokuro': Gashadokuro, 'rokurokubi': Rokurokubi, 'nue': Nue,
@@ -2716,7 +2875,7 @@ BOSS_CLASSES = {
     'mikaboshi': Mikaboshi,
     'oonyudo': Oonyudo, 'nurarihyon': Nurarihyon, 'kamaitachi_trio': KamaitachiTrio,
     'akkorokamui': Akkorokamui, 'enma': Enma, 'izanami': Izanami, 'amaterasu': Amaterasu, 'kagutsuchi': Kagutsuchi, 'fujin': Fujin,
-    'sutoku': Sutoku,
+    'sutoku': Sutoku, 'masakado': Masakado,
 }
 
 
