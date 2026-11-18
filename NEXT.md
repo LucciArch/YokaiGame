@@ -453,15 +453,19 @@ Ohne Video-Werkzeug NICHT wieder selbst Szenen malen.
   (noch ohne Belohnung), `epilogue.STORY_SHIRAMINE`, Kapitel `wahres_ende` im Story-Baum (Szene `shiramine`, Platzhalter).
   bosstest prüft die Pforte („Shiramine-Pforte OK“).
 
-# Nächster Schritt: Belohnung + Feinschliff für Sutoku-in
-Warum: Der geheime Boss steht, aber sein Sieg gibt noch nichts und er klingt wie jeder Endboss. Plan:
-1. Item `sutoku_sutra` („Blut-Sutra“, Pool B, Symbol handgesetzt in einem neuen `art_src/fable/items/icons_v20.py`):
-   eigene sig – z. B. jeder 7. Wurf kehrt nach 0,6 s um und fliegt durch die Feinde zurück (Umkehr-Fluch als Spielerwaffe).
-   Als Belohnung im Erfolg `sutoku` (`data.ACHIEVEMENTS`, wie `('item', 'uzume_suzu')`) und `BOSS_REWARD['sutoku']`.
-2. Eigene Bossmusik (`art_src/music/tracks.py`, wie `amaterasu`; in `audio.track_for` auf den Seed von Shiramine legen –
-   Seed 58 + 100 + 8 = 166; validate.py prüft die Bossmusik je Biom, Ausnahme dort mit eintragen).
-3. Titelbild-Stimmung nach Sutoku-Sieg (wie 'iwato' in `app.py` ~Z. 346: z. B. Krähen vor rotem Morgenhimmel).
-4. Wanddeko Hi-Res für Shiramine (`walldeco_hi.py`, wie `iwato_hi`) – derzeit nur die einfache Standard-Deko.
+# Erledigt (Runden 176–178): Belohnung + Feinschliff für Sutoku-in
+- Runde 176: Item `sutoku_sutra` (Blut-Sutra, Pool B, sig `blutsutra`): jeder 7. Wurf bekommt Bahn-Tag `sutra` (in `fl['sg']`),
+  `bullet_tick` kehrt ihn nach 0,6 s um (×1,5, `hit` geleert, durchbohrend). Belohnung über `BOSS_REWARD['sutoku']` und
+  Erfolg `sutoku`. Symbol `art_src/fable/items/icons_v20.py`. sigtest + bosstest prüfen.
+- Runde 177: Bossmusik `tracks.sutoku` (`python3 tracks.py sutoku` in art_src/music; .wav danach löschen), `audio.track_for`
+  Seed 166; validate prüft die Zuordnung.
+- Runde 178: Titelstimmung `sutoku` in `App.draw_night` (Blutmond, `BRANCH['sutoku']`, Krähenzug); uiflow2 zeichnet sie.
+
+# Nächster Schritt: Wanddeko Hi-Res für Shiramine + Synergie für die Blut-Sutra
+Warum: Shiramine nutzt als einziges neues Biom noch die einfache Wanddeko, und das neue Item hat keine Synergie.
+1. `walldeco_hi.py` (wie `iwato_hi`): z. B. zerrissene Sutren-Banner, Krähen-Ema, Grabtafeln; validate prüft Indexgleichheit.
+2. Synergie Blut-Sutra + Tengu-Item (z. B. `tengu_uchiwa`/`yatagarasu`): „König der Tengu“ – umkehrende Sutren
+   lassen beim Wenden drei Federn fächern. Danach `synbalance` grob prüfen (Blut-Sutra allein noch ungemessen).
 
 # Danach (Story)
 - Zweiter geheimer Boss über eine besondere Bedingung (z. B. Kapitel-I-Boss ohne Treffer → Masakados Haupt erscheint) –
@@ -470,6 +474,7 @@ Warum: Der geheime Boss steht, aber sein Sieg gibt noch nichts und er klingt wie
 - Iwato erst nach Yomi öffnen (strengerer Pfad wie Isaac), oder Kapitel VII je nach gewähltem Weg
 
 # Weitere Ideen
+- Zwischensequenzen als Schattenspiel (`art_src/cutscenes`, parallele Sitzung, Probe für Luca) – auf Lucas Antwort warten
 - Tsukumogami Teil 3: Ungaikyō, Kyōrinrin, Zorigami als Items
 - `--raum`-Gegenmessung Oni-Horn ×1,03, Yashiori ×1,04, Kakuremino ×1,07 mit `--leben`/`--still`
 - Hi-ōgi (×1,53) und Masakari (×1,35) beobachten
