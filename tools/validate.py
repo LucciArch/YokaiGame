@@ -47,7 +47,7 @@ for a in data.ACHIEVEMENTS:
 from yokai.audio import Audio, MUSIC_DIR
 for k, b in data.BIOMES.items():   # Bossmusik wie Run.boss_music (Tiefe = Biom-Tiefe)
     tr = Audio.track_for(('x', 0, 0, 'boss', b['music'][4] + 100 + b.get('depth', 1)))
-    if not _os.path.exists(_os.path.join(MUSIC_DIR, tr + '.ogg')) or (tr == 'amaterasu') != (k == 'iwato'): print('boss music', k, tr); bad += 1
+    if not _os.path.exists(_os.path.join(MUSIC_DIR, tr + '.ogg')) or (tr == 'amaterasu') != (k == 'iwato') or (tr == 'sutoku') != (k == 'shiramine'): print('boss music', k, tr); bad += 1
 for k in data.BIOMES:   # Wanddekos: Hi-Res-Streifen passt zum einfachen (gleicher Index)
     lo, hi = gfx.env_img(k, 'wall_deco', 32), gfx.env_img(k, 'wall_deco_hi', 64)
     if lo and (not hi or len(hi) != len(lo) or hi[0].get_size() != (64, 32)): print('wall_deco_hi', k); bad += 1

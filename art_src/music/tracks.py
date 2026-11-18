@@ -319,6 +319,47 @@ def amaterasu():
     return s
 
 
+# ============================================================ Geheimer Endboss: Sutoku-in (Shiramine no Onryō)
+def sutoku():
+    s = Song(138, 49, 'in', 36, seed=1301)
+    # Grab im Nebel: Tempelglocke, Mokugyo-Takt der Sutren-Lesung, Shakuhachi-Klage des Verbannten
+    s.bonsho(0, vel=1.0)
+    s.windfx(0, 8, 0.2, 320)
+    s.drone(0, 0, 8, octv=-2, vel=0.34, cutoff=420)
+    for b in range(0, 8):
+        s.drums("k...k...k...k.k.", b, steps_per_beat=4, vel=0.55 + b * 0.04)
+    s.wind("0/6 1/2 | 0/8 | 4,/4 0/2 1/2 | 2-1/8 | 3/4 2/2 1/2 | 0/8 | 1/2 0/2 4,/4 | 4,/8", 0, 'shaku', octv=0, vel=0.8, pan=-0.1)
+    s.sho([0, 1, 3], 4, 4, octv=0, vel=0.3)
+    # Der Groll erwacht: Taiko, harte Shamisen, Tengu-Fue umkehrt das Thema (Umkehr-Fluch)
+    s.bonsho(8, vel=0.9)
+    g1 = "O.kOS.kOO.kSS.kk"
+    g2 = "OOkSOOkSOkOkSSSS"
+    riff = "0,/1 1,/1 0,/1 4,,/1 0,/1 1,/1 2,/1 1,/1"
+    for b in range(8, 20):
+        s.drums(g1 if b % 4 != 3 else g2, b, steps_per_beat=4, vel=0.92)
+        s.shamisen(riff, b, vel=0.72, pan=-0.3)
+    s.drone(0, 8, 12, octv=-1, vel=0.34, cutoff=650)
+    s.wind("3/4 2/2 3/2 | 4/6 5/2 | 6/3 5/1 4/4 | 3/8 | 1/4 2/2 3/2 | 2~/4 4/4 | 5/2 4/2 5/2 6/2 | 6/8", 8, 'fue', octv=1, vel=0.82, pan=0.25)
+    s.wind("0/16 | 1/8 0/8", 8, 'shaku', octv=0, vel=0.5, pan=-0.2)
+    s.wind("7!/4 6/4 | 5-4/8 | 3!/2 4/2 5/4 | 6/8", 16, 'fue', octv=1, vel=0.85, pan=0.25)
+    # Sanuki: alles bricht ab, nur Glocke, Krähen-Wind und Sutren-Takt
+    s.bonsho(20, vel=0.9)
+    s.windfx(20, 4, 0.28, 700)
+    for b in range(20, 24):
+        s.drums("k.k.k.k.k.k.kkkk" if b == 23 else "k...k...k...k...", b, steps_per_beat=4, vel=0.7)
+    s.wind("4,/8 | 0/8 | 1/4 0/4 | 4,/8", 20, 'shaku', octv=0, vel=0.75)
+    # Der König der Tengu: volles Ensemble, Leitmotiv in der Tiefe, Fue darüber
+    for b in range(24, 36):
+        s.drums(g2 if b % 2 else g1, b, steps_per_beat=4, vel=0.98)
+        s.shamisen(riff, b, vel=0.78, pan=-0.3)
+        s.koto("0/1 1/1 3/1 1/1 4/1 3/1 1/1 0/1", b, octv=1, vel=0.42, pan=0.4)
+    s.drone(0, 24, 12, octv=-1, vel=0.36, cutoff=800)
+    s.wind(THEME, 24, 'shaku', octv=0, vel=0.8, pan=-0.15)
+    s.wind("7/8 | 6-5/8 | 6!/2 5/2 4/4 | 3/8 | 5!/4 6/4 | 7/8 | 6/2 5/2 4/2 3/2 | 0'/8", 24, 'fue', octv=1, vel=0.8, pan=0.3)
+    s.sho([0, 1, 3, 4], 32, 4, octv=0, vel=0.42)
+    return s
+
+
 # ============================================================ Spielende: Shi no Kane
 def gameover():
     s = Song(60, 57, 'hira', 10, seed=1001)
@@ -368,7 +409,7 @@ def matsuri():
 
 
 TRACKS = {'title': title, 'forest': forest, 'temple': temple, 'mountain': mountain, 'sea': sea,
-          'underworld': underworld, 'heaven': heaven, 'boss': boss, 'boss_final': boss_final, 'amaterasu': amaterasu,
+          'underworld': underworld, 'heaven': heaven, 'boss': boss, 'boss_final': boss_final, 'amaterasu': amaterasu, 'sutoku': sutoku,
           'gameover': gameover, 'victory': victory, 'matsuri': matsuri}
 
 if __name__ == '__main__':
