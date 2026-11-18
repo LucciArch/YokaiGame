@@ -362,23 +362,33 @@ für Talismane greifen (z. B. `bullet_tick`) – sollen sie auch für Strahl/Hie
 - Hinweis: `synbalance --leben` ist bei Shuten-dōji Tiefe 5 sehr verrauscht (Bot stirbt nach 3 Treffern, ~4 % Schaden);
   für Treffer-Effekte besser `kappa_ou 2` ohne --leben gegenprüfen.
 
-# Nächster Schritt: Hi-ōgi-Synergie oder Siegel-Lücken schließen
-Warum: Ohne Synergie unter den Siegel-Items sind noch hi_ogi (hana), zanshin_tsuba (kenji), fuchs_trugbild (kuzunoha),
-tanuki_kesa (ponpoko), gojo_giboshi (benkei, nur alte Gojō-Synergie mit Flag), ido_kagami (okiku), ushiwaka_fue (kotaro),
-taizan_fukun (seimei). Je ein Paar mit einem anderen Item derselben Figur bauen, z. B.
-- `zanshin_tsuba` + `ichi_no_tachi` (Kenji): erster Hieb stapelt sofort 3 Zanshin-Stufen
-- `ido_kagami` + ein Okiku-Item: Spiegel fängt 2 Geschosse
+# Erledigt (Runden 156–158): Synergien für Siegel-Items Teil 9
+- Runde 156: `ichigeki` (zanshin_tsuba + ichi_no_tachi, sig `ichigeki`): erster Hieb → Zanshin 3 Stufen, Fenster 3 s
+  (`sigs._zs_win`). kappa_ou 2 ×0,64 gegen ×0,65 nur Items, --raum ×1,04 gegen ×1,07 (eher Würze als Kraft).
+- Runde 157: `mizukagami` (ido_kagami + okiku_ido, sig `mizukagami`): Spiegel fängt bis 3 Geschosse, Umkreis 70, Rückwurf bremst.
+  ×0,59 gegen ×0,69, --raum ×0,92 gegen ×1,07.
+- Runde 158: `kage_kitsune` (fuchs_trugbild + kuzu_blatt, sig `kage_kitsune`): Trugbild 4,5 s, wirft brennend mit 70 %.
+  Boss ≈ neutral (verrauscht), --raum ×0,62 gegen ×0,74.
+- Messung „nur Items“: Wrapper, der vor `runpy` von synbalance die `fx` der Synergie leert (dann gleiche Seeds/Baseline).
+  Achtung: shuten_doji Tiefe 5 läuft für Siegel-Paare oft bis 180 s → nutzlos, besser kappa_ou 2.
+
+# Nächster Schritt: restliche Siegel-Lücken
+Warum: Ohne eigene Synergie sind noch hi_ogi (hana), tanuki_kesa (ponpoko), gojo_giboshi (benkei, nur alte Gojō-Synergie
+mit Flag), ushiwaka_fue (kotaro), taizan_fukun (seimei). Je ein Paar mit einem anderen Item derselben Figur, z. B.
+- `tanuki_kesa` + `tanuki_tokkuri` (Ponpoko)
+- `ushiwaka_fue` + `sojobo_hane` (Kotarō: Ushiwakamaru lernte bei Sōjōbō)
+- `taizan_fukun` + `kikyo_mon` (Seimei)
 - `hi_ogi` vorsichtig (schon ×1,53 allein)
 Je Synergie: `SYNERGIES`, `TEXT`, sig, sigtest-Fall, Messung; Aufschlag ≤ ~×1,5.
 
 # Danach
 - Ebene 9–10 ohne Meister noch ~10 s Bosszeit – nach Lucas Spieltest ggf. weiter anheben
 - Hi-ōgi (×1,53) und Masakari (×1,35) beobachten – oberer Rand der Siegel-Items
+- `ichigeki` ist schwach – ggf. zusätzlich: Kill durch den ersten Hieb lädt ihn sofort neu
 
 # Weitere Ideen
+- `synbalance --nur-items`: den Wrapper als Option einbauen (Synergie-fx leeren, gleiche Seeds)
 - `synbalance --raum`: Option, `on_room_enter` nach dem Spawnen der ersten Welle aufzurufen (für Nebel-/Eintritts-Synergien)
-- `synbalance --leben` stabiler machen (mehr Seeds oder schwächere Tiefe als Standard)
 - Wanddekos: zweite Variante pro Biom (Index 2), Werkzeug walldeco_hi.py steht
 - Mondhase ist im Raum recht klein – ggf. größer zeichnen (Canvas 64×60 → 80×72) und Wendezone anpassen
-- Prüfungen: Bestenzeit je Prüfung im Menü anzeigen
 - Codex: aktive Items im Lauf als „entdeckt“ merken
