@@ -244,7 +244,7 @@ TEXT = {
     'zanshin': 'Kills kurz nacheinander stapeln Kampfgeist: +8 % Schaden je Stufe (bis 5)',
     'fuchszauber': 'Jeder 4. Treffer entzündet Fuchsfeuer; brennende Feinde verfallen 2 s dem Fuchszauber',
     'chagama': 'Die Rolle macht dich zum heißen Teekessel: kurz unverwundbar, wer dich berührt, verbrüht',
-    'schwertjagd': 'Jeder 30. Kill: +0,2 Schaden für den Rest des Laufs (bis +2)',
+    'schwertjagd': 'Jeder 20. Kill: +0,2 Schaden für den Rest des Laufs (bis +2)',
     'sarayashiki': 'Jeder 9. Wurf ist ein Teller, der in Scherben zerspringt – danach lässt Okikus Klage nahe Feinde fliehen',
     'tsubute': 'Alle 3 s fällt ein Stein auf einen Feind (150 % Schaden)',
     'taizan': 'Einmal pro Ebene wird ein tödlicher Treffer abgewendet – dafür −20 % Schaden bis zur nächsten Ebene',
@@ -262,7 +262,7 @@ TEXT = {
     'habakiri': 'Jeder 8. Treffer: Habakiri-Schnitt mit 300 % Schaden oder 4 % des Feindlebens (Bosse 1 %; der höhere Wert)',
     'tamagushi': 'Jeder 3. Raum ohne Treffer: die Kami nehmen das Opfer an – ½ Herz',
     'kesagiri': 'Jeder 4. Wurf: zwei durchbohrende Klingen schneiden schräg (je 120 %)',
-    'hoshi_tama': 'Jeder Kill: 10 % (+2 % je Glück) Chance auf einen Fuchsfeuer-Ring – 8 brennende Flammen (60 %)',
+    'hoshi_tama': 'Jeder Kill: 15 % (+2 % je Glück) Chance auf einen Fuchsfeuer-Ring – 8 brennende Flammen (60 %)',
     'bayashi': 'Stehst du still, trommelst du: alle 2 s eine Schallwelle – 150 % im Umkreis, stößt Yokai weg',
     'gojo': 'Wirst du getroffen, fegt die Naginata um dich: 300 % im Umkreis, schleudert Yokai weg',
     'ido_kagami': 'Alle 3 s fängt der Brunnenspiegel ein Feindgeschoss nahe dir und wirft es zurück (150 %)',
@@ -1120,12 +1120,12 @@ def hit_post(run, e, b, dmg):
 
 
 def _jagd(p, run, e, g):
-    """Schwertjagd: jeder 30. Kill (oder Senbon-Treffer) +0,2 Schaden, bis +2."""
+    """Schwertjagd: jeder 20. Kill (oder Senbon-Treffer) +0,2 Schaden, bis +2."""
     g['jagd'] = g.get('jagd', 0) + 1
-    if g['jagd'] % 30 == 0 and g.get('jagd_b', 0) < 2.0:
+    if g['jagd'] % 20 == 0 and g.get('jagd_b', 0) < 2.0:
         g['jagd_b'] = round(g.get('jagd_b', 0) + 0.2, 2)
         p.recalc()
-        _float(run, e, 'Klinge Nr. %d' % (g['jagd'] // 30), (210, 220, 240))
+        _float(run, e, 'Klinge Nr. %d' % (g['jagd'] // 20), (210, 220, 240))
 
 
 def on_kill(run, e):
@@ -1148,7 +1148,7 @@ def on_kill(run, e):
                 for _ in range(2):
                     run.spawn_pickup('coin', e.x, e.y)
     gy = 'gyoretsu' in S                                 # Kitsunebi no Gyōretsu: Laterne und Juwel zusammen
-    if 'hoshi_tama' in S and random.random() < (0.10 + 0.02 * p.s['luck']) * (2 if gy else 1):
+    if 'hoshi_tama' in S and random.random() < (0.15 + 0.02 * p.s['luck']) * (2 if gy else 1):
         _float(run, e, 'Hoshi no Tama', (255, 210, 150))
         if gy:
             _syn(run, 'gyoretsu', e.x, e.y, (255, 170, 90))

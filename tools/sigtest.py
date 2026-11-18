@@ -175,7 +175,7 @@ if abs((h0 - e.hp) - e.maxhp * 0.05) > 0.01:
 d0 = p.s['dmg']
 for _ in range(60):
     sigs.on_kill(run, e)
-if sigs.st(p).get('jagd_b') != 0.4 or not p.s['dmg'] > d0:
+if sigs.st(p).get('jagd_b') != 0.6 or not p.s['dmg'] > d0:
     print('FEHLER Schwertjagd', sigs.st(p).get('jagd_b'), d0, p.s['dmg']); bad += 1
 # Welle „Sieg“: Tachi-ōjō, Masakari, Blutdurst, Fuchs-Trugbild
 g.start_run('hana', 22); run = g.run; p = run.player
@@ -518,7 +518,7 @@ if 'ganryu' not in p.sgs or n1 < 2 or not sigs.st(p).get('ichi'):
 g.start_run('benkei', 46); run = g.run; p = run.player
 for iid in ('tausendstes_schwert', 'nanatsu_dogu'):
     p.gain_item(iid, silent=True)
-sigs.st(p)['shots'] = 4; sigs.st(p)['jagd'] = 29
+sigs.st(p)['shots'] = 4; sigs.st(p)['jagd'] = 19
 b = run.fire_player_bullet(p.x, p.y, 0, 1, 100, 2, 1, {})
 sigs.on_fire(p, run, [b])
 e = Enemy(run, 'gaki', p.x + 40, p.y); e.spawn_t = 0; e.hp = e.maxhp = 999; run.enemies = [e]
