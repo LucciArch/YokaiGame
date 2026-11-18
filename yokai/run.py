@@ -167,6 +167,8 @@ class Run:
             self.restore_state(restore)
         else:
             self.save.stat('runs')
+            if self.player.active:                   # das Start-Item der Figur gilt als entdeckt
+                self.save.add_to('seen', 'active:' + self.player.active)
             self.player.pose_t = 0.0
             audio.play('pose_' + char_id)
             self.apply_challenge()
@@ -1968,6 +1970,7 @@ class Run:
                 old = p.active
                 old_charge = p.charge
                 p.active = new
+                self.save.add_to('seen', pd.item)
                 self.hint('active', 'Aktives Item: mit E einsetzen. Es lädt sich mit jedem geräumten Raum auf.')
                 # abgelegte Items behalten ihre Ladung – sonst ließe sich durch Hin- und Hertauschen endlos aufladen
                 stored = getattr(pd, 'stored_charge', None)
@@ -2724,7 +2727,7 @@ class Run:
             by = near.y - 52 - (9 if extra else 0)
             gfx.hi_panel((int(bx - w / 2), int(by), int(w), hh), 215, col)
             gfx.TEXT.add(name, bx, by + 2, 8, col, 'c')
-            if not near.item.startswith('active:') and near.item not in self.save['seen']:
+            if near.item not in self.save['seen']:
                 gfx.TEXT.add('Neu!', bx + w / 2 - 4, by + 2, 6, (255, 230, 120), 'r')
             gfx.TEXT.add(desc, bx, by + 12, 6, (230, 225, 210), 'c')
             gfx.TEXT.add(fxs, bx, by + 21, 6, (170, 220, 255), 'c')

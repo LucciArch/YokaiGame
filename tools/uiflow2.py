@@ -42,7 +42,9 @@ try:
     from yokai.data import ACTIVES   # Codex: aktive Items hinten, gesperrte nennen ihren Erfolg
     n = len(ITEM_IDS); g.codex_sel = n + list(ACTIVES).index('totsuka'); gfx.TEXT.clear(); g.st_codex(1 / 60, [], [])
     assert any(t[0].startswith('Freischalten: Bestehe') or t[0] == 'Gesperrt (aktives Item)' for t in gfx.TEXT.items), 'Codex zeigt gesperrtes aktives Item nicht'
-    g.codex_sel = n; gfx.TEXT.clear(); g.st_codex(1 / 60, [], [])
+    g.codex_sel = n; g.save['seen'][:] = [s for s in g.save['seen'] if s != 'active:ofuda_sturm']; gfx.TEXT.clear(); g.st_codex(1 / 60, [], [])
+    assert any(t[0] == 'Noch nicht entdeckt.' for t in gfx.TEXT.items), 'Codex verrät unentdecktes aktives Item'
+    g.save['seen'].append('active:ofuda_sturm'); gfx.TEXT.clear(); g.st_codex(1 / 60, [], [])
     assert any(t[0] == ACTIVES['ofuda_sturm']['name'] for t in gfx.TEXT.items), 'Codex zeigt aktives Item nicht'
     g.st_codex(1 / 60, [], ['down']); assert g.codex_sel < n + len(ACTIVES)
     g.state = 'title'

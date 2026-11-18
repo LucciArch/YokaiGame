@@ -1127,11 +1127,11 @@ class Game:
         T = gfx.TEXT
         seen = set(self.save['seen'])
         unlocked = set(self.save['items'])
-        # Aktive Items hängen hinten an (eigener Rahmen); sie haben keine Entdeckung, nur Sperre
+        # Aktive Items hängen hinten an (eigener Rahmen); im Save als 'active:<id>' entdeckt
         ids = ITEM_IDS + ['active:' + a for a in ACTIVES]
         cols = 16
         self.veil(s, (14, 22, W - 28, 176))
-        self.page_head('Codex der Items', 'seal_codex', '%d / %d entdeckt' % (len(seen & set(ITEM_IDS)), len(ITEM_IDS)))
+        self.page_head('Codex der Items', 'seal_codex', '%d / %d entdeckt' % (len(seen & set(ids)), len(ids)))
         rows_vis = 7
         sel_row = self.codex_sel // cols
         top = max(0, min(sel_row - 3, (len(ids) - 1) // cols - rows_vis + 1))
@@ -1149,8 +1149,10 @@ class Game:
                 if act.get('locked') and iid[7:] not in unlocked:
                     pygame.draw.rect(s, (110, 90, 70), (x + 6, y + 9, 10, 8))
                     pygame.draw.circle(s, (110, 90, 70), (x + 11, y + 9), 4, 1)
-                else:
+                elif iid in seen:
                     gfx.draw_icon(s, act['icon'], act['col'], x + 11, y + 10)
+                else:
+                    T.add('?', x + 11, y + 3, 9, (120, 110, 130), 'c')
                 continue
             it = ITEMS[iid]
             if iid in seen:
@@ -1173,6 +1175,10 @@ class Game:
             T.add('Gesperrt (aktives Item)', 28, 206, 11, (200, 150, 150))
             how = next((a[2] for a in ACHIEVEMENTS if a[3] == ('active', iid[7:])), None)
             T.add('Freischalten: ' + (how or 'durch einen Erfolg'), 28, 224, 8, (210, 200, 190))
+        elif act and iid not in seen:
+            T.add('???', 28, 206, 11, (160, 150, 170))
+            T.add('Noch nicht entdeckt.', 28, 224, 8, (210, 200, 190))
+            T.add('Aktives Item – liegt in Schatzräumen, Läden und Schreinen auf einem Sockel', 28, 240, 7, (190, 180, 150))
         elif act:
             T.add(act['name'], 28, 206, 11, act['col'])
             T.add('„%s“' % act['desc'], 28, 222, 8, (230, 225, 210))
@@ -1548,7 +1554,7 @@ class Game:
         pt = st.get('playtime', 0)
         rows = [('Läufe', st['runs']), ('Siege', st['wins']), ('Wahre Siege (Takamagahara)', st.get('true_wins', 0)),
                 ('Siege im Oni-Modus', st.get('wins_hard', 0)), ('Tode', st['deaths']), ('Besiegte Yokai', st['kills']),
-                ('Gesammelte Mon', st['coins']), ('Gesammelte Items', st['items']), ('Entdeckte Items', '%d / %d' % (len(self.save['seen']), len(ITEM_IDS))),
+                ('Gesammelte Mon', st['coins']), ('Gesammelte Items', st['items']), ('Entdeckte Items', '%d / %d' % (len(self.save['seen']), len(ITEM_IDS) + len(ACTIVES))),
                 ('Synergien entdeckt', '%d / %d' % (len(self.save['synergies_seen']), len(SYNERGIES))),
                 ('Transformationen', '%d / %d' % (len(self.save['transforms_seen']), len(TRANSFORMS))),
                 ('Besiegte Bosse', '%d / %d' % (len(self.save['bosses']), len(BOSSES))), ('Oni-Pakte', st['oni_deals']),
