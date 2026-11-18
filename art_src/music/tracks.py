@@ -402,6 +402,49 @@ def masakado():
     return s
 
 
+# ============================================================ Geheimer Boss: Sugawara no Michizane (Dazaifu)
+def michizane():
+    s = Song(124, 50, 'yo', 36, seed=1501)
+    # Hof von Heian: Gagaku-Eröffnung – Shō-Cluster, Koto-Figuren, Fue wie eine Hichiriki, ferner Donner
+    s.sho([0, 1, 2, 4], 0, 4, octv=0, vel=0.42)
+    s.sho([0, 2, 3, 4], 4, 4, octv=0, vel=0.42)
+    s.drone(0, 0, 8, octv=-2, vel=0.3, cutoff=420)
+    for b in range(0, 8):
+        s.koto("0/2 2/2 4/2 2/2" if b % 2 == 0 else "3/2 2/2 1/2 0/2", b, octv=0, vel=0.42, pan=0.35)
+        s.drums("O..............." if b % 4 == 0 else "k.......k.......", b, steps_per_beat=4, vel=0.6)
+    s.wind("0/8 | 2/4 1/2 0/2 | 4,/4 0/4 | 1-0/8 | 2/2 3/2 4/4 | 3/4 2/4 | 1/2 2/2 1/2 0/2 | 0/8", 0, 'fue', octv=0, vel=0.7, pan=-0.15)
+    s.windfx(6, 2, 0.2, 600)
+    # Verbannung: die Tonart kippt ins Dunkle, Shakuhachi singt das Pflaumengedicht (Kochi fukaba)
+    s.bonsho(8, vel=0.9)
+    s.scale = SCALES['in']
+    for b in range(8, 16):
+        s.drums("k...k...k...k.k." if b % 2 else "O...k...k...k...", b, steps_per_beat=4, vel=0.7)
+        s.shamisen("0,/2 r/2 0,/1 2,/1 r/2", b, vel=0.55, pan=-0.3)
+    s.drone(0, 8, 8, octv=-1, vel=0.34, cutoff=600)
+    s.wind(THEME, 8, 'shaku', octv=0, vel=0.8, pan=-0.1)
+    # Seiryōden: der Donner schlägt ein – Taiko-Wirbel, harte Shamisen, Fue als Blitz
+    thunder = "O.O.oOo.O.O.SSSS"
+    thunder2 = "O..oO..oO.oOS.SS"
+    riff = "0,/1 1,/1 0,/1 4,,/1 0,/1 2,/1 1,/1 0,/1"
+    for b in range(16, 28):
+        s.drums(thunder if b % 4 == 3 else thunder2, b, steps_per_beat=4, vel=1.0)
+        s.shamisen(riff, b, vel=0.78, pan=-0.3)
+        if b % 4 == 0:
+            s.bonsho(b, vel=0.7)
+            s.windfx(b, 2, 0.3, 1200)
+    s.drone(0, 16, 12, octv=-1, vel=0.38, cutoff=900)
+    s.wind("4/4 3/2 4/2 | 7!/6 5/2 | 4/2 3/2 2/4 | 1/8 | 3/4 4/2 5/2 | 4~/4 2/4 | 3/2 4/2 5/2 7/2 | 7/8", 16, 'fue', octv=1, vel=0.85, pan=0.25)
+    s.wind("7!/4 5/4 | 4-2/8 | 3!/2 4/2 5/4 | 7/8", 24, 'fue', octv=1, vel=0.88, pan=0.25)
+    # Karai Tenjin: volles Ensemble, Shō hält den Hof-Akkord gegen den Sturm, Koto fällt wie Regen
+    for b in range(28, 36):
+        s.drums(thunder2 if b % 2 else thunder, b, steps_per_beat=4, vel=1.0)
+        s.shamisen(riff, b, vel=0.8, pan=-0.3)
+        s.koto("4'/1 3'/1 2'/1 1'/1 0'/1 4/1 3/1 2/1", b, octv=0, vel=0.45, pan=0.4)
+    s.sho([0, 1, 3, 4], 28, 8, octv=0, vel=0.4)
+    s.wind(THEME, 28, 'shaku', octv=0, vel=0.78, pan=-0.15)
+    return s
+
+
 # ============================================================ Spielende: Shi no Kane
 def gameover():
     s = Song(60, 57, 'hira', 10, seed=1001)
@@ -451,7 +494,7 @@ def matsuri():
 
 
 TRACKS = {'title': title, 'forest': forest, 'temple': temple, 'mountain': mountain, 'sea': sea,
-          'underworld': underworld, 'heaven': heaven, 'boss': boss, 'boss_final': boss_final, 'amaterasu': amaterasu, 'sutoku': sutoku, 'masakado': masakado,
+          'underworld': underworld, 'heaven': heaven, 'boss': boss, 'boss_final': boss_final, 'amaterasu': amaterasu, 'sutoku': sutoku, 'masakado': masakado, 'michizane': michizane,
           'gameover': gameover, 'victory': victory, 'matsuri': matsuri}
 
 if __name__ == '__main__':
