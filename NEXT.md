@@ -501,13 +501,20 @@ Ohne Video-Werkzeug NICHT wieder selbst Szenen malen.
   Sieg: `michizane_wins`, Erfolg `michizane`, `STORY_DAZAIFU`, Story-Knoten `dazaifu` (unter `kubizuka`). bosstest „Dazaifu-Pforte OK“.
 - Runde 190: Bossmusik `tracks.michizane` (Gagaku → Donner); Dazaifu-Seed 63 → Boss-Seed 173 in `audio.track_for`. validate prüft.
 
-# Nächster Schritt: Belohnung für Michizane + „Drei große Onryō“
-Warum: Kapitel X ist spielbar, aber der Sieg gibt noch nichts (`BOSS_REWARD['michizane'] = None`, Erfolg ohne Item) – die
-Onryō-Reihe braucht ihren Abschluss.
-1. Boss-Item `tenjin_ume` o. ä. (Pool B, Symbol handgesetzt in `art_src/fable/items/icons_v22.py`): z. B. Pflaumenblüten-Geschosse
-   rufen bei jedem 6. Treffer einen Blitz auf das Ziel (Seiryōden). sig in `sigs.py`, sigtest + bosstest wie bei `masakado_kage`.
-2. Synergie „Drei große Onryō“ (`masakado_kage` + `sutoku_sutra` + neues Item) mit eigener Fähigkeit.
-3. Feinschliff Dazaifu: Hi-Res-Wanddeko `walldeco_hi.dazaifu_hi`, Titelstimmung `michizane` (Pflaumenblüten im Gewitter).
+# Erledigt (Runden 191–193): Michizane-Belohnung, Drei große Onryō, Dazaifu-Wände
+- Runde 191: Boss-Item `tenjin_ume` (Tobiume-Zweig, Pool B, dmg +0,5, sig `tobiume` in `sigs.hit_post`): jeder 6. Geschosstreffer →
+  `run.lightning` 150 % + drei suchende Blüten (40 %, Flag `_ume`, zählen selbst nicht mit). Symbol `art_src/fable/items/icons_v22.py`.
+  `BOSS_REWARD['michizane']`, Erfolg `michizane` schaltet es frei. sigtest + bosstest prüfen.
+- Runde 192: Synergie `san_onryo` (Drei große Onryō: `masakado_kage` + `sutoku_sutra` + `tenjin_ume`): Tobiume jeden 4. Treffer, Blüten
+  als Blut-Sutra (`sg: ('sutra',)`), jeder Kagemusha-Zerfall ruft Blitze auf die drei nächsten Feinde. sigtest prüft. **synbalance ungemessen.**
+- Runde 193: `walldeco_hi.dazaifu_hi` (Pflaumenast mit Tanzaku + weißer Tobiume, Goshingyū unter Tōrō). Gebaut mit `hi.py` (ändert nur Dazaifu).
+
+# Nächster Schritt: Titelstimmung `michizane` + Michizane-Balance
+Warum: Kapitel X ist damit inhaltlich rund; es fehlt nur noch die Titelstimmung wie bei Masakado (Runde 185) – und der Boss
+schwankt im bosstest stark (27–57 Treffer).
+1. Titelstimmung `michizane` in `App.draw_night` (Pflaumenblüten im Gewitter, ferne Blitze, Donnerwolke als Silhouette); uiflow2 zeichnet sie.
+2. Michizane Phase 3: Blitz-Verfolgung (alle 1,6 s) mit mehreren bosstest-Seeds messen, ggf. auf 2,0 s oder Vorwarnung verlängern.
+3. synbalance für `tenjin_ume` / `san_onryo` mit einer Boss/Tiefe-Kombination, die unter dem 180-s-Deckel bleibt.
 
 # Danach (Story)
 - Je Figur ein eigenes Story-Kapitel (`ENDINGS` in `epilogue.py` als Knoten im Baum, Bedingung `char_wins`)
