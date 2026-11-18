@@ -300,15 +300,24 @@ für Talismane greifen (z. B. `bullet_tick`) – sollen sie auch für Strahl/Hie
   `_blast` 80 % am Ziel, alle 1,5 s (in `hit_post`; erst ×2,06 mit 120 %/1 s, gedämpft auf ×1,55).
 - Messung jeweils `synbalance.py shuten_doji 5 <id> --leben` (Iwato ×1,45 als Vergleich).
 
-# Nächster Schritt: weitere Synergien für Belohnungs-Items (Teil 2)
-Warum: Siegel-/Prüfungs-Items sind jetzt 60 Stück, aber erst 4 haben Synergien untereinander (plus Henro/Misogi).
-Mythologisch naheliegende, noch freie Paare (vorher `grep "items=\[" yokai/data.py` prüfen):
-- Orochi: habakiri + yashiori_sake (Susanoo berauscht und zerschneidet die Schlange)
-- Seimei: kikyo_mon + seimei_ido oder hoki_naiden + juni_shinsho
-- Okikus Brunnen: okiku_ido + tsurube / ido_kagami
+# Erledigt (Runden 135–137): Synergien für Belohnungs-Items Teil 2
+- Runde 135: `orochi_taiji` (habakiri + yashiori_sake, sig `yamata_giri`): Habakiri gegen Berauschte schon beim 6. Treffer,
+  Schnitt berauscht gewöhnliche Feinde (nur +25 %, ohne Bremse – mit Bremse ×3,2→ höher). ×3,2 gegen ×2,2 nur Items.
+  Achtung: Der Habakiri-Schnitt ruft `damage_enemy` → `hit_post` erneut auf und zählt selbst als Treffer (alt).
+- Runde 136: `seimei_jinja` (kikyo_mon + seimei_ido, sig `kikyo_ido`): Pentagramm-Schluss → `_blast` 60 % mit
+  `run._echo = True` (sonst laden Nachbar-Pentagramme), Geisterherz-Chance 40 %. ×1,72 (Items ×1,67).
+- Runde 137: `ido_no_yurei` (okiku_ido + tsurube, sig `ido_reikon`): Brunnenwasser trifft alle Feinde 25 % je Geisterherz,
+  ½ Geisterherz jeden 2. Raum. ×1,42 (Raum-Synergie, Bossmaß wenig aussagekräftig).
+
+# Nächster Schritt: Belohnungs-Synergien Teil 3
+Warum: Noch viele Siegel-/Prüfungs-Items ohne Partner; Paare mit klarer Sage sind am stärksten für den Wiederspielwert.
+Freie Paare (vorher `grep "items=\[" yokai/data.py` prüfen):
+- Seimei: hoki_naiden + juni_shinsho (Papiervogel/zwölf Generäle)
 - Benkei: tausendstes_schwert + nanatsu_dogu, tachi_ojo + miidera_kane
 - Kuzunoha: kuzu_blatt + shinoda_blatt / fuchs_trugbild
-Je Synergie: `SYNERGIES`-Eintrag, `TEXT`, sig in `yokai/sigs.py`, sigtest-Fall, `synbalance --leben` (Ziel ≤ ~×1,6).
+- Susanoo: murakumo + kushinada_kushi
+Je Synergie: `SYNERGIES`-Eintrag, `TEXT`, sig in `yokai/sigs.py`, sigtest-Fall, `synbalance shuten_doji 5 <id> --leben`
+und zum Vergleich mit `fx=dict()` (Items allein); Synergie-Aufschlag ≤ ~×1,5.
 
 # Danach
 - Ebene 9–10 ohne Meister noch ~10 s Bosszeit – nach Lucas Spieltest ggf. weiter anheben
