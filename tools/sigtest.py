@@ -670,5 +670,34 @@ sigs.on_dash(p, run); tr = sigs.st(p)['trug']; run.pbullets = []
 sigs._siegel_fire(p, run, [], sigs.st(p), 1, 0, 10, 100, 1, 2)
 if 'kage_kitsune' not in p.sgs or tr[2] != 4.5 or len(run.pbullets) != 1 or not run.pbullets[0].fl.get('burn'):
     print('FEHLER Kage-kitsune', tr, [b.fl for b in run.pbullets]); bad += 1
+# Hōshi-danuki (Tanuki-Kesa + Tokkuri): der Jizō trinkt einen Schluck, ein Schluck macht den Jizō wieder bereit
+g.start_run('ponpoko', 62); run = g.run; p = run.player
+for iid in ('tanuki_kesa', 'tanuki_tokkuri'):
+    p.gain_item(iid, silent=True)
+run.room.cleared = False; gg = sigs.st(p); gg['jizo'] = True; gg['hd_jz'] = 0; gg['tk'] = 0
+j1 = sigs.jizo(p, run); sake = gg.get('sake_t', 0) > run.time
+sigs._schluck(p, run, gg, 8); j2 = gg['jizo']; sigs.jizo(p, run); sigs._schluck(p, run, gg, 8)
+if 'hoshi_danuki' not in p.sgs or not (j1 and sake and j2) or gg['jizo']:
+    print('FEHLER Hōshi-danuki', j1, sake, j2, gg['jizo']); bad += 1
+# Shanaō (Ushiwakas Flöte + Sōjōbōs Feder): der Wirbel verwirrt, jeder 4. Wurf ist ein Flötenton
+g.start_run('kotaro', 63); run = g.run; p = run.player
+for iid in ('ushiwaka_fue', 'sojobo_hane'):
+    p.gain_item(iid, silent=True)
+e = Enemy(run, 'gaki', p.x + 30, p.y); e.spawn_t = 0; e.hp = e.maxhp = 999; run.enemies = [e]
+sigs.on_dash(p, run)
+if 'shanao' not in p.sgs or getattr(e, 'sg_conf', 0) < 2.0:
+    print('FEHLER Shanaō', getattr(e, 'sg_conf', 0)); bad += 1
+# Taizan-Fukun-Sai (Taizan-Fukun + Kikyō-Mon): 4 Treffer schließen das Pentagramm, 12 Pentagramme tilgen die Schuld
+g.start_run('seimei', 64); run = g.run; p = run.player
+for iid in ('taizan_fukun', 'kikyo_mon'):
+    p.gain_item(iid, silent=True)
+e = Enemy(run, 'gaki', p.x + 60, p.y); e.spawn_t = 0; e.hp = e.maxhp = 99999; run.enemies = [e]
+gg = sigs.st(p); gg['taizan_used'] = gg['taizan_pen'] = 1
+for k in range(60):   # der Pentagramm-Schaden zählt selbst als Treffer → Schuld nach 25–48 Würfen getilgt
+    sigs.hit_post(run, e, run.fire_player_bullet(p.x, p.y, 0, 1, 100, 2, 1, {}), 1)
+    if k == 20:
+        pen47 = gg['taizan_pen']
+if 'taizan_sai' not in p.sgs or not pen47 or gg['taizan_pen'] or gg['taizan_used']:
+    print('FEHLER Taizan-Fukun-Sai', pen47, gg['taizan_pen'], gg['taizan_used']); bad += 1
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)

@@ -218,6 +218,9 @@ TEXT = {
     'kintaro': 'Jeder Axttreffer zählt vierfach für den Keulenschlag, und die Keule trifft weiter (55 px statt 40)',
     'kurama': 'Sōjōbōs Wirbel wird größer (65 px), und jedes verwehte Feindgeschoss wird eine weitere Windklinge (bis +3)',
     'rashomon': 'Der Oni-Arm packt alle 2 s statt 2,5 s – unter 2 Herzen sogar jede Sekunde mit 250 %',
+    'hoshi_danuki': 'Prallt ein Treffer am Jizō ab, nimmst du sofort einen Schluck Sake (4 s +30 % Feuerrate) – und jeder Schluck macht den Jizō wieder bereit (einmal pro Raum)',
+    'shanao': 'Sōjōbōs Wirbel trägt den Flötenton: Yokai im Wirbel sind 2 s verwirrt, und jeder 4. statt 6. Wurf ist ein Flötenton',
+    'taizan_sai': 'Das Pentagramm schließt sich schon nach 4 Treffern; nach dem Ritual tilgen 12 Pentagramme die Schuld – kein Malus mehr, und das Ritual ist wieder bereit',
     'kage_kitsune': 'Das Fuchs-Trugbild bleibt 4,5 s statt 3 s und wirft brennendes Fuchsfeuer (70 % statt 50 %)',
     'mizukagami': 'Der Brunnenspiegel fängt bis zu 3 Feindgeschosse auf einmal (Umkreis 70 statt 50) und wirft sie als kaltes Brunnenwasser zurück (bremst)',
     'ichigeki': 'Der erste Hieb weckt sofort 3 Stufen Kampfgeist (+24 %), und Zanshin hält 3 s statt 2 s wach',
@@ -778,7 +781,7 @@ def _siegel_fire(p, run, bullets, g, n, base, dmg, spd, life, size):
     if 'tsukikage' in S and n % 6 == 0:                  # Mondschatten-Klinge
         nb = run.fire_player_bullet(p.x, p.y - 3, base, dmg * 1.5, spd * 1.1, 3, life * 1.3, {'pierce': 1, 'spectral': 1})
         nb.col = (150, 160, 220)
-    if 'fue' in S and n % (4 if 'gojo_bashi' in S else 6) == 0 and bullets:           # Ushiwakas Flötenton
+    if 'fue' in S and n % (4 if 'gojo_bashi' in S or 'shanao' in S else 6) == 0 and bullets:           # Ushiwakas Flötenton
         bullets[0].fl = dict(bullets[0].fl, fue=1)
         bullets[0].col = (150, 210, 130)
 
@@ -950,10 +953,18 @@ def hit_post(run, e, b, dmg):
             nb.hit.add(e)
     if 'kikyo' in S and not echo:
         e.sg_kk = getattr(e, 'sg_kk', 0) + 1
-        if e.sg_kk >= 5:
+        if e.sg_kk >= (4 if 'taizan_sai' in S else 5):
             e.sg_kk = 0
+            if 'taizan_sai' in S and g.get('taizan_used'):   # Taizan-Fukun-Sai: Sterne tilgen die Schuld
+                g['tz_kk'] = g.get('tz_kk', 0) + 1
+                if g['tz_kk'] >= 12:
+                    g['tz_kk'] = g['taizan_used'] = g['taizan_pen'] = 0
+                    _syn(run, 'taizan_sai', p.x, p.y, (200, 60, 60))
+                    _float(run, e, 'Schuld getilgt', (220, 90, 80))
             _sparks(run, e.x, e.y, ((140, 120, 220), (230, 220, 255)), 8, 90)
+            run._echo = True                             # der Stern selbst zählt nicht fürs nächste Pentagramm
             run.damage_enemy(e, p.damage() * 2.5, None)
+            run._echo = False
             if 'kikyo_ido' in S:                         # Seimei-Jinja: der Stern öffnet die Quelle
                 _syn(run, 'kikyo_ido', e.x, e.y, (140, 120, 220))
                 run._echo = True                         # Welle lädt keine Pentagramme der Nachbarn
@@ -1376,6 +1387,10 @@ def jizo(p, run):
         return False
     g['jizo'] = False
     p.iframes = 2.0
+    if 'hoshi_danuki' in p.sgs:                          # Hōshi-danuki: der Jizō trinkt einen Schluck
+        _syn(run, 'hoshi_danuki', p.x, p.y, (210, 180, 120))
+        g['sake_t'] = run.time + 4
+        g['hd_jz'] = g.get('hd_jz', 0) or 1
     _ring(run, p.x, p.y, (150, 150, 140), 30)
     run.floats.append([p.x, p.y - 20, 'Jizō!', (190, 190, 175), 0.8])
     return True
@@ -1459,6 +1474,11 @@ def on_dash(p, run):
         _blast(run, p.x, p.y, rad, p.damage() * 1.2, (180, 190, 210), 260)
         n0 = len(run.ebullets)
         run.ebullets[:] = [b for b in run.ebullets if math.hypot(b.x - p.x, b.y - p.y) > rad]
+        if 'shanao' in S:                                # Shanaō: der Wirbel trägt den Flötenton
+            _syn(run, 'shanao', p.x, p.y, (150, 210, 130))
+            for e in run.enemies:
+                if e.active() and not e.is_boss and math.hypot(e.x - p.x, e.y - p.y) < rad + e.r:
+                    e.sg_conf = max(getattr(e, 'sg_conf', 0), 2.0)
         if kurama and n0 > len(run.ebullets):
             _syn(run, 'kurama', p.x, p.y, (200, 230, 220))
             g['hd'] = g.get('hd', 0) + min(3, n0 - len(run.ebullets))
@@ -1581,6 +1601,9 @@ def _schluck(p, run, g, k):
         if g['tk'] % 8 == 0:
             g['sake_t'] = run.time + 4
             run.floats.append([p.x, p.y - 20, 'Kanpai!', (230, 210, 160), 0.8])
+            if 'hoshi_danuki' in p.sgs and g.get('hd_jz') == 1 and not run.room.cleared:
+                g['jizo'] = True                         # ein Schluck, und der Mönch erstarrt wieder zu Stein
+                g['hd_jz'] = 2
 
 
 def on_coin(p, run, v):
@@ -1645,6 +1668,7 @@ def on_room_enter(run):
     g['ojo_room'] = 0
     g['trug'] = None
     g['ichi'] = g['jizo'] = not run.room.cleared
+    g['hd_jz'] = 0
     fl = [run.depth, run.stage]
     if 'senryo' in S and run.room.kind == 'shop' and g.get('senryo') != fl:
         g['senryo'] = fl                                 # Zinsen der Senryō-Truhe
@@ -1708,7 +1732,7 @@ def on_floor(run):
         return
     g = st(p)
     g['kenko_used'] = 0
-    g['taizan_used'] = g['taizan_pen'] = 0
+    g['taizan_used'] = g['taizan_pen'] = g['tz_kk'] = 0
     g['kushi'] = 0
     g['parade'] = 0
     g['anmut'] = 0

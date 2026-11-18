@@ -483,6 +483,9 @@ SYNERGIES = [
     dict(id='ichigeki', name='Ichigeki Hissatsu', desc='Ein Hieb, ein Tod – und danach bleibt der Geist wach, wie es der alte Meister lehrte', items=['zanshin_tsuba', 'ichi_no_tachi'], fx=dict(sig_ichigeki=1)),
     dict(id='mizukagami', name='Mizukagami', desc='Im stillen Brunnenwasser spiegelt sich Okikus Gesicht – und alles, was nach ihr geworfen wird', items=['ido_kagami', 'okiku_ido'], fx=dict(sig_mizukagami=1)),
     dict(id='kage_kitsune', name='Kage-kitsune', desc='Das Blatt fällt, der Schatten bleibt – im Wald von Shinoda wirft die Füchsin noch Feuer', items=['fuchs_trugbild', 'kuzu_blatt'], fx=dict(sig_kage_kitsune=1)),
+    dict(id='hoshi_danuki', name='Hōshi-danuki', desc='Der Tanuki in der Mönchsrobe bettelt um Sake – und wird wieder zu Stein, sobald er getrunken hat', items=['tanuki_kesa', 'tanuki_tokkuri'], fx=dict(sig_hoshi_danuki=1)),
+    dict(id='shanao', name='Shanaō', desc='Auf dem Kurama hieß Ushiwaka noch Shanaō – der Tengu-König lehrte ihn, die Flöte in den Wind zu spielen', items=['ushiwaka_fue', 'sojobo_hane'], fx=dict(sig_shanao=1)),
+    dict(id='taizan_sai', name='Taizan-Fukun-Sai', desc='Seimeis Stern bezahlt die Schuld beim Herrn des Berges – Pentagramm um Pentagramm', items=['taizan_fukun', 'kikyo_mon'], fx=dict(sig_taizan_sai=1)),
     dict(id='henro', name='Henro', desc='Dōgyō ninin – Pilgerstab und Kraniche wandern mit dir', items=['kongozue', 'senbazuru'], fx=dict(luck=1, sig_henro=1)),
 ]
 
