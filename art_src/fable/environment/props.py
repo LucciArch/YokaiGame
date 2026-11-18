@@ -472,6 +472,36 @@ def rocks(name):
             cv.form(m, (k[1], k[2], k[3]), 2, 1)
         out.append(fin(cv, P))
 
+    elif name == 'shiramine':
+        cv, rng, m = plain_boulder(0)
+        out.append(fin(cv, P))
+        cv, rng = new(1)                                     # Gorintō am Grab des Kaisers, Blut-Sutra-Streifen daran
+        box(cv, k, 10, 21, 22, 28, top=2)
+        m = cv.E(16, 17, 5, 4.2)
+        cv.fill(dil(m), k[0])
+        cv.form(m, (k[0], k[1], k[2]), 2, 1)
+        roof = cv.PG([(8, 13), (13, 9), (19, 9), (24, 13)])
+        cv.fill(dil(roof), k[0])
+        cv.form(roof, (k[1], k[2], k[3]), 2, 1)
+        top = cv.E(16, 6.5, 2.6, 2.8)
+        cv.fill(dil(top), k[0])
+        cv.form(top, (k[1], k[2], k[3]), 1, 1)
+        cv.rect(13, 22, 15, 27, PAPER[2])                    # angeklebter Sutra-Streifen, in Blut geschrieben
+        cv.vl(15, 22, 27, PAPER[1])
+        for y in (23, 25):
+            cv.hl(13, 14, y, RED[2])
+        out.append(fin(cv, P))
+        cv, rng = new(2)                                     # verkohlter Kiefernstumpf mit Krähenfeder
+        w = ('#120c12', '#261a1e', '#3a2a28', '#54402e')
+        m, t = cyl(cv, w, 16, 28, 7, 13, top=('#261a1e', '#4a2a22', '#8a2a20'))
+        for x in (11, 14, 19, 21):
+            cv.vl(x, 19, 27, w[0])
+        cv.rect(5, 26, 9, 28, w[1])
+        cv.rect(23, 27, 27, 28, w[0])
+        cv.line([(20, 12), (26, 6)], '#363a66')
+        cv.line([(21, 12), (27, 7)], '#1c1c3a')
+        out.append(fin(cv, P))
+
     elif name == 'yukiyama':
         sn = P['snow']
         cv, rng = new(0)                                     # ice crystal cluster

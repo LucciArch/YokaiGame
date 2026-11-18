@@ -2,7 +2,7 @@
 from core import mix
 
 ORDER = ['chikurin', 'inari', 'obakedera', 'hakaba', 'kurama', 'yukiyama', 'ryugu', 'uminobe', 'yomi', 'jigoku',
-         'takamagahara', 'kawabe', 'yashiki', 'oeyama', 'shinkai', 'enma_cho', 'tsukiyomi', 'yomi_oku', 'iwato']
+         'takamagahara', 'kawabe', 'yashiki', 'oeyama', 'shinkai', 'enma_cho', 'tsukiyomi', 'yomi_oku', 'iwato', 'shiramine']
 
 
 def B(floor_pat, wall_pat, pit, dark, f, cap, w, k, **extra):
@@ -97,4 +97,8 @@ BIOMES = {
     'iwato': B('stone', 'rock', 'void', 70,              # Ama-no-Iwato: Felsenhöhle der verborgenen Sonne
                ('#120c10', '#1e1418', '#2a1c1e', '#382624'), ('#0e080a', '#1c1012', '#a04a18'),
                ('#1a1012', '#2e1c1c', '#463028', '#62443a'), ('#1a1012', '#34221e', '#523a2e', '#72543e')),
+    'shiramine': B('gravel', 'rock', 'void', 75,         # Shiramine: Bergwald um das Grab des verbannten Kaisers
+                   ('#0e0c14', '#1a1620', '#241c26', '#30242c'), ('#0a080e', '#16101a', '#8a1c2a'),
+                   ('#120e18', '#221a26', '#382630', '#54363a'), ('#120e16', '#2a2028', '#443238', '#64484a'),
+                   leaf=('#2a1428', '#4a1c2e')),
 }

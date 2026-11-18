@@ -4,7 +4,7 @@ import random
 import pygame
 from collections import deque, defaultdict
 from .settings import *
-from . import gfx, props, weapons, audio, sigs, entities
+from . import gfx, props, weapons, audio, sigs, entities, story
 from .data import (TRINKETS, BIOMES, DEPTH_BIOMES, BOSS_POOL, ITEMS, ITEM_IDS, ACTIVES, ENEMIES, CHAMPIONS, BOSSES,
                    BOSS_REWARD, CHARS, ACHIEVEMENTS, TRANSFORMS, SYNERGIES, CHAR_ORDER, CHAR_UNLOCKS, CHALLENGES)
 from .rooms import generate_floor, build_room_tiles, Room
@@ -279,7 +279,7 @@ class Run:
     def path_nodes(self):
         """Alle Ebenen des Laufs als (Kapitel, Abschnitt)."""
         out = []
-        last = 7 if self.depth >= 7 else 6 if (self.save['heaven_unlocked'] or self.depth >= 6) and not (self.challenge and self.challenge != 'bossrush') else 5
+        last = self.depth if self.depth >= 7 else 6 if (self.save['heaven_unlocked'] or self.depth >= 6) and not (self.challenge and self.challenge != 'bossrush') else 5
         for d in range(1, last + 1):
             two = d in self.TWO_STAGE and (not self.challenge or self.challenge == 'langer_weg')
             out += [(d, 0), (d, 1)] if two else [(d, 0)]
@@ -320,8 +320,8 @@ class Run:
         s.blit(surf, (int(ox), y - 6))
 
     def floor_label(self):
-        roman = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII']
-        return 'Ebene %d  ·  Kapitel %s' % (self.floor_no, roman[min(7, self.depth)])
+        roman = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII']
+        return 'Ebene %d  ·  Kapitel %s' % (self.floor_no, roman[min(8, self.depth)])
 
     @property
     def enemy_dmg(self):
@@ -405,7 +405,7 @@ class Run:
             self.depth = depth or self.depth + 1
             self.stage = 0
         self.descend = 1.3
-        if self.depth > 6 and depth != 7:     # nur die Yomi- und die Iwato-Pforte führen nach Kapitel VII
+        if self.depth > 6 and depth not in (7, 8):     # nur Yomi-/Iwato-Pforte (VII) und Shiramine (VIII) führen weiter
             self.depth = 1
             self.loop += 1
             self.loop_mult = 1 + 0.6 * self.loop
@@ -1334,6 +1334,9 @@ class Run:
             self.objs.append(Obj('victory', cx - 105, cy + 40))
             self.objs.append(Obj('iwato', cx, cy + 40))
             self.objs.append(Obj('yomi', cx + 105, cy + 40))
+        elif self.depth == 7 and not self.challenge and story.unlocked(self.save, 'schatten'):
+            self.objs.append(Obj('victory', cx - 70, cy + 40))     # der Schatten hinter dem Morgen wartet in Shiramine
+            self.objs.append(Obj('shiramine', cx + 70, cy + 40))
         elif self.depth >= 6:
             self.objs.append(Obj('victory', cx, cy + 40))
         else:
@@ -2189,6 +2192,9 @@ class Run:
             self.oku = 'yomi_oku'
             self.go_deeper(7)
             self.banner('Yomi no Kuni', 'Tief im Totenreich wartet Izanami – wer hier isst, kehrt nie zurück', (190, 120, 220), big=True)
+        elif k == 'shiramine':
+            self.go_deeper(8)
+            self.banner('Shiramine', 'Am Grab des verbannten Kaisers sammeln sich die Krähen', (220, 70, 80), big=True)
         elif k == 'victory':
             if self.result is None:
                 self.result = 'win'
@@ -2380,11 +2386,14 @@ class Run:
             if self.depth == 7 and self.biome_id == 'iwato':
                 s.stat('iwato_wins')
                 self.achieve('iwato')
+            elif self.depth == 8:
+                s.stat('sutoku_wins')
+                self.achieve('sutoku')
             elif self.depth == 7:
                 s.stat('yomi_wins')
                 self.achieve('yomi')
             self.mark('sieg')
-            if self.depth == 7:
+            if self.depth >= 7:
                 self.mark('oku')
             if self.hard:
                 self.mark('oni')

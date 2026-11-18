@@ -48,14 +48,20 @@ CHAPTERS = [
         'Sonne und Unterwelt sind versöhnt. Doch die Schatten, die beide warfen, sind zusammengewachsen.',
         'Man erzählt von einem Wesen ohne Namen, geboren in der Nacht der hundert Dämonen – aus all der Angst der Menschen.',
         'Wenn es sich zeigt, wird kein Morgen es aufhalten. Die Geschichte ist noch nicht zu Ende …']),
+    ('wahres_ende', 'Der Kaiser von Shiramine', lambda sv: _st(sv, 'sutoku_wins') >= 1,
+     'Folge dem Schatten nach Shiramine und stelle dich, was dort wartet.', 'shiramine', [
+        'Der Schatten hatte einen Namen: Sutoku-in, der Kaiser, den man in die Verbannung schickte und dessen Sutren man zurückwies.',
+        'Achthundert Jahre wuchs sein Groll auf Shiramine, genährt von jeder Angst in der Nacht der hundert Dämonen.',
+        'Hana legt die Schreinglocke auf sein Grab und betet für ihn. Diesmal nimmt jemand seine Sutren an.',
+        'Über den Bergen von Sanuki geht die Sonne auf – ein Morgen ohne Schatten. Der Weg ist zu Ende.']),
 ]
 BY_ID = {c[0]: c for c in CHAPTERS}
 # Story-Baum: Lage der Knoten und Verbindungen
-POS = {'prolog': (240, 46), 'morgen': (240, 92), 'stern': (240, 138), 'yomi': (140, 184), 'iwato': (340, 184),
-       'schatten': (240, 230), 'gefaehrten': (400, 92), 'meister': (400, 138)}
+POS = {'prolog': (240, 40), 'morgen': (240, 76), 'stern': (240, 112), 'yomi': (140, 148), 'iwato': (340, 148),
+       'schatten': (240, 184), 'wahres_ende': (240, 220), 'gefaehrten': (400, 76), 'meister': (400, 112)}
 EDGES = [('prolog', 'morgen'), ('morgen', 'stern'), ('stern', 'yomi'), ('stern', 'iwato'), ('yomi', 'schatten'),
-         ('iwato', 'schatten'), ('prolog', 'gefaehrten'), ('gefaehrten', 'meister')]
-ORDER = ['prolog', 'morgen', 'stern', 'yomi', 'iwato', 'schatten', 'gefaehrten', 'meister']
+         ('iwato', 'schatten'), ('schatten', 'wahres_ende'), ('prolog', 'gefaehrten'), ('gefaehrten', 'meister')]
+ORDER = ['prolog', 'morgen', 'stern', 'yomi', 'iwato', 'schatten', 'wahres_ende', 'gefaehrten', 'meister']
 
 
 def unlocked(sv, cid):

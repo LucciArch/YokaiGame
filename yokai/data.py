@@ -748,6 +748,7 @@ ACHIEVEMENTS = [
     ('secret10', 'Schatzjäger', 'Finde 10 Geheimräume', None),
     ('yomi', 'Rückkehr aus Yomi', 'Besiege Izanami in ihrem Totenpalast', ('item', 'yomi_momo')),
     ('iwato', 'Die Sonne kehrt zurück', 'Besiege Amaterasu in Ama-no-Iwato', ('item', 'uzume_suzu')),
+    ('sutoku', 'Der Fluch von Shiramine', 'Besiege Sutoku-in am Grab des verbannten Kaisers', None),
     ('all_bosses', 'Bezwinger der Nachtparade', 'Besiege alle 24 Bosse', None),
     ('teahouse', 'Teezeremonie', 'Trinke im Teehaus', None),
     ('slots', 'Glücksspieler', 'Spiele am Tanuki-Automaten', None),
@@ -810,6 +811,15 @@ BIOMES['iwato'] = dict(name='Felsenhöhle der Sonne', jp='Ama-no-Iwato', depth=7
                        enemies=['komainu', 'tennin', 'karasu_tengu', 'kitsunebi_e', 'yamabiko', 'katawaguruma', 'kamaitachi', 'nurikabe'],
                        music=('iwato', 220, 100, 'mystic', 57), dark=95, grade=(110, 60, 10), pit='void', decor='cracks',
                        boss='amaterasu')
+# Kapitel VIII (geheim, nach „Der Schatten hinter dem Morgen“): Shiramine, das Grab des verbannten Kaisers Sutoku-in.
+# Nur die Shiramine-Pforte nach einem Sieg in Kapitel VII führt hierher.
+BIOMES['shiramine'] = dict(name='Grab des verbannten Kaisers', jp='Shiramine', depth=8, floor=(30, 22, 32), floor_pat='gravel',
+                           wall=(36, 26, 38), wall_pat='rock', rock=(90, 70, 76), moss=False, ambient='embers',
+                           enemies=['karasu_tengu', 'kamaitachi', 'onibi', 'shinigami', 'oni', 'yamabiko', 'kasha', 'katawaguruma'],
+                           music=('iwato', 196, 96, 'mystic', 58), weather='ash', dark=85, grade=(90, 20, 30), pit='void',
+                           decor='leaves', boss='sutoku')
+DEPTH_BIOMES[8] = ['shiramine']
+BOSS_POOL[8] = ['sutoku']
 BOSS_POOL[6].remove('izanami')    # Izanami wartet jetzt in ihrem eigenen Reich
 BOSS_POOL[7] = ['izanami']
 

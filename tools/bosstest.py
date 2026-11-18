@@ -87,6 +87,25 @@ from yokai.epilogue import Epilogue, STORY_IWATO
 assert Epilogue(g, run).blocks[0] == STORY_IWATO[0]
 print('Iwato-Pforte OK')
 
+# Shiramine-Pforte: nach „Der Schatten hinter dem Morgen“ führt ein Sieg in Kapitel VII weiter zu Sutoku-in (Kapitel VIII)
+from yokai import story
+g.start_run('hana', 12); run = g.run; run.depth = 7
+run.objs = []; run.boss_room_rewards()
+assert 'shiramine' not in [o.kind for o in run.objs]            # Kapitel noch gesperrt: keine Pforte
+run.save.data.setdefault('story_seen', []).append('schatten')
+run.objs = []; run.boss_room_rewards()
+gate = [o for o in run.objs if o.kind == 'shiramine']
+assert gate and 'victory' in [o.kind for o in run.objs], [o.kind for o in run.objs]
+run.draw(g.screen, 1.0); gfx.TEXT.clear(); gfx.HI.clear()
+run.interact(gate[0])
+assert (run.depth, run.biome_id, run.boss_id, run.loop) == (8, 'shiramine', 'sutoku', 0), (run.depth, run.biome_id, run.boss_id, run.loop)
+assert 'VIII' in run.floor_label()
+run.end_run(True)
+assert 'sutoku' in run.save['achievements'] and story.unlocked(run.save, 'wahres_ende')
+from yokai.epilogue import Epilogue, STORY_SHIRAMINE
+assert Epilogue(g, run).blocks[0] == STORY_SHIRAMINE[0]
+print('Shiramine-Pforte OK')
+
 # Rückkehr aus Yomi: der erste Sieg über Izanami schaltet den Pfirsich frei
 g.start_run('hana', 10); run = g.run; run.depth = 7
 run.save['achievements'] = [a for a in run.save['achievements'] if a != 'yomi']
