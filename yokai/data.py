@@ -674,6 +674,7 @@ BOSSES = {
     'kagutsuchi': dict(name='Kagutsuchi', title='Der Gott des Feuers', hp=1450),
     'mikaboshi': dict(name='Amatsu-Mikaboshi', title='Der böse Stern des Himmels', hp=1500),
     'fujin': dict(name='Fūjin', title='Der Gott des Windes', hp=1600),
+    'sutoku': dict(name='Sutoku-in', title='Der Kaiser, der zum Dämon wurde', hp=2600),
 }
 BOSS_REWARD = {  # Freischaltung beim ersten Sieg
     'omukade': 'senbazuru', 'kappa_ou': 'komainu', 'jorogumo': 'ronin_schwur', 'gashadokuro': 'sanzu_muenze',
@@ -682,6 +683,7 @@ BOSS_REWARD = {  # Freischaltung beim ersten Sieg
     'oonyudo': 'onyudo_kette', 'nurarihyon': 'nurarihyon_pfeife', 'kamaitachi_trio': 'kamaitachi_klingen',
     'akkorokamui': 'akkoro_tinte', 'enma': 'enma_spiegel', 'izanami': 'izanami_schleier', 'amaterasu': None, 'kagutsuchi': 'kagutsuchi_glut',
     'fujin': 'kaze_bukuro', 'orochi': 'yamata_zahn', 'shuten_doji': 'shuten_schale', 'tamamo': 'kyubi_juwel', 'mikaboshi': 'hoshi_splitter',
+    'sutoku': None,
 }
 
 # =====================================================================  PRÜFUNGEN (Herausforderungen)

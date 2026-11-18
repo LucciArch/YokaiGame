@@ -7,7 +7,7 @@ from yokai import data, gfx
 from yokai.bosses import make_boss
 from yokai.settings import *
 g = Game(headless=True)
-for depth, pool in [(7, ['amaterasu'])] + list(data.BOSS_POOL.items()):   # Amaterasu nur über die Iwato-Pforte
+for depth, pool in [(7, ['amaterasu']), (8, ['sutoku'])] + list(data.BOSS_POOL.items()):   # Amaterasu nur über die Iwato-Pforte, Sutoku-in geheim
     for bid in pool:
         g.start_run('hana', 100)
         run = g.run
@@ -34,6 +34,8 @@ for depth, pool in [(7, ['amaterasu'])] + list(data.BOSS_POOL.items()):   # Amat
             traceback.print_exc(); print('CRASH', bid); break
         if bid == 'amaterasu':   # tritt aus der Höhle: drei Phasen, danach ist es hell
             assert b.phase == 3 and b.extra_dark == 0 and b.alpha == 255, (b.phase, b.extra_dark, b.alpha)
+        if bid == 'sutoku':   # geheimer Endboss: drei Phasen, im dritten verdunkelt sich die Arena
+            assert b.phase == 3 and b.extra_dark > 0, (b.phase, b.extra_dark)
         if bid == 'izanami':   # Endbossin in Yomi: drei Phasen, die Arena wird dunkler
             run.update(1 / 60, {'move': [0, 0], 'shoot': [0, 0], 'dash': False, 'active': False, 'salt': False})
             assert not [h for h in run.hazards if getattr(h, 'boss', None) is b], 'Hände bleiben nach dem Tod'

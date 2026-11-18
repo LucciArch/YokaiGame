@@ -269,6 +269,15 @@
   "w": 298,
   "walk": 4
  },
+ "boss_sutoku": {
+  "atk": 4,
+  "h": 150,
+  "hi": true,
+  "kind": "strip",
+  "n": 7,
+  "w": 250,
+  "walk": 4
+ },
  "boss_tamamo": {
   "atk": 4,
   "h": 68,

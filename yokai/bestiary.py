@@ -144,6 +144,7 @@ BOSS_LORE = {
     'izanami': ('伊邪那美', 'Die Schöpfergöttin, die bei der Geburt des Feuers starb und Herrin von Yomi wurde. Als Izanagi sie im Tod erblickte, schwor sie, täglich tausend Menschen zu töten.'),
     'kagutsuchi': ('迦具土', 'Der Gott des Feuers, dessen Geburt seine Mutter Izanami tötete. Sein Vater erschlug ihn – aus seinem Blut entstanden weitere Götter.'),
     'fujin': ('風神', 'Der Gott des Windes, grünhäutig und wild, mit einem gewaltigen Sack voller Stürme über den Schultern. Er tritt stets mit seinem Bruder Raijin auf – so malte ihn Tawaraya Sōtatsu auf seinen berühmten Wandschirm.'),
+    'sutoku': ('崇徳院', 'Der Kaiser, der im Hōgen-Aufstand unterlag und nach Sanuki verbannt wurde. Dort schrieb er Sutren mit seinem eigenen Blut; als der Hof sie zurückwies, schwor er, zum großen Dämon Japans zu werden. Man sagt, er wurde zum König der Tengu – einer der drei großen Onryō neben Sugawara no Michizane und Taira no Masakado.'),
     'mikaboshi': ('天津甕星', 'Der böse Stern des Himmels, ein Gott, der sich als Einziger nicht der Herrschaft der himmlischen Götter beugte.'),
 }
 

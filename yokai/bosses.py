@@ -2593,6 +2593,120 @@ class Amaterasu(Boss):
         gfx.draw_glow(s, int(self.x), int(self.y - 14), 40 if self.phase > 1 else 22, (255, 200, 90), int((60 if self.phase > 1 else 30) + 30 * k))
 
 
+class Sutoku(Boss):
+    """Sutoku-in, der verbannte Kaiser – geheimer Endboss nach „Der Schatten hinter dem Morgen“ (Kapitel VIII).
+    Er schrieb in der Verbannung Sutren mit seinem Blut; als der Hof sie zurückwies, schwor er, zum großen Dämon
+    Japans zu werden, „der den Kaiser zum Bauern und den Bauern zum Kaiser macht“.
+    Phase 1: Blut-Sutren (Schriftspalten von rechts nach links), Umkehr-Fluch, Tengu-Federn.
+    Phase 2: König der Tengu – Krähen-Tengu, Federsturm, Groll-Feuer. Phase 3: Der große Dämon – die Arena verdunkelt sich."""
+    sheet = ('boss_sutoku', 1, None)
+    r = 15
+    BLOOD = (200, 30, 50)
+    INK = (120, 110, 200)
+    FIRE = (230, 60, 50)
+
+    def setup(self):
+        self.y = CY - 36
+        self.P2 = 0.6
+        self.attacks = ['sutra', 'reverse', 'feathers']
+        self.attacks2 = ['sutra', 'reverse', 'storm', 'grudge']
+
+    def on_phase2(self):
+        self.run.banner('König der Tengu', 'Die Krähen von Shiramine folgen ihrem Kaiser', (200, 120, 140), big=True)
+        self.summon('karasu_tengu', 2, 70)
+
+    def update(self, dt):
+        super().update(dt)
+        if self.phase == 2 and not self.dead and self.hp < self.maxhp * 0.3:
+            self.phase = 3
+            self.extra_dark = 60
+            self.attacks = ['sutra', 'reverse', 'storm', 'grudge', 'oath']
+            self.rest *= 0.85
+            run = self.run
+            run.banner('Der große Dämon Japans', '„Den Kaiser mache ich zum Bauern, den Bauern zum Kaiser“', (230, 60, 60), big=True)
+            audio.play('roar')
+            run.shake(10)
+
+    def a_sutra(self):
+        """Blut-Sutren: Schriftspalten fallen von oben, wie Japanisch geschrieben von rechts nach links; jede Spalte hat eine Lücke."""
+        cols = 7 + self.phase
+        w = RW / cols
+        for i in range(cols):
+            x = RX + RW - w * (i + 0.5)
+            gap = random.randint(1, 5)
+            self.fire_t = self.t
+            for j in range(7):
+                if j in (gap, gap + 1):
+                    continue
+                ebullet(self.run, x, RY + 6, math.pi / 2, 70, self.BLOOD, 3, delay=j * 0.13)
+            audio.play('eshot', 0.5)
+            yield 0.32 - 0.03 * self.phase
+        yield 0.7
+
+    def a_reverse(self):
+        """Umkehr-Fluch: ein Ring fliegt hinaus, hält an und stürzt verkehrt zurück zum Kaiser – oben wird unten."""
+        n = 14 + 4 * self.phase
+        off = random.random()
+        bs = [ebullet(self.run, self.x, self.y, off + i / n * math.tau, 120, self.INK, 3, acc=-1.4) for i in range(n)]
+        self.fire_t = self.t
+        audio.play('eshot', 0.7)
+        yield 1.0
+        audio.play('bell', 0.5)
+        for b in bs:
+            if not b.dead:
+                b.vx, b.vy, b.acc = -b.vx * 3, -b.vy * 3, 0.4
+                b.col = self.BLOOD
+        yield 0.9
+
+    def a_feathers(self):
+        """Tengu-Federn: drei geschwungene Fächer aus blauschwarzen Schwungfedern."""
+        for k in range(3):
+            self.fan(5 + self.phase, 0.2, 105, self.INK, r=3, curve=0.9 if k % 2 else -0.9)
+            yield 0.4
+        yield 0.5
+
+    def a_storm(self):
+        """Federsturm: die Schwingen schlagen, Federn kommen von beiden Seiten der Arena."""
+        for k in range(5):
+            y = self.p.y + random.uniform(-30, 30)
+            ebullet(self.run, RX + 4, y, 0, 95, self.INK, 3)
+            ebullet(self.run, RX + RW - 4, y + 18, math.pi, 95, self.INK, 3)
+            self.fan(3, 0.3, 90, self.INK)
+            yield 0.35
+        yield 0.5
+
+    def a_grudge(self):
+        """Groll-Feuer: Flammen schlagen dort hoch, wo die Spielerin steht, dazu ein langsamer Feuerring."""
+        for i in range(3 + self.phase):
+            self.hazard(self.p.x + random.uniform(-16, 16), self.p.y + random.uniform(-12, 12), 18, 0.8, 0.3, 'fire')
+            yield 0.3
+        self.ring(16, 60, random.random(), self.FIRE, 4, eff='burn')
+        yield 0.7
+
+    def a_oath(self):
+        """Der Schwur: Sutren-Spirale in Blut, deren Arme sich zweimal umkehren."""
+        bs = []
+        for k in range(30):
+            if k % 5 == 0:
+                self.fire_t = self.t
+            for j in range(2):
+                bs.append(ebullet(self.run, self.x, self.y, k * 0.23 + j * math.pi, 90, self.BLOOD, 3, acc=-0.9))
+            yield 0.05
+        yield 0.4
+        for b in bs:
+            if not b.dead:
+                b.curve = 1.2
+        yield 1.0
+
+    def move(self, dt):
+        self.x = CX + math.sin(self.t * 0.4) * (60 if self.phase == 1 else 100)
+        self.y = CY - 36 + math.sin(self.t * 0.8) * (10 if self.phase == 1 else 24)
+
+    def render_under(self, s, t):
+        k = 0.5 + 0.5 * math.sin(t * 2.5)
+        gfx.draw_glow(s, int(self.x), int(self.y + 10), 34, (200, 30, 40), int(40 + 30 * k))
+
+
 BOSS_CLASSES = {
     'omukade': Omukade, 'kappa_ou': KappaOu, 'jorogumo': Jorogumo,
     'gashadokuro': Gashadokuro, 'rokurokubi': Rokurokubi, 'nue': Nue,
@@ -2602,6 +2716,7 @@ BOSS_CLASSES = {
     'mikaboshi': Mikaboshi,
     'oonyudo': Oonyudo, 'nurarihyon': Nurarihyon, 'kamaitachi_trio': KamaitachiTrio,
     'akkorokamui': Akkorokamui, 'enma': Enma, 'izanami': Izanami, 'amaterasu': Amaterasu, 'kagutsuchi': Kagutsuchi, 'fujin': Fujin,
+    'sutoku': Sutoku,
 }
 
 
