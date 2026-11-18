@@ -806,5 +806,17 @@ if ob:
     ob.t = 0.7; sigs.bullet_tick(ob, run, 0.016)
 if not ('onryo' in p.sgs and bl == ([False] * 4 + [True]) * 2 and len(run.pbullets) == 14 and ob.fl.get('_su') and abs(ob.dmg - d0 * 1.5) < 0.01):
     print('FEHLER Onryo-Bund', p.sgs, bl, len(run.pbullets)); bad += 1
+# Tobiume: jeder 6. Geschosstreffer ruft einen Blitz aufs Ziel und streut drei Blüten, die selbst nicht mitzählen
+g.start_run('hana', 71); run = g.run; p = run.player
+p.gain_item('tenjin_ume', silent=True); run.pbullets = []; run.hazards = []
+e = make_boss(run, 'shuten_doji'); e.spawn_t = 0; e.invuln = False; run.enemies = [e]
+b = Bullet(100, 100, 50, 0, 10, 3, 1, 'p', (255, 255, 255), {})
+strikes = []
+for _ in range(12):
+    sigs.hit_post(run, e, b, 1); strikes.append(len(run.hazards))
+for ub in list(run.pbullets):
+    sigs.hit_post(run, e, ub, 1)
+if not (strikes == [0] * 5 + [1] * 6 + [2] and len(run.pbullets) == 6 and all(u.fl.get('_ume') for u in run.pbullets) and len(run.hazards) == 2):
+    print('FEHLER Tobiume', strikes, len(run.pbullets), len(run.hazards)); bad += 1
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)

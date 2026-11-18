@@ -145,7 +145,7 @@ assert (run.depth, run.biome_id, run.boss_id, run.loop) == (10, 'dazaifu', 'mich
 assert run.floor_label().endswith('Kapitel X')
 run.draw(g.screen, 1.0); gfx.TEXT.clear(); gfx.HI.clear()
 run.end_run(True)
-assert 'michizane' in run.save['achievements'] and story.unlocked(run.save, 'dazaifu')
+assert 'michizane' in run.save['achievements'] and story.unlocked(run.save, 'dazaifu') and 'tenjin_ume' in run.save['items']
 from yokai.epilogue import STORY_DAZAIFU
 assert Epilogue(g, run).blocks[0] == STORY_DAZAIFU[0]
 print('Dazaifu-Pforte OK')

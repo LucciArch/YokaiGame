@@ -131,6 +131,7 @@ TEXT = {
     'leben_tod': 'Kills schenken manchmal ½ Geisterherz',
     'suzu': 'Nach der Rolle läuten die Glöckchen (alle 4 s): feindliche Geschosse in der Nähe verlöschen, nahe Feinde fliehen lachend 2 s',
     'daitengu': 'Wendet eine Blut-Sutra, fächert sie drei durchbohrende Krähenfedern (je 60 %) in ihre neue Richtung',
+    'tobiume': 'Jeder 6. Geschosstreffer ruft den Seiryōden-Blitz auf das Ziel (150 %) und streut drei Pflaumenblüten (je 40 %)',
     'kagemusha': 'Jedes 7. Geschoss, das dich treffen würde, trifft einen Kagemusha: er zerfällt in sieben suchende Onibi (je 80 %)',
     'onryo': 'Kagemusha schon bei jedem 5. Geschoss; seine Onibi tragen Sutokus Blutfluch und wenden nach 0,6 s mit 150 %',
     'blutsutra': 'Jeder 7. Wurf ist eine Blut-Sutra: nach 0,6 s kehrt sie um und schneidet mit 150 % durch alle Feinde zurück',
@@ -1093,6 +1094,14 @@ def hit_post(run, e, b, dmg):
             if 'blitzschlag' in S:
                 _syn(run, 'blitzschlag', e.x, e.y, (255, 240, 120))
                 _chain_strikes(run, e, 1, p.damage() * 1.6 + 3)
+    if 'tobiume' in S and b is not None and not echo and not b.fl.get('_ume'):
+        g['ume'] = g.get('ume', 0) + 1
+        if g['ume'] % 6 == 0:                            # Tenjin schlägt dort ein, wohin die Pflaume fliegt
+            run.lightning(e.x, e.y, p.damage() * 1.5 + 2)
+            for i in range(3):
+                nb = run.fire_player_bullet(e.x, e.y, random.random() * math.tau, p.damage() * 0.4, 170, 2.5, 0.7, {'homing': 1, '_ume': 1})
+                nb.col = (255, 170, 190)
+                nb.hit.add(e)
     if b is not None and b.fl.get('_urteil'):
         e.sg_curse = 6.0
     if 'pentagramm' in S and not echo and not (b is not None and b.fl.get('_shiki')):   # Papierdiener laden das Siegel nicht nach

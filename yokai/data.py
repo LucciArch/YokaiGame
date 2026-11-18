@@ -261,6 +261,7 @@ I('yomi_momo', 'Pfirsich von Yomotsu Hirasaka', 'Izanagis Wurf gegen die Verfolg
 I('uzume_suzu', 'Uzumes Kagura-Suzu', 'Ihr Tanz lockte die Sonne aus der Höhle', 'uzume_suzu', (255, 214, 90), 'B', ['kami'], 4, True, spd=5, sig_suzu=1)
 I('sutoku_sutra', 'Blut-Sutra', 'Mit eigenem Blut geschrieben, vom Hof verschmäht', 'sutoku_sutra', (190, 30, 40), 'B', ['yurei', 'tengu'], 4, True, dmg=0.5, sig_blutsutra=1)
 I('masakado_kage', 'Kagemusha', 'Sieben Krieger, nur einer wirft einen Schatten', 'masakado_kage', (150, 235, 220), 'B', ['yurei', 'oni'], 4, True, hp=1, sig_kagemusha=1)
+I('tenjin_ume', 'Tobiume-Zweig', 'Die Pflaume flog ihrem Herrn nach Dazaifu nach', 'tenjin_ume', (255, 170, 190), 'B', ['kami', 'yurei'], 4, True, dmg=0.5, sig_tobiume=1)
 I('kagutsuchi_glut', 'Glut des Kagutsuchi', 'Das erste Feuer der Welt', 'flame', (255, 90, 30), 'B', ['kami', 'oni'], 4, True, burn=1, dmgm=1.2, sig_erstes_feuer=1)
 I('geheimkarte', 'Karte des Diebes', 'Wo sind die verborgenen Räume?', 'scroll', (190, 160, 110), 'TS', [], 2, True, map=1, salts=2)
 
@@ -689,7 +690,7 @@ BOSS_REWARD = {  # Freischaltung beim ersten Sieg
     'oonyudo': 'onyudo_kette', 'nurarihyon': 'nurarihyon_pfeife', 'kamaitachi_trio': 'kamaitachi_klingen',
     'akkorokamui': 'akkoro_tinte', 'enma': 'enma_spiegel', 'izanami': 'izanami_schleier', 'amaterasu': None, 'kagutsuchi': 'kagutsuchi_glut',
     'fujin': 'kaze_bukuro', 'orochi': 'yamata_zahn', 'shuten_doji': 'shuten_schale', 'tamamo': 'kyubi_juwel', 'mikaboshi': 'hoshi_splitter',
-    'sutoku': 'sutoku_sutra', 'masakado': 'masakado_kage', 'michizane': None,   # Belohnung folgt mit Kapitel X
+    'sutoku': 'sutoku_sutra', 'masakado': 'masakado_kage', 'michizane': 'tenjin_ume',
 }
 
 # =====================================================================  PRÜFUNGEN (Herausforderungen)
@@ -756,7 +757,7 @@ ACHIEVEMENTS = [
     ('iwato', 'Die Sonne kehrt zurück', 'Besiege Amaterasu in Ama-no-Iwato', ('item', 'uzume_suzu')),
     ('sutoku', 'Der Fluch von Shiramine', 'Besiege Sutoku-in am Grab des verbannten Kaisers', ('item', 'sutoku_sutra')),
     ('masakado', 'Das Haupt kehrt heim', 'Besiege Taira no Masakado am Kubizuka', ('item', 'masakado_kage')),
-    ('michizane', 'Der Donner verstummt', 'Besiege Sugawara no Michizane in Dazaifu', None),
+    ('michizane', 'Der Donner verstummt', 'Besiege Sugawara no Michizane in Dazaifu', ('item', 'tenjin_ume')),
     ('all_bosses', 'Bezwinger der Nachtparade', 'Besiege alle 24 Bosse', None),
     ('teahouse', 'Teezeremonie', 'Trinke im Teehaus', None),
     ('slots', 'Glücksspieler', 'Spiele am Tanuki-Automaten', None),
