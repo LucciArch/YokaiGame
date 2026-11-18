@@ -462,5 +462,17 @@ for _ in range(8):
     ns.append(sum(1 for b in run.pbullets[n0:] if b.fl.get('homing')))
 if 'juni_tori' not in p.sgs or ns[7] != 12 or ns[6] != 0:
     print('FEHLER Shikigami-Tsukai', ns); bad += 1
+# Yakumo Tatsu (Murakumo + Kushinadas Kamm): Kamm-Stufen beschleunigen die Wolke, ab 4 springt der Blitz weiter
+g.start_run('hana', 42); run = g.run; p = run.player
+for iid in ('murakumo', 'kushinada_kushi'):
+    p.gain_item(iid, silent=True)
+e = Enemy(run, 'gaki', p.x + 40, p.y); o = Enemy(run, 'gaki', p.x + 80, p.y)
+for x in (e, o):
+    x.spawn_t = 0; x.hp = x.maxhp = 999
+run.enemies = [e, o]; run.hazards = []; sigs.st(p)['kushi'] = 8; sigs.st(p)['mk'] = 0
+for _ in range(12):
+    sigs.tick(p, run, 0.1)
+if 'yakumo' not in p.sgs or sum(1 for h in run.hazards if h.kind == 'strike') < 2:
+    print('FEHLER Yakumo Tatsu', [h.kind for h in run.hazards]); bad += 1
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)

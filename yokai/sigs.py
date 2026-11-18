@@ -210,6 +210,7 @@ TEXT = {
     'kikyo_ido': 'Schließt sich das Pentagramm, sprudelt der Brunnen: Welle um das Ziel (60 %); Räume ohne Treffer geben zu 40 % ein Geisterherz',
     'ido_reikon': 'Das Brunnenwasser trifft alle Feinde (25 % je Geisterherz, höchstens 100 %) und gibt schon jeden 2. Raum ½ Geisterherz',
     'juni_tori': 'Die zwölf Himmelsgeneräle kommen schon jeden 8. Wurf – als Papiervögel, die Feinde verfolgen',
+    'yakumo': 'Jede Kamm-Stufe lässt die Gewitterwolke schneller blitzen (bis 1,8×); ab 4 Stufen springt der Blitz auf einen zweiten Feind',
     'henro': 'Jede neue Ebene faltet zwei Kraniche, jede 2. Ebene bringt ein Geisterherz',
     'sommerwind': 'Die Rolle wirft acht Federn, die weiter fliegen',
     'fest_der_laternen': 'Treffer entzünden doppelt so oft den Boden, die Flammen brennen länger',
@@ -2003,11 +2004,15 @@ def _siegel_tick(p, run, dt, S, g):
         if random.random() < 0.3:
             from .entities import Particle
             run.particles.append(Particle(p.x + random.uniform(-9, 9), p.y - 26 + random.uniform(-3, 3), 0, 4, 0.5, (110, 115, 140), 3))
-        e = _nearest(run, p.x, p.y, 160) if g['mk'] >= 2.0 else None
+        ku = g.get('kushi', 0) if 'yakumo' in S else 0     # Yakumo Tatsu: Kushinadas Kamm treibt die Wolke an
+        e = _nearest(run, p.x, p.y, 160) if g['mk'] >= 2.0 / (1 + 0.1 * ku) else None
         if e:
             g['mk'] = 0
             run.zap(p.x, p.y - 26, e.x, e.y)
             run.lightning(e.x, e.y, p.damage())
+            if ku >= 4:
+                _syn(run, 'yakumo', p.x, p.y - 26, (230, 120, 140))
+                _chain_strikes(run, e, 1, p.damage() * 0.6)
     if g.get('kessel', 0) > 0 and random.random() < 0.4:
         from .entities import Particle
         run.particles.append(Particle(p.x + random.uniform(-5, 5), p.y - 8, 0, -30, 0.4, (225, 225, 220), 2))

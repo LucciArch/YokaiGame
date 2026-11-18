@@ -463,6 +463,7 @@ SYNERGIES = [
     dict(id='seimei_jinja', name='Seimei-Jinja', desc='Glockenblumen-Stern und Brunnen – der Schrein in Kyōto', items=['kikyo_mon', 'seimei_ido'], fx=dict(luck=1, sig_kikyo_ido=1)),
     dict(id='ido_no_yurei', name='Ido no Yūrei', desc='Eimer und Brunnen – aus dem kalten Wasser steigt Okiku', items=['okiku_ido', 'tsurube'], fx=dict(spirit=1, sig_ido_reikon=1)),
     dict(id='shikigami_tsukai', name='Shikigami-Tsukai', desc='Das geheime Buch und die zwölf Generäle – Seimeis Papiervögel', items=['hoki_naiden', 'juni_shinsho'], fx=dict(sig_juni_tori=1)),
+    dict(id='yakumo_tatsu', name='Yakumo Tatsu', desc='Achtfach steigen die Wolken über Izumo – Susanoos Lied für Kushinada', items=['murakumo', 'kushinada_kushi'], fx=dict(sig_yakumo=1)),
     dict(id='henro', name='Henro', desc='Dōgyō ninin – Pilgerstab und Kraniche wandern mit dir', items=['kongozue', 'senbazuru'], fx=dict(luck=1, sig_henro=1)),
 ]
 
