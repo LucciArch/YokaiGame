@@ -495,6 +495,9 @@ SYNERGIES = [
     dict(id='sakaki_mai', name='Sakaki-mai', desc='Die Miko tanzt mit Fächer und Sakaki-Zweig – die Kami sehen zu und nehmen das Opfer gern an', items=['hi_ogi', 'tamagushi'], fx=dict(sig_sakaki_mai=1)),
     dict(id='koromogawa', name='Koromogawa', desc='Am Koromo-Fluss starb Benkei stehend – und seine Naginata hörte nicht auf zu kreisen', items=['gojo_giboshi', 'tachi_ojo'], fx=dict(sig_koromogawa=1)),
     dict(id='henro', name='Henro', desc='Dōgyō ninin – Pilgerstab und Kraniche wandern mit dir', items=['kongozue', 'senbazuru'], fx=dict(luck=1, sig_henro=1)),
+    dict(id='hoichi', name='Mimi-nashi Hōichi', desc='Der blinde Biwa-Spieler sang den Heike-Geistern – die Sutren auf seiner Haut ließen sie hindurchgreifen', items=['biwa_bokuboku', 'juzu'], fx=dict(sig_hoichi=1)),
+    dict(id='furisode_kaji', name='Furisode-Kaji', desc='Das verfluchte Langarm-Kimono fing Feuer – und Edo brannte drei Tage', items=['kosode_te', 'chochin_obake'], fx=dict(sig_furisode=1)),
+    dict(id='dogu_yagyo', name='Dōgu-Yagyō', desc='Sandalen und Stoffbahnen ziehen nachts gemeinsam durchs Haus – der Umzug der alten Dinge', items=['bake_zori', 'ittan_momen'], fx=dict(sig_dogu_yagyo=1)),
 ]
 
 # =====================================================================  TRANSFORMATIONEN

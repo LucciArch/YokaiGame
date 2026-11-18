@@ -221,6 +221,9 @@ TEXT = {
     'hoshi_danuki': 'Prallt ein Treffer am Jizō ab, nimmst du sofort einen Schluck Sake (4 s +30 % Feuerrate) – und jeder Schluck macht den Jizō wieder bereit (einmal pro Raum)',
     'shanao': 'Sōjōbōs Wirbel trägt den Flötenton: Yokai im Wirbel sind 2 s verwirrt, und jeder 4. statt 6. Wurf ist ein Flötenton',
     'sakaki_mai': 'Im Tanz bremsen die Sakaki-Blätter die Getroffenen, und schon jeder 2. statt 3. Raum ohne Treffer bringt ½ Herz',
+    'hoichi': 'Die Biwa klagt jeden 3. statt 5. Wurf; die Klangwellen gehen durch Wände',
+    'furisode': 'Die bleichen Hände packen 3 Feinde und setzen sie in Brand; die Laterne leckt jeden 4. Treffer',
+    'dogu_yagyo': 'Die Sandale rennt bei 60 % der Kills los und wickelt ihr Ziel 1 s ein (Bosse 0,3 s)',
     'koromogawa': 'Die Naginata fegt weiter (75 px statt 55); solange du bei Tachi-ōjō aufrecht stehst, fegt sie jede Sekunde mit 150 %',
     'taizan_sai': 'Das Pentagramm schließt sich schon nach 4 Treffern; nach dem Ritual tilgen 12 Pentagramme die Schuld – kein Malus mehr, und das Ritual ist wieder bereit',
     'kage_kitsune': 'Das Fuchs-Trugbild bleibt 4,5 s statt 3 s und wirft brennendes Fuchsfeuer (70 % statt 50 %)',
@@ -798,9 +801,13 @@ def _siegel_fire(p, run, bullets, g, n, base, dmg, spd, life, size):
     if 'tsukikage' in S and n % 6 == 0:                  # Mondschatten-Klinge
         nb = run.fire_player_bullet(p.x, p.y - 3, base, dmg * 1.5, spd * 1.1, 3, life * 1.3, {'pierce': 1, 'spectral': 1})
         nb.col = (150, 160, 220)
-    if 'biwa' in S and n % 5 == 0:                      # Biwa-bokuboku: die Saiten klagen
+    hoichi = 'hoichi' in S                               # Mimi-nashi Hōichi: öfter, und die Geister greifen durch Wände
+    if 'biwa' in S and n % (3 if hoichi else 5) == 0:   # Biwa-bokuboku: die Saiten klagen
+        if hoichi:
+            _syn(run, 'hoichi', p.x, p.y, (200, 160, 100))
         for da in (-0.3, 0, 0.3):
-            nb = run.fire_player_bullet(p.x, p.y - 3, base + da, dmg * 0.7, spd * 0.9, 3, life, {'pierce': 1})
+            nb = run.fire_player_bullet(p.x, p.y - 3, base + da, dmg * 0.7, spd * 0.9, 3, life,
+                                        {'pierce': 1, 'spectral': 1} if hoichi else {'pierce': 1})
             nb.col = (200, 160, 100)
     if 'fue' in S and n % (4 if 'gojo_bashi' in S or 'shanao' in S else 6) == 0 and bullets:           # Ushiwakas Flötenton
         bullets[0].fl = dict(bullets[0].fl, fue=1, pierce=1)   # Yoshitsunes leichter Schritt: der Ton fliegt durch
@@ -966,9 +973,12 @@ def hit_post(run, e, b, dmg):
             _float(run, e, 'Gong!', (170, 200, 150))
             e.slowed = max(e.slowed, 1.0)
             run.damage_enemy(e, p.damage() * 2.5, None)
+    if b is not None and b.fl.get('zori'):               # Dōgu-Yagyō: die Sandale wickelt ein
+        _syn(run, 'dogu_yagyo', e.x, e.y, (235, 235, 245))
+        e.frozen = max(e.frozen, 0.3 if e.is_boss else 1.0)
     if 'chochin_obake' in S and b is not None and not echo:
         g['cho'] = g.get('cho', 0) + 1
-        if g['cho'] >= 6:                                # die Laterne leckt zu
+        if g['cho'] >= (4 if 'furisode' in S else 6):  # die Laterne leckt zu
             g['cho'] = 0
             _float(run, e, 'Bero!', (230, 90, 70))
             e.burn = max(e.burn, 3.0)
@@ -1176,8 +1186,10 @@ def on_kill(run, e):
             if not p.heal(1):
                 for _ in range(2):
                     run.spawn_pickup('coin', e.x, e.y)
-    if 'bake_zori' in S and random.random() < 0.3:      # die Sandale rennt los
-        nb = run.fire_player_bullet(e.x, e.y, random.uniform(0, math.tau), p.damage() * 1.5, 170, 3, 1.6, {'homing': 1})
+    dy = 'dogu_yagyo' in S                               # Dōgu-Yagyō: die Sandale zieht die Stoffbahn mit
+    if 'bake_zori' in S and random.random() < (0.6 if dy else 0.3):   # die Sandale rennt los
+        nb = run.fire_player_bullet(e.x, e.y, random.uniform(0, math.tau), p.damage() * 1.5, 170, 3, 1.6,
+                                    {'homing': 1, 'zori': 1} if dy else {'homing': 1})
         nb.col = (200, 180, 110)
     gy = 'gyoretsu' in S                                 # Kitsunebi no Gyōretsu: Laterne und Juwel zusammen
     if 'hoshi_tama' in S and random.random() < (0.15 + 0.02 * p.s['luck']) * (2 if gy else 1):
@@ -1314,12 +1326,18 @@ def on_hurt(p, run):
             nb.hit = seen; nb.col = (170, 230, 250)
     if 'kosode' in S:                                    # Kosode-no-te: Hände greifen aus dem Ärmel
         done = set()
-        for _ in range(2):
+        fs = 'furisode' in S                             # Furisode-Kaji: das verfluchte Kimono brennt
+        if fs:
+            _syn(run, 'furisode', p.x, p.y, (230, 110, 60))
+        for _ in range(3 if fs else 2):
             e = _nearest(run, p.x, p.y, 200, lambda o: id(o) not in done)
             if not e:
                 break
             done.add(id(e))
             _ring(run, e.x, e.y, (220, 210, 190), 16)
+            if fs:
+                e.burn = max(e.burn, 4.0)
+                e.burn_dps = max(e.burn_dps, max(1.0, p.damage() * 0.4))
             e.frozen = max(e.frozen, 0.3 if e.is_boss else 1.0)
             run.damage_enemy(e, p.damage() * 2, None)
     if 'gojo' in S:                                      # Benkeis Naginata fegt um ihn

@@ -755,5 +755,23 @@ for _ in range(20):
     sigs.on_kill(run, e)
 if not any(b.fl.get('homing') for b in run.pbullets[nb0:]):
     print('FEHLER Bake-zori'); bad += 1
+# Synergien der Tsukumogami: Hōichi, Furisode-Kaji, Dōgu-Yagyō
+g.start_run('hana', 68); run = g.run; p = run.player
+for iid in ('biwa_bokuboku', 'juzu', 'kosode_te', 'chochin_obake', 'bake_zori', 'ittan_momen'):
+    p.gain_item(iid, silent=True)
+gg = sigs.st(p); run.pbullets = []
+sigs._siegel_fire(p, run, [], gg, 3, 0, 10, 100, 1, 2)
+if not {'hoichi', 'furisode', 'dogu_yagyo'} <= p.sgs or sum(1 for b in run.pbullets if b.fl.get('spectral')) < 3:
+    print('FEHLER Hoichi', p.sgs & {'hoichi', 'furisode', 'dogu_yagyo'}); bad += 1
+run.enemies = []
+for k in range(3):
+    e = Enemy(run, 'gaki', p.x + 40 + k * 20, p.y); e.spawn_t = 0; e.hp = e.maxhp = 99999; run.enemies.append(e)
+sigs.on_hurt(p, run)
+if not all(e.burn > 0 and e.frozen > 0 for e in run.enemies):
+    print('FEHLER Furisode-Kaji'); bad += 1
+e = run.enemies[0]; e.frozen = 0
+b = run.fire_player_bullet(p.x, p.y, 0, 1, 100, 2, 1, {'zori': 1}); sigs.hit_post(run, e, b, 1)
+if e.frozen < 0.9:
+    print('FEHLER Dogu-Yagyo'); bad += 1
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)
