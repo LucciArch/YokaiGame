@@ -7,7 +7,7 @@ from yokai import data, gfx
 from yokai.bosses import make_boss
 from yokai.settings import *
 g = Game(headless=True)
-for depth, pool in [(7, ['amaterasu']), (8, ['sutoku'])] + list(data.BOSS_POOL.items()):   # Amaterasu nur über die Iwato-Pforte, Sutoku-in geheim
+for depth, pool in [(7, ['amaterasu']), (8, ['sutoku']), (9, ['michizane'])] + list(data.BOSS_POOL.items()):   # Amaterasu nur über die Iwato-Pforte, Sutoku-in geheim, Michizane noch ohne Pforte
     for bid in pool:
         g.start_run('hana', 100)
         run = g.run
@@ -38,6 +38,8 @@ for depth, pool in [(7, ['amaterasu']), (8, ['sutoku'])] + list(data.BOSS_POOL.i
             assert b.phase == 3 and b.extra_dark > 0, (b.phase, b.extra_dark)
         if bid == 'masakado':   # geheimer Boss: drei Phasen, im dritten sechs Kagemusha neben dem echten Haupt
             assert b.phase == 3 and len(b.decoys) == 6, (b.phase, len(b.decoys))
+        if bid == 'michizane':   # geheimer Boss: drei Phasen, im dritten liegt die Donnerwolke über der Arena
+            assert b.phase == 3 and b.storm and b.extra_dark > 0, (b.phase, b.storm, b.extra_dark)
         if bid == 'izanami':   # Endbossin in Yomi: drei Phasen, die Arena wird dunkler
             run.update(1 / 60, {'move': [0, 0], 'shoot': [0, 0], 'dash': False, 'active': False, 'salt': False})
             assert not [h for h in run.hazards if getattr(h, 'boss', None) is b], 'Hände bleiben nach dem Tod'

@@ -161,6 +161,15 @@
   "w": 206,
   "walk": 4
  },
+ "boss_michizane": {
+  "atk": 4,
+  "h": 180,
+  "hi": true,
+  "kind": "strip",
+  "n": 7,
+  "w": 150,
+  "walk": 4
+ },
  "boss_mikaboshi": {
   "atk": 4,
   "h": 74,

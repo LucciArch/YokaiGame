@@ -2866,6 +2866,112 @@ class Masakado(Boss):
                 sheets.blit_center(s, self.sheet[0], x, y - 4 + math.sin(t * 2.2 + i) * 1.2, sheets.hdir(self.p.x - x), self.af(self.sheet[0], t, 7, i))
 
 
+class Michizane(Boss):
+    """Sugawara no Michizane – der Gelehrte, der als Donnergott (Karai Tenjin) zurückkehrt; dritter der großen Onryō.
+    Zu Unrecht nach Dazaifu verbannt, starb er dort; danach schlug der Blitz in den Seiryōden des Kaiserpalasts ein und
+    tötete seine Verleumder. Sein Pflaumenbaum flog ihm aus Kyōto nach (Tobiume).
+    Phase 1: Pflaumenblüten-Fächer, Ostwind, Blitze auf markierte Felder. Phase 2: Karai Tenjin – der Trommelkranz donnert.
+    Phase 3: die Donnerwolke liegt über der Arena, Blitze folgen der Spielerin."""
+    sheet = ('boss_michizane', 1, None)
+    r = 15
+    PLUM = (240, 120, 150)
+    BOLT = (255, 236, 130)
+    INK = (130, 120, 200)
+
+    def setup(self):
+        self.y = CY - 36
+        self.P2 = 0.6
+        self.storm = 0.0            # > 0: Donnerwolke über der Arena (Phase 3), Zeit bis zum nächsten Einschlag
+        self.attacks = ['tobiume', 'seiryoden', 'kochi']
+        self.attacks2 = ['tobiume', 'seiryoden', 'taiko', 'kochi']
+
+    def on_phase2(self):
+        self.run.banner('Karai Tenjin', 'Der Gelehrte ist zum Donnergott geworden', (250, 220, 110), big=True)
+        self.ring(14, 70, 0, self.BOLT, 3)
+
+    def update(self, dt):
+        super().update(dt)
+        if self.phase == 2 and not self.dead and self.hp < self.maxhp * 0.3:
+            self.phase = 3
+            self.extra_dark = 50
+            self.storm = 1.5
+            self.attacks = ['tobiume', 'seiryoden', 'taiko', 'raiu']
+            self.rest *= 0.9
+            run = self.run
+            run.banner('Der Donner über dem Seiryōden', '„Wer mich verleumdet hat, den trifft der Himmel“', (250, 230, 140), big=True)
+            audio.play('roar')
+            run.shake(10)
+        if self.storm and not self.dead:
+            self.storm -= dt
+            if self.storm <= 0:                     # die Wolke folgt der Spielerin
+                self.storm = 1.6
+                self.hazard(self.p.x + random.uniform(-10, 10), self.p.y + random.uniform(-10, 10), 14, 0.9, 0.15, 'strike')
+
+    def a_tobiume(self):
+        """Tobiume: Pflaumenblüten fliegen in Büscheln heran und springen kurz vor dem Ziel zu fünf Blütenblättern auf."""
+        for k in range(2 + self.phase):
+            self.fire_t = self.t
+            a = self.ang_p() + random.uniform(-0.4, 0.4)
+            b = ebullet(self.run, self.x - 14, self.y, a, 90, self.PLUM, 5, acc=-1.2)
+            audio.play('eshot', 0.6)
+            yield 0.55
+            if not b.dead:
+                for i in range(5):
+                    ebullet(self.run, b.x, b.y, a + i * math.tau / 5, 70, self.PLUM, 2)
+                b.dead = True
+        yield 0.5
+
+    def a_seiryoden(self):
+        """Seiryōden-Brand: Blitze schlagen reihenweise auf markierte Felder ein – jede Reihe hat eine Lücke."""
+        rows = 3 + self.phase
+        for j in range(rows):
+            y = RY + 30 + (RH - 60) * j / max(1, rows - 1)
+            gap = random.randrange(6)
+            for i in range(6):
+                if i != gap:
+                    self.hazard(RX + 30 + (RW - 60) * i / 5, y, 16, 0.9, 0.15, 'strike')
+            self.fire_t = self.t
+            yield 0.35
+        yield 0.9
+
+    def a_kochi(self):
+        """Kochi fukaba: „Wenn der Ostwind weht, sende mir deinen Duft, Pflaumenblüte“ – Blüten treiben in Wellen vom Ostrand heran."""
+        for k in range(5):
+            y0 = random.uniform(RY + 10, RY + 40)
+            for j in range(6):
+                ebullet(self.run, RX + RW - 4, y0 + j * (RH - 50) / 5, math.pi, 75, self.PLUM, 3, curve=0.35 if k % 2 else -0.35)
+            self.fire_t = self.t
+            audio.play('eshot', 0.4)
+            yield 0.5
+        yield 0.4
+
+    def a_taiko(self):
+        """Trommelkranz: sieben Trommeln schlagen nacheinander, jede schickt einen Funkenring aus Donner."""
+        for i in range(7):
+            a = math.pi * (1.15 + 0.12 * i)
+            x, y = self.x + math.cos(a) * 30, self.y - 10 + math.sin(a) * 30
+            self.ring(7 + self.phase, 80, i * 0.3, self.BOLT, x=x, y=y, r=2)
+            yield 0.22
+        yield 0.7
+
+    def a_raiu(self):
+        """Raiu: Gewitterregen – Tintenschrift-Tropfen fallen schräg, dazwischen gezielte Blitzbahnen."""
+        for k in range(12):
+            ebullet(self.run, RX + random.uniform(0, RW), RY + 4, math.pi / 2 + 0.25, 100, self.INK, 2)
+            if k % 4 == 3:
+                self.fan(3, 0.12, 150, self.BOLT, r=2)
+            yield 0.12
+        yield 0.6
+
+    def move(self, dt):
+        self.x = CX + math.sin(self.t * 0.45) * (70 if self.phase == 1 else 110)
+        self.y = CY - 40 + math.sin(self.t * 0.9) * (10 if self.phase == 1 else 20)
+
+    def render_under(self, s, t):
+        k = 0.5 + 0.5 * math.sin(t * 4)
+        gfx.draw_glow(s, int(self.x), int(self.y + 20), 34, (240, 220, 120), int(30 + 25 * k))
+
+
 BOSS_CLASSES = {
     'omukade': Omukade, 'kappa_ou': KappaOu, 'jorogumo': Jorogumo,
     'gashadokuro': Gashadokuro, 'rokurokubi': Rokurokubi, 'nue': Nue,
@@ -2875,7 +2981,7 @@ BOSS_CLASSES = {
     'mikaboshi': Mikaboshi,
     'oonyudo': Oonyudo, 'nurarihyon': Nurarihyon, 'kamaitachi_trio': KamaitachiTrio,
     'akkorokamui': Akkorokamui, 'enma': Enma, 'izanami': Izanami, 'amaterasu': Amaterasu, 'kagutsuchi': Kagutsuchi, 'fujin': Fujin,
-    'sutoku': Sutoku, 'masakado': Masakado,
+    'sutoku': Sutoku, 'masakado': Masakado, 'michizane': Michizane,
 }
 
 
