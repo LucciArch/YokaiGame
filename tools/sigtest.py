@@ -516,5 +516,16 @@ e = Enemy(run, 'gaki', p.x + 40, p.y); e.spawn_t = 0; e.hp = e.maxhp = 999; run.
 sigs.hit_post(run, e, b, 1)
 if 'senbon' not in p.sgs or not b.fl.get('senbon') or sigs.st(p).get('jagd_b', 0) != 0.2:
     print('FEHLER Senbon-gari', b.fl, sigs.st(p).get('jagd_b')); bad += 1
+# Tamagushi-hōten (Tamagushi + Norito): Norito jeden 12. Wurf, vergehende Geschosse werden Sakaki-Blätter
+g.start_run('hana', 47); run = g.run; p = run.player
+for iid in ('tamagushi', 'kotodama'):
+    p.gain_item(iid, silent=True)
+e = Enemy(run, 'gaki', p.x + 80, p.y); e.spawn_t = 0; e.hp = e.maxhp = 999; run.enemies = [e]
+for k in range(3):
+    run.ebullets.append(Bullet(p.x + 40, p.y + 10 * k, 0, 0, 1, 3, 1, 'e', (255, 0, 0), {}))
+sigs.st(p)['shots'] = 11; n0 = len(run.pbullets)
+sigs.on_fire(p, run, [])
+if 'hoten' not in p.sgs or run.ebullets or len(run.pbullets) - n0 != 3:
+    print('FEHLER Tamagushi-hōten', len(run.ebullets), len(run.pbullets) - n0); bad += 1
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)

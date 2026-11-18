@@ -468,6 +468,7 @@ SYNERGIES = [
     dict(id='yoto_muramasa', name='Yōtō Muramasa', desc='Die verfluchte Klinge lernt den Kesa-Schnitt – und kann nicht mehr aufhören', items=['muramasa', 'kesagiri'], fx=dict(sig_yoto=1)),
     dict(id='ganryujima', name='Ganryūjima', desc='Die wendende Schwalbe gegen den ersten Hieb – Kojirō und Musashi auf der Insel', items=['tsubame_gaeshi', 'ichi_no_tachi'], fx=dict(sig_ganryu=1)),
     dict(id='senbon_gari', name='Senbon-gari', desc='Sieben Waffen auf dem Rücken, die tausendste Klinge vor Augen – Benkeis Jagd an der Gojō-Brücke', items=['tausendstes_schwert', 'nanatsu_dogu'], fx=dict(sig_senbon=1)),
+    dict(id='tamagushi_hoten', name='Tamagushi-hōten', desc='Der Sakaki-Zweig wird dargebracht, das Norito gesprochen – und die Kami antworten', items=['tamagushi', 'kotodama'], fx=dict(sig_hoten=1)),
     dict(id='henro', name='Henro', desc='Dōgyō ninin – Pilgerstab und Kraniche wandern mit dir', items=['kongozue', 'senbazuru'], fx=dict(luck=1, sig_henro=1)),
 ]
 

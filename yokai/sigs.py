@@ -214,6 +214,7 @@ TEXT = {
     'koishikuba': 'Der Fuchsnebel liegt in jedem Raum, auch nach Treffern, und entzündet die Yokai mit Fuchsfeuer – so verfallen sie dem Fuchszauber',
     'yoto': 'Im Blutdurst schneidet Kesa-giri schon jeden 2. Wurf, mit blutroten Klingen (150 %)',
     'ganryu': 'Der erste Hieb kehrt alle 8 s im Raum zurück und schnellt als Schwalbenschnitt zu zwei weiteren Feinden (je 100 %)',
+    'hoten': 'Das Norito kommt schon jeden 12. Wurf, und bis zu 8 vergehende Feindgeschosse werden Sakaki-Blätter, die Yokai treffen (je 60 %)',
     'senbon': 'Benkeis Waffen kommen schon jeden 5. Wurf, und jeder ihrer Treffer zählt für die Schwertjagd wie ein Kill',
     'henro': 'Jede neue Ebene faltet zwei Kraniche, jede 2. Ebene bringt ein Geisterherz',
     'sommerwind': 'Die Rolle wirft acht Federn, die weiter fliegen',
@@ -724,7 +725,15 @@ def _siegel_fire(p, run, bullets, g, n, base, dmg, spd, life, size):
             nb = run.fire_player_bullet(p.x, p.y - 3, base + random.uniform(-0.45, 0.45), dmg * 0.4,
                                         spd * random.uniform(0.75, 1.0), 1.5, life * 0.7, {'mame': 1})
             nb.col = (210, 170, 110)
-    if 'kotodama' in S and n % 16 == 0 and run.ebullets:  # Norito
+    hoten = 'hoten' in S                                 # Tamagushi-hōten: Zweig und Gebet zusammen
+    if 'kotodama' in S and n % (12 if hoten else 16) == 0 and run.ebullets:  # Norito
+        if hoten:                                        # vergehende Geschosse werden Sakaki-Blätter
+            for eb in run.ebullets[:8]:
+                e = run.nearest_enemy(eb.x, eb.y)
+                if e:
+                    nb = run.fire_player_bullet(eb.x, eb.y, math.atan2(e.y - eb.y, e.x - eb.x), p.damage() * 0.6, 240, 2.5, 1.2, {})
+                    nb.col = (110, 180, 90)
+            _syn(run, 'hoten', p.x, p.y, (110, 180, 90))
         run.clear_ebullets()
         _ring(run, p.x, p.y, (240, 230, 200), 70)
     senbon = 'senbon' in S                               # Senbon-gari: Benkei greift öfter zur Waffe
