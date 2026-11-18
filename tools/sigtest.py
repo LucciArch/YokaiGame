@@ -527,5 +527,14 @@ sigs.st(p)['shots'] = 11; n0 = len(run.pbullets)
 sigs.on_fire(p, run, [])
 if 'hoten' not in p.sgs or run.ebullets or len(run.pbullets) - n0 != 3:
     print('FEHLER Tamagushi-hōten', len(run.ebullets), len(run.pbullets) - n0); bad += 1
+# Ataka no Seki (Tachi-ōjō + Kanjinchō): schon bei 1 Herz, 4 s, Feinde erstarren
+g.start_run('benkei', 48); run = g.run; p = run.player
+for iid in ('tachi_ojo', 'kanjincho'):
+    p.gain_item(iid, silent=True)
+e = Enemy(run, 'gaki', p.x + 80, p.y); e.spawn_t = 0; e.hp = e.maxhp = 999; run.enemies = [e]
+p.hp = 2; p.spirit = 0
+sigs.on_hurt(p, run)
+if 'ataka' not in p.sgs or sigs.st(p).get('ojo') != 4.0 or e.frozen < 2.0:
+    print('FEHLER Ataka no Seki', p.total_hp(), sigs.st(p).get('ojo'), e.frozen); bad += 1
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)

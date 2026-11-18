@@ -215,6 +215,7 @@ TEXT = {
     'yoto': 'Im Blutdurst schneidet Kesa-giri schon jeden 2. Wurf, mit blutroten Klingen (150 %)',
     'ganryu': 'Der erste Hieb kehrt alle 8 s im Raum zurück und schnellt als Schwalbenschnitt zu zwei weiteren Feinden (je 100 %)',
     'hoten': 'Das Norito kommt schon jeden 12. Wurf, und bis zu 8 vergehende Feindgeschosse werden Sakaki-Blätter, die Yokai treffen (je 60 %)',
+    'ataka': 'Tachi-ōjō hält schon bei 1 Herz und 4 s lang, und alle Yokai im Raum erstarren 2 s (Bosse ½ s) vor Benkeis Blick',
     'senbon': 'Benkeis Waffen kommen schon jeden 5. Wurf, und jeder ihrer Treffer zählt für die Schwertjagd wie ein Kill',
     'henro': 'Jede neue Ebene faltet zwei Kraniche, jede 2. Ebene bringt ein Geisterherz',
     'sommerwind': 'Die Rolle wirft acht Federn, die weiter fliegen',
@@ -1194,11 +1195,17 @@ def on_hurt(p, run):
     g = st(p)
     g['room_hit'] = True
     g['hurt_t'] = run.time
-    if 'tachi_ojo' in S and p.total_hp() == 1 and not g.get('ojo_room'):
+    ataka = 'ataka' in S                                 # Ataka no Seki: schon bei 1 Herz, länger, die Wächter erstarren
+    if 'tachi_ojo' in S and p.total_hp() <= (2 if ataka else 1) and not g.get('ojo_room'):
         g['ojo_room'] = 1
-        g['ojo'] = 3.0
-        p.iframes = max(p.iframes, 3.0)
+        g['ojo'] = 4.0 if ataka else 3.0
+        p.iframes = max(p.iframes, g['ojo'])
         _ring(run, p.x, p.y, (210, 200, 180), 50)
+        if ataka:
+            _syn(run, 'ataka', p.x, p.y, (230, 220, 190))
+            for e in run.enemies:
+                if e.active():
+                    e.frozen = max(e.frozen, 0.5 if e.is_boss else 2.0)
         run.banner('Tachi-ōjō', 'Aufrecht bis zum letzten Atemzug', (220, 210, 190))
     if 'mino' in S:                                      # Susanoos Regen: Blitze auf die nächsten Feinde
         done = set()
