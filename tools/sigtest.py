@@ -433,5 +433,15 @@ from yokai.entities import Enemy
 o = Enemy(run, 'gaki', p.x + 30, p.y); sigs.st(p)['hb'] = 7; sigs.hit_post(run, o, None, 1)
 if 'yamata_giri' not in p.sgs or hb_boss >= 5 or not getattr(o, 'sg_drunk', 0) > run.time:
     print('FEHLER Orochi-Taiji', hb_boss, getattr(o, 'sg_drunk', 0)); bad += 1
+# Seimei-Jinja (Kikyō-Mon + Seimei-Brunnen): Pentagramm-Schluss löst eine Welle um das Ziel aus
+g.start_run('hana', 39); run = g.run; p = run.player
+for iid in ('kikyo_mon', 'seimei_ido'):
+    p.gain_item(iid, silent=True)
+from yokai.entities import Enemy
+e = Enemy(run, 'gaki', p.x + 60, p.y); o = Enemy(run, 'gaki', p.x + 75, p.y); e.spawn_t = o.spawn_t = 0
+e.hp = o.hp = e.maxhp = o.maxhp = 999; run.enemies = [e, o]; e.sg_kk = 4; h0 = o.hp
+sigs.hit_post(run, e, None, 1)
+if 'kikyo_ido' not in p.sgs or not o.hp < h0 or getattr(o, 'sg_kk', 0) or run._echo:
+    print('FEHLER Seimei-Jinja', h0 - o.hp, getattr(o, 'sg_kk', 0)); bad += 1
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)

@@ -207,6 +207,7 @@ TEXT = {
     'okiku': 'Okiku zählt nur bis neun: der zehnte Teller zerspringt schon beim 9. Kill und nach jedem neunten Wurf um dich',
     'gojo_bashi': 'Jeder 4. Wurf ist ein Flötenton; trifft er, fegt Benkeis Naginata um das Ziel (80 %, höchstens alle 1,5 s)',
     'yamata_giri': 'Gegen Berauschte schneidet Habakiri schon jeden 4. Treffer; der Schnitt berauscht auch gewöhnliche Feinde',
+    'kikyo_ido': 'Schließt sich das Pentagramm, sprudelt der Brunnen: Welle um das Ziel (60 %); Räume ohne Treffer geben zu 40 % ein Geisterherz',
     'henro': 'Jede neue Ebene faltet zwei Kraniche, jede 2. Ebene bringt ein Geisterherz',
     'sommerwind': 'Die Rolle wirft acht Federn, die weiter fliegen',
     'fest_der_laternen': 'Treffer entzünden doppelt so oft den Boden, die Flammen brennen länger',
@@ -886,6 +887,11 @@ def hit_post(run, e, b, dmg):
             e.sg_kk = 0
             _sparks(run, e.x, e.y, ((140, 120, 220), (230, 220, 255)), 8, 90)
             run.damage_enemy(e, p.damage() * 2.5, None)
+            if 'kikyo_ido' in S:                         # Seimei-Jinja: der Stern öffnet die Quelle
+                _syn(run, 'kikyo_ido', e.x, e.y, (140, 120, 220))
+                run._echo = True                         # Welle lädt keine Pentagramme der Nachbarn
+                _blast(run, e.x, e.y, 40, p.damage() * 0.6, (150, 190, 240), 120)
+                run._echo = False
     if 'treffsicher' in S:
         hi = 'goetter_arsenal' in S
         g['ts'] = min(0.35 if hi else 0.2, g.get('ts', 0) + (0.04 if hi else 0.02))
@@ -1552,7 +1558,7 @@ def on_room_clear(run):
     if 'kushinada' in S:
         g['kushi'] = min(8, g.get('kushi', 0) + 1)
     g['shinoda'] = not g.get('room_hit')
-    if 'seimei_ido' in S and not g.get('room_hit') and random.random() < 0.25:
+    if 'seimei_ido' in S and not g.get('room_hit') and random.random() < (0.4 if 'kikyo_ido' in S else 0.25):
         run.spawn_pickup('spirit', p.x, p.y - 20)
     if 'opfergabe' in S and random.random() < (0.1 + 0.01 * luck) * (3 if 'shinsen' in S else 1):
         run.spawn_pickup('key', p.x, p.y - 20)
