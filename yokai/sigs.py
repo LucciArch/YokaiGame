@@ -218,6 +218,7 @@ TEXT = {
     'kintaro': 'Jeder Axttreffer zählt vierfach für den Keulenschlag, und die Keule trifft weiter (55 px statt 40)',
     'kurama': 'Sōjōbōs Wirbel wird größer (65 px), und jedes verwehte Feindgeschoss wird eine weitere Windklinge (bis +3)',
     'rashomon': 'Der Oni-Arm packt alle 2 s statt 2,5 s – unter 2 Herzen sogar jede Sekunde mit 250 %',
+    'morinji': 'Jede Rolle schenkt 3 s Glückssträhne (goldene Würfe +20 %), und der heiße Kessel hält länger (1,2 s)',
     'gyoretsu': 'Der Fuchsfeuer-Ring des Sternjuwels kommt doppelt so oft, und seine Flammen suchen ihr Ziel wie die der Laterne',
     'mamemaki': 'Die Bohnen fliegen schon jeden 2. Wurf, vier statt drei, und getroffene Yokai fliehen 2 s',
     'ataka': 'Tachi-ōjō hält schon bei 1 Herz und 4 s lang, und alle Yokai im Raum erstarren 2 s (Bosse ½ s) vor Benkeis Blick',
@@ -1434,8 +1435,12 @@ def on_dash(p, run):
             _syn(run, 'kurama', p.x, p.y, (200, 230, 220))
             g['hd'] = g.get('hd', 0) + min(3, n0 - len(run.ebullets))
     if 'chagama' in S:                                   # Bunbuku-Chagama: kurz ein heißer Teekessel
-        p.iframes = max(p.iframes, 0.8)
-        g['kessel'] = 0.8
+        kt = 1.2 if 'morinji' in S else 0.8
+        p.iframes = max(p.iframes, kt)
+        g['kessel'] = kt
+        if 'morinji' in S:                               # Morin-ji: der Kessel bringt Kaufmannsglück
+            _syn(run, 'morinji', p.x, p.y, (255, 220, 110))
+            g['gold_t'] = max(g.get('gold_t', 0), run.time + 3)
         _ring(run, p.x, p.y, (220, 220, 210), 22)
     if 'suzu' in S and run.time - g.get('suzu', -9) >= (2.5 if 'iwato' in S or 'kagura' in S else 4.0):
         _suzu(p, run)

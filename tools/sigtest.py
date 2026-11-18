@@ -603,5 +603,15 @@ for _ in range(200):
     ring += len(fire) >= 8 and all(b.fl.get('homing') for b in fire)
 if 'gyoretsu' not in p.sgs or not 0.18 * 200 < ring < 0.6 * 200:
     print('FEHLER Kitsunebi no Gyōretsu', ring); bad += 1
+# Morin-ji (Bunbuku-Chagama + Shigaraki-Tanuki): Rolle schenkt 3 s Glückssträhne, Kessel 1,2 s
+g.start_run('ponpoko', 55); run = g.run; p = run.player
+for iid in ('bunbuku_kessel', 'shigaraki_tanuki'):
+    p.gain_item(iid, silent=True)
+run.enemies = []; sigs.st(p)['gold_t'] = 0
+sigs.on_dash(p, run)
+b = Bullet(p.x, p.y, 1, 0, 10, 3, 1, 'p', (255, 255, 255), {})
+sigs.on_fire(p, run, [b])
+if 'morinji' not in p.sgs or sigs.st(p).get('kessel') != 1.2 or sigs.st(p).get('gold_t') != run.time + 3 or b.dmg != 12:
+    print('FEHLER Morin-ji', sigs.st(p).get('kessel'), sigs.st(p).get('gold_t'), b.dmg); bad += 1
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)
