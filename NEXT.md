@@ -428,7 +428,8 @@ Ittan-momen, Kosode-no-te), je mit eigener `sig_*`-Wirkung in `yokai/sigs.py`, I
 Lexikon-Text in `yokai/bestiary.py`; in Pools einbinden, sigtest je Item. Teil 2: 3–4 Synergien dazu.
 
 # Danach
-- Kakuremino, Oni-Horn, Yashiori einmal mit `--raum` (jetzt mit Raum-Eintritt) und `--still`/`--leben` gegenmessen
+- `--raum` mit Raum-Eintritt (Lauf 169–170): Oni-Horn ×1,03, Yashiori ×1,04, Kakuremino ×1,07 – Sonderrollen
+  (wenig Leben / Champion / Stillstand); bei Bedarf mit `--leben` bzw. `--still` gegenmessen
 - Ebene 9–10 ohne Meister noch ~10 s Bosszeit – nach Lucas Spieltest ggf. weiter anheben
 - Hi-ōgi (×1,53) und Masakari (×1,35) beobachten – oberer Rand der Siegel-Items
 
