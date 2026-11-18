@@ -459,6 +459,7 @@ SYNERGIES = [
     dict(id='kagura', name='Kagura', desc='Fächer und Glöckchen – der Tanz für die Götter', items=['hi_ogi', 'uzume_suzu'], fx=dict(spd=3, sig_kagura=1)),
     dict(id='sarayashiki', name='Banchō Sarayashiki', desc='Ichi-mai … kyū-mai … – und doch fehlt einer', items=['neunter_teller', 'zehnter_teller'], fx=dict(spirit=1, sig_okiku=1)),
     dict(id='gojo_ohashi', name='Gojō-Ōhashi', desc='Flötenspieler und Naginata-Mönch – aus Feinden werden Gefährten', items=['gojo_giboshi', 'ushiwaka_fue'], fx=dict(hp=1, sig_gojo_bashi=1)),
+    dict(id='orochi_taiji', name='Orochi-Taiji', desc='Erst der Sake, dann das Schwert – so fiel die achtköpfige Schlange', items=['habakiri', 'yashiori_sake'], fx=dict(sig_yamata_giri=1)),
     dict(id='henro', name='Henro', desc='Dōgyō ninin – Pilgerstab und Kraniche wandern mit dir', items=['kongozue', 'senbazuru'], fx=dict(luck=1, sig_henro=1)),
 ]
 

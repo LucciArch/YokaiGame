@@ -206,6 +206,7 @@ TEXT = {
     'kagura': 'Die Rolle läutet die Suzu alle 2,5 s; läutet sie im Tanz, wirbeln 6 Sakaki-Blätter (je 50 %) auf die Feinde',
     'okiku': 'Okiku zählt nur bis neun: der zehnte Teller zerspringt schon beim 9. Kill und nach jedem neunten Wurf um dich',
     'gojo_bashi': 'Jeder 4. Wurf ist ein Flötenton; trifft er, fegt Benkeis Naginata um das Ziel (80 %, höchstens alle 1,5 s)',
+    'yamata_giri': 'Gegen Berauschte schneidet Habakiri schon jeden 4. Treffer; der Schnitt berauscht auch gewöhnliche Feinde',
     'henro': 'Jede neue Ebene faltet zwei Kraniche, jede 2. Ebene bringt ein Geisterherz',
     'sommerwind': 'Die Rolle wirft acht Federn, die weiter fliegen',
     'fest_der_laternen': 'Treffer entzünden doppelt so oft den Boden, die Flammen brennen länger',
@@ -901,10 +902,15 @@ def hit_post(run, e, b, dmg):
             e.sg_conf = max(getattr(e, 'sg_conf', 0), 2.0)
             _float(run, e, 'Verzaubert', (255, 170, 90))
     if 'habakiri' in S and not echo:
+        drunk = 'yamata_giri' in S and run.time < getattr(e, 'sg_drunk', 0)
         g['hb'] = g.get('hb', 0) + 1
-        if g['hb'] >= 8:
+        if g['hb'] >= (6 if drunk else 8):                  # Orochi-Taiji: Berauschte schon beim 6. Treffer
             g['hb'] = 0
             _float(run, e, 'Habakiri!', (190, 220, 255))
+            if drunk:
+                _syn(run, 'yamata_giri', e.x, e.y, (230, 220, 180))
+            elif 'yamata_giri' in S and not e.is_boss and not e.champ:
+                e.sg_drunk = run.time + 3                # der Schnitt berauscht (ohne Bremse: sonst ×3,2 statt ×2,6)
             _sparks(run, e.x, e.y, ((190, 220, 255), (255, 255, 255)), 10, 120)
             run.damage_enemy(e, max(p.damage() * 3, e.maxhp * (0.01 if e.is_boss else 0.04)), None)   # Bosse: 4 % war ×3 (balance-check-128)
     if 'yashiori' in S and (e.is_boss or e.champ) and run.time >= getattr(e, 'sg_ys', -9):
