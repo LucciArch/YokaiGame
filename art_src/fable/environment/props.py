@@ -552,6 +552,60 @@ def rocks(name):
             cv.px(x + 2, y + 6, RED[3])
         out.append(fin(cv, P))
 
+    elif name == 'dazaifu':
+        plum = ('#5a1430', '#a02a48', '#e05a74', '#ffb4c0')     # Kōbai: rote Pflaumenblüte
+        bark = ('#100a12', '#22141c', '#3a2226', '#56362e')
+        cv, rng = new(0)                                     # Tobiume: knorriger Pflaumenbaum, rot blühend, gestützt
+        trunk = capsule(cv, 15, 28, 3.2, 13, 17, 2.4) | capsule(cv, 13, 17, 2.4, 18, 10, 1.6) | capsule(cv, 13, 18, 2, 6, 12, 1.2)
+        trunk |= capsule(cv, 18, 10, 1.6, 25, 7, 1) | capsule(cv, 16, 13, 1.4, 22, 15, 1) | capsule(cv, 6, 12, 1.2, 4, 7, .8)
+        cv.fill(dil(trunk), K)
+        cv.form(trunk, (bark[0], bark[1], bark[2]), 1, 1)
+        cv.hline([(14, 27), (13, 22), (14, 18)], bark[3])          # rissige Rinde
+        cv.line([(23, 22), (20, 14)], WOOD[2])                    # Stützpfahl unter dem Ast
+        cv.hl(19, 21, 16, STRAW[2])
+        for (x, y) in ((6, 11), (4, 7), (9, 9), (18, 9), (22, 7), (25, 6), (22, 14), (16, 8), (12, 14), (20, 12), (27, 9), (3, 11)):
+            bl = cv.E(x, y, 1.6, 1.4)
+            cv.fill(dil(bl), plum[0])
+            cv.fill(bl, plum[2])
+            cv.hpx(x - .5, y - .5, plum[3])
+            cv.hpx(x, y, GOLD[3])
+        for (x, y) in ((8, 20), (24, 26), (4, 26), (19, 27)):     # gefallene Blüten
+            cv.hpx(x, y, plum[2]); cv.hpx(x + .5, y, plum[1])
+        out.append(fin(cv, P))
+        cv, rng = new(1)                                     # Goshingyū: liegender Bronze-Ochse, Kopf blank gerieben
+        br = ('#0e1a1c', '#1c3230', '#2e4c44', '#4a6c5a')
+        body = cv.E(17, 22, 10, 5.5) | cv.R(8, 22, 26, 26)
+        head = cv.E(7, 20, 4.2, 3.6) | cv.E(4.5, 22.5, 2.6, 2)
+        legs = cv.R(9, 25, 13, 27) | cv.R(20, 25, 25, 27)
+        base_ = cv.R(5, 27, 29, 29)
+        cv.fill(dil(body | head | legs | base_), K)
+        cv.form(base_, STONE[1:], 1, 1)
+        cv.form(body | legs, br[:3], 2, 1)
+        cv.form(head, (GOLD[0], GOLD[1], GOLD[2]), 1, 1)        # von Pilgerhänden golden poliert
+        cv.hpx(5.5, 19.5, GOLD[3]); cv.hpx(6, 19.5, GOLD[3])
+        cv.hline([(6, 17), (4, 15), (3, 15.5)], br[2])           # Hörner
+        cv.hline([(9, 17), (10, 15), (11.5, 14.5)], br[2])
+        cv.px(6, 20, K)                                       # Auge
+        cv.hline([(14, 18), (20, 17.5), (25, 19)], br[3])        # Rückenlicht
+        cv.hline([(26, 22), (28, 24), (27, 26)], br[1])          # Schwanz
+        cv.hline([(10, 18), (10.5, 21), (10, 23.5)], RED[3])         # rote Votivschnur um den Hals
+        cv.hpx(9.5, 24, RED[2]); cv.hpx(10, 24.5, RED[2])
+        cv.hline([(11, 26), (8, 26.5)], br[0])                   # eingeknicktes Vorderbein
+        out.append(fin(cv, P))
+        cv, rng = new(2)                                     # vom Blitz gespaltene Zeder mit Shimenawa, noch glimmend
+        ced = ('#0e0a10', '#1e1418', '#34221e', '#4e3426')
+        m, t = cyl(cv, ced, 16, 28, 6.5, 12, top=('#1e1418', '#3a1a14', '#7a2a18'))
+        split = cv.PG([(13, 14), (16, 6), (17, 15)]) | cv.PG([(18, 15), (21, 4), (23, 15)])
+        cv.fill(dil(split), K)
+        cv.form(split, (ced[1], ced[2], ced[3]), 1, 1)
+        cv.hline([(16, 7), (16, 14)], LAVA[2])                   # glühender Spalt
+        cv.hline([(21, 6), (21, 14)], LAVA[3])
+        cv.hpx(21, 5, GOLD[3])
+        rope(cv, 9, 23, 20, 1)
+        for (x, y) in ((6, 27), (26, 27), (9, 28)):           # Splitter
+            cv.hline([(x, y), (x + 2, y - 1)], ced[2])
+        out.append(fin(cv, P))
+
     elif name == 'yukiyama':
         sn = P['snow']
         cv, rng = new(0)                                     # ice crystal cluster
@@ -1555,6 +1609,21 @@ def wall_decos(name, base):
         b.rect(13, 7, 14, 7, s[2]); b.px(13, 6, s[3])
         b.px(15, 13, blood[1])
         b.grid(18, 5, ".a.\naba\n.a.", dict(a=blood[2], b='#ff8a7a'))
+    elif name == 'dazaifu':
+        plum = ('#5a1430', '#a02a48', '#e05a74', '#ffb4c0')
+        a.line([(0, 3), (8, 5), (14, 2), (22, 6), (31, 4)], '#22141c')      # Pflaumenzweig über dem Zaun
+        a.line([(0, 4), (8, 6), (14, 3), (22, 7), (31, 5)], '#100a12')
+        a.line([(14, 2), (17, 0)], '#22141c'); a.line([(22, 6), (24, 10)], '#22141c')
+        for (x, y) in ((4, 3), (10, 4), (17, 1), (20, 5), (24, 9), (28, 3), (13, 6)):
+            a.grid(x - 1, y - 1, ".a.\naba\n.a.", dict(a=plum[2], b=GOLD[3]))
+        for x in (6, 18, 27):                                # Tanzaku mit Tenjins Gedicht, daran gebunden
+            a.rect(x, 7, x + 1, 12, PAPER[2]); a.vl(x + 1, 7, 12, PAPER[1])
+            a.px(x, 9, '#1c121c'); a.px(x, 11, '#1c121c')
+        niche(b, 9, 22, 5)                                   # Nische: kleiner Bronze-Ochse, Tōrō darüber
+        br = ('#1c3230', '#2e4c44', '#4a6c5a')
+        b.grid(11, 10, "..aaaaaa..\nyyabbbbba.\nyKabbcbbba\n.aabbbbbba\n..bb..bb..", dict(a=br[0], b=br[1], c=br[2], y=GOLD[2], K=K))
+        b.rect(11, 14, 20, 14, P['k1']); b.hl(11, 20, 13, P['k2'])
+        b.grid(18, 5, ".a.\nbcb\n.a.", dict(a=WOOD[2], b=GOLD[2], c=GOLD[3]))
     elif name == 'kubizuka':
         pale = ('#1a3a4a', '#3a7a86', '#8ad0c8', '#e0fff4')
         for x, top in ((4, 2), (10, 1), (16, 3), (22, 1)):   # Sotoba-Grabbretter, an die Mauer gelehnt

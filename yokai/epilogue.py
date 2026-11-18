@@ -46,6 +46,9 @@ STORY_SHIRAMINE = ['Die Blut-Sutren verbrennen im Groll-Feuer, und die Krähen v
 STORY_KUBIZUKA = ['Das Haupt des Masakado kreist ein letztes Mal über Ōtemachi, dann sinkt es lachend in seinen Grabhügel.',
                   'Am Morgen stehen frische Steinfrösche vor dem Kubizuka – „kaeru“, heimkehren. Diesmal bleibt er, wo er ist.']
 
+STORY_DAZAIFU = ['Der letzte Donner rollt über den Tenmangū, dann bricht der Regen ab. Im Mondlicht blüht der Pflaumenbaum, der einst nach Dazaifu flog.',
+                 'Die drei großen Onryō ruhen. Am Morgen legen Schüler Ema mit Prüfungswünschen an den Schrein – Tenjin ist wieder ein Gott der Gelehrten.']
+
 T_STORY = 4.2        # Sekunden pro Textblock
 T_CREDITS = 15.0
 
@@ -56,7 +59,7 @@ class Epilogue:
         self.t = 0.0
         self.true = run.depth >= 6
         self.char = run.char
-        story = STORY_KUBIZUKA if run.depth == 9 else STORY_SHIRAMINE if run.depth == 8 else STORY_IWATO if run.biome_id == 'iwato' else STORY_YOMI if run.depth >= 7 else STORY_TRUE if self.true else STORY_NORMAL
+        story = STORY_DAZAIFU if run.depth == 10 else STORY_KUBIZUKA if run.depth == 9 else STORY_SHIRAMINE if run.depth == 8 else STORY_IWATO if run.biome_id == 'iwato' else STORY_YOMI if run.depth >= 7 else STORY_TRUE if self.true else STORY_NORMAL
         end = ENDINGS.get(self.char, ('', ''))[1 if self.true else 0]
         self.blocks = story + [end]
         seen = [e for e in game.save.data.get('enemies_seen', []) if e in ENEMIES and sheets.has(ENEMIES[e]['sprite'])

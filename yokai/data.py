@@ -756,6 +756,7 @@ ACHIEVEMENTS = [
     ('iwato', 'Die Sonne kehrt zurück', 'Besiege Amaterasu in Ama-no-Iwato', ('item', 'uzume_suzu')),
     ('sutoku', 'Der Fluch von Shiramine', 'Besiege Sutoku-in am Grab des verbannten Kaisers', ('item', 'sutoku_sutra')),
     ('masakado', 'Das Haupt kehrt heim', 'Besiege Taira no Masakado am Kubizuka', ('item', 'masakado_kage')),
+    ('michizane', 'Der Donner verstummt', 'Besiege Sugawara no Michizane in Dazaifu', None),
     ('all_bosses', 'Bezwinger der Nachtparade', 'Besiege alle 24 Bosse', None),
     ('teahouse', 'Teezeremonie', 'Trinke im Teehaus', None),
     ('slots', 'Glücksspieler', 'Spiele am Tanuki-Automaten', None),
@@ -836,6 +837,14 @@ BIOMES['kubizuka'] = dict(name='Grabhügel des Hauptes', jp='Kubizuka', depth=9,
                           decor='cracks', boss='masakado')
 DEPTH_BIOMES[9] = ['kubizuka']
 BOSS_POOL[9] = ['masakado']
+# Kapitel X (geheim, nach einem Sieg über Masakado): Dazaifu, wo Sugawara no Michizane in der Verbannung starb.
+BIOMES['dazaifu'] = dict(name='Schrein des Donnergottes', jp='Dazaifu', depth=10, floor=(24, 26, 40), floor_pat='gravel',
+                         wall=(58, 20, 32), wall_pat='wood', rock=(62, 68, 88), moss=False, ambient='fog',
+                         enemies=['gozu', 'mezu', 'mokumokuren', 'tenome', 'karasu_tengu', 'onibi', 'kasha', 'shinigami'],
+                         music=('yo', 220, 104, 'mystic', 63), weather='rain_dark', dark=80, grade=(60, 30, 70), pit='void',
+                         decor='leaves', boss='michizane')
+DEPTH_BIOMES[10] = ['dazaifu']
+BOSS_POOL[10] = ['michizane']
 BOSS_POOL[6].remove('izanami')    # Izanami wartet jetzt in ihrem eigenen Reich
 BOSS_POOL[7] = ['izanami']
 

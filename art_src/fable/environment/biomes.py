@@ -2,7 +2,7 @@
 from core import mix
 
 ORDER = ['chikurin', 'inari', 'obakedera', 'hakaba', 'kurama', 'yukiyama', 'ryugu', 'uminobe', 'yomi', 'jigoku',
-         'takamagahara', 'kawabe', 'yashiki', 'oeyama', 'shinkai', 'enma_cho', 'tsukiyomi', 'yomi_oku', 'iwato', 'shiramine', 'kubizuka']
+         'takamagahara', 'kawabe', 'yashiki', 'oeyama', 'shinkai', 'enma_cho', 'tsukiyomi', 'yomi_oku', 'iwato', 'shiramine', 'kubizuka', 'dazaifu']
 
 
 def B(floor_pat, wall_pat, pit, dark, f, cap, w, k, **extra):
@@ -105,4 +105,8 @@ BIOMES = {
                   ('#0c1014', '#151b20', '#1d252a', '#283236'), ('#080c10', '#121a1e', '#5a8a86'),
                   ('#10161a', '#1c262a', '#2c3a3c', '#435654'), ('#10161a', '#242e32', '#3c4a4c', '#5e706c'),
                   leaf=('#1a3a30', '#2e5a44')),
+    'dazaifu': B('gravel', 'wood', 'void', 75,           # Dazaifu: Tenmangū bei Gewitternacht, rote Pflaumenblüten, Bronze-Ochsen
+                 ('#0e0e1a', '#181a28', '#222436', '#2e3044'), ('#0a0a12', '#141624', '#c04a5a'),
+                 ('#1a0c16', '#3a1420', '#5e2028', '#84342e'), ('#121420', '#262a3a', '#3e4458', '#5e6680'),
+                 leaf=('#5a1a34', '#a03050')),
 }

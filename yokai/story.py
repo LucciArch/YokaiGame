@@ -60,14 +60,20 @@ CHAPTERS = [
         'Drei Tage lachte es auf dem Richtplatz in Kyōto, dann flog es heim nach Osten und stürzte in Shibasaki zu Boden.',
         'Die Menschen bauten ihm einen Hügel und stellten Frösche davor, damit alles Verlorene heimkehrt.',
         'Nun ruht das Haupt. Doch zwischen den Kampferbäumen glimmt noch ein Funke – Sugawara no Michizane wartet auf seinen Donner.']),
+    ('dazaifu', 'Der Donner über dem Seiryōden', lambda sv: _st(sv, 'michizane_wins') >= 1,
+     'Folge dem Donner nach Dazaifu und stelle dich Sugawara no Michizane.', 'dazaifu', [
+        'Michizane war der klügste Mann am Hof – bis die Fujiwara ihn verleumdeten und nach Dazaifu verbannten.',
+        'Er starb dort in Armut. Nur sein Pflaumenbaum flog ihm aus Kyōto nach.',
+        'Dann schlug der Blitz in den Seiryōden, und einer nach dem anderen starben seine Feinde.',
+        'Hana betet vor dem Ochsen aus Bronze. Der Donner verstummt – und der dritte große Groll findet Ruhe.']),
 ]
 BY_ID = {c[0]: c for c in CHAPTERS}
 # Story-Baum: Lage der Knoten und Verbindungen
 POS = {'prolog': (240, 40), 'morgen': (240, 76), 'stern': (240, 112), 'yomi': (140, 148), 'iwato': (340, 148),
-       'schatten': (240, 184), 'wahres_ende': (240, 220), 'kubizuka': (360, 220), 'gefaehrten': (400, 76), 'meister': (400, 112)}
+       'schatten': (240, 184), 'wahres_ende': (240, 220), 'kubizuka': (360, 220), 'dazaifu': (360, 256), 'gefaehrten': (400, 76), 'meister': (400, 112)}
 EDGES = [('prolog', 'morgen'), ('morgen', 'stern'), ('stern', 'yomi'), ('stern', 'iwato'), ('yomi', 'schatten'),
-         ('iwato', 'schatten'), ('schatten', 'wahres_ende'), ('wahres_ende', 'kubizuka'), ('prolog', 'gefaehrten'), ('gefaehrten', 'meister')]
-ORDER = ['prolog', 'morgen', 'stern', 'yomi', 'iwato', 'schatten', 'wahres_ende', 'kubizuka', 'gefaehrten', 'meister']
+         ('iwato', 'schatten'), ('schatten', 'wahres_ende'), ('wahres_ende', 'kubizuka'), ('kubizuka', 'dazaifu'), ('prolog', 'gefaehrten'), ('gefaehrten', 'meister')]
+ORDER = ['prolog', 'morgen', 'stern', 'yomi', 'iwato', 'schatten', 'wahres_ende', 'kubizuka', 'dazaifu', 'gefaehrten', 'meister']
 
 
 def unlocked(sv, cid):
