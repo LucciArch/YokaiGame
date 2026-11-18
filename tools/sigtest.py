@@ -631,5 +631,14 @@ e = Enemy(run, 'gaki', p.x + 60, p.y); e.spawn_t = 0; e.hp = e.maxhp = 100; run.
 sigs.on_dash(p, run); hp1 = e.hp; sigs.on_dash(p, run)
 if 'oharae' not in p.sgs or abs(hp1 - 92) > 0.01 or abs(e.hp - 92) > 0.01:
     print('FEHLER Ōharae', hp1, e.hp); bad += 1
+# Totsuka no Tsurugi (Habakiri + Ama-no-Ōhabari): der Habakiri-Schnitt ruft einen springenden Blitz
+g.start_run('susanoo', 58); run = g.run; p = run.player
+for iid in ('habakiri', 'ohabari'):
+    p.gain_item(iid, silent=True)
+e = Enemy(run, 'gaki', p.x + 60, p.y); e.spawn_t = 0; e.hp = e.maxhp = 999
+o = Enemy(run, 'gaki', p.x + 90, p.y); o.spawn_t = 0; o.hp = o.maxhp = 999; run.enemies = [e, o]
+sigs.st(p)['hb'] = 7; n0 = len(run.hazards); sigs.hit_post(run, e, None, 1)
+if 'totsuka' not in p.sgs or len(run.hazards) - n0 != 2:
+    print('FEHLER Totsuka no Tsurugi', len(run.hazards) - n0); bad += 1
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)

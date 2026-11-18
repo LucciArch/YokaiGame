@@ -479,6 +479,7 @@ SYNERGIES = [
     dict(id='morinji', name='Morin-ji', desc='Im Tempel von Tatebayashi steht noch heute der Kessel – und jeder Kaufmann, der ihn sieht, hat Glück', items=['bunbuku_kessel', 'shigaraki_tanuki'], fx=dict(sig_morinji=1)),
     dict(id='kotaro', name='Kotarō', desc='Unsichtbar unter dem Strohmantel, nur die Steine verraten ihn – so lernte der Waisenjunge bei den Tengu', items=['tengu_tsubute', 'kakuremino'], fx=dict(sig_kotaro=1)),
     dict(id='oharae', name='Ōharae', desc='Die Große Reinigung am Ende des Jahres – kleiner Stab und großer Stab fegen gemeinsam alles Unreine fort', items=['haraegushi', 'onusa'], fx=dict(sig_oharae=1)),
+    dict(id='totsuka', name='Totsuka no Tsurugi', desc='Zwei Zehn-Faust-Schwerter: mit dem einen erschlug Izanagi den Feuergott, mit dem anderen Susanoo die Schlange', items=['habakiri', 'ohabari'], fx=dict(sig_totsuka=1)),
     dict(id='henro', name='Henro', desc='Dōgyō ninin – Pilgerstab und Kraniche wandern mit dir', items=['kongozue', 'senbazuru'], fx=dict(luck=1, sig_henro=1)),
 ]
 

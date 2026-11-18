@@ -218,6 +218,7 @@ TEXT = {
     'kintaro': 'Jeder Axttreffer zählt vierfach für den Keulenschlag, und die Keule trifft weiter (55 px statt 40)',
     'kurama': 'Sōjōbōs Wirbel wird größer (65 px), und jedes verwehte Feindgeschoss wird eine weitere Windklinge (bis +3)',
     'rashomon': 'Der Oni-Arm packt alle 2 s statt 2,5 s – unter 2 Herzen sogar jede Sekunde mit 250 %',
+    'totsuka': 'Jeder Habakiri-Schnitt ruft den Donner des Ōhabari: ein Blitz auf das Ziel (100 %), der auf bis zu 3 weitere Feinde springt',
     'oharae': 'Höchstens alle 4 s schwingt die Rolle auch den Haraegushi: alle Yokai im Raum verlieren 8 % ihres Lebens (Bosse 200 % Schaden)',
     'kotaro': 'Unsichtbar im Kakuremino fallen die Tengu-Steine doppelt so oft (alle 1,5 s) und härter (200 %)',
     'morinji': 'Jede Rolle schenkt 3 s Glückssträhne (goldene Würfe +20 %), und der heiße Kessel hält länger (1,2 s)',
@@ -976,6 +977,10 @@ def hit_post(run, e, b, dmg):
                 e.sg_drunk = run.time + 3                # der Schnitt berauscht (ohne Bremse: sonst ×3,2 statt ×2,6)
             _sparks(run, e.x, e.y, ((190, 220, 255), (255, 255, 255)), 10, 120)
             run.damage_enemy(e, max(p.damage() * 3, e.maxhp * (0.01 if e.is_boss else 0.04)), None)   # Bosse: 4 % war ×3 (balance-check-128)
+            if 'totsuka' in S:                           # Totsuka no Tsurugi: Izanagis Schwert antwortet mit Donner
+                _syn(run, 'totsuka', e.x, e.y, (255, 240, 150))
+                run.lightning(e.x, e.y, p.damage())
+                _chain_strikes(run, e, 3, p.damage())
     if 'yashiori' in S and (e.is_boss or e.champ) and run.time >= getattr(e, 'sg_ys', -9):
         e.sg_ys, e.sg_drunk = run.time + 8, run.time + 3
         e.slowed = max(e.slowed, 3.0)
