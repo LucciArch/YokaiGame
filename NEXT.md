@@ -437,21 +437,35 @@ für Talismane greifen (z. B. `bullet_tick`) – sollen sie auch für Strahl/Hie
 In dieser Sitzung gab es kein Video-Werkzeug. Vorgeschlagen (Plugin-Verzeichnis, eigenes Konto/Guthaben nötig):
 „Cinematic AI Video Maker“, „AI Video & Image Generator by Clipwave“, „AI Video Editor & Timeline“ (ManyMotions).
 Sobald eines aktiv ist (`ListPlugins` prüfen): je Kapitel (Szenen-Schlüssel in `story.CHAPTERS`: mond, morgen, stern,
-yomi, sonne, feuer, siegel, schatten) ein Video erzeugen, als MP4 nach `yokai/assets/story/<szene>.mp4`, Wiedergabe
+yomi, sonne, feuer, siegel, schatten, shiramine) ein Video erzeugen, als MP4 nach `yokai/assets/story/<szene>.mp4`, Wiedergabe
 in `Cutscene.frame` (pygame kann kein MP4 → z. B. beim Build in JPG-Einzelbilder zerlegen oder `imageio`/`cv2`;
 Größe im PyInstaller-Build beachten). Abweichung von „alles selbst erzeugt“ nur hierfür – Lucas ausdrücklicher Wunsch.
 Ohne Video-Werkzeug NICHT wieder selbst Szenen malen.
 
-# Nächster Schritt: Story Teil 2 – Geheimer Boss nach „Der Schatten hinter dem Morgen“
-Warum: Luca wünscht sich Isaac-artige Progression mit geheimen Bossen und Zwischensequenzen nach dem Endboss. Das
-Kapitel `schatten` kündigt den Gegner schon an. Plan: neuer Boss (folkloretreu, z. B. **Sutoku-in** – der verbannte
-Kaiser, der als großer Onryō/Ō-Tengu zurückkehrt, einer der „drei großen Onryō“), Hi-Res-Sprite in `art_src/`
-(handgesetzt), eigenes Biom/Kapitel VIII (Portal nach Izanami bzw. Amaterasu, nur wenn `story.unlocked(save,'schatten')`),
-Boss-Muster in `yokai/bosses.py`, Eintrag in `bestiary.BOSS_LORE`, neues Kapitel `wahres_ende` mit eigener Szene und
-Epilog-Text (`epilogue.py`), Figuren-Siegel ggf. später. bosstest/uiflow2 erweitern.
+# Erledigt (Runden 174–175): Story Teil 2 – geheimer Boss Sutoku-in, Kapitel VIII Shiramine
+- Runde 174: `bosses.Sutoku` (3 Phasen: Blut-Sutren-Spalten rechts→links, Umkehr-Fluch, Tengu-Federn; Phase 2 Krähen-Tengu,
+  Federsturm, Groll-Feuer; Phase 3 `extra_dark`, Sutren-Spirale). Sprite `art_src/fable/bosses_3/boss_sutoku.py`
+  (`PYTHONPATH=.. python3 boss_sutoku.py`, dann `python3 ../../import_fable.py .` in bosses_3 – danach die anderen
+  Boss-PNGs per `git checkout` zurücksetzen, sie werden nur neu kodiert). bosstest: ~41 Treffer (Amaterasu ~21, Izanami ~52).
+- Runde 175: Biom `shiramine` (depth 8; Palette in `environment/biomes.py`, Requisiten in `props.rocks`, gebaut mit
+  `build.py shiramine` + `hi.py`, Ordner nach `yokai/assets/env/shiramine` kopiert). Pforte `Obj('shiramine')` im Bossraum
+  von Kapitel VII, nur wenn `story.unlocked(save, 'schatten')` und keine Prüfung. Sieg: `stats.sutoku_wins`, Erfolg `sutoku`
+  (noch ohne Belohnung), `epilogue.STORY_SHIRAMINE`, Kapitel `wahres_ende` im Story-Baum (Szene `shiramine`, Platzhalter).
+  bosstest prüft die Pforte („Shiramine-Pforte OK“).
+
+# Nächster Schritt: Belohnung + Feinschliff für Sutoku-in
+Warum: Der geheime Boss steht, aber sein Sieg gibt noch nichts und er klingt wie jeder Endboss. Plan:
+1. Item `sutoku_sutra` („Blut-Sutra“, Pool B, Symbol handgesetzt in einem neuen `art_src/fable/items/icons_v20.py`):
+   eigene sig – z. B. jeder 7. Wurf kehrt nach 0,6 s um und fliegt durch die Feinde zurück (Umkehr-Fluch als Spielerwaffe).
+   Als Belohnung im Erfolg `sutoku` (`data.ACHIEVEMENTS`, wie `('item', 'uzume_suzu')`) und `BOSS_REWARD['sutoku']`.
+2. Eigene Bossmusik (`art_src/music/tracks.py`, wie `amaterasu`; in `audio.track_for` auf den Seed von Shiramine legen –
+   Seed 58 + 100 + 8 = 166; validate.py prüft die Bossmusik je Biom, Ausnahme dort mit eintragen).
+3. Titelbild-Stimmung nach Sutoku-Sieg (wie 'iwato' in `app.py` ~Z. 346: z. B. Krähen vor rotem Morgenhimmel).
+4. Wanddeko Hi-Res für Shiramine (`walldeco_hi.py`, wie `iwato_hi`) – derzeit nur die einfache Standard-Deko.
 
 # Danach (Story)
-- Zweiter geheimer Boss über eine besondere Bedingung (z. B. Kapitel-I-Boss ohne Treffer → Masakados Haupt erscheint)
+- Zweiter geheimer Boss über eine besondere Bedingung (z. B. Kapitel-I-Boss ohne Treffer → Masakados Haupt erscheint) –
+  Masakado und Michizane sind die beiden anderen „großen Onryō“ neben Sutoku, das passt als Reihe.
 - Je Figur ein eigenes Story-Kapitel (`ENDINGS` in `epilogue.py` als Knoten im Baum, Bedingung `char_wins`)
 - Iwato erst nach Yomi öffnen (strengerer Pfad wie Isaac), oder Kapitel VII je nach gewähltem Weg
 
