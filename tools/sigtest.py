@@ -640,5 +640,35 @@ o = Enemy(run, 'gaki', p.x + 90, p.y); o.spawn_t = 0; o.hp = o.maxhp = 999; run.
 sigs.st(p)['hb'] = 7; n0 = len(run.hazards); sigs.hit_post(run, e, None, 1)
 if 'totsuka' not in p.sgs or len(run.hazards) - n0 != 2:
     print('FEHLER Totsuka no Tsurugi', len(run.hazards) - n0); bad += 1
+# Ichigeki Hissatsu (Zanshin-Tsuba + Ichi-no-tachi): der erste Hieb weckt 3 Stufen Kampfgeist, Zanshin hält 3 s
+g.start_run('kenji', 59); run = g.run; p = run.player
+for iid in ('zanshin_tsuba', 'ichi_no_tachi'):
+    p.gain_item(iid, silent=True)
+e = Enemy(run, 'gaki', p.x + 60, p.y); e.spawn_t = 0; e.hp = e.maxhp = 999; run.enemies = [e]
+sigs.st(p)['ichi'] = True; m0 = sigs.dmg_mult(p)
+sigs.hit_post(run, e, run.fire_player_bullet(p.x, p.y, 0, 1, 100, 2, 1, {}), 1)
+m1 = sigs.dmg_mult(p); run.time += 2.5; m2 = sigs.dmg_mult(p)
+if 'ichigeki' not in p.sgs or abs(m1 / m0 - 1.24) > 0.01 or abs(m2 - m1) > 0.01:
+    print('FEHLER Ichigeki Hissatsu', m0, m1, m2); bad += 1
+# Mizukagami (Brunnenspiegel + Brunnen von Banchō Sarayashiki): der Spiegel fängt bis zu 3 Geschosse
+g.start_run('okiku', 60); run = g.run; p = run.player
+for iid in ('ido_kagami', 'okiku_ido'):
+    p.gain_item(iid, silent=True)
+e = Enemy(run, 'gaki', p.x + 120, p.y); e.spawn_t = 0; e.hp = e.maxhp = 999; run.enemies = [e]
+run.ebullets = []
+for k in range(4):
+    ebullet(run, p.x + 20 + 12 * k, p.y + 10, 0, 0)
+n0 = len(run.ebullets); run.pbullets = []; sigs.st(p)['ido'] = 3.0; sigs.tick(p, run, 0.01)
+if 'mizukagami' not in p.sgs or n0 != 4 or len(run.ebullets) != 1 or len(run.pbullets) != 3:
+    print('FEHLER Mizukagami', n0, len(run.ebullets), len(run.pbullets)); bad += 1
+# Kage-kitsune (Kuzunohas Spiegelbild + Kuzu-Blatt): das Trugbild hält 4,5 s und wirft brennendes Fuchsfeuer
+g.start_run('kuzunoha', 61); run = g.run; p = run.player
+for iid in ('fuchs_trugbild', 'kuzu_blatt'):
+    p.gain_item(iid, silent=True)
+e = Enemy(run, 'gaki', p.x + 120, p.y); e.spawn_t = 0; e.hp = e.maxhp = 999; run.enemies = [e]
+sigs.on_dash(p, run); tr = sigs.st(p)['trug']; run.pbullets = []
+sigs._siegel_fire(p, run, [], sigs.st(p), 1, 0, 10, 100, 1, 2)
+if 'kage_kitsune' not in p.sgs or tr[2] != 4.5 or len(run.pbullets) != 1 or not run.pbullets[0].fl.get('burn'):
+    print('FEHLER Kage-kitsune', tr, [b.fl for b in run.pbullets]); bad += 1
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)

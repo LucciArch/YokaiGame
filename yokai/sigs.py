@@ -218,6 +218,9 @@ TEXT = {
     'kintaro': 'Jeder Axttreffer zählt vierfach für den Keulenschlag, und die Keule trifft weiter (55 px statt 40)',
     'kurama': 'Sōjōbōs Wirbel wird größer (65 px), und jedes verwehte Feindgeschoss wird eine weitere Windklinge (bis +3)',
     'rashomon': 'Der Oni-Arm packt alle 2 s statt 2,5 s – unter 2 Herzen sogar jede Sekunde mit 250 %',
+    'kage_kitsune': 'Das Fuchs-Trugbild bleibt 4,5 s statt 3 s und wirft brennendes Fuchsfeuer (70 % statt 50 %)',
+    'mizukagami': 'Der Brunnenspiegel fängt bis zu 3 Feindgeschosse auf einmal (Umkreis 70 statt 50) und wirft sie als kaltes Brunnenwasser zurück (bremst)',
+    'ichigeki': 'Der erste Hieb weckt sofort 3 Stufen Kampfgeist (+24 %), und Zanshin hält 3 s statt 2 s wach',
     'totsuka': 'Jeder Habakiri-Schnitt ruft den Donner des Ōhabari: ein Blitz auf das Ziel (100 %), der auf bis zu 3 weitere Feinde springt',
     'oharae': 'Höchstens alle 4 s schwingt die Rolle auch den Haraegushi: alle Yokai im Raum verlieren 8 % ihres Lebens (Bosse 200 % Schaden)',
     'kotaro': 'Unsichtbar im Kakuremino fallen die Tengu-Steine doppelt so oft (alle 1,5 s) und härter (200 %)',
@@ -700,7 +703,10 @@ def _siegel_fire(p, run, bullets, g, n, base, dmg, spd, life, size):
     if tr and tr[2] > 0:                                 # das Fuchs-Trugbild wirft mit
         tgt = _nearest(run, tr[0], tr[1], 300)
         a = math.atan2(tgt.y - tr[1], tgt.x - tr[0]) if tgt else base
-        nb = run.fire_player_bullet(tr[0], tr[1] - 4, a, dmg * 0.5, spd, size, life, {})
+        kage = 'kage_kitsune' in S                       # Kage-kitsune: der Schatten wirft Fuchsfeuer
+        if kage:
+            _syn(run, 'kage_kitsune', tr[0], tr[1], (255, 170, 90))
+        nb = run.fire_player_bullet(tr[0], tr[1] - 4, a, dmg * (0.7 if kage else 0.5), spd, size, life, {'burn': 1} if kage else {})
         nb.col = (255, 170, 90)
     if 'gluecksstraehne' in S and run.time < g.get('gold_t', 0):
         for b in bullets:
@@ -904,6 +910,9 @@ def hit_post(run, e, b, dmg):
         _float(run, e, 'Ichi-no-tachi!', (220, 220, 235))
         _sparks(run, e.x, e.y, ((235, 235, 250), (160, 160, 180)), 8, 100)
         run.damage_enemy(e, dmg * 3, None)
+        if 'ichigeki' in S:                              # Ichigeki: nach dem ersten Hieb bleibt der Geist wach
+            _syn(run, 'ichigeki', e.x, e.y, (200, 170, 90))
+            g['zs'], g['zs_t'] = max(3, g.get('zs', 0)), run.time
         if 'ganryu' in S:                                # Ganryūjima: der Hieb wendet wie die Schwalbe
             g['ichi_t'] = run.time
             _syn(run, 'ganryu', e.x, e.y, (90, 110, 160))
@@ -1131,7 +1140,7 @@ def on_kill(run, e):
                 if o.active() and not o.is_boss and math.hypot(o.x - e.x, o.y - e.y) < 80:
                     o.sg_fear = max(getattr(o, 'sg_fear', 0), 2.0)
     if 'zanshin' in S:
-        g['zs'] = min(5, g.get('zs', 0) + 1) if run.time - g.get('zs_t', -9) < 2.0 else 1
+        g['zs'] = min(5, g.get('zs', 0) + 1) if run.time - g.get('zs_t', -9) < _zs_win(S) else 1
         g['zs_t'] = run.time
     if 'schwertjagd' in S:
         _jagd(p, run, e, g)
@@ -1427,7 +1436,7 @@ def on_dash(p, run):
         return
     g = st(p)
     if 'doppelgaenger' in S:                             # Kuzunohas Spiegelbild bleibt stehen
-        g['trug'] = [p.x, p.y, 3.0]
+        g['trug'] = [p.x, p.y, 4.5 if 'kage_kitsune' in S else 3.0]
     if 'hanadaka' in S:
         g['hd'] = 3
     if 'onusa' in S:                                     # Ōnusa: Geschosse werden zu Shide
@@ -2107,13 +2116,19 @@ def _siegel_tick(p, run, dt, S, g):
                 _schluck(p, run, g, 2)
     if 'ido_kagami' in S:
         g['ido'] = g.get('ido', 0) + dt
+        mizu = 'mizukagami' in S                         # Mizukagami: der Brunnen hinter dem Spiegel fängt mehr
         if g['ido'] >= 3.0:
-            eb = min(run.ebullets, key=lambda b: math.hypot(b.x - p.x, b.y - p.y), default=None)
             tgt = run.nearest_enemy(p.x, p.y)
-            if eb and tgt and math.hypot(eb.x - p.x, eb.y - p.y) < 50:
+            ebs = sorted((b for b in run.ebullets if math.hypot(b.x - p.x, b.y - p.y) < (70 if mizu else 50)),
+                         key=lambda b: math.hypot(b.x - p.x, b.y - p.y))[:3 if mizu else 1] if tgt else []
+            if ebs:
                 g['ido'] = 0
+                if mizu:
+                    _syn(run, 'mizukagami', p.x, p.y, (150, 190, 230))
+            for eb in ebs:
                 run.ebullets.remove(eb)
-                nb = run.fire_player_bullet(eb.x, eb.y, math.atan2(tgt.y - eb.y, tgt.x - eb.x), p.damage() * 1.5, 220, 3, 1.5, {})
+                nb = run.fire_player_bullet(eb.x, eb.y, math.atan2(tgt.y - eb.y, tgt.x - eb.x), p.damage() * 1.5, 220, 3, 1.5,
+                                            {'slow': 1} if mizu else {})
                 nb.col = (150, 190, 230)
                 _ring(run, eb.x, eb.y, (150, 190, 230), 12)
     if 'murakumo' in S:                                  # Gewitterwolke über dem Kopf
@@ -2133,6 +2148,10 @@ def _siegel_tick(p, run, dt, S, g):
     if g.get('kessel', 0) > 0 and random.random() < 0.4:
         from .entities import Particle
         run.particles.append(Particle(p.x + random.uniform(-5, 5), p.y - 8, 0, -30, 0.4, (225, 225, 220), 2))
+
+
+def _zs_win(S):
+    return 3.0 if 'ichigeki' in S else 2.0
 
 
 def dmg_mult(p):
@@ -2157,7 +2176,7 @@ def dmg_mult(p):
         m *= 1 + 0.03 * g.get('parade', 0)
     if g.get('hannya', 0) > 0:
         m *= 1.5
-    if 'zanshin' in S and run.time - g.get('zs_t', -9) < 2.0:
+    if 'zanshin' in S and run.time - g.get('zs_t', -9) < _zs_win(S):
         m *= 1 + 0.08 * g.get('zs', 0)
     if g.get('taizan_pen'):
         m *= 0.8
