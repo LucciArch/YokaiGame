@@ -208,6 +208,7 @@ TEXT = {
     'gojo_bashi': 'Jeder 4. Wurf ist ein Flötenton; trifft er, fegt Benkeis Naginata um das Ziel (80 %, höchstens alle 1,5 s)',
     'yamata_giri': 'Gegen Berauschte schneidet Habakiri schon jeden 4. Treffer; der Schnitt berauscht auch gewöhnliche Feinde',
     'kikyo_ido': 'Schließt sich das Pentagramm, sprudelt der Brunnen: Welle um das Ziel (60 %); Räume ohne Treffer geben zu 40 % ein Geisterherz',
+    'ido_reikon': 'Das Brunnenwasser trifft alle Feinde (25 % je Geisterherz, höchstens 100 %) und gibt schon jeden 2. Raum ½ Geisterherz',
     'henro': 'Jede neue Ebene faltet zwei Kraniche, jede 2. Ebene bringt ein Geisterherz',
     'sommerwind': 'Die Rolle wirft acht Federn, die weiter fliegen',
     'fest_der_laternen': 'Treffer entzünden doppelt so oft den Boden, die Flammen brennen länger',
@@ -1959,9 +1960,14 @@ def _siegel_tick(p, run, dt, S, g):
             g['tsurube'] = 0
             g['tsr'] = g.get('tsr', 0) + 1
             _ring(run, p.x, p.y, (120, 170, 220), 110)
+            wet = 'ido_reikon' in S and p.spirit > 0          # Ido no Yūrei: Okiku steigt mit dem Wasser auf
+            if wet:
+                _syn(run, 'ido_reikon', p.x, p.y, (120, 170, 220))
             for e in en:
                 e.slowed = max(e.slowed, 3.0)
-            if g['tsr'] % 4 == 0:
+                if wet:
+                    run.damage_enemy(e, p.damage() * 0.25 * min(4, p.spirit), None)
+            if g['tsr'] % (2 if 'ido_reikon' in S else 4) == 0:
                 p.spirit += 1
     tr = g.get('trug')
     if tr and tr[2] > 0:

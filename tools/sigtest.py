@@ -443,5 +443,14 @@ e.hp = o.hp = e.maxhp = o.maxhp = 999; run.enemies = [e, o]; e.sg_kk = 4; h0 = o
 sigs.hit_post(run, e, None, 1)
 if 'kikyo_ido' not in p.sgs or not o.hp < h0 or getattr(o, 'sg_kk', 0) or run._echo:
     print('FEHLER Seimei-Jinja', h0 - o.hp, getattr(o, 'sg_kk', 0)); bad += 1
+# Ido no Yūrei (Okikus Brunnen + Eimer): Brunnenwasser trifft je Geisterherz, ½ Geisterherz jeden 2. Raum
+g.start_run('hana', 40); run = g.run; p = run.player
+for iid in ('okiku_ido', 'tsurube'):
+    p.gain_item(iid, silent=True)
+e = Enemy(run, 'gaki', p.x + 60, p.y); e.spawn_t = 0; e.hp = e.maxhp = 999; run.enemies = [e]
+p.spirit = 2; sigs.st(p)['tsurube'] = 1; sigs.st(p)['tsr'] = 1; h0 = e.hp
+sigs.tick(p, run, 0.016)
+if 'ido_reikon' not in p.sgs or not e.hp < h0 or p.spirit != 3:
+    print('FEHLER Ido no Yūrei', h0 - e.hp, p.spirit); bad += 1
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)
