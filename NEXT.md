@@ -469,13 +469,24 @@ Ohne Video-Werkzeug NICHT wieder selbst Szenen malen.
   Federn (je 60 % des gewendeten Schadens). sigtest prüft. **synbalance ungemessen**: `synbalance.py shuten_doji 5 …` läuft
   bei allen Kämpfen in den 180-s-Deckel (auch Zufall) – andere Boss/Tiefe suchen, bei der die Baseline unter 180 s bleibt.
 
-# Nächster Schritt: Zweiter geheimer Boss – Taira no Masakado (Story Teil 3)
-Warum: Sutoku ist fertig (Boss, Biom, Musik, Item, Synergie, Titel, Deko); Masakado ist der nächste der „drei großen Onryō“
-und gibt Könnern ein neues Ziel. Auf mehrere Runden verteilen:
-1. `bosses.Masakado` (Sprite handgesetzt in `art_src/fable/bosses_3/`, wie Sutoku): das fliegende Haupt (Kubizuka-Sage) –
-   Phase 1 Reiterpfeile, Phase 2 der Kopf löst sich und fliegt, Phase 3 sieben Schattendoppelgänger (nur einer echt).
-2. Freischaltbedingung: z. B. Kapitel-I-Boss ohne Treffer besiegt → Kubizuka-Pforte; Erfolg + Boss-Item als Belohnung.
-3. Danach Bossmusik, Titelstimmung, Wanddeko wie bei Sutoku.
+# Erledigt (Runde 181)
+- Runde 181: `bosses.Masakado` (Sprite `art_src/fable/bosses_3/boss_masakado.py`, Onibi-Farbfamilie `u0–u3`; Import wie bei
+  Sutoku, danach die anderen Boss-PNGs per `git checkout` zurücksetzen). Phase 1 Reiterpfeile/Yabusame/Sturmangriff,
+  Phase 2 (65 %) fliegendes Haupt: Onibi-Bogen, Zähneknirschen-Kiefer; Phase 3 (30 %) `decoys`: sechs Kagemusha ohne Schatten
+  und ohne Treffer-Aufblitzen (in `draw` nach `super().draw` geblittet), alle 4 s `shuffle()`. `hitboxes` nur am Haupt.
+  `BOSSES['masakado']` hp 2600, `BOSS_REWARD['masakado'] = None`, Lexikon-Eintrag. bosstest: ~37 Treffer (Sutoku ~41).
+  **Noch nicht erreichbar** – keine Pforte, kein Biom.
+
+# Nächster Schritt: Kubizuka-Pforte + Kapitel IX (Story Teil 3, Fortsetzung)
+Warum: Masakado existiert, ist aber im Spiel noch nicht erreichbar.
+1. Biom `kubizuka` (depth 9): Palette in `environment/biomes.py` (nächtliches Ōtemachi-Gräberfeld: Steinlaternen, Grabhügel
+   mit Gorintō, Kampfer-Bäume, bleiches Onibi), Requisiten in `props.rocks`, `build.py kubizuka` + `hi.py`, nach
+   `yokai/assets/env/kubizuka` kopieren; `BIOMES/DEPTH_BIOMES/BOSS_POOL[9]` in `data.py`.
+2. Pforte `Obj('kubizuka')` im Shiramine-Bossraum (depth 8), nur wenn Sutoku schon einmal besiegt war (`sutoku_wins` ≥ 1 vor
+   diesem Lauf) – `boss_room_rewards`, `interact` (`go_deeper(9)`), `end_run` (`masakado_wins`, Erfolg `masakado`),
+   `floor_label` „IX“, Epilog `STORY_KUBIZUKA`, Story-Knoten. bosstest wie „Shiramine-Pforte OK“.
+3. Danach: Boss-Item (z. B. „Kagemusha-Spiegel“: Schattendoppelgänger als Familiar), Bossmusik `tracks.masakado`,
+   Titelstimmung, Wanddeko.
 
 # Danach (Story)
 - Danach Sugawara no Michizane (Raijin-Onryō, Blitze, Pflaumenblüten) als dritter großer Onryō
