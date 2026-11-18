@@ -783,5 +783,12 @@ vx = b.vx; b.t = 0.7; b.hit.add(1)
 sigs.bullet_tick(b, run, 0.016)
 if not (b.fl.get('pierce') and b.vx == -vx and abs(b.dmg - 15) < 0.01 and not b.hit and b.life >= 1.3):
     print('FEHLER Blut-Sutra', b.fl, b.vx, vx, b.dmg); bad += 1
+# Großer Tengu von Shiramine: die wendende Sutra fächert drei durchbohrende Federn mit 60 %
+p.gain_item('tengu_maske', silent=True)
+b = run.fire_player_bullet(p.x, p.y, 0, 10, 100, 2, 1, {'sg': ('sutra',)}); b.t = 0.7; n0 = len(run.pbullets)
+sigs.bullet_tick(b, run, 0.016)
+fd = run.pbullets[n0:]
+if not ('daitengu' in p.sgs and len(fd) == 3 and all(f.fl.get('pierce') and abs(f.dmg - 6) < 0.01 for f in fd)):
+    print('FEHLER Daitengu', p.sgs, [(f.dmg, f.fl) for f in fd]); bad += 1
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)

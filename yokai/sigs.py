@@ -130,6 +130,7 @@ TEXT = {
     'mondteich': 'Mondsichel-Talismane lassen Feinde erstarren und treffen Gebremste 40 % stärker',
     'leben_tod': 'Kills schenken manchmal ½ Geisterherz',
     'suzu': 'Nach der Rolle läuten die Glöckchen (alle 4 s): feindliche Geschosse in der Nähe verlöschen, nahe Feinde fliehen lachend 2 s',
+    'daitengu': 'Wendet eine Blut-Sutra, fächert sie drei durchbohrende Krähenfedern (je 60 %) in ihre neue Richtung',
     'blutsutra': 'Jeder 7. Wurf ist eine Blut-Sutra: nach 0,6 s kehrt sie um und schneidet mit 150 % durch alle Feinde zurück',
     'iwato': 'Verlöschte Geschosse kehren als Sonnenstrahlen (120 %) zu den Feinden zurück, die Glöckchen läuten schon nach 2,5 s',
     'izanagis_flucht': 'Auch die Rolle wirft Pfirsiche (150 %, alle 3 s), Feinde fliehen doppelt so weit und lang',
@@ -661,6 +662,12 @@ def bullet_tick(b, run, dt):
         b.dmg *= 1.5
         b.hit.clear()
         _ring(run, b.x, b.y, (190, 30, 40), 14)
+        if 'daitengu' in run.player.sgs:              # der verbannte Kaiser als König der Tengu
+            _syn(run, 'daitengu', b.x, b.y, (190, 30, 40))
+            a, sp = math.atan2(b.vy, b.vx), math.hypot(b.vx, b.vy)
+            for da in (-0.35, 0, 0.35):
+                f = run.fire_player_bullet(b.x, b.y, a + da, b.dmg * 0.4, sp * 1.15, max(1.5, b.r * 0.8), b.life, {'pierce': 1})
+                f.col = (70, 60, 100)
     if 'stromauf' in tags:
         f = 1 + 1.3 * dt
         b.vx *= f; b.vy *= f

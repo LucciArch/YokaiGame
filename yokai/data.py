@@ -499,6 +499,7 @@ SYNERGIES = [
     dict(id='hoichi', name='Mimi-nashi Hōichi', desc='Der blinde Biwa-Spieler sang den Heike-Geistern – die Sutren auf seiner Haut ließen sie hindurchgreifen', items=['biwa_bokuboku', 'juzu'], fx=dict(sig_hoichi=1)),
     dict(id='furisode_kaji', name='Furisode-Kaji', desc='Das verfluchte Langarm-Kimono fing Feuer – und Edo brannte drei Tage', items=['kosode_te', 'chochin_obake'], fx=dict(sig_furisode=1)),
     dict(id='dogu_yagyo', name='Dōgu-Yagyō', desc='Sandalen und Stoffbahnen ziehen nachts gemeinsam durchs Haus – der Umzug der alten Dinge', items=['bake_zori', 'ittan_momen'], fx=dict(sig_dogu_yagyo=1)),
+    dict(id='daitengu', name='Großer Tengu von Shiramine', desc='Sutoku schwor beim eigenen Blut, ein großer Dämon zu werden – und wurde König der Tengu', items=['sutoku_sutra', 'tengu_maske'], fx=dict(sig_daitengu=1)),
 ]
 
 # =====================================================================  TRANSFORMATIONEN
