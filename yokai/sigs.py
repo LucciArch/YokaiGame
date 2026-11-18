@@ -218,6 +218,7 @@ TEXT = {
     'kintaro': 'Jeder Axttreffer zählt vierfach für den Keulenschlag, und die Keule trifft weiter (55 px statt 40)',
     'kurama': 'Sōjōbōs Wirbel wird größer (65 px), und jedes verwehte Feindgeschoss wird eine weitere Windklinge (bis +3)',
     'rashomon': 'Der Oni-Arm packt alle 2 s statt 2,5 s – unter 2 Herzen sogar jede Sekunde mit 250 %',
+    'mamemaki': 'Die Bohnen fliegen schon jeden 2. Wurf, vier statt drei, und getroffene Yokai fliehen 2 s',
     'ataka': 'Tachi-ōjō hält schon bei 1 Herz und 4 s lang, und alle Yokai im Raum erstarren 2 s (Bosse ½ s) vor Benkeis Blick',
     'utage': 'Jeder Trommelschlag zählt wie zwei Münzen für den Tokkuri, und im Sake-Rausch trommelst du auch im Gehen – lauter und weiter (200 %)',
     'senbon': 'Benkeis Waffen kommen schon jeden 5. Wurf, und jeder ihrer Treffer zählt für die Schwertjagd wie ein Kill',
@@ -728,8 +729,11 @@ def _siegel_fire(p, run, bullets, g, n, base, dmg, spd, life, size):
             nb = run.fire_player_bullet(p.x, p.y - 3, base + k * math.pi / 6, dmg * 0.6, spd * 0.8, 2.5,
                                         life * (1.5 if tori else 1), {'homing': 1} if tori else {})
             nb.col = (235, 235, 250) if tori else (230, 200, 120)
-    if 'mame' in S and n % 3 == 0:                       # Oni wa soto!
-        for _ in range(3):
+    mm = 'mamemaki' in S                                 # Mamemaki: das Oni-Horn treibt die Bohnen
+    if 'mame' in S and n % (2 if mm else 3) == 0:        # Oni wa soto!
+        if mm:
+            _syn(run, 'mamemaki', p.x, p.y, (210, 170, 110))
+        for _ in range(4 if mm else 3):
             nb = run.fire_player_bullet(p.x, p.y - 3, base + random.uniform(-0.45, 0.45), dmg * 0.4,
                                         spd * random.uniform(0.75, 1.0), 1.5, life * 0.7, {'mame': 1})
             nb.col = (210, 170, 110)
@@ -883,7 +887,7 @@ def hit_post(run, e, b, dmg):
     g = st(p)
     echo = getattr(run, '_echo', False)   # Schaden von Bodenfeuer, Blitz oder Explosion
     if b is not None and b.fl.get('mame') and not e.is_boss:
-        e.sg_fear = max(getattr(e, 'sg_fear', 0), 1.0)
+        e.sg_fear = max(getattr(e, 'sg_fear', 0), 2.0 if 'mamemaki' in S else 1.0)
     if b is not None and b.fl.get('fue') and not e.is_boss:
         e.sg_conf = max(getattr(e, 'sg_conf', 0), 2.0)
     if b is not None and b.fl.get('fue') and 'gojo_bashi' in S and not echo and run.time - g.get('gojo_t', -9) >= 1.5:

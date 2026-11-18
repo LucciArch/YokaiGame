@@ -579,5 +579,17 @@ p.hp = 2; p.spirit = 0; sigs.st(p)['ibar'] = 0
 sigs.tick(p, run, 1.05)
 if 'rashomon' not in p.sgs or sigs.st(p).get('ibar') != 0 or e.hp >= 999:
     print('FEHLER Rashōmon', sigs.st(p).get('ibar'), e.hp); bad += 1
+# Mamemaki (Setsubun-Bohnen + Oni-Horn): vier Bohnen jeden 2. Wurf, Yokai fliehen 2 s
+g.start_run('akago', 53); run = g.run; p = run.player
+for iid in ('setsubun_mame', 'oni_tsuno'):
+    p.gain_item(iid, silent=True)
+e = Enemy(run, 'gaki', p.x + 60, p.y); e.spawn_t = 0; e.hp = e.maxhp = 999; run.enemies = [e]
+sigs.st(p)['shots'] = 1; n0 = len(run.pbullets)
+sigs.on_fire(p, run, [])
+mame = [b for b in run.pbullets[n0:] if b.fl.get('mame')]
+if mame:
+    sigs.hit_post(run, e, mame[0], 1)
+if 'mamemaki' not in p.sgs or len(mame) != 4 or getattr(e, 'sg_fear', 0) != 2.0:
+    print('FEHLER Mamemaki', len(mame), getattr(e, 'sg_fear', 0)); bad += 1
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)
