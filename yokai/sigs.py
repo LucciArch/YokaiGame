@@ -220,6 +220,8 @@ TEXT = {
     'rashomon': 'Der Oni-Arm packt alle 2 s statt 2,5 s – unter 2 Herzen sogar jede Sekunde mit 250 %',
     'hoshi_danuki': 'Prallt ein Treffer am Jizō ab, nimmst du sofort einen Schluck Sake (4 s +30 % Feuerrate) – und jeder Schluck macht den Jizō wieder bereit (einmal pro Raum)',
     'shanao': 'Sōjōbōs Wirbel trägt den Flötenton: Yokai im Wirbel sind 2 s verwirrt, und jeder 4. statt 6. Wurf ist ein Flötenton',
+    'sakaki_mai': 'Im Tanz bremsen die Sakaki-Blätter die Getroffenen, und schon jeder 2. statt 3. Raum ohne Treffer bringt ½ Herz',
+    'koromogawa': 'Die Naginata fegt weiter (75 px statt 55); solange du bei Tachi-ōjō aufrecht stehst, fegt sie jede Sekunde mit 150 %',
     'taizan_sai': 'Das Pentagramm schließt sich schon nach 4 Treffern; nach dem Ritual tilgen 12 Pentagramme die Schuld – kein Malus mehr, und das Ritual ist wieder bereit',
     'kage_kitsune': 'Das Fuchs-Trugbild bleibt 4,5 s statt 3 s und wirft brennendes Fuchsfeuer (70 % statt 50 %)',
     'mizukagami': 'Der Brunnenspiegel fängt bis zu 3 Feindgeschosse auf einmal (Umkreis 70 statt 50) und wirft sie als kaltes Brunnenwasser zurück (bremst)',
@@ -699,8 +701,11 @@ def _siegel_fire(p, run, bullets, g, n, base, dmg, spd, life, size):
     S = p.sgs
     g['fire_t'] = run.time
     if 'kagura_mai' in S and run.time - g.get('hurt_t', -9) >= 4.0:
+        if 'sakaki_mai' in S:
+            _syn(run, 'sakaki_mai', p.x, p.y, (90, 170, 80))
         for da in (-0.5, 0.5):                           # Sakaki-Blätter
-            nb = run.fire_player_bullet(p.x, p.y - 3, base + da, dmg * 0.6, spd * 0.8, 2.5, life, {'homing': 1})
+            nb = run.fire_player_bullet(p.x, p.y - 3, base + da, dmg * 0.6, spd * 0.8, 2.5, life,
+                                        {'homing': 1, 'slow': 1} if 'sakaki_mai' in S else {'homing': 1})
             nb.col = (90, 170, 80)
     tr = g.get('trug')
     if tr and tr[2] > 0:                                 # das Fuchs-Trugbild wirft mit
@@ -1268,7 +1273,7 @@ def on_hurt(p, run):
             nb = run.fire_player_bullet(p.x, p.y, k * math.tau / 8, p.damage() * 1.2, 220, 2.5, 0.6, {'pierce': 1})
             nb.hit = seen; nb.col = (170, 230, 250)
     if 'gojo' in S:                                      # Benkeis Naginata fegt um ihn
-        _blast(run, p.x, p.y, 55, p.damage() * 3, (200, 170, 90), 380)
+        _blast(run, p.x, p.y, 75 if 'koromogawa' in S else 55, p.damage() * 3, (200, 170, 90), 380)
     g['ts'] = 0
     if 'hannya_zorn' in S:
         g['hannya'] = 6.0
@@ -1697,7 +1702,7 @@ def on_room_clear(run):
             p.heal(1)
     if 'tamagushi' in S and not g.get('room_hit'):
         g['tama'] = g.get('tama', 0) + 1
-        if g['tama'] % 3 == 0 and p.heal(1):
+        if g['tama'] % (2 if 'sakaki_mai' in S else 3) == 0 and p.heal(1):
             run.floats.append([p.x, p.y - 20, 'Tamagushi', (110, 180, 90), 0.8])
     if 'kushinada' in S:
         g['kushi'] = min(8, g.get('kushi', 0) + 1)
@@ -2091,6 +2096,10 @@ def _siegel_tick(p, run, dt, S, g):
             run.damage_enemy(e, p.damage() * (2.0 if kot else 1.5), None)
             if not e.is_boss:
                 e.frozen = max(e.frozen, 0.4)
+    if 'koromogawa' in S and g.get('ojo', 0) > 0 and run.time - g.get('kg_t', -9) >= 1.0:
+        g['kg_t'] = run.time                             # Koromogawa: aufrecht stehend kreist die Naginata
+        _syn(run, 'koromogawa', p.x, p.y, (200, 170, 90))
+        _blast(run, p.x, p.y, 75, p.damage() * 1.5, (200, 170, 90), 300)
     if 'ibaraki' in S:
         g['ibar'] = g.get('ibar', 0) + dt
         zorn = 'rashomon' in S and p.total_hp() < 4      # Rashōmon: der Oni holt sich im Zorn seinen Arm zurück

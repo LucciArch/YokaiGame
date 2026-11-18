@@ -486,6 +486,8 @@ SYNERGIES = [
     dict(id='hoshi_danuki', name='Hōshi-danuki', desc='Der Tanuki in der Mönchsrobe bettelt um Sake – und wird wieder zu Stein, sobald er getrunken hat', items=['tanuki_kesa', 'tanuki_tokkuri'], fx=dict(sig_hoshi_danuki=1)),
     dict(id='shanao', name='Shanaō', desc='Auf dem Kurama hieß Ushiwaka noch Shanaō – der Tengu-König lehrte ihn, die Flöte in den Wind zu spielen', items=['ushiwaka_fue', 'sojobo_hane'], fx=dict(sig_shanao=1)),
     dict(id='taizan_sai', name='Taizan-Fukun-Sai', desc='Seimeis Stern bezahlt die Schuld beim Herrn des Berges – Pentagramm um Pentagramm', items=['taizan_fukun', 'kikyo_mon'], fx=dict(sig_taizan_sai=1)),
+    dict(id='sakaki_mai', name='Sakaki-mai', desc='Die Miko tanzt mit Fächer und Sakaki-Zweig – die Kami sehen zu und nehmen das Opfer gern an', items=['hi_ogi', 'tamagushi'], fx=dict(sig_sakaki_mai=1)),
+    dict(id='koromogawa', name='Koromogawa', desc='Am Koromo-Fluss starb Benkei stehend – und seine Naginata hörte nicht auf zu kreisen', items=['gojo_giboshi', 'tachi_ojo'], fx=dict(sig_koromogawa=1)),
     dict(id='henro', name='Henro', desc='Dōgyō ninin – Pilgerstab und Kraniche wandern mit dir', items=['kongozue', 'senbazuru'], fx=dict(luck=1, sig_henro=1)),
 ]
 

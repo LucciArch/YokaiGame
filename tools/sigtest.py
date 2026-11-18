@@ -699,5 +699,24 @@ for k in range(60):   # der Pentagramm-Schaden zählt selbst als Treffer → Sch
         pen47 = gg['taizan_pen']
 if 'taizan_sai' not in p.sgs or not pen47 or gg['taizan_pen'] or gg['taizan_used']:
     print('FEHLER Taizan-Fukun-Sai', pen47, gg['taizan_pen'], gg['taizan_used']); bad += 1
+# Sakaki-mai (Hi-ōgi + Tamagushi): Blätter im Tanz bremsen, jeder 2. Raum ohne Treffer heilt
+g.start_run('hana', 65); run = g.run; p = run.player
+for iid in ('hi_ogi', 'tamagushi'):
+    p.gain_item(iid, silent=True)
+gg = sigs.st(p); gg['hurt_t'] = -99; run.pbullets = []
+sigs._siegel_fire(p, run, [], gg, 1, 0, 10, 100, 1, 2)
+p.hp = 2; gg['tama'] = 0; gg['room_hit'] = False; sigs.on_room_clear(run); h1 = p.hp
+gg['room_hit'] = False; sigs.on_room_clear(run)
+if 'sakaki_mai' not in p.sgs or len(run.pbullets) != 2 or not all(b.fl.get('slow') for b in run.pbullets) or h1 != 2 or p.hp != 3:
+    print('FEHLER Sakaki-mai', [b.fl for b in run.pbullets], h1, p.hp); bad += 1
+# Koromogawa (Gojō-Giboshi + Tachi-ōjō): aufrecht stehend fegt die Naginata jede Sekunde
+g.start_run('benkei', 66); run = g.run; p = run.player
+for iid in ('gojo_giboshi', 'tachi_ojo'):
+    p.gain_item(iid, silent=True)
+e = Enemy(run, 'gaki', p.x + 65, p.y); e.spawn_t = 0; e.hp = e.maxhp = 99999; run.enemies = [e]
+gg = sigs.st(p); gg['ojo'] = 3.0; sigs.tick(p, run, 0.01); h1 = e.hp
+sigs.tick(p, run, 0.01); h2 = e.hp; run.time += 1.0; sigs.tick(p, run, 0.01)
+if 'koromogawa' not in p.sgs or not (h1 < 99999 and h2 == h1 and e.hp < h2):
+    print('FEHLER Koromogawa', h1, h2, e.hp); bad += 1
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)
