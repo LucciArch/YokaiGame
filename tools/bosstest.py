@@ -101,7 +101,7 @@ run.interact(gate[0])
 assert (run.depth, run.biome_id, run.boss_id, run.loop) == (8, 'shiramine', 'sutoku', 0), (run.depth, run.biome_id, run.boss_id, run.loop)
 assert 'VIII' in run.floor_label()
 run.end_run(True)
-assert 'sutoku' in run.save['achievements'] and story.unlocked(run.save, 'wahres_ende')
+assert 'sutoku' in run.save['achievements'] and story.unlocked(run.save, 'wahres_ende') and 'sutoku_sutra' in run.save['items']
 from yokai.epilogue import Epilogue, STORY_SHIRAMINE
 assert Epilogue(g, run).blocks[0] == STORY_SHIRAMINE[0]
 print('Shiramine-Pforte OK')

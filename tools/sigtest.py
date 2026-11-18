@@ -773,5 +773,15 @@ e = run.enemies[0]; e.frozen = 0
 b = run.fire_player_bullet(p.x, p.y, 0, 1, 100, 2, 1, {'zori': 1}); sigs.hit_post(run, e, b, 1)
 if e.frozen < 0.9:
     print('FEHLER Dogu-Yagyo'); bad += 1
+# Blut-Sutra: jeder 7. Wurf kehrt nach 0,6 s um, durchbohrt und trifft 150 %
+g.start_run('hana', 69); run = g.run; p = run.player
+p.gain_item('sutoku_sutra', silent=True)
+sigs.st(p)['shots'] = 6; run.pbullets = []
+b = run.fire_player_bullet(p.x, p.y, 0, 10, 100, 2, 1, {})
+sigs.on_fire(p, run, [b])
+vx = b.vx; b.t = 0.7; b.hit.add(1)
+sigs.bullet_tick(b, run, 0.016)
+if not (b.fl.get('pierce') and b.vx == -vx and abs(b.dmg - 15) < 0.01 and not b.hit and b.life >= 1.3):
+    print('FEHLER Blut-Sutra', b.fl, b.vx, vx, b.dmg); bad += 1
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)

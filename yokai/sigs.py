@@ -130,6 +130,7 @@ TEXT = {
     'mondteich': 'Mondsichel-Talismane lassen Feinde erstarren und treffen Gebremste 40 % stärker',
     'leben_tod': 'Kills schenken manchmal ½ Geisterherz',
     'suzu': 'Nach der Rolle läuten die Glöckchen (alle 4 s): feindliche Geschosse in der Nähe verlöschen, nahe Feinde fliehen lachend 2 s',
+    'blutsutra': 'Jeder 7. Wurf ist eine Blut-Sutra: nach 0,6 s kehrt sie um und schneidet mit 150 % durch alle Feinde zurück',
     'iwato': 'Verlöschte Geschosse kehren als Sonnenstrahlen (120 %) zu den Feinden zurück, die Glöckchen läuten schon nach 2,5 s',
     'izanagis_flucht': 'Auch die Rolle wirft Pfirsiche (150 %, alle 3 s), Feinde fliehen doppelt so weit und lang',
     'onmyo_spiegel': 'Der Spiegel wirft jedes 2. Geschoss als Siegel-Explosion zurück',
@@ -460,6 +461,11 @@ def on_fire(p, run, bullets):
                 _syn(run, 'okiku', p.x, p.y, (220, 230, 255))
                 _teller(p, run, p.x, p.y)
     _siegel_fire(p, run, bullets, g, n, base, dmg, spd, life, size)
+    if 'blutsutra' in S and n % 7 == 0:                  # Sutokus Umkehr-Fluch als eigene Waffe
+        for b in bullets:
+            b.fl = dict(b.fl, pierce=1, sg=tuple(b.fl.get('sg', ())) + ('sutra',))
+            b.col = (190, 30, 40)
+            b.life = b.maxlife = max(b.life, 1.3)
     if 'sichel' in S:
         g['sichel'] = -g.get('sichel', 1)
         tgt = run.nearest_enemy(p.x, p.y)
@@ -649,6 +655,12 @@ def bullet_tick(b, run, dt):
     tags = b.fl.get('sg')
     if not tags:
         return True
+    if 'sutra' in tags and b.t > 0.6 and not b.fl.get('_su'):
+        b.fl = dict(b.fl, _su=1)
+        b.vx, b.vy = -b.vx, -b.vy
+        b.dmg *= 1.5
+        b.hit.clear()
+        _ring(run, b.x, b.y, (190, 30, 40), 14)
     if 'stromauf' in tags:
         f = 1 + 1.3 * dt
         b.vx *= f; b.vy *= f
