@@ -456,6 +456,8 @@ SYNERGIES = [
     dict(id='mokumokuren', name='Mokumokuren', desc='Augen im zerrissenen Papier', items=['shoji_papier', 'geheimkarte'], fx=dict(sig_mokumokuren=1)),
     dict(id='sommerwind', name='Sommerwind', desc='Windglocke und Spatzenfeder', items=['furin', 'suzume_feder'], fx=dict(salts_regen=0.15, sig_sommerwind=1)),
     dict(id='misogi', name='Misogi', desc='Reinigung im kalten Wasser – Stab und Salz tilgen jede Unreinheit', items=['onusa', 'kiyome_sack'], fx=dict(salts=1, sig_misogi=1)),
+    dict(id='kagura', name='Kagura', desc='Fächer und Glöckchen – der Tanz für die Götter', items=['hi_ogi', 'uzume_suzu'], fx=dict(spd=3, sig_kagura=1)),
+    dict(id='sarayashiki', name='Banchō Sarayashiki', desc='Ichi-mai … kyū-mai … – und doch fehlt einer', items=['neunter_teller', 'zehnter_teller'], fx=dict(spirit=1, sig_okiku=1)),
     dict(id='henro', name='Henro', desc='Dōgyō ninin – Pilgerstab und Kraniche wandern mit dir', items=['kongozue', 'senbazuru'], fx=dict(luck=1, sig_henro=1)),
 ]
 

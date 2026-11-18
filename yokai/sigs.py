@@ -203,6 +203,8 @@ TEXT = {
     'shogatsu': 'Klebende Feinde sind verflucht: doppelter Schaden',
     'pilger': '+10 % Schaden pro Ebene statt +5 %',
     'misogi': 'Salz verwandelt alle Feindgeschosse im Raum in Shide (bis 12, je 60 %); die Rolle reinigt weiter (90, bis 8)',
+    'kagura': 'Die Rolle läutet die Suzu alle 2,5 s; läutet sie im Tanz, wirbeln 6 Sakaki-Blätter (je 50 %) auf die Feinde',
+    'okiku': 'Okiku zählt nur bis neun: der zehnte Teller zerspringt schon beim 9. Kill und nach jedem neunten Wurf um dich',
     'henro': 'Jede neue Ebene faltet zwei Kraniche, jede 2. Ebene bringt ein Geisterherz',
     'sommerwind': 'Die Rolle wirft acht Federn, die weiter fliegen',
     'fest_der_laternen': 'Treffer entzünden doppelt so oft den Boden, die Flammen brennen länger',
@@ -415,6 +417,9 @@ def on_fire(p, run, bullets):
             for e in run.enemies:
                 if e.active() and not e.is_boss and math.hypot(e.x - p.x, e.y - p.y) < 70 + e.r:
                     e.sg_fear = max(getattr(e, 'sg_fear', 0), 1.5)
+            if 'okiku' in S:                             # „… jū-mai!“ – der fehlende Teller zerspringt um dich
+                _syn(run, 'okiku', p.x, p.y, (220, 230, 255))
+                _teller(p, run, p.x, p.y)
     _siegel_fire(p, run, bullets, g, n, base, dmg, spd, life, size)
     if 'sichel' in S:
         g['sichel'] = -g.get('sichel', 1)
@@ -1028,12 +1033,8 @@ def on_kill(run, e):
             nb.col = (120, 200, 255)
     if 'zehnter' in S:
         g['zt'] = g.get('zt', 0) + 1
-        if g['zt'] % 10 == 0:                            # der zehnte Teller
-            _sparks(run, e.x, e.y, ((235, 240, 255), (120, 150, 220)), 10, 100)
-            seen = set()
-            for k in range(10):
-                nb = run.fire_player_bullet(e.x, e.y, k * math.tau / 10, p.damage() * 0.6, 200, 2, 0.45, {})
-                nb.hit = seen; nb.col = (220, 230, 255)
+        if g['zt'] % (9 if 'okiku' in S else 10) == 0:   # der zehnte Teller (Okiku zählt nur bis neun)
+            _teller(p, run, e.x, e.y)
             for o in run.enemies:
                 if o.active() and not o.is_boss and math.hypot(o.x - e.x, o.y - e.y) < 80:
                     o.sg_fear = max(getattr(o, 'sg_fear', 0), 2.0)
@@ -1344,7 +1345,7 @@ def on_dash(p, run):
         p.iframes = max(p.iframes, 0.8)
         g['kessel'] = 0.8
         _ring(run, p.x, p.y, (220, 220, 210), 22)
-    if 'suzu' in S and run.time - g.get('suzu', -9) >= (2.5 if 'iwato' in S else 4.0):
+    if 'suzu' in S and run.time - g.get('suzu', -9) >= (2.5 if 'iwato' in S or 'kagura' in S else 4.0):
         _suzu(p, run)
     if 'izanagis_flucht' in S and run.time - g.get('momo', -9) >= 3.0:
         _syn(run, 'izanagis_flucht', p.x, p.y, (255, 170, 140))
@@ -1413,6 +1414,15 @@ def on_dash(p, run):
             run.fire_player_bullet(p.x, p.y - 3, a, p.damage() * 0.7, p.s['shotspd'], 2.5, 1.1 if 'sommerwind' in S else 0.7, {})
 
 
+def _teller(p, run, x, y):
+    """Der zehnte Teller zerspringt: 10 Scherben (je 60 %, eine Trefferliste)."""
+    _sparks(run, x, y, ((235, 240, 255), (120, 150, 220)), 10, 100)
+    seen = set()
+    for k in range(10):
+        nb = run.fire_player_bullet(x, y, k * math.tau / 10, p.damage() * 0.6, 200, 2, 0.45, {})
+        nb.hit = seen; nb.col = (220, 230, 255)
+
+
 def _suzu(p, run):
     """Uzumes Kagura-Suzu: der Klang löscht nahe Geschosse, die Yokai lachen und fliehen."""
     from . import audio
@@ -1423,6 +1433,12 @@ def _suzu(p, run):
         if e.active() and not e.is_boss and math.hypot(e.x - p.x, e.y - p.y) < 70 + e.r:
             e.sg_fear = max(getattr(e, 'sg_fear', 0), 2.0)
     _ring(run, p.x, p.y, (255, 214, 90), 55)
+    S = p.sgs
+    if 'kagura' in S and run.time - st(p).get('hurt_t', -9) >= 4.0:   # Kagura: im Tanz wirbeln Sakaki-Blätter
+        _syn(run, 'kagura', p.x, p.y, (90, 170, 80))
+        for k in range(6):
+            b = run.fire_player_bullet(p.x, p.y - 3, k * math.tau / 6, p.damage() * 0.5, 170, 2.5, 1.6, {'homing': 1})
+            b.col = (90, 170, 80)
     audio.play('bell', 0.5)
     if 'iwato' in p.sgs and near:
         _syn(run, 'iwato', p.x, p.y, (255, 230, 140))

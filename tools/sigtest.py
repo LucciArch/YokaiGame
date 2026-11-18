@@ -393,5 +393,22 @@ p.active = 'yatagarasu_feder'; p.charge = 9; run.use_active()
 if not p.f['homing'] or not p.f['pierce']:
     print('FEHLER Aktiv yatagarasu_feder'); bad += 1
 g.save['achievements'][:] = ach0; g.save['items'][:] = it0; g.save['stats'].clear(); g.save['stats'].update(st0); g.save.write()
+# Kagura (Hi-ōgi + Uzumes Suzu): Suzu im Tanz wirbelt 6 Sakaki-Blätter, außerhalb nicht
+g.start_run('hana', 35); run = g.run; p = run.player
+for iid in ('hi_ogi', 'uzume_suzu'):
+    p.gain_item(iid, silent=True)
+run.time = 20.0; sigs.st(p)['hurt_t'] = 10.0
+n0 = len(run.pbullets); sigs._suzu(p, run); n1 = len(run.pbullets)
+sigs.st(p)['hurt_t'] = 19.0; sigs._suzu(p, run)
+if 'kagura' not in p.sgs or n1 - n0 != 6 or len(run.pbullets) != n1:
+    print('FEHLER Kagura', n1 - n0, len(run.pbullets) - n1); bad += 1
+# Banchō Sarayashiki (9. + 10. Teller): Okikus Klage zerspringt um dich, der Teller schon beim 9. Kill
+g.start_run('hana', 36); run = g.run; p = run.player
+for iid in ('neunter_teller', 'zehnter_teller'):
+    p.gain_item(iid, silent=True)
+sigs.st(p)['shots'] = 9; n0 = len(run.pbullets); sigs.on_fire(p, run, []); n1 = len(run.pbullets)
+sigs.st(p)['zt'] = 8; e = make_boss(run, 'shuten_doji'); e.x, e.y = p.x + 40, p.y; sigs.on_kill(run, e)
+if 'okiku' not in p.sgs or n1 - n0 < 10 or len(run.pbullets) - n1 != 10:
+    print('FEHLER Sarayashiki', n1 - n0, len(run.pbullets) - n1); bad += 1
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)
