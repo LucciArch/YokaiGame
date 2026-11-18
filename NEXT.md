@@ -405,10 +405,19 @@ für Talismane greifen (z. B. `bullet_tick`) – sollen sie auch für Strahl/Hie
   Grenzfälle ×0,91–0,99 mit Kampfanteil: zanshin_tsuba, yashiori_sake, kakuremino, onusa, hoshi_tama, kuzu_blatt,
   ushiwaka_fue, oni_tsuno, tausendstes_schwert, bunbuku_kessel, ichi_no_tachi.
 
-# Nächster Schritt: Grenzfälle mit `--raum` gegenmessen
-Warum: Die elf Grenzfälle oben könnten im Bosskampf nur zu wenig zeigen (Kills, Rolle, Stillstand) – oder wirklich
-schwach sein. `python tools/synbalance.py kappa_ou 3 zanshin_tsuba,oni_tsuno,... --items --raum` (~6 min); was auch
-dort ≥ ×0,95 liegt, behutsam stärken (eine Zahl pro Item, sigtest-Erwartungen mitziehen). Vergleich: Zufall = ×1,00.
+# Erledigt (Runden 167–168)
+- Runde 167: `--raum`-Gegenmessung (kappa_ou 3) der elf Grenzfälle: onusa/zanshin/kuzu/bunbuku ×0,92–0,95 (im Feld);
+  hoshi_tama ×0,99, ichi/tausendstes/yashiori/oni_tsuno/fue/kakuremino ×1,02–1,07. Gestärkt: Schwertjagd jeden 20.
+  statt 30. Kill, Hoshi no Tama 15 % statt 10 % (→ ×0,98). Fue-Verwirrung 3 s getestet → ×1,09 (schlechter, Rauschen
+  ±0,05; Verwirrung lässt Feinde wegtorkeln) → zurück auf 2 s. Kakuremino (Stillstand), Oni-Horn (<2 Herzen),
+  Yashiori (Boss/Champion), Ichi-no-tachi (Raumwechsel) zeigt das Raummaß systembedingt nicht.
+- Runde 168: Codex speichert aktive Items als `'active:<id>'` in `save['seen']` (Aufheben, Start-Item der Figur);
+  unentdeckte zeigen „?“, Sockel zeigt „Neu!“, Zähler/Statistik zählen aktive Items mit. uiflow2 prüft beides.
+
+# Nächster Schritt: Ushiwakas Flöte offensiver machen
+Warum: Im Boss- (×0,9x) und Raummaß (×1,05) das schwächste Kampf-Siegel ohne Sonderrolle; Verwirrung allein hilft
+im Zeitmaß nicht. Idee: Der Flötenton-Wurf trifft mit +50 % und durchbohrt (Yoshitsunes leichter Schritt), oder jeder
+6. Wurf fächert zu drei Tönen auf. Messen mit `synbalance.py kappa_ou 3 ushiwaka_fue --items` und `--raum`.
 
 # Danach
 - Ebene 9–10 ohne Meister noch ~10 s Bosszeit – nach Lucas Spieltest ggf. weiter anheben
@@ -416,8 +425,8 @@ dort ≥ ×0,95 liegt, behutsam stärken (eine Zahl pro Item, sigtest-Erwartunge
 - Alle 132 Synergien haben ein `sig_`-Flag – neue Synergien-Wellen nur noch mit neuen Items
 
 # Weitere Ideen
-- `synbalance --raum`: Option, `on_room_enter` nach dem Spawnen der ersten Welle aufzurufen (für Nebel-/Eintritts-Synergien)
+- `synbalance --raum`: Option, `on_room_enter` je Welle aufzurufen (dann misst es auch Ichi-no-tachi / Raum-Eintritt)
 - Wanddekos: zweite Variante pro Biom (Index 2), Werkzeug walldeco_hi.py steht
 - Mondhase ist im Raum recht klein – ggf. größer zeichnen (Canvas 64×60 → 80×72) und Wendezone anpassen
-- Codex: aktive Items im Lauf als „entdeckt“ merken
-- Neue Siegel-Synergien sichtbar machen: Lexikon-Seite „Synergien“ mit Filter nach Figur
+- Lexikon-Seite „Synergien“ mit Filter nach Figur
+- Neue Item-Welle (z. B. Tsukumogami-Hausgeräte) samt Synergien – bringt frischen Fundstoff für Wiederspielwert
