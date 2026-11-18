@@ -286,7 +286,7 @@ TEXT = {
     'jizo': 'Der erste Treffer in jedem Raum: du erstarrst zum steinernen Jizō – kein Schaden, 2 s unverwundbar',
     'kanjin': 'Die Spendenliste: alles im Laden kostet 15 % weniger',
     'reikon': 'Je Geisterherz +12 % Schaden (höchstens +48 %)',
-    'fue': 'Jeder 6. Wurf ist ein Flötenton: getroffene Yokai sind 2 s verwirrt',
+    'fue': 'Jeder 6. Wurf ist ein Flötenton (+50 % Schaden, durchbohrt): getroffene Yokai sind 2 s verwirrt',
     'seimei_ido': 'Raum ohne Treffer geräumt: 25 % Chance auf ein Geisterherz',
     'kodomo_kanabo': 'Jeder 8. Treffer ist ein Keulenschlag: 200 % im Umkreis, schleudert Yokai weg',
     'ohabari': 'Treffer: 12 % Chance, dass ein Blitz auf bis zu 3 weitere Feinde springt (80 %)',
@@ -793,7 +793,8 @@ def _siegel_fire(p, run, bullets, g, n, base, dmg, spd, life, size):
         nb = run.fire_player_bullet(p.x, p.y - 3, base, dmg * 1.5, spd * 1.1, 3, life * 1.3, {'pierce': 1, 'spectral': 1})
         nb.col = (150, 160, 220)
     if 'fue' in S and n % (4 if 'gojo_bashi' in S or 'shanao' in S else 6) == 0 and bullets:           # Ushiwakas Flötenton
-        bullets[0].fl = dict(bullets[0].fl, fue=1)
+        bullets[0].fl = dict(bullets[0].fl, fue=1, pierce=1)   # Yoshitsunes leichter Schritt: der Ton fliegt durch
+        bullets[0].dmg *= 1.5
         bullets[0].col = (150, 210, 130)
 
 

@@ -418,7 +418,7 @@ bl = [Bullet(p.x, p.y, 100, 0, 1, 3, 1, 'p', (255, 255, 255))]
 sigs.st(p)['shots'] = 3; sigs.on_fire(p, run, bl)
 e = make_boss(run, 'shuten_doji'); e.spawn_t = 0; e.x, e.y = p.x + 60, p.y; run.enemies = [e]
 run.time = 30.0; h0 = e.hp; sigs.hit_post(run, e, bl[0], 1); h1 = e.hp; sigs.hit_post(run, e, bl[0], 1)
-if 'gojo_bashi' not in p.sgs or not bl[0].fl.get('fue') or not h1 < h0 or e.hp != h1:
+if 'gojo_bashi' not in p.sgs or not bl[0].fl.get('fue') or not bl[0].fl.get('pierce') or bl[0].dmg != 1.5 or not h1 < h0 or e.hp != h1:
     print('FEHLER Gojō-Ōhashi', h0 - h1, h1 - e.hp); bad += 1
 # Orochi-Taiji (Habakiri + Yashiori): Berauschte zählen doppelt, der Schnitt berauscht gewöhnliche Feinde
 g.start_run('hana', 38); run = g.run; p = run.player
