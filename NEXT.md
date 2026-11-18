@@ -372,13 +372,22 @@ für Talismane greifen (z. B. `bullet_tick`) – sollen sie auch für Strahl/Hie
 - Messung „nur Items“: Wrapper, der vor `runpy` von synbalance die `fx` der Synergie leert (dann gleiche Seeds/Baseline).
   Achtung: shuten_doji Tiefe 5 läuft für Siegel-Paare oft bis 180 s → nutzlos, besser kappa_ou 2.
 
-# Nächster Schritt: restliche Siegel-Lücken
-Warum: Ohne eigene Synergie sind noch hi_ogi (hana), tanuki_kesa (ponpoko), gojo_giboshi (benkei, nur alte Gojō-Synergie
-mit Flag), ushiwaka_fue (kotaro), taizan_fukun (seimei). Je ein Paar mit einem anderen Item derselben Figur, z. B.
-- `tanuki_kesa` + `tanuki_tokkuri` (Ponpoko)
-- `ushiwaka_fue` + `sojobo_hane` (Kotarō: Ushiwakamaru lernte bei Sōjōbō)
-- `taizan_fukun` + `kikyo_mon` (Seimei)
-- `hi_ogi` vorsichtig (schon ×1,53 allein)
+# Erledigt (Runden 159–161): Synergien für Siegel-Items Teil 10
+- Runde 159: `hoshi_danuki` (tanuki_kesa + tanuki_tokkuri, sig `hoshi_danuki`): Jizō-Abpraller → Sake 4 s; der nächste
+  Schluck macht den Jizō im Raum wieder bereit (`g['hd_jz']` 0→1→2, einmal pro Raum). Boss/--raum neutral (Gott-Modus-Bot).
+- Runde 160: `shanao` (ushiwaka_fue + sojobo_hane, sig `shanao`): Rollen-Wirbel verwirrt Yokai 2 s, Flötenton jeder 4. Wurf.
+  Boss neutral, --raum ×1,20 gegen ×1,13 (Kontrolle, kein Tempo).
+- Runde 161: `taizan_sai` (taizan_fukun + kikyo_mon, sig `taizan_sai`): Pentagramm nach 4 Treffern; nach dem Ritual
+  tilgen 12 Pentagramme Malus + `taizan_used`. kappa_ou 2 ×0,37 gegen ×0,50, --raum ×0,81 gegen ×0,94.
+- Fix: Kikyō-Pentagramm-Schaden lief ohne `run._echo` und zählte selbst fürs nächste Pentagramm (effektiv jeder 4. statt 5.).
+  Kikyō-Mon und Seimei-Jinja sind dadurch etwas schwächer – beim nächsten Messen beobachten.
+
+# Nächster Schritt: hi_ogi und Gojō
+Warum: Letzte Siegel-Items ohne eigene Synergie-Fähigkeit: `hi_ogi` (Hana) – vorsichtig, schon ×1,53 allein – und
+`gojo_giboshi` (Benkei; `gojo_ohashi` gibt nur hp + altes Flag `sig_gojo_bashi`). Vorschläge:
+- `hi_ogi` + ein schwächeres Hana-Item, Effekt eher Kontrolle/Komfort statt Schaden
+- `gojo_giboshi` + `nanatsu_dogu` oder `tachi_ojo` (Benkei)
+Danach Kikyō-Mon nach dem Fix neu messen (`synbalance --items kikyo_mon`).
 Je Synergie: `SYNERGIES`, `TEXT`, sig, sigtest-Fall, Messung; Aufschlag ≤ ~×1,5.
 
 # Danach
