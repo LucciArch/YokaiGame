@@ -335,12 +335,18 @@ für Talismane greifen (z. B. `bullet_tick`) – sollen sie auch für Strahl/Hie
   und sammelt keine Münzen, misst die Synergie also nicht.
 - Testumgebung: `pip install pygame-ce numpy` (ohne numpy stürzen uiflow2/bot ab).
 
-# Nächster Schritt: Belohnungs-Synergien Teil 6
-Warum: Kotarō (4) und Akago (5) haben die meisten Siegel-Items ohne Sagen-Partner – genau die Figuren, bei denen
-neue Synergien am meisten Wiederspielwert bringen. Freie Items (Stand Runde 146, Skript: Siegel-Tabelle gegen SYNERGIES):
-- Kotarō: tengu_tsubute, kakuremino, sojobo_hane, hanadaka_men (z. B. sojobo_hane + hanadaka_men „Kurama-Lehre“,
-  kakuremino + tengu_tsubute „Unsichtbarer Steinwurf“)
-- Akago: ibaraki_arm, masakari, setsubun_mame, oni_tsuno, kodomo_kanabo (z. B. masakari + kodomo_kanabo „Kintarō“)
+# Erledigt (Runden 147–149): Synergien für Belohnungs-Items Teil 6
+- Runde 147: `kintaro` (masakari + kodomo_kanabo, sig `kintaro`): Axt-Geschosse tragen `fl['axt']`, Treffer zählen 4 für
+  `g['kk']` (jetzt Zähler ≥ 8 + Reset statt `% 8`), Keulenschlag 55 px. ×1,46.
+- Runde 148: `kurama_lehre` (sojobo_hane + hanadaka_men, sig `kurama`): Rollen-Wirbel 65 px, je verwehtem Feindgeschoss
+  +1 Windklinge (`g['hd']`, max +3). ×1,36.
+- Runde 149: `rashomon` (ibaraki_arm + oni_tsuno, sig `rashomon`): Oni-Arm alle 2 s, unter 2 Herzen jede Sekunde mit 250 %. ×1,40.
+
+# Nächster Schritt: Belohnungs-Synergien Teil 7
+Warum: Noch freie Siegel-Items ohne Sagen-Partner (Stand Runde 149):
+- Kotarō: tengu_tsubute + kakuremino („Unsichtbarer Steinwurf“: im Kakuremino fallen Steine doppelt so oft) –
+  vorher `synbalance` um stillstehenden Bot erweitern, sonst nicht messbar
+- Akago: setsubun_mame (z. B. + oni_tsuno oder + kodomo_kanabo „Mamemaki“: Bohnen lassen Oni erstarren)
 - Kuzunoha: hoshi_tama + kitsune_chochin; Ponpoko: bunbuku_kessel + shigaraki_tanuki
 Je Synergie: `SYNERGIES`, `TEXT`, sig, sigtest-Fall, `synbalance shuten_doji 5 <id> --leben`; Aufschlag ≤ ~×1,5.
 
