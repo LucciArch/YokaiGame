@@ -260,6 +260,7 @@ I('kaze_bukuro', 'Kaze-bukuro', 'Fūjins Windsack', 'cloud', (150, 220, 180), 'B
 I('yomi_momo', 'Pfirsich von Yomotsu Hirasaka', 'Izanagis Wurf gegen die Verfolger aus Yomi', 'yomi_momo', (255, 170, 140), 'B', ['kami'], 4, True, hp=1, sig_momo=1)
 I('uzume_suzu', 'Uzumes Kagura-Suzu', 'Ihr Tanz lockte die Sonne aus der Höhle', 'uzume_suzu', (255, 214, 90), 'B', ['kami'], 4, True, spd=5, sig_suzu=1)
 I('sutoku_sutra', 'Blut-Sutra', 'Mit eigenem Blut geschrieben, vom Hof verschmäht', 'sutoku_sutra', (190, 30, 40), 'B', ['yurei', 'tengu'], 4, True, dmg=0.5, sig_blutsutra=1)
+I('masakado_kage', 'Kagemusha', 'Sieben Krieger, nur einer wirft einen Schatten', 'masakado_kage', (150, 235, 220), 'B', ['yurei', 'oni'], 4, True, hp=1, sig_kagemusha=1)
 I('kagutsuchi_glut', 'Glut des Kagutsuchi', 'Das erste Feuer der Welt', 'flame', (255, 90, 30), 'B', ['kami', 'oni'], 4, True, burn=1, dmgm=1.2, sig_erstes_feuer=1)
 I('geheimkarte', 'Karte des Diebes', 'Wo sind die verborgenen Räume?', 'scroll', (190, 160, 110), 'TS', [], 2, True, map=1, salts=2)
 
@@ -686,7 +687,7 @@ BOSS_REWARD = {  # Freischaltung beim ersten Sieg
     'oonyudo': 'onyudo_kette', 'nurarihyon': 'nurarihyon_pfeife', 'kamaitachi_trio': 'kamaitachi_klingen',
     'akkorokamui': 'akkoro_tinte', 'enma': 'enma_spiegel', 'izanami': 'izanami_schleier', 'amaterasu': None, 'kagutsuchi': 'kagutsuchi_glut',
     'fujin': 'kaze_bukuro', 'orochi': 'yamata_zahn', 'shuten_doji': 'shuten_schale', 'tamamo': 'kyubi_juwel', 'mikaboshi': 'hoshi_splitter',
-    'sutoku': 'sutoku_sutra', 'masakado': None,   # Belohnung (Boss-Item) folgt in einer eigenen Runde
+    'sutoku': 'sutoku_sutra', 'masakado': 'masakado_kage',
 }
 
 # =====================================================================  PRÜFUNGEN (Herausforderungen)
@@ -752,7 +753,7 @@ ACHIEVEMENTS = [
     ('yomi', 'Rückkehr aus Yomi', 'Besiege Izanami in ihrem Totenpalast', ('item', 'yomi_momo')),
     ('iwato', 'Die Sonne kehrt zurück', 'Besiege Amaterasu in Ama-no-Iwato', ('item', 'uzume_suzu')),
     ('sutoku', 'Der Fluch von Shiramine', 'Besiege Sutoku-in am Grab des verbannten Kaisers', ('item', 'sutoku_sutra')),
-    ('masakado', 'Das Haupt kehrt heim', 'Besiege Taira no Masakado am Kubizuka', None),
+    ('masakado', 'Das Haupt kehrt heim', 'Besiege Taira no Masakado am Kubizuka', ('item', 'masakado_kage')),
     ('all_bosses', 'Bezwinger der Nachtparade', 'Besiege alle 24 Bosse', None),
     ('teahouse', 'Teezeremonie', 'Trinke im Teehaus', None),
     ('slots', 'Glücksspieler', 'Spiele am Tanuki-Automaten', None),

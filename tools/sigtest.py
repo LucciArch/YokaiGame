@@ -790,5 +790,12 @@ sigs.bullet_tick(b, run, 0.016)
 fd = run.pbullets[n0:]
 if not ('daitengu' in p.sgs and len(fd) == 3 and all(f.fl.get('pierce') and abs(f.dmg - 6) < 0.01 for f in fd)):
     print('FEHLER Daitengu', p.sgs, [(f.dmg, f.fl) for f in fd]); bad += 1
+# Kagemusha: jedes 7. Geschoss, das treffen würde, zerfällt an einem Doppelgänger in sieben suchende Onibi
+g.start_run('hana', 70); run = g.run; p = run.player
+p.gain_item('masakado_kage', silent=True); p.iframes = 0; run.pbullets = []
+eb = Bullet(p.x, p.y, 0, 0, 1, 3, 1, 'e', (255, 0, 0), {})
+bl = [sigs.block(p, run, eb) for _ in range(14)]
+if not (bl == ([False] * 6 + [True]) * 2 and len(run.pbullets) == 14 and all(b.fl.get('homing') for b in run.pbullets)):
+    print('FEHLER Kagemusha', bl, len(run.pbullets)); bad += 1
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)

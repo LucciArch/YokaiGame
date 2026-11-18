@@ -123,7 +123,7 @@ assert (run.depth, run.biome_id, run.boss_id, run.loop) == (9, 'kubizuka', 'masa
 assert 'IX' in run.floor_label()
 run.draw(g.screen, 1.0); gfx.TEXT.clear(); gfx.HI.clear()
 run.end_run(True)
-assert 'masakado' in run.save['achievements'] and story.unlocked(run.save, 'kubizuka')
+assert 'masakado' in run.save['achievements'] and story.unlocked(run.save, 'kubizuka') and 'masakado_kage' in run.save['items']
 from yokai.epilogue import STORY_KUBIZUKA
 assert Epilogue(g, run).blocks[0] == STORY_KUBIZUKA[0]
 print('Kubizuka-Pforte OK')

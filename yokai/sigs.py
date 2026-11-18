@@ -131,6 +131,7 @@ TEXT = {
     'leben_tod': 'Kills schenken manchmal ½ Geisterherz',
     'suzu': 'Nach der Rolle läuten die Glöckchen (alle 4 s): feindliche Geschosse in der Nähe verlöschen, nahe Feinde fliehen lachend 2 s',
     'daitengu': 'Wendet eine Blut-Sutra, fächert sie drei durchbohrende Krähenfedern (je 60 %) in ihre neue Richtung',
+    'kagemusha': 'Jedes 7. Geschoss, das dich treffen würde, trifft einen Kagemusha: er zerfällt in sieben suchende Onibi (je 80 %)',
     'blutsutra': 'Jeder 7. Wurf ist eine Blut-Sutra: nach 0,6 s kehrt sie um und schneidet mit 150 % durch alle Feinde zurück',
     'iwato': 'Verlöschte Geschosse kehren als Sonnenstrahlen (120 %) zu den Feinden zurück, die Glöckchen läuten schon nach 2,5 s',
     'izanagis_flucht': 'Auch die Rolle wirft Pfirsiche (150 %, alle 3 s), Feinde fliehen doppelt so weit und lang',
@@ -1460,6 +1461,15 @@ def block(p, run, b):
                     sb = run.fire_player_bullet(b.x, b.y, a + da, p.damage() * 1.2, 260, 3, 1.0,
                                                 {'homing': 1, 'burn': 1, '_urteil': 1} if 'gericht' in S else {'homing': 1, 'burn': 1})
                     sb.col = (255, 190, 90)
+            return True
+    if 'kagemusha' in S:
+        g['kage'] = g.get('kage', 0) + 1
+        if g['kage'] % 7 == 0:                           # nur einer der sieben ist der echte Masakado
+            run.floats.append([p.x, p.y - 20, 'Kagemusha', (150, 235, 220), 0.8])
+            _ring(run, p.x, p.y, (150, 235, 220), 40)
+            for i in range(7):
+                nb = run.fire_player_bullet(p.x, p.y, i / 7 * math.tau, p.damage() * 0.8, 200, 3.5, 1.4, {'homing': 1, 'pierce': 1})
+                nb.col = (150, 235, 220)
             return True
     if 'schuppenpanzer' in S and random.random() < (0.35 if 'drachenschuppen' in S else 0.25):
         if 'drachenschuppen' in S:
