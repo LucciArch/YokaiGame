@@ -340,16 +340,17 @@ class Game:
         t = self.t
         sway = math.sin(t * 0.11)
         # Die Nacht wandelt sich mit dem Fortschritt: nach dem Wahren Sieg Herbst (roter Mond, Ahorn),
-        # nach einem Sieg im Oni-Modus Winter (Schnee), nach Yomi Totennacht, nach Ama-no-Iwato Morgenröte
+        # nach einem Sieg im Oni-Modus Winter (Schnee), nach Yomi Totennacht, nach Ama-no-Iwato Morgenröte,
+        # nach Shiramine Blutmond mit Krähenzug
         st = self.save['stats']
         ach = self.save['achievements']
-        mood = 'iwato' if 'iwato' in ach else 'yomi' if 'yomi' in ach else 'yuki' if st.get('wins_hard', 0) else 'aki' if st.get('true_wins', 0) else None
-        tint = {'aki': (255, 196, 160), 'yuki': (196, 214, 255), 'yomi': (200, 168, 255), 'iwato': (255, 212, 160)}.get(mood)
+        mood = 'sutoku' if 'sutoku' in ach else 'iwato' if 'iwato' in ach else 'yomi' if 'yomi' in ach else 'yuki' if st.get('wins_hard', 0) else 'aki' if st.get('true_wins', 0) else None
+        tint = {'aki': (255, 196, 160), 'yuki': (196, 214, 255), 'yomi': (200, 168, 255), 'iwato': (255, 212, 160), 'sutoku': (255, 150, 140)}.get(mood)
         for name, par in (('sky', 0), ('far', 8), ('mid', 16), ('fog', 24), ('near', 32)):
             im = gfx.env_img('_title', name)
             if tint and name in ('sky', 'fog'):
                 im = [gfx.tinted_mult(im[0], tint)]
-            elif mood in ('aki', 'yuki') and name == 'near':
+            elif mood in self.BRANCH and name == 'near':
                 im = [self._branch(im[0], mood)]
             drift = math.sin(t * 0.07) if name == 'fog' else sway    # Nebel zieht gegen die Berge
             s.blit(im[0], (-par + int(round(drift * par)), 0))
@@ -368,7 +369,7 @@ class Game:
                     s.fill((236, 222, 176) if k < 24 else (150, 140, 150), (x, y, w_, 1))
                 if mood:
                     gfx.draw_glow(s, 388, 64, 54 + 3 * math.sin(t * 0.8), {'aki': (230, 70, 40), 'yuki': (170, 200, 255),
-                                                                           'iwato': (255, 190, 80)}.get(mood, (150, 80, 220)), 70)
+                                                                           'iwato': (255, 190, 80), 'sutoku': (200, 24, 36)}.get(mood, (150, 80, 220)), 70)
                 if mood == 'iwato':              # Amaterasu ist zurück: Strahlenkranz dreht sich langsam um die Sonne
                     for i in range(16):
                         a = i / 16 * math.tau + t * 0.05
@@ -397,8 +398,22 @@ class Game:
             px = (rr.uniform(0, 160) + ph * 200 + math.sin(t * 1.3 + i) * 8) % W
             py = 20 + ph * (H - 20)
             pc = {'aki': ((214, 70, 34), (240, 140, 50)), 'yomi': ((170, 140, 220), (120, 100, 170)),
-                  'iwato': ((255, 214, 120), (250, 190, 215))}.get(mood, ((250, 190, 215),) * 2)[i % 2]
-            s.fill(pc, (int(px), int(py), 2 + (mood == 'aki'), 1 + (i % 2)))   # Ahornblätter etwas breiter
+                  'iwato': ((255, 214, 120), (250, 190, 215)), 'sutoku': ((196, 36, 34), (110, 18, 28))}.get(mood, ((250, 190, 215),) * 2)[i % 2]
+            s.fill(pc, (int(px), int(py), 2 + (mood in ('aki', 'sutoku')), 1 + (i % 2)))   # Ahornblätter etwas breiter
+        if mood == 'sutoku':                             # Krähen-Tengu ziehen in Keilen am Blutmond vorbei
+            for i in range(9):
+                rr = random.Random(900 + i)
+                ph = (t * rr.uniform(0.018, 0.03) + rr.random()) % 1
+                x = int(ph * (W + 40)) - 20
+                y = int(rr.uniform(30, 150) + 6 * math.sin(t * 0.6 + i))
+                up = math.sin(t * rr.uniform(7, 10) + i) > 0           # Flügelschlag
+                for dx in range(1, 7):                                 # Schwingen, außen gefächert
+                    dy = -(dx // 2) if up else dx // 3
+                    s.fill((14, 6, 10), (x - 1 - dx, y + dy, 1, 2 if dx < 5 else 1))
+                    s.fill((14, 6, 10), (x + 1 + dx, y + dy, 1, 2 if dx < 5 else 1))
+                s.fill((14, 6, 10), (x - 1, y - 1, 3, 3))              # Leib
+                s.fill((14, 6, 10), (x + 2, y - 2, 2, 2))              # Kopf mit Schnabel in Flugrichtung
+                s.set_at((x + 4, y - 1), (60, 40, 30))
         for i in range(14 if mood != 'yuki' else 0):     # Glühwürmchen über dem Schilf (nicht im Winter)
             rr = random.Random(300 + i)
             x = (rr.uniform(0, W) + 18 * math.sin(t * rr.uniform(0.2, 0.5) + i)) % W
@@ -407,7 +422,7 @@ class Game:
             if b > 0.2:
                 gfx.draw_glow(s, int(x), int(y), 5, (200, 240, 110), int(70 * b))
                 s.fill((236, 255, 150) if b > 0.7 else (170, 200, 90), (int(x), int(y), 1, 1))
-        nh = 6 if mood == 'yomi' else 1 if mood == 'iwato' else 3   # nach Yomi doppelt so viele Seelen, im Morgenlicht fast keine
+        nh = 6 if mood == 'yomi' else 1 if mood in ('iwato', 'sutoku') else 3   # nach Yomi doppelt so viele Seelen, im Morgenlicht fast keine
         for i in range(nh):                              # Hitodama: Seelenflammen schweben über dem See
             rr = random.Random(500 + i)
             ph = (t * 0.035 + i / nh) % 1
@@ -423,7 +438,8 @@ class Game:
             s.fill((235, 248, 255), (int(x) - 1, int(y), 3, 3))
 
     BRANCH = {'aki': ((92, 24, 20), (168, 42, 26), (222, 92, 36), (250, 166, 70)),       # Ahorn
-              'yuki': ((70, 80, 120), (130, 146, 186), (200, 212, 240), (248, 250, 255))}  # Schnee auf dem Zweig
+              'yuki': ((70, 80, 120), (130, 146, 186), (200, 212, 240), (248, 250, 255)),   # Schnee auf dem Zweig
+              'sutoku': ((40, 10, 16), (96, 16, 26), (156, 28, 34), (206, 64, 52))}         # Shiramine-Ahorn im Blutlicht
 
     def _dawn(self):
         im = self.__dict__.get('_dawn_im')
