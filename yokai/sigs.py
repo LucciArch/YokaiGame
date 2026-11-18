@@ -209,6 +209,7 @@ TEXT = {
     'yamata_giri': 'Gegen Berauschte schneidet Habakiri schon jeden 4. Treffer; der Schnitt berauscht auch gewöhnliche Feinde',
     'kikyo_ido': 'Schließt sich das Pentagramm, sprudelt der Brunnen: Welle um das Ziel (60 %); Räume ohne Treffer geben zu 40 % ein Geisterherz',
     'ido_reikon': 'Das Brunnenwasser trifft alle Feinde (25 % je Geisterherz, höchstens 100 %) und gibt schon jeden 2. Raum ½ Geisterherz',
+    'juni_tori': 'Die zwölf Himmelsgeneräle kommen schon jeden 8. Wurf – als Papiervögel, die Feinde verfolgen',
     'henro': 'Jede neue Ebene faltet zwei Kraniche, jede 2. Ebene bringt ein Geisterherz',
     'sommerwind': 'Die Rolle wirft acht Federn, die weiter fliegen',
     'fest_der_laternen': 'Treffer entzünden doppelt so oft den Boden, die Flammen brennen länger',
@@ -701,10 +702,14 @@ def _siegel_fire(p, run, bullets, g, n, base, dmg, spd, life, size):
         for da in (-0.6, 0.6):
             nb = run.fire_player_bullet(p.x, p.y - 3, base + da, dmg * 1.2, spd * 1.1, 3, life, {'pierce': 1})
             nb.col = (230, 230, 245)
-    if 'juni' in S and n % 12 == 0:                      # Jūni-Shinshō
+    tori = 'juni_tori' in S                              # Shikigami-Tsukai: die Generäle fliegen als Papiervögel
+    if 'juni' in S and n % (8 if tori else 12) == 0:     # Jūni-Shinshō
+        if tori:
+            _syn(run, 'juni_tori', p.x, p.y, (235, 235, 250))
         for k in range(12):
-            nb = run.fire_player_bullet(p.x, p.y - 3, base + k * math.pi / 6, dmg * 0.6, spd * 0.8, 2.5, life, {})
-            nb.col = (230, 200, 120)
+            nb = run.fire_player_bullet(p.x, p.y - 3, base + k * math.pi / 6, dmg * 0.6, spd * 0.8, 2.5,
+                                        life * (1.5 if tori else 1), {'homing': 1} if tori else {})
+            nb.col = (235, 235, 250) if tori else (230, 200, 120)
     if 'mame' in S and n % 3 == 0:                       # Oni wa soto!
         for _ in range(3):
             nb = run.fire_player_bullet(p.x, p.y - 3, base + random.uniform(-0.45, 0.45), dmg * 0.4,

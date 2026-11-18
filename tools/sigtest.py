@@ -452,5 +452,15 @@ p.spirit = 2; sigs.st(p)['tsurube'] = 1; sigs.st(p)['tsr'] = 1; h0 = e.hp
 sigs.tick(p, run, 0.016)
 if 'ido_reikon' not in p.sgs or not e.hp < h0 or p.spirit != 3:
     print('FEHLER Ido no Yūrei', h0 - e.hp, p.spirit); bad += 1
+# Shikigami-Tsukai (Hoki Naiden + Jūni-Shinshō): Generäle jeden 8. Wurf als verfolgende Papiervögel
+g.start_run('hana', 41); run = g.run; p = run.player
+for iid in ('hoki_naiden', 'juni_shinsho'):
+    p.gain_item(iid, silent=True)
+ns = []
+for _ in range(8):
+    n0 = len(run.pbullets); sigs.on_fire(p, run, [Bullet(100, 100, 50, 0, 10, 3, 1, 'p', (255, 255, 255), {})])
+    ns.append(sum(1 for b in run.pbullets[n0:] if b.fl.get('homing')))
+if 'juni_tori' not in p.sgs or ns[7] != 12 or ns[6] != 0:
+    print('FEHLER Shikigami-Tsukai', ns); bad += 1
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)
