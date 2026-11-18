@@ -491,19 +491,30 @@ Ohne Video-Werkzeug NICHT wieder selbst Szenen malen.
 - Runde 186: `walldeco_hi.kubizuka_hi` (Sotoba mit Bonji + Shide, Steinfrosch mit rotem Latz, Onibi); `WALL_LIGHT` → (20, 4)
 - Runde 187: Synergie Onryō-Bund (`masakado_kage` + `sutoku_sutra`, `sig_onryo`); sigtest prüft
 
-# Nächster Schritt: Sugawara no Michizane (dritter großer Onryō)
-Warum: Sutoku und Masakado stehen, der Onryō-Bund nennt schon „zwei der drei“ – der dritte schließt die Reihe.
-1. Boss `michizane` (Hi-Res, handgesetzt): Hofgewand, Shaku, Raijin-Wolke; Phasen: Pflaumenblüten-Fächer (Tobiume),
-   Blitzschläge auf markierte Felder (Seiryōden-Brand), zuletzt Donnerwolke über der Arena. Bosstest erweitern.
-2. Pforte/Kapitel X (z. B. nach Masakado-Sieg im Kubizuka, Biom „Dazaifu“ mit Pflaumenbäumen und Ochsenstatuen).
-3. Belohnungs-Item + Synergie „Drei große Onryō“ (alle drei Boss-Items).
-4. Masakado-Balance weiter beobachten (bosstest ~16 Treffer, 44 s – deutlich leichter als Sutoku mit ~74).
+# Erledigt (Runden 188–190): Kapitel X Dazaifu – Sugawara no Michizane
+- Runde 188: `bosses.Michizane` (Sprite `art_src/fable/bosses_3/boss_michizane.py`, Import wie bei Masakado, andere Boss-PNGs danach
+  per `git checkout` zurücksetzen). Phase 1 Tobiume/Kochi/Seiryōden (Blitz-Hazards `'strike'` reihenweise mit Lücke), Phase 2 (60 %)
+  Trommelkranz `a_taiko`, Phase 3 (30 %) `storm` – Blitz folgt der Spielerin alle 1,6 s, `extra_dark` 50. hp 2700, Lexikon.
+  bosstest: ~27–57 Treffer, ~62 s (zwischen Masakado und Sutoku).
+- Runde 189: Biom `dazaifu` (depth 10; Palette `environment/biomes.py`, Requisiten Tobiume/Goshingyū/Blitz-Zeder in `props.rocks`,
+  Wanddekos in `props.wall_decos`; Hi-Res nur hochskaliert). Pforte `Obj('dazaifu')` im Kubizuka-Bossraum, wenn `masakado_wins` ≥ 1.
+  Sieg: `michizane_wins`, Erfolg `michizane`, `STORY_DAZAIFU`, Story-Knoten `dazaifu` (unter `kubizuka`). bosstest „Dazaifu-Pforte OK“.
+- Runde 190: Bossmusik `tracks.michizane` (Gagaku → Donner); Dazaifu-Seed 63 → Boss-Seed 173 in `audio.track_for`. validate prüft.
+
+# Nächster Schritt: Belohnung für Michizane + „Drei große Onryō“
+Warum: Kapitel X ist spielbar, aber der Sieg gibt noch nichts (`BOSS_REWARD['michizane'] = None`, Erfolg ohne Item) – die
+Onryō-Reihe braucht ihren Abschluss.
+1. Boss-Item `tenjin_ume` o. ä. (Pool B, Symbol handgesetzt in `art_src/fable/items/icons_v22.py`): z. B. Pflaumenblüten-Geschosse
+   rufen bei jedem 6. Treffer einen Blitz auf das Ziel (Seiryōden). sig in `sigs.py`, sigtest + bosstest wie bei `masakado_kage`.
+2. Synergie „Drei große Onryō“ (`masakado_kage` + `sutoku_sutra` + neues Item) mit eigener Fähigkeit.
+3. Feinschliff Dazaifu: Hi-Res-Wanddeko `walldeco_hi.dazaifu_hi`, Titelstimmung `michizane` (Pflaumenblüten im Gewitter).
 
 # Danach (Story)
 - Je Figur ein eigenes Story-Kapitel (`ENDINGS` in `epilogue.py` als Knoten im Baum, Bedingung `char_wins`)
 - Iwato erst nach Yomi öffnen (strengerer Pfad wie Isaac), oder Kapitel VII je nach gewähltem Weg
 
 # Weitere Ideen
+- Michizane-Balance beobachten (bosstest schwankt 27–57 Treffer; Blitz-Verfolgung in Phase 3 evtl. zu dicht)
 - Zwischensequenzen als Schattenspiel (`art_src/cutscenes`, parallele Sitzung, Probe für Luca) – auf Lucas Antwort warten
 - Tsukumogami Teil 3: Ungaikyō, Kyōrinrin, Zorigami als Items
 - `--raum`-Gegenmessung Oni-Horn ×1,03, Yashiori ×1,04, Kakuremino ×1,07 mit `--leben`/`--still`
