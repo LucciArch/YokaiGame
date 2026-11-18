@@ -623,5 +623,13 @@ sigs.tick(p, run, 1.55); hp1 = e.hp                      # sichtbar: noch kein S
 sigs.st(p)['invis'] = 5; sigs.tick(p, run, 0.01)
 if 'kotaro' not in p.sgs or hp1 != 999 or abs(999 - e.hp - p.damage() * 2.0) > 0.01:
     print('FEHLER Kotarō', hp1, e.hp); bad += 1
+# Ōharae (Haraegushi + Ōnusa): die Rolle schwingt höchstens alle 4 s auch den Haraegushi (8 %)
+g.start_run('hana', 57); run = g.run; p = run.player
+for iid in ('haraegushi', 'onusa'):
+    p.gain_item(iid, silent=True)
+e = Enemy(run, 'gaki', p.x + 60, p.y); e.spawn_t = 0; e.hp = e.maxhp = 100; run.enemies = [e]
+sigs.on_dash(p, run); hp1 = e.hp; sigs.on_dash(p, run)
+if 'oharae' not in p.sgs or abs(hp1 - 92) > 0.01 or abs(e.hp - 92) > 0.01:
+    print('FEHLER Ōharae', hp1, e.hp); bad += 1
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)

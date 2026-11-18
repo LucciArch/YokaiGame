@@ -218,6 +218,7 @@ TEXT = {
     'kintaro': 'Jeder Axttreffer zählt vierfach für den Keulenschlag, und die Keule trifft weiter (55 px statt 40)',
     'kurama': 'Sōjōbōs Wirbel wird größer (65 px), und jedes verwehte Feindgeschoss wird eine weitere Windklinge (bis +3)',
     'rashomon': 'Der Oni-Arm packt alle 2 s statt 2,5 s – unter 2 Herzen sogar jede Sekunde mit 250 %',
+    'oharae': 'Höchstens alle 4 s schwingt die Rolle auch den Haraegushi: alle Yokai im Raum verlieren 8 % ihres Lebens (Bosse 200 % Schaden)',
     'kotaro': 'Unsichtbar im Kakuremino fallen die Tengu-Steine doppelt so oft (alle 1,5 s) und härter (200 %)',
     'morinji': 'Jede Rolle schenkt 3 s Glückssträhne (goldene Würfe +20 %), und der heiße Kessel hält länger (1,2 s)',
     'gyoretsu': 'Der Fuchsfeuer-Ring des Sternjuwels kommt doppelt so oft, und seine Flammen suchen ihr Ziel wie die der Laterne',
@@ -1426,6 +1427,18 @@ def on_dash(p, run):
         g['hd'] = 3
     if 'onusa' in S:                                     # Ōnusa: Geschosse werden zu Shide
         _shide(p, run, *((90, 8) if 'misogi' in S else (60, 6)), 0.4)
+    if 'oharae' in S and run.time - g.get('ohar_t', -9) >= 4.0:   # Ōharae: die Rolle schwingt auch den Haraegushi
+        en = [e for e in run.enemies if e.active()]
+        if en:
+            g['ohar_t'] = run.time
+            _syn(run, 'oharae', p.x, p.y, (245, 245, 235))
+            _ring(run, p.x, p.y, (245, 245, 235), 120)
+            for e in en:
+                if e.is_boss:                            # Bosse: fester Schwung statt Prozenten
+                    run.damage_enemy(e, p.damage() * 2.0, None)
+                else:
+                    e.hp -= e.maxhp * 0.08
+                    e.flash = 0.1
     if 'tengu_wirbel' in S:
         kurama = 'kurama' in S                           # Kurama-Lehre: größerer Wirbel, Verwehtes wird Windklinge
         rad = 65 if kurama else 45
