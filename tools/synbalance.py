@@ -1,7 +1,8 @@
 """Misst jede Synergie gegen denselben Boss: Kampfzeit und Treffer im Vergleich zu gleich vielen Zufalls-Items.
 Aufruf: python tools/synbalance.py [boss] [tiefe] [ids]  –  Ausgabe sortiert nach Tempo (Faktor < 1 = schneller als Zufall).
 Mit --tod: Überlebenszeit ohne Gott-Modus gegen einen Boss, der in Phase 2 festgehalten wird (Faktor > 1 = zäher als Zufall).
-Mit --raum: statt des Bosses drei Wellen zu je 8 Normalgegnern aus dem Gebiet der Tiefe (für Raum-Synergien).
+Mit --raum: statt des Bosses drei Wellen zu je 8 Normalgegnern aus dem Gebiet der Tiefe (für Raum-Synergien);
+  jede Welle löst den Raum-Eintritt aus.
 Mit --leben: ohne Gott-Modus; gemessen wird der Boss-Schaden in % bis zum Tod (Faktor > 1 = mehr Schaden als Zufall),
   damit Effekte „wenn du getroffen wirst“ nur so oft wirken, wie die Herzen reichen.
 Mit --waffe=w_laser (w_sword, w_bow ...): alle Kämpfe mit dieser Angriffsart.
@@ -18,7 +19,7 @@ os.environ['SDL_VIDEODRIVER'] = 'dummy'; os.environ['SDL_AUDIODRIVER'] = 'dummy'
 os.environ['APPDATA'] = os.path.join(os.environ.get('TEMP', '/tmp'), 'yokai_syn')
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 from yokai.app import Game
-from yokai import data, gfx, weapons
+from yokai import data, gfx, weapons, sigs
 from yokai.bosses import make_boss, CX, CY
 
 NUR = '--nur-items' in sys.argv
@@ -79,6 +80,7 @@ def fight(items, seed):
                 for i in range(8):
                     a = i / 8 * math.tau
                     run.spawn_enemy(random.choice(kinds), CX + math.cos(a) * 150, CY + math.sin(a) * 90)
+                sigs.on_room_enter(run)   # jede Welle zählt als neuer Raum (Ichi-no-tachi, Shinoda-Nebel …)
             tgt = run.nearest_enemy(p.x, p.y) or p
         else:
             tgt = b

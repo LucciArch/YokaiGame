@@ -281,7 +281,7 @@ TEXT = {
     'oni_tsuno': 'Unter 2 Herzen: +30 % Schaden und deine Würfe durchbohren',
     'kushinada': 'Jeder geräumte Raum: +4 % Schaden bis zur nächsten Ebene (höchstens +32 %)',
     'onusa': 'Die Rolle reinigt: nahe Feindgeschosse werden zu Shide-Streifen, die zurückfliegen (40 %, höchstens 6)',
-    'ichi': 'Der erste Treffer in jedem Raum ist der erste Hieb: +300 % Zusatzschaden',
+    'ichi': 'Der erste Treffer in jedem Raum ist der erste Hieb: +300 % Zusatzschaden; jeder Feind nimmt deinen ersten Treffer mit +50 %',
     'chochin': 'Betrittst du einen Kampfraum, schwärmen 4 Fuchsfeuer aus (+1 je 2 Glück, je 80 %, brennen)',
     'jizo': 'Der erste Treffer in jedem Raum: du erstarrst zum steinernen Jizō – kein Schaden, 2 s unverwundbar',
     'kanjin': 'Die Spendenliste: alles im Laden kostet 15 % weniger',
@@ -920,6 +920,9 @@ def hit_post(run, e, b, dmg):
         g['gojo_t'] = run.time                           # auf den Flötenton schwingt Benkeis Naginata
         _syn(run, 'gojo_bashi', e.x, e.y, (200, 170, 90))
         _blast(run, e.x, e.y, 35, p.damage() * 0.8, (200, 170, 90), 160)
+    if 'ichi' in S and b is not None and not echo and not getattr(e, 'sg_ichi', False):
+        e.sg_ichi = True                                 # jeder Feind spürt den ersten Hieb
+        run.damage_enemy(e, dmg * 0.5, None)
     if 'ichi' in S and b is not None and not echo and g.get('ichi'):
         g['ichi'] = False                                # Ichi-no-tachi: der erste Hieb
         _float(run, e, 'Ichi-no-tachi!', (220, 220, 235))

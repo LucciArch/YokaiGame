@@ -256,7 +256,7 @@ b = Bullet(100, 100, 50, 0, 10, 3, 1, 'p', (255, 255, 255), {})
 hs = []
 for _ in range(2):
     h0 = e.hp; sigs.hit_post(run, e, b, 10); hs.append(h0 - e.hp)
-if not (hs[0] >= 30 and hs[1] == 0):
+if not (hs[0] >= 35 and hs[1] == 0):   # ×3 Raum-Hieb + 50 % erster Treffer am Feind
     print('FEHLER Ichi-no-tachi', hs); bad += 1
 p.iframes = 0; p.dash_t = 0; hp0 = p.total_hp()
 p.hurt(1)
