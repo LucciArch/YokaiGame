@@ -445,6 +445,8 @@ class Audio:
             return 'amaterasu'
         if mood == 'boss' and seed == 166:     # Biom 'shiramine' (Seed 58 + 100 + Tiefe 8)
             return 'sutoku'
+        if mood == 'boss' and seed == 159:     # Biom 'kubizuka' (Seed 50 + 100 + Tiefe 9)
+            return 'masakado'
         if mood == 'boss':
             return 'boss_final' if (seed - 100) // 10 >= 5 else 'boss'
         return {1: 'forest', 2: 'temple', 3: 'mountain', 4: 'sea', 5: 'underworld', 6: 'heaven'}.get(seed // 10)

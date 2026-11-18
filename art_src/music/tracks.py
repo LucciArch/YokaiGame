@@ -360,6 +360,48 @@ def sutoku():
     return s
 
 
+# ============================================================ Geheimer Endboss: Taira no Masakado (Kubizuka)
+def masakado():
+    s = Song(150, 47, 'iwato', 32, seed=1401)
+    # Grabhügel bei Nacht: Glocke, Regenwind, Biwa-artige Schläge der Shamisen in der Tiefe, Shakuhachi
+    s.bonsho(0, vel=1.0)
+    s.windfx(0, 8, 0.24, 380)
+    s.drone(0, 0, 8, octv=-2, vel=0.36, cutoff=380)
+    for b in range(0, 8):
+        s.drums("h.......h...h..." if b % 2 else "h...............", b, steps_per_beat=4, vel=0.6)
+        if b % 2 == 0:
+            s.shamisen("0,,/2 r/2 0,/1 4,,/1 r/2", b, vel=0.6, pan=-0.25)
+    s.wind("0/8 | 1/4 0/4 | 4,/2 3,/2 4,/4 | 0/8 | 2/4 1/4 | 0/6 4,/2 | 3,/4 4,/4 | 0/8", 0, 'shaku', octv=0, vel=0.78, pan=-0.1)
+    # Die Reiter aus dem Osten: galoppierende Taiko, harte Shamisen, Fue als Kriegsruf
+    gallop = "O.oO.oO.oO.oS.SS"
+    gallop2 = "O.oO.oS.oO.oSSSS"
+    riff = "0,/1 0,/1 2,/1 0,/1 3,/1 2,/1 1,/1 2,/1"
+    s.bonsho(8, vel=0.85)
+    for b in range(8, 20):
+        s.drums(gallop if b % 4 != 3 else gallop2, b, steps_per_beat=4, vel=0.95)
+        s.shamisen(riff, b, vel=0.74, pan=-0.3)
+    s.drone(0, 8, 12, octv=-1, vel=0.34, cutoff=700)
+    s.wind("4/4 3/2 4/2 | 5/6 4/2 | 3/2 4/2 5/4 | 4/8 | 2/4 3/2 4/2 | 3~/4 1/4 | 2/2 3/2 4/2 5/2 | 5/8", 8, 'fue', octv=1, vel=0.82, pan=0.25)
+    s.wind("0/16 | 4,/8 0/8", 8, 'shaku', octv=0, vel=0.5, pan=-0.2)
+    s.wind("7!/4 5/4 | 4-2/8 | 3!/2 4/2 5/4 | 7/8", 16, 'fue', octv=1, vel=0.86, pan=0.25)
+    # Das Haupt fliegt: alles reißt ab, Wind, fallende Koto-Linie, das Lachen der Glocke
+    s.windfx(20, 4, 0.34, 900)
+    for b in range(20, 24):
+        s.koto("4'/1 3'/1 2'/1 1'/1 0'/1 4/1 3/1 2/1", b, octv=0, vel=0.5, pan=0.35)
+        s.bell(0, b, e8=0, octv=1, vel=0.4)
+        s.drums("O.......O...OOOO" if b == 23 else "O.......O.......", b, steps_per_beat=4, vel=0.8)
+    # Sieben Kagemusha: volles Ensemble, Leitmotiv tief, Fue darüber, Shō hält den Atem an
+    for b in range(24, 32):
+        s.drums(gallop2 if b % 2 else gallop, b, steps_per_beat=4, vel=1.0)
+        s.shamisen(riff, b, vel=0.8, pan=-0.3)
+        s.koto("0/1 2/1 3/1 2/1 4/1 3/1 2/1 0/1", b, octv=1, vel=0.4, pan=0.4)
+    s.drone(0, 24, 8, octv=-1, vel=0.38, cutoff=850)
+    s.wind(THEME, 24, 'shaku', octv=0, vel=0.8, pan=-0.15)
+    s.wind("7/8 | 5-4/8 | 5!/2 4/2 3/4 | 2/8 | 4!/4 5/4 | 7/8 | 5/2 4/2 3/2 2/2 | 0'/8", 24, 'fue', octv=1, vel=0.8, pan=0.3)
+    s.sho([0, 2, 3, 4], 28, 4, octv=0, vel=0.42)
+    return s
+
+
 # ============================================================ Spielende: Shi no Kane
 def gameover():
     s = Song(60, 57, 'hira', 10, seed=1001)
@@ -409,7 +451,7 @@ def matsuri():
 
 
 TRACKS = {'title': title, 'forest': forest, 'temple': temple, 'mountain': mountain, 'sea': sea,
-          'underworld': underworld, 'heaven': heaven, 'boss': boss, 'boss_final': boss_final, 'amaterasu': amaterasu, 'sutoku': sutoku,
+          'underworld': underworld, 'heaven': heaven, 'boss': boss, 'boss_final': boss_final, 'amaterasu': amaterasu, 'sutoku': sutoku, 'masakado': masakado,
           'gameover': gameover, 'victory': victory, 'matsuri': matsuri}
 
 if __name__ == '__main__':

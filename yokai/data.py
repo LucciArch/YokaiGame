@@ -829,7 +829,7 @@ BOSS_POOL[8] = ['sutoku']
 BIOMES['kubizuka'] = dict(name='Grabhügel des Hauptes', jp='Kubizuka', depth=9, floor=(22, 30, 34), floor_pat='stone',
                           wall=(28, 38, 42), wall_pat='stone', rock=(70, 86, 88), moss=True, ambient='fog',
                           enemies=['onibi', 'hitodama', 'shinigami', 'kasha', 'katawaguruma', 'oni', 'karasu_tengu'],
-                          music=('iwato', 174, 92, 'mystic', 59), weather='rain_dark', dark=90, grade=(20, 60, 70), pit='void',
+                          music=('iwato', 174, 92, 'mystic', 50), weather='rain_dark', dark=90, grade=(20, 60, 70), pit='void',
                           decor='cracks', boss='masakado')
 DEPTH_BIOMES[9] = ['kubizuka']
 BOSS_POOL[9] = ['masakado']
