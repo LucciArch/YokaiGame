@@ -731,7 +731,7 @@ WALL_LIGHT = {
     ('tsukiyomi', 0): (16, 9, (200, 215, 255), 38), ('yomi_oku', 1): (15, 9, ONIBI_C, 40),
     ('yomi', 1): (17, 6, (230, 210, 120), 30),                # Ikazuchis Blitze
     ('shiramine', 1): (20, 6, (235, 70, 80), 34),             # Groll-Feuer am Gorintō
-    ('kubizuka', 1): (20, 2, (150, 235, 220), 30),            # Onibi über dem Steinfrosch
+    ('kubizuka', 1): (20, 4, (150, 235, 220), 30),            # Onibi über dem Steinfrosch
 }
 
 

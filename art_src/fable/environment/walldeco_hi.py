@@ -1138,3 +1138,74 @@ def shiramine_hi(name, base):
 
 
 HI['shiramine'] = shiramine_hi
+
+
+# ---- Kubizuka: Sotoba-Bretter mit Bonji-Schrift und Shide / Nische mit Steinfrosch (kaeru = heimkehren), darüber Onibi
+PALE = ('#1a3a4a', '#3a7a86', '#8ad0c8', '#e0fff4')
+
+
+def kubizuka_hi(name, base):
+    import random
+    a, b = base.copy(), base.copy()
+    Y, X = _g(a)
+    r = random.Random('kubizuka-hi')
+    ink = '#160c14'
+    for i, (x, top) in enumerate(((7, 5), (19, 2), (31, 6), (43, 3))):   # Sotoba, leicht verschieden hoch
+        w = 8
+        board = (X >= x) & (X <= x + w) & (Y >= top + 5) & (Y <= 31)
+        head = (X >= x) & (X <= x + w) & (Y >= top + 2) & (Y < top + 5)
+        tip = hpoly(a, [(x, top + 2), (x + w // 2, top - 1), (x + w, top + 2)])
+        allm = board | head | tip
+        hfill(a, edge(allm), K)
+        hfill(a, allm, WOOD[2])
+        hfill(a, allm & (X <= x + 1), WOOD[3])                    # Mondlicht von links
+        hfill(a, allm & (X >= x + w - 1), WOOD[1])
+        hr(a, x, top + 4, x + w, top + 4, K)                      # Kerben des Fünf-Elemente-Kopfes
+        hr(a, x, top + 7, x + w, top + 7, K)
+        hp(a, x, top + 5, K); hp(a, x + w, top + 5, K)
+        for y in range(top + 9, 28, 4):                           # Bonji-Zeichen, verwittert
+            c = ink if r.random() > .25 else WOOD[1]
+            hr(a, x + 3, y, x + 5, y, c); hp(a, x + 4, y + 1, c)
+            hp(a, x + 3 + r.choice((0, 2)), y + 2, c)
+        for y in range(top + 10, 31, 5):                          # Maserung
+            hp(a, x + 2 + (y % 3), y, WOOD[1])
+    for x0 in (28, 52):                                           # Shide-Papierstreifen zwischen den Brettern, im Wind geknickt
+        for k, (dx, dy) in enumerate(((0, 0), (1, 2), (-1, 4), (0, 6))):
+            hr(a, x0 + dx, 12 + dy, x0 + dx + 2, 13 + dy, PAPER[3] if k % 2 == 0 else PAPER[2])
+        hp(a, x0 + 3, 11, K)
+    # B: Felsnische mit Steinfrosch auf Sockel, Onibi schwebt darüber (Licht bei 40, 4)
+    nm = (X >= 14) & (X <= 48) & (Y >= 4) & (Y <= 29) & ~(((X == 14) | (X == 48)) & (Y == 4))
+    hfill(b, nm, K)
+    hfill(b, nm & (abs(X - 40) + abs(Y - 7) < 10) & ~(abs(X - 40) + abs(Y - 7) < 6), '#0c1e24')
+    s = STONE
+    ped = (X >= 18) & (X <= 41) & (Y >= 25) & (Y <= 29)
+    hfill(b, edge(ped), K); hfill(b, ped, s[1]); hr(b, 18, 25, 41, 25, s[2])
+    hfill(b, ped & (Y >= 28) & ((X + Y) % 3 > 0), MOSS[1])
+    body = he(b, 29.5, 20, 9, 5.5) & (Y <= 24)                    # gedrungener Leib
+    legs = he(b, 22, 23, 3, 2) | he(b, 37, 23, 3, 2)              # Hinterschenkel
+    eyes = he(b, 24.5, 14, 2.6, 2.4) | he(b, 34.5, 14, 2.6, 2.4)  # vorstehende Augenhöcker
+    frog = body | legs | eyes
+    hfill(b, edge(frog), K)
+    hfill(b, frog, s[2])
+    hfill(b, frog & (X <= 25), s[3])
+    hfill(b, frog & (X >= 36), s[1])
+    hfill(b, he(b, 29.5, 22.5, 5, 1.6), s[3])                     # helle Kehle
+    hln(b, [(22, 19), (25, 21), (34, 21), (37, 19)], K)           # breites Maul
+    for cx in (24, 34):
+        hp(b, cx, 14, PALE[2]); hp(b, cx + 1, 14, PALE[3]); hp(b, cx, 13, K)   # Onibi spiegelt sich im Steinauge
+    hr(b, 21, 24, 24, 24, K); hr(b, 35, 24, 38, 24, K)            # Zehen
+    for (x, y) in ((27, 17), (31, 18), (33, 16), (21, 21)):       # Flechten
+        hp(b, x, y, MOSS[2])
+    bib = hpoly(b, [(25, 22), (34, 22), (29, 25)])                # roter Latz unter dem Maul, wie ihn Pilger umbinden
+    hfill(b, bib, '#8a1c2a'); hfill(b, bib & (Y == 22), '#c03040'); hfill(b, bib & (X >= 32), '#5a0e1a')
+    fire = hpoly(b, [(37, 9), (38, 4), (40, 6), (41, 0), (43, 5), (44, 3), (44, 9), (40, 11)])
+    hfill(b, edge(fire), PALE[0])
+    hfill(b, fire, PALE[1])
+    hfill(b, hpoly(b, [(38, 9), (40, 5), (41, 3), (43, 8), (40, 10)]), PALE[2])
+    hfill(b, he(b, 40.5, 8, 1.5, 1.5), PALE[3])
+    for (x, y) in ((36, 2), (46, 6), (35, 7)):
+        hp(b, x, y, PALE[2])
+    return [a, b]
+
+
+HI['kubizuka'] = kubizuka_hi
