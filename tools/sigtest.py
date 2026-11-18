@@ -818,5 +818,21 @@ for ub in list(run.pbullets):
     sigs.hit_post(run, e, ub, 1)
 if not (strikes == [0] * 5 + [1] * 6 + [2] and len(run.pbullets) == 6 and all(u.fl.get('_ume') for u in run.pbullets) and len(run.hazards) == 2):
     print('FEHLER Tobiume', strikes, len(run.pbullets), len(run.hazards)); bad += 1
+# Drei große Onryō: Blitz schon jeden 4. Treffer, Blüten als Blut-Sutra; Kagemusha ruft Blitze auf die drei nächsten Feinde
+for iid in ('masakado_kage', 'sutoku_sutra'):
+    p.gain_item(iid, silent=True)
+run.pbullets = []; run.hazards = []; sigs.st(p)['ume'] = 0
+strikes = []
+for _ in range(8):
+    sigs.hit_post(run, e, b, 1); strikes.append(len(run.hazards))
+ok = 'san_onryo' in p.sgs and strikes == [0] * 3 + [1] * 4 + [2] and all(u.fl.get('sg') == ('sutra',) for u in run.pbullets)
+run.hazards = []; run.enemies = [make_boss(run, 'shuten_doji') for _ in range(4)]
+for o in run.enemies:
+    o.spawn_t = 0
+p.iframes = 0; sigs.st(p)['kage'] = 0
+eb = Bullet(p.x, p.y, 0, 0, 1, 3, 1, 'e', (255, 0, 0), {})
+bl = [sigs.block(p, run, eb) for _ in range(5)]
+if not (ok and bl[-1] and len(run.hazards) == 3):
+    print('FEHLER Drei große Onryō', sorted(p.sgs), strikes, bl, len(run.hazards)); bad += 1
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)

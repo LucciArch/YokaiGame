@@ -133,6 +133,7 @@ TEXT = {
     'daitengu': 'Wendet eine Blut-Sutra, fächert sie drei durchbohrende Krähenfedern (je 60 %) in ihre neue Richtung',
     'tobiume': 'Jeder 6. Geschosstreffer ruft den Seiryōden-Blitz auf das Ziel (150 %) und streut drei Pflaumenblüten (je 40 %)',
     'kagemusha': 'Jedes 7. Geschoss, das dich treffen würde, trifft einen Kagemusha: er zerfällt in sieben suchende Onibi (je 80 %)',
+    'san_onryo': 'Tenjins Blitz schon jeden 4. Treffer, seine Blüten wenden als Blut-Sutra; jeder Kagemusha ruft Blitze auf die drei nächsten Feinde (150 %)',
     'onryo': 'Kagemusha schon bei jedem 5. Geschoss; seine Onibi tragen Sutokus Blutfluch und wenden nach 0,6 s mit 150 %',
     'blutsutra': 'Jeder 7. Wurf ist eine Blut-Sutra: nach 0,6 s kehrt sie um und schneidet mit 150 % durch alle Feinde zurück',
     'iwato': 'Verlöschte Geschosse kehren als Sonnenstrahlen (120 %) zu den Feinden zurück, die Glöckchen läuten schon nach 2,5 s',
@@ -1096,10 +1097,14 @@ def hit_post(run, e, b, dmg):
                 _chain_strikes(run, e, 1, p.damage() * 1.6 + 3)
     if 'tobiume' in S and b is not None and not echo and not b.fl.get('_ume'):
         g['ume'] = g.get('ume', 0) + 1
-        if g['ume'] % 6 == 0:                            # Tenjin schlägt dort ein, wohin die Pflaume fliegt
+        san = 'san_onryo' in S                           # Drei große Onryō: Sutokus Fluch fährt in die Blüten
+        if g['ume'] % (4 if san else 6) == 0:            # Tenjin schlägt dort ein, wohin die Pflaume fliegt
+            if san:
+                _syn(run, 'san_onryo', e.x, e.y, (255, 170, 190))
             run.lightning(e.x, e.y, p.damage() * 1.5 + 2)
             for i in range(3):
-                nb = run.fire_player_bullet(e.x, e.y, random.random() * math.tau, p.damage() * 0.4, 170, 2.5, 0.7, {'homing': 1, '_ume': 1})
+                nb = run.fire_player_bullet(e.x, e.y, random.random() * math.tau, p.damage() * 0.4, 170, 2.5, 0.7,
+                                            {'homing': 1, '_ume': 1, 'sg': ('sutra',)} if san else {'homing': 1, '_ume': 1})
                 nb.col = (255, 170, 190)
                 nb.hit.add(e)
     if b is not None and b.fl.get('_urteil'):
@@ -1484,6 +1489,11 @@ def block(p, run, b):
                 nb = run.fire_player_bullet(p.x, p.y, i / 7 * math.tau, p.damage() * 0.8, 200, 3.5, 1.4,
                                             {'homing': 1, 'pierce': 1, 'sg': ('sutra',)} if onryo else {'homing': 1, 'pierce': 1})
                 nb.col = (190, 30, 40) if onryo else (150, 235, 220)
+            if 'san_onryo' in S:                         # der Donnergott antwortet dem Neuen Kaiser
+                _syn(run, 'san_onryo', p.x, p.y, (255, 240, 120))
+                for o in sorted((o for o in run.enemies if o.active()), key=lambda o: math.hypot(o.x - p.x, o.y - p.y))[:3]:
+                    run.zap(p.x, p.y, o.x, o.y)
+                    run.lightning(o.x, o.y, p.damage() * 1.5)
             return True
     if 'schuppenpanzer' in S and random.random() < (0.35 if 'drachenschuppen' in S else 0.25):
         if 'drachenschuppen' in S:
