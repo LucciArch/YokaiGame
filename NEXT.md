@@ -309,13 +309,21 @@ für Talismane greifen (z. B. `bullet_tick`) – sollen sie auch für Strahl/Hie
 - Runde 137: `ido_no_yurei` (okiku_ido + tsurube, sig `ido_reikon`): Brunnenwasser trifft alle Feinde 25 % je Geisterherz,
   ½ Geisterherz jeden 2. Raum. ×1,42 (Raum-Synergie, Bossmaß wenig aussagekräftig).
 
-# Nächster Schritt: Belohnungs-Synergien Teil 3
-Warum: Noch viele Siegel-/Prüfungs-Items ohne Partner; Paare mit klarer Sage sind am stärksten für den Wiederspielwert.
+# Erledigt (Runden 138–140): Synergien für Belohnungs-Items Teil 3
+- Runde 138: `shikigami_tsukai` (hoki_naiden + juni_shinsho, sig `juni_tori`): Jūni-Shinshō jeden 8. statt 12. Wurf,
+  als verfolgende Papiervögel (1,5× Flugzeit). ×1,40 gegen ×0,94 nur Items.
+- Runde 139: `yakumo_tatsu` (murakumo + kushinada_kushi, sig `yakumo`): Wolke blitzt je Kamm-Stufe 10 % öfter, ab 4 Stufen
+  `_chain_strikes` auf einen zweiten Feind (60 %). Bosstest hat keine Kamm-Stufen → gemessen mit `kushi` fest auf 8
+  (vorübergehendes sed): ×1,75 gegen ×1,34.
+- Runde 140: `koishikuba` (kuzu_blatt + shinoda_blatt, sig `koishikuba`): Fuchsnebel jeden Raum (auch nach Treffern),
+  Nicht-Bosse brennen 3 s (30 %). `synbalance --raum` misst das nicht (Wellen kommen nach `on_room_enter`, beide 180 s).
+
+# Nächster Schritt: Belohnungs-Synergien Teil 4
+Warum: Kenji und Benkei haben noch fünf Siegel-Items ohne Partner; Sagen-Paare tragen den Wiederspielwert.
 Freie Paare (vorher `grep "items=\[" yokai/data.py` prüfen):
-- Seimei: hoki_naiden + juni_shinsho (Papiervogel/zwölf Generäle)
-- Benkei: tausendstes_schwert + nanatsu_dogu, tachi_ojo + miidera_kane
-- Kuzunoha: kuzu_blatt + shinoda_blatt / fuchs_trugbild
-- Susanoo: murakumo + kushinada_kushi
+- Benkei: tausendstes_schwert + nanatsu_dogu (999 Klingen + sieben Waffen), tachi_ojo + kanjincho?
+- Kenji: muramasa + kesagiri, tsubame_gaeshi + ichi_no_tachi (Kojirō / Musashi)
+- Hana: tamagushi + kotodama
 Je Synergie: `SYNERGIES`-Eintrag, `TEXT`, sig in `yokai/sigs.py`, sigtest-Fall, `synbalance shuten_doji 5 <id> --leben`
 und zum Vergleich mit `fx=dict()` (Items allein); Synergie-Aufschlag ≤ ~×1,5.
 
@@ -324,6 +332,7 @@ und zum Vergleich mit `fx=dict()` (Items allein); Synergie-Aufschlag ≤ ~×1,5.
 - Hi-ōgi (×1,53) und Masakari (×1,35) beobachten – oberer Rand der Siegel-Items
 
 # Weitere Ideen
+- `synbalance --raum`: Option, `on_room_enter` nach dem Spawnen der ersten Welle aufzurufen (für Nebel-/Eintritts-Synergien)
 - Wanddekos: zweite Variante pro Biom (Index 2), Werkzeug walldeco_hi.py steht
 - Mondhase ist im Raum recht klein – ggf. größer zeichnen (Canvas 64×60 → 80×72) und Wendezone anpassen
 - Spitze (Feuerwerk/Oni-Rausch/Hannya-Zorn ≈ ×4,2) mit `--raum` gegenprüfen
