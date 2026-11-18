@@ -613,5 +613,15 @@ b = Bullet(p.x, p.y, 1, 0, 10, 3, 1, 'p', (255, 255, 255), {})
 sigs.on_fire(p, run, [b])
 if 'morinji' not in p.sgs or sigs.st(p).get('kessel') != 1.2 or sigs.st(p).get('gold_t') != run.time + 3 or b.dmg != 12:
     print('FEHLER Morin-ji', sigs.st(p).get('kessel'), sigs.st(p).get('gold_t'), b.dmg); bad += 1
+# Kotarō (Tengu-Tsubute + Kakuremino): unsichtbar fallen die Steine alle 1,5 s statt 3 s, mit 200 %
+g.start_run('kotaro', 56); run = g.run; p = run.player
+for iid in ('tengu_tsubute', 'kakuremino'):
+    p.gain_item(iid, silent=True)
+e = Enemy(run, 'gaki', p.x + 60, p.y); e.spawn_t = 0; e.hp = e.maxhp = 999; run.enemies = [e]
+sigs.st(p)['tsub'] = 0; sigs.st(p)['invis'] = 0
+sigs.tick(p, run, 1.55); hp1 = e.hp                      # sichtbar: noch kein Stein
+sigs.st(p)['invis'] = 5; sigs.tick(p, run, 0.01)
+if 'kotaro' not in p.sgs or hp1 != 999 or abs(999 - e.hp - p.damage() * 2.0) > 0.01:
+    print('FEHLER Kotarō', hp1, e.hp); bad += 1
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)

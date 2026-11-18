@@ -7,6 +7,8 @@ Mit --leben: ohne Gott-Modus; gemessen wird der Boss-Schaden in % bis zum Tod (F
 Mit --waffe=w_laser (w_sword, w_bow ...): alle Kämpfe mit dieser Angriffsart.
 Mit --figur=kenji (benkei, kotaro ...): alle Kämpfe mit dieser Figur; dann wird statt der Synergien jedes Waffen-Item
   (+ ein Zufalls-Item) gemessen – bei Figuren mit eigener Waffe also die Waffen-Brücke (weapons.bridge_of).
+Mit --still: der Bot steht (keine Bewegung, keine Rolle) und wirft im Wechsel 2 s ja, 2 s nein – für Stillstand-Synergien
+  wie Trommel/Kakuremino; am besten mit --leben, denn stehend schafft er den Boss kaum in 180 s.
 Mit --items: die IDs im dritten Parameter sind Items; jedes wird mit einem Zufalls-Item gegen zwei Zufalls-Items gemessen.
 Mit Nahkampfwaffe (auch aus Items wie Speer oder Tamahagane) läuft der Bot zum Ziel und umkreist es."""
 import os, sys, math, random
@@ -26,6 +28,9 @@ if TOD:
 LEBEN = '--leben' in sys.argv
 if LEBEN:
     sys.argv.remove('--leben')
+STILL = '--still' in sys.argv
+if STILL:
+    sys.argv.remove('--still')
 RAUM = '--raum' in sys.argv
 if RAUM:
     sys.argv.remove('--raum')
@@ -77,7 +82,12 @@ def fight(items, seed):
         if nah:   # auf Hiebweite heran, dann seitlich ausweichen
             dx, dy = tgt.x - p.x, tgt.y - p.y
             mv = [dx, dy] if math.hypot(dx, dy) > 34 + getattr(tgt, 'r', 0) else [-dy, dx]
-        inp = {'move': mv, 'shoot': [tgt.x - p.x, tgt.y - p.y], 'dash': int(t * 60) % 120 == 0,
+        sh = [tgt.x - p.x, tgt.y - p.y]
+        if STILL:
+            mv = [0, 0]
+            if t % 4 >= 2:
+                sh = [0, 0]
+        inp = {'move': mv, 'shoot': sh, 'dash': not STILL and int(t * 60) % 120 == 0,
                'active': False, 'salt': False}
         run.update(dt, inp)
         if p.total_hp() < hp0:

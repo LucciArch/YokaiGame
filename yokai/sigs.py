@@ -218,6 +218,7 @@ TEXT = {
     'kintaro': 'Jeder Axttreffer zählt vierfach für den Keulenschlag, und die Keule trifft weiter (55 px statt 40)',
     'kurama': 'Sōjōbōs Wirbel wird größer (65 px), und jedes verwehte Feindgeschoss wird eine weitere Windklinge (bis +3)',
     'rashomon': 'Der Oni-Arm packt alle 2 s statt 2,5 s – unter 2 Herzen sogar jede Sekunde mit 250 %',
+    'kotaro': 'Unsichtbar im Kakuremino fallen die Tengu-Steine doppelt so oft (alle 1,5 s) und härter (200 %)',
     'morinji': 'Jede Rolle schenkt 3 s Glückssträhne (goldene Würfe +20 %), und der heiße Kessel hält länger (1,2 s)',
     'gyoretsu': 'Der Fuchsfeuer-Ring des Sternjuwels kommt doppelt so oft, und seine Flammen suchen ihr Ziel wie die der Laterne',
     'mamemaki': 'Die Bohnen fliegen schon jeden 2. Wurf, vier statt drei, und getroffene Yokai fliehen 2 s',
@@ -2028,12 +2029,15 @@ def _siegel_tick(p, run, dt, S, g):
     if 'tsubute' in S:
         g['tsub'] = g.get('tsub', 0) + dt
         en = [e for e in run.enemies if e.active()]
-        if g['tsub'] >= 3.0 and en:
+        kot = 'kotaro' in S and g.get('invis', 0) > 0   # Kotarō: aus dem Kakuremino fallen die Steine doppelt so oft
+        if g['tsub'] >= (1.5 if kot else 3.0) and en:
             g['tsub'] = 0
             e = random.choice(en)
+            if kot:
+                _syn(run, 'kotaro', p.x, p.y, (200, 180, 110))
             _sparks(run, e.x, e.y - 4, ((150, 140, 130), (110, 100, 95), (200, 190, 175)), 8, 70)
             _ring(run, e.x, e.y, (170, 160, 150), 14)
-            run.damage_enemy(e, p.damage() * 1.5, None)
+            run.damage_enemy(e, p.damage() * (2.0 if kot else 1.5), None)
             if not e.is_boss:
                 e.frozen = max(e.frozen, 0.4)
     if 'ibaraki' in S:
