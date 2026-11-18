@@ -536,5 +536,17 @@ p.hp = 2; p.spirit = 0
 sigs.on_hurt(p, run)
 if 'ataka' not in p.sgs or sigs.st(p).get('ojo') != 4.0 or e.frozen < 2.0:
     print('FEHLER Ataka no Seki', p.total_hp(), sigs.st(p).get('ojo'), e.frozen); bad += 1
+# Shōjō-ji no Utage (Tanuki-bayashi + Tokkuri): Schläge füllen den Tokkuri, im Rausch auch im Gehen
+g.start_run('ponpoko', 49); run = g.run; p = run.player
+for iid in ('tanuki_bayashi', 'tanuki_tokkuri'):
+    p.gain_item(iid, silent=True)
+e = Enemy(run, 'gaki', p.x + 30, p.y); e.spawn_t = 0; e.hp = e.maxhp = 999; run.enemies = [e]
+gg = sigs.st(p); gg['tk'] = 6; gg['bay'] = 1.95; gg['still'] = 1.0
+sigs.tick(p, run, 0.1)
+k1 = run.time < gg.get('sake_t', 0)
+gg['still'] = 0; gg['bay'] = 1.95
+sigs.tick(p, run, 0.1)
+if 'utage' not in p.sgs or not k1 or gg.get('tk') != 10:
+    print('FEHLER Shōjō-ji no Utage', k1, gg.get('tk')); bad += 1
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)

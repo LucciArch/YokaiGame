@@ -216,6 +216,7 @@ TEXT = {
     'ganryu': 'Der erste Hieb kehrt alle 8 s im Raum zurück und schnellt als Schwalbenschnitt zu zwei weiteren Feinden (je 100 %)',
     'hoten': 'Das Norito kommt schon jeden 12. Wurf, und bis zu 8 vergehende Feindgeschosse werden Sakaki-Blätter, die Yokai treffen (je 60 %)',
     'ataka': 'Tachi-ōjō hält schon bei 1 Herz und 4 s lang, und alle Yokai im Raum erstarren 2 s (Bosse ½ s) vor Benkeis Blick',
+    'utage': 'Jeder Trommelschlag zählt wie zwei Münzen für den Tokkuri, und im Sake-Rausch trommelst du auch im Gehen – lauter und weiter (200 %)',
     'senbon': 'Benkeis Waffen kommen schon jeden 5. Wurf, und jeder ihrer Treffer zählt für die Schwertjagd wie ein Kill',
     'henro': 'Jede neue Ebene faltet zwei Kraniche, jede 2. Ebene bringt ein Geisterherz',
     'sommerwind': 'Die Rolle wirft acht Federn, die weiter fliegen',
@@ -1517,6 +1518,15 @@ def _suzu(p, run):
             sb.col = (255, 230, 140)
 
 
+def _schluck(p, run, g, k):
+    """Tokkuri: jede 8. Münze (bei Utage auch Trommelschläge) – 4 s Sake-Rausch."""
+    for _ in range(k):
+        g['tk'] = g.get('tk', 0) + 1
+        if g['tk'] % 8 == 0:
+            g['sake_t'] = run.time + 4
+            run.floats.append([p.x, p.y - 20, 'Kanpai!', (230, 210, 160), 0.8])
+
+
 def on_coin(p, run, v):
     """Gibt zusätzliche Mon zurück."""
     S = p.sgs
@@ -1528,10 +1538,7 @@ def on_coin(p, run, v):
         g['gold_t'] = run.time + 5
         run.floats.append([p.x, p.y - 20, 'Glückssträhne!', (255, 220, 110), 0.8])
     if 'tokkuri' in S:
-        g['tk'] = g.get('tk', 0) + 1
-        if g['tk'] % 8 == 0:
-            g['sake_t'] = run.time + 4
-            run.floats.append([p.x, p.y - 20, 'Kanpai!', (230, 210, 160), 0.8])
+        _schluck(p, run, g, 1)
     if 'fuchsglueck' in S and v == 1 and random.random() < (0.4 if 'fuchsgeld' in S else 0.2):
         extra = 4
         if 'fuchsgeld' in S:
@@ -2036,10 +2043,15 @@ def _siegel_tick(p, run, dt, S, g):
     if 'kakuremino' in S and g.get('still', 0) >= 1.0 and run.time - g.get('fire_t', -9) >= 1.0:
         g['invis'] = max(g.get('invis', 0), 0.1)
     if 'bayashi' in S:                                   # Tanuki-bayashi: Bauchtrommel im Stillstand
-        g['bay'] = g.get('bay', 0) + dt if g.get('still', 0) > 0.3 else 0
+        utage = 'utage' in S                             # Shōjō-ji no Utage: im Sake-Rausch trommelt man auch im Gehen
+        g['bay'] = g.get('bay', 0) + dt if g.get('still', 0) > 0.3 or (utage and run.time < g.get('sake_t', 0)) else 0
         if g['bay'] >= 2.0 and any(e.active() for e in run.enemies):
             g['bay'] = 0
-            _blast(run, p.x, p.y, 60, p.damage() * 1.5, (170, 120, 80), 300)
+            rausch = utage and run.time < g.get('sake_t', 0)
+            _blast(run, p.x, p.y, 70 if rausch else 60, p.damage() * (2.0 if rausch else 1.5), (170, 120, 80), 300)
+            if utage:                                    # jeder Schlag ein Schluck: Kanpai alle 4 Schläge
+                _syn(run, 'utage', p.x, p.y, (200, 180, 140))
+                _schluck(p, run, g, 2)
     if 'ido_kagami' in S:
         g['ido'] = g.get('ido', 0) + dt
         if g['ido'] >= 3.0:
