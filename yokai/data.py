@@ -471,6 +471,7 @@ SYNERGIES = [
     dict(id='tamagushi_hoten', name='Tamagushi-hōten', desc='Der Sakaki-Zweig wird dargebracht, das Norito gesprochen – und die Kami antworten', items=['tamagushi', 'kotodama'], fx=dict(sig_hoten=1)),
     dict(id='ataka_no_seki', name='Ataka no Seki', desc='Die leere Liste laut vorgelesen, aufrecht vor dem Tor – kein Wächter wagt sich vor', items=['tachi_ojo', 'kanjincho'], fx=dict(sig_ataka=1)),
     dict(id='shojoji_utage', name='Shōjō-ji no Utage', desc='Shō, shō, Shōjō-ji – im Mondlicht trommeln die Tanuki, und der Sake geht nie aus', items=['tanuki_bayashi', 'tanuki_tokkuri'], fx=dict(sig_utage=1)),
+    dict(id='kintaro', name='Kintarō', desc='Das Bergkind mit Axt und Keule – es rang mit Bären und wurde Raikōs Gefolgsmann', items=['masakari', 'kodomo_kanabo'], fx=dict(sig_kintaro=1)),
     dict(id='henro', name='Henro', desc='Dōgyō ninin – Pilgerstab und Kraniche wandern mit dir', items=['kongozue', 'senbazuru'], fx=dict(luck=1, sig_henro=1)),
 ]
 

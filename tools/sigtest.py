@@ -548,5 +548,17 @@ gg['still'] = 0; gg['bay'] = 1.95
 sigs.tick(p, run, 0.1)
 if 'utage' not in p.sgs or not k1 or gg.get('tk') != 10:
     print('FEHLER Shōjō-ji no Utage', k1, gg.get('tk')); bad += 1
+# Kintarō (Masakari + Kinder-Kanabō): Axttreffer zählen vierfach für den Keulenschlag
+g.start_run('akago', 50); run = g.run; p = run.player
+for iid in ('masakari', 'kodomo_kanabo'):
+    p.gain_item(iid, silent=True)
+sigs.st(p)['shots'] = 4
+b = run.fire_player_bullet(p.x, p.y, 0, 1, 100, 2, 1, {})
+sigs.on_fire(p, run, [b])
+e = Enemy(run, 'gaki', p.x + 40, p.y); e.spawn_t = 0; e.hp = e.maxhp = 999; run.enemies = [e]
+sigs.hit_post(run, e, b, 1); kk1 = sigs.st(p).get('kk')
+sigs.hit_post(run, e, b, 1)
+if 'kintaro' not in p.sgs or not b.fl.get('axt') or kk1 != 4 or sigs.st(p).get('kk') != 0 or e.hp >= 999:
+    print('FEHLER Kintarō', b.fl, kk1, sigs.st(p).get('kk'), e.hp); bad += 1
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)

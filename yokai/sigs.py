@@ -215,6 +215,7 @@ TEXT = {
     'yoto': 'Im Blutdurst schneidet Kesa-giri schon jeden 2. Wurf, mit blutroten Klingen (150 %)',
     'ganryu': 'Der erste Hieb kehrt alle 8 s im Raum zurück und schnellt als Schwalbenschnitt zu zwei weiteren Feinden (je 100 %)',
     'hoten': 'Das Norito kommt schon jeden 12. Wurf, und bis zu 8 vergehende Feindgeschosse werden Sakaki-Blätter, die Yokai treffen (je 60 %)',
+    'kintaro': 'Jeder Axttreffer zählt vierfach für den Keulenschlag, und die Keule trifft weiter (55 px statt 40)',
     'ataka': 'Tachi-ōjō hält schon bei 1 Herz und 4 s lang, und alle Yokai im Raum erstarren 2 s (Bosse ½ s) vor Benkeis Blick',
     'utage': 'Jeder Trommelschlag zählt wie zwei Münzen für den Tokkuri, und im Sake-Rausch trommelst du auch im Gehen – lauter und weiter (200 %)',
     'senbon': 'Benkeis Waffen kommen schon jeden 5. Wurf, und jeder ihrer Treffer zählt für die Schwertjagd wie ein Kill',
@@ -706,6 +707,9 @@ def _siegel_fire(p, run, bullets, g, n, base, dmg, spd, life, size):
         b.r *= 1.3
         b.col = (220, 120, 60)
         b.fl = dict(b.fl, boomerang=1, pierce=1)
+        if 'kintaro' in S:                               # Kintarō: die Axt schlägt wie die Keule
+            b.fl['axt'] = 1
+            _syn(run, 'kintaro', p.x, p.y, (220, 120, 60))
     yoto = 'yoto' in S and run.time < g.get('bd_t', 0)  # Yōtō Muramasa: im Blutdurst schneidet die Klinge doppelt so oft
     if 'kesagiri' in S and n % (2 if yoto else 4) == 0:  # Diagonalschnitt
         if yoto:
@@ -913,9 +917,11 @@ def hit_post(run, e, b, dmg):
             e.slowed = max(e.slowed, 1.0)
             run.damage_enemy(e, p.damage() * 2.5, None)
     if 'kodomo_kanabo' in S and b is not None and not echo:
-        g['kk'] = g.get('kk', 0) + 1
-        if g['kk'] % 8 == 0:                             # Keulenschlag
-            _blast(run, e.x, e.y, 40, p.damage() * 2, (110, 110, 125), 320)
+        axt = b.fl.get('axt')                            # Kintarō: Axttreffer zählen vierfach, Schlag weiter
+        g['kk'] = g.get('kk', 0) + (4 if axt else 1)
+        if g['kk'] >= 8:                                 # Keulenschlag
+            g['kk'] = 0
+            _blast(run, e.x, e.y, 55 if 'kintaro' in S else 40, p.damage() * 2, (110, 110, 125), 320)
     if 'tsubame' in S and b is not None and not echo and random.random() < 0.12:
         o = _nearest(run, e.x, e.y, 160, lambda o: o is not e)
         if o:                                            # Schwalbenschnitt
