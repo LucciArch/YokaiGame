@@ -720,6 +720,7 @@ PROP_LIGHT = {
     ('yomi_oku', 0): (16, 12, (255, 170, 150), 36),        # Götterpfirsiche am Ōkamuzumi
     ('tsukiyomi', 0): (16, 8, (200, 215, 255), 30),        # Tsuki no Katsura
     ('yomi_oku', 1): (16, 26, ONIBI_C, 44),                # Herd der Unterwelt
+    ('kubizuka', 0): (16, 14, (150, 235, 220), 44),        # Steinlaterne mit bleichem Onibi
 }
 # Leuchtende Wanddekos: (Biom, Index) -> (x, y im 32x16-Stück, Farbe, Lichtradius)
 WALL_LIGHT = {
@@ -730,6 +731,7 @@ WALL_LIGHT = {
     ('tsukiyomi', 0): (16, 9, (200, 215, 255), 38), ('yomi_oku', 1): (15, 9, ONIBI_C, 40),
     ('yomi', 1): (17, 6, (230, 210, 120), 30),                # Ikazuchis Blitze
     ('shiramine', 1): (20, 6, (235, 70, 80), 34),             # Groll-Feuer am Gorintō
+    ('kubizuka', 1): (20, 2, (150, 235, 220), 30),            # Onibi über dem Steinfrosch
 }
 
 

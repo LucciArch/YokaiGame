@@ -510,9 +510,9 @@ class Game:
             if info is None:
                 from .run import load_run_file
                 d = load_run_file() or {}
-                roman = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII']
+                roman = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX']
                 info = self._cont_info = ('%s  ·  Ebene %d  ·  Kapitel %s  ·  %d Items' % (
-                    CHARS.get(d.get('char'), {}).get('name', '?'), d.get('floor_no', 0) + 1, roman[min(8, max(1, d.get('depth', 1)))],
+                    CHARS.get(d.get('char'), {}).get('name', '?'), d.get('floor_no', 0) + 1, roman[min(9, max(1, d.get('depth', 1)))],
                     len(d.get('player', {}).get('items', []))) if d else '')
             T.add(info, W // 2 + 76, 85, 6, (200, 220, 170))
         else:
@@ -1070,10 +1070,11 @@ class Game:
         win = run.result == 'win'
         if win:
             iwato = run.biome_id == 'iwato'
-            T.add('Sieg!' if run.depth < 6 else 'Wahrer Sieg!' if run.depth == 6 else 'Der Fluch ist gebrochen!' if run.depth == 8
+            T.add('Sieg!' if run.depth < 6 else 'Wahrer Sieg!' if run.depth == 6 else 'Der Fluch ist gebrochen!' if run.depth == 8 else 'Das Haupt kehrt heim!' if run.depth == 9
                   else 'Die Sonne kehrt zurück!' if iwato else 'Rückkehr aus Yomi!', W // 2, 30, 22, (255, 230, 150), 'c')
             T.add('Die Nacht der hundert Dämonen ist vorüber.' if run.depth < 6 else 'Der böse Stern ist gefallen. Der Himmel ist frei.' if run.depth == 6
                   else 'Sutoku-in findet Ruhe. Über Shiramine geht ein echter Morgen auf.' if run.depth == 8
+                  else 'Masakados Haupt sinkt in den Hügel zurück. Die Frösche von Kubizuka schweigen.' if run.depth == 9
                   else 'Amaterasu tritt aus der Höhle. Das Licht kehrt in die Welt zurück.' if iwato
                   else 'Izanami ruht. Der Felsen von Yomotsu Hirasaka schließt sich hinter dir.', W // 2, 60, 9, (240, 230, 210), 'c')
         else:

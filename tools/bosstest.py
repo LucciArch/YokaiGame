@@ -7,7 +7,7 @@ from yokai import data, gfx
 from yokai.bosses import make_boss
 from yokai.settings import *
 g = Game(headless=True)
-for depth, pool in [(7, ['amaterasu']), (8, ['sutoku', 'masakado'])] + list(data.BOSS_POOL.items()):   # Amaterasu nur über die Iwato-Pforte, Sutoku-in geheim
+for depth, pool in [(7, ['amaterasu']), (8, ['sutoku'])] + list(data.BOSS_POOL.items()):   # Amaterasu nur über die Iwato-Pforte, Sutoku-in geheim
     for bid in pool:
         g.start_run('hana', 100)
         run = g.run
@@ -107,6 +107,26 @@ assert 'sutoku' in run.save['achievements'] and story.unlocked(run.save, 'wahres
 from yokai.epilogue import Epilogue, STORY_SHIRAMINE
 assert Epilogue(g, run).blocks[0] == STORY_SHIRAMINE[0]
 print('Shiramine-Pforte OK')
+
+# Kubizuka-Pforte: erst wer Sutoku-in schon einmal erlöst hat, findet in Shiramine den Weg zu Masakado (Kapitel IX)
+g.start_run('hana', 13); run = g.run; run.depth = 8
+run.save['stats']['sutoku_wins'] = 0
+run.objs = []; run.boss_room_rewards()
+assert 'kubizuka' not in [o.kind for o in run.objs]
+run.save['stats']['sutoku_wins'] = 1
+run.objs = []; run.boss_room_rewards()
+gate = [o for o in run.objs if o.kind == 'kubizuka']
+assert gate and 'victory' in [o.kind for o in run.objs], [o.kind for o in run.objs]
+run.draw(g.screen, 1.0); gfx.TEXT.clear(); gfx.HI.clear()
+run.interact(gate[0])
+assert (run.depth, run.biome_id, run.boss_id, run.loop) == (9, 'kubizuka', 'masakado', 0), (run.depth, run.biome_id, run.boss_id, run.loop)
+assert 'IX' in run.floor_label()
+run.draw(g.screen, 1.0); gfx.TEXT.clear(); gfx.HI.clear()
+run.end_run(True)
+assert 'masakado' in run.save['achievements'] and story.unlocked(run.save, 'kubizuka')
+from yokai.epilogue import STORY_KUBIZUKA
+assert Epilogue(g, run).blocks[0] == STORY_KUBIZUKA[0]
+print('Kubizuka-Pforte OK')
 
 # Rückkehr aus Yomi: der erste Sieg über Izanami schaltet den Pfirsich frei
 g.start_run('hana', 10); run = g.run; run.depth = 7

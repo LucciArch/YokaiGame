@@ -502,6 +502,56 @@ def rocks(name):
         cv.line([(21, 12), (27, 7)], '#1c1c3a')
         out.append(fin(cv, P))
 
+    elif name == 'kubizuka':
+        pale = ('#1a3a4a', '#3a7a86', '#8ad0c8', '#e0fff4')      # bleiches Onibi über dem Grab
+        cv, rng = new(0)                                     # Ishidōrō mit Onibi im Lichtfenster, Moos am Sockel
+        base = cv.R(11, 25, 21, 28)
+        post = cv.R(14, 18, 18, 25)
+        fbox = cv.R(11.5, 11, 20.5, 17)
+        roof = cv.PG([(7, 11), (10, 8), (16, 5.5), (22, 8), (25, 11), (23, 10.5), (9, 10.5)])
+        cap = cv.E(16, 5, 1.4, 1.6)
+        sil = base | post | fbox | roof | cap | cv.R(12, 17, 20, 18)
+        cv.fill(dil(sil), K)
+        for part in (base, post, fbox, cv.R(12, 17, 20, 18), roof, cap):
+            cv.form(part, (k[0], k[1], k[2]), 1, 1)
+        cv.fill(cv.R(13.5, 12.5, 18.5, 15.5), K)
+        cv.fill(cv.E(16, 14, 2, 1.4), pale[2])
+        cv.fill(cv.E(16, 13.6, 1, .7), pale[3])
+        cv.hline([(9, 10), (23, 10)], k[3])
+        cover(cv, base | post, MOSS, 3, rng)
+        out.append(fin(cv, P))
+        cv, rng = new(1)                                     # Itabi-Grabstein des Hauptes auf dem Hügel, Räucherwerk davor
+        mound = cv.E(16, 27, 12, 4) & (cv.Y <= 28)
+        cv.fill(dil(mound), K)
+        cv.form(mound, (P['f1'], P['f2'], P['f3']), 1, 1)
+        st = cv.PG([(11, 26), (11, 7), (16, 3), (21, 7), (21, 26)])
+        cv.fill(dil(st), K)
+        cv.form(st, (k[1], k[2], k[3]), 2, 1)
+        cv.hl(12, 20, 9, k[0])                               # eingemeißelter Bogen und Inschrift (Namu Amida Butsu)
+        for y in range(11, 24, 2):
+            cv.hl(15, 16 + (y // 2) % 2, y, k[0])
+            cv.px(17, y, k[3])
+        cv.line([(19, 12), (18, 16), (20, 19)], k[0])          # alter Riss
+        cv.rect(13, 25, 19, 27, IRON[1])                     # Kōro mit Räucherstäbchen
+        cv.hl(13, 19, 25, IRON[2])
+        for x in (15, 16, 17):
+            for y in (23, 23.5, 24, 24.5):
+                cv.hpx(x + .5, y, '#6a4a2a')
+            cv.hpx(x + .5, 22.5, LAVA[3])
+        for (x, y) in ((16, 21.5), (16.5, 21), (17, 20.5), (16.5, 20), (16, 19.5)):
+            cv.hpx(x, y, PAPER[2])
+        cv.grid(6, 24, ".a.\naba", dict(a=MOSS[1], b=MOSS[2]))
+        out.append(fin(cv, P))
+        cv, rng = new(2)                                     # Steinfrösche (kaeru – das Haupt „kehrt zurück“), roter Latz
+        box(cv, k, 3, 24, 29, 28, top=2)
+        box(cv, k, 11, 20, 21, 24, top=1)                    # kleiner Sockel für den mittleren Frosch
+        frog = ".KKK...KKK.\nKcwcK.KcwcK\nKcpcKKKcpcK\nKbbbbbbbbbK\nKcbKKKKKbaK\nKbbbbbbbbaK\n.KrrrrrrrK.\nKaaK...KaaK\nKKKK...KKKK"
+        fl = dict(K=K, a=k[1], b=k[2], c=k[3], w='#9aaca4', p='#0a0a10', r=RED[2])
+        for (x, y) in ((1, 16), (10, 12), (20, 16)):
+            cv.grid(x, y, frog, fl)
+            cv.px(x + 2, y + 6, RED[3])
+        out.append(fin(cv, P))
+
     elif name == 'yukiyama':
         sn = P['snow']
         cv, rng = new(0)                                     # ice crystal cluster
@@ -1505,4 +1555,21 @@ def wall_decos(name, base):
         b.rect(13, 7, 14, 7, s[2]); b.px(13, 6, s[3])
         b.px(15, 13, blood[1])
         b.grid(18, 5, ".a.\naba\n.a.", dict(a=blood[2], b='#ff8a7a'))
+    elif name == 'kubizuka':
+        pale = ('#1a3a4a', '#3a7a86', '#8ad0c8', '#e0fff4')
+        for x, top in ((4, 2), (10, 1), (16, 3), (22, 1)):   # Sotoba-Grabbretter, an die Mauer gelehnt
+            a.rect(x, top + 2, x + 4, 15, WOOD[2])
+            a.vl(x + 4, top + 2, 15, WOOD[1])
+            a.vl(x, top + 2, 15, WOOD[3])
+            a.hl(x + 1, x + 3, top + 1, WOOD[2])
+            a.px(x + 2, top, WOOD[3])
+            a.px(x - 1, top + 2, K); a.px(x + 5, top + 2, K)
+            a.hl(x + 1, x + 3, top + 4, K)                   # Kerben des Fünf-Elemente-Kopfes
+            for y in range(top + 6, 14, 2):
+                a.px(x + 2, y, '#1c121c')
+        niche(b, 9, 22, 4)                                   # Nische: kleiner Steinfrosch, darüber schwebt Onibi
+        b.rect(11, 14, 20, 14, k[1]); b.hl(11, 20, 13, k[2])
+        b.grid(10, 6, ".KKK...KKK.\nKcwcK.KcwcK\nKcpcKKKcpcK\nKbbbbbbbbbK\nKcbKKKKKbaK\n.KrrrrrrrK.\nKaaK...KaaK",
+               dict(K=K, a=k[1], b=k[2], c=k[3], w='#9aaca4', p='#0a0a10', r=RED[2]))
+        b.grid(19, 1, ".a.\nabc\n.a.", dict(a=pale[1], b=pale[2], c=pale[3]))   # Onibi schwebt in der Nische
     return [a, b]

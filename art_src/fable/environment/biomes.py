@@ -2,7 +2,7 @@
 from core import mix
 
 ORDER = ['chikurin', 'inari', 'obakedera', 'hakaba', 'kurama', 'yukiyama', 'ryugu', 'uminobe', 'yomi', 'jigoku',
-         'takamagahara', 'kawabe', 'yashiki', 'oeyama', 'shinkai', 'enma_cho', 'tsukiyomi', 'yomi_oku', 'iwato', 'shiramine']
+         'takamagahara', 'kawabe', 'yashiki', 'oeyama', 'shinkai', 'enma_cho', 'tsukiyomi', 'yomi_oku', 'iwato', 'shiramine', 'kubizuka']
 
 
 def B(floor_pat, wall_pat, pit, dark, f, cap, w, k, **extra):
@@ -101,4 +101,8 @@ BIOMES = {
                    ('#0e0c14', '#1a1620', '#241c26', '#30242c'), ('#0a080e', '#16101a', '#8a1c2a'),
                    ('#120e18', '#221a26', '#382630', '#54363a'), ('#120e16', '#2a2028', '#443238', '#64484a'),
                    leaf=('#2a1428', '#4a1c2e')),
+    'kubizuka': B('stone', 'stone', 'void', 85,          # Kubizuka: Grabhügel von Masakados Haupt, bleiches Onibi zwischen Kampfern
+                  ('#0c1014', '#151b20', '#1d252a', '#283236'), ('#080c10', '#121a1e', '#5a8a86'),
+                  ('#10161a', '#1c262a', '#2c3a3c', '#435654'), ('#10161a', '#242e32', '#3c4a4c', '#5e706c'),
+                  leaf=('#1a3a30', '#2e5a44')),
 }

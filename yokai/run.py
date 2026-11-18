@@ -320,8 +320,8 @@ class Run:
         s.blit(surf, (int(ox), y - 6))
 
     def floor_label(self):
-        roman = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII']
-        return 'Ebene %d  ·  Kapitel %s' % (self.floor_no, roman[min(8, self.depth)])
+        roman = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX']
+        return 'Ebene %d  ·  Kapitel %s' % (self.floor_no, roman[min(9, self.depth)])
 
     @property
     def enemy_dmg(self):
@@ -405,7 +405,7 @@ class Run:
             self.depth = depth or self.depth + 1
             self.stage = 0
         self.descend = 1.3
-        if self.depth > 6 and depth not in (7, 8):     # nur Yomi-/Iwato-Pforte (VII) und Shiramine (VIII) führen weiter
+        if self.depth > 6 and depth not in (7, 8, 9):     # nur Yomi-/Iwato-Pforte (VII), Shiramine (VIII) und Kubizuka (IX) führen weiter
             self.depth = 1
             self.loop += 1
             self.loop_mult = 1 + 0.6 * self.loop
@@ -1337,6 +1337,9 @@ class Run:
         elif self.depth == 7 and not self.challenge and story.unlocked(self.save, 'schatten'):
             self.objs.append(Obj('victory', cx - 70, cy + 40))     # der Schatten hinter dem Morgen wartet in Shiramine
             self.objs.append(Obj('shiramine', cx + 70, cy + 40))
+        elif self.depth == 8 and not self.challenge and self.save['stats'].get('sutoku_wins', 0):
+            self.objs.append(Obj('victory', cx - 70, cy + 40))     # wer Sutoku-in schon einmal erlöste, hört das Haupt rufen
+            self.objs.append(Obj('kubizuka', cx + 70, cy + 40))
         elif self.depth >= 6:
             self.objs.append(Obj('victory', cx, cy + 40))
         else:
@@ -2195,6 +2198,9 @@ class Run:
         elif k == 'shiramine':
             self.go_deeper(8)
             self.banner('Shiramine', 'Am Grab des verbannten Kaisers sammeln sich die Krähen', (220, 70, 80), big=True)
+        elif k == 'kubizuka':
+            self.go_deeper(9)
+            self.banner('Kubizuka', 'Über dem Grabhügel lacht ein Haupt ohne Körper', (140, 220, 210), big=True)
         elif k == 'victory':
             if self.result is None:
                 self.result = 'win'
@@ -2386,6 +2392,9 @@ class Run:
             if self.depth == 7 and self.biome_id == 'iwato':
                 s.stat('iwato_wins')
                 self.achieve('iwato')
+            elif self.depth == 9:
+                s.stat('masakado_wins')
+                self.achieve('masakado')
             elif self.depth == 8:
                 s.stat('sutoku_wins')
                 self.achieve('sutoku')

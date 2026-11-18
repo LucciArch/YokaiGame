@@ -54,14 +54,20 @@ CHAPTERS = [
         'Achthundert Jahre wuchs sein Groll auf Shiramine, genährt von jeder Angst in der Nacht der hundert Dämonen.',
         'Hana legt die Schreinglocke auf sein Grab und betet für ihn. Diesmal nimmt jemand seine Sutren an.',
         'Über den Bergen von Sanuki geht die Sonne auf – ein Morgen ohne Schatten. Der Weg ist zu Ende.']),
+    ('kubizuka', 'Das Haupt, das nach Osten flog', lambda sv: _st(sv, 'masakado_wins') >= 1,
+     'Folge dem Ruf vom Kubizuka und stelle dich Taira no Masakado.', 'kubizuka', [
+        'Doch als Sutoku-in Ruhe fand, erwachte im Osten ein zweiter Groll: das Haupt des Taira no Masakado.',
+        'Drei Tage lachte es auf dem Richtplatz in Kyōto, dann flog es heim nach Osten und stürzte in Shibasaki zu Boden.',
+        'Die Menschen bauten ihm einen Hügel und stellten Frösche davor, damit alles Verlorene heimkehrt.',
+        'Nun ruht das Haupt. Doch zwischen den Kampferbäumen glimmt noch ein Funke – Sugawara no Michizane wartet auf seinen Donner.']),
 ]
 BY_ID = {c[0]: c for c in CHAPTERS}
 # Story-Baum: Lage der Knoten und Verbindungen
 POS = {'prolog': (240, 40), 'morgen': (240, 76), 'stern': (240, 112), 'yomi': (140, 148), 'iwato': (340, 148),
-       'schatten': (240, 184), 'wahres_ende': (240, 220), 'gefaehrten': (400, 76), 'meister': (400, 112)}
+       'schatten': (240, 184), 'wahres_ende': (240, 220), 'kubizuka': (360, 220), 'gefaehrten': (400, 76), 'meister': (400, 112)}
 EDGES = [('prolog', 'morgen'), ('morgen', 'stern'), ('stern', 'yomi'), ('stern', 'iwato'), ('yomi', 'schatten'),
-         ('iwato', 'schatten'), ('schatten', 'wahres_ende'), ('prolog', 'gefaehrten'), ('gefaehrten', 'meister')]
-ORDER = ['prolog', 'morgen', 'stern', 'yomi', 'iwato', 'schatten', 'wahres_ende', 'gefaehrten', 'meister']
+         ('iwato', 'schatten'), ('schatten', 'wahres_ende'), ('wahres_ende', 'kubizuka'), ('prolog', 'gefaehrten'), ('gefaehrten', 'meister')]
+ORDER = ['prolog', 'morgen', 'stern', 'yomi', 'iwato', 'schatten', 'wahres_ende', 'kubizuka', 'gefaehrten', 'meister']
 
 
 def unlocked(sv, cid):

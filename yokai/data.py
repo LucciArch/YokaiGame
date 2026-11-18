@@ -686,7 +686,7 @@ BOSS_REWARD = {  # Freischaltung beim ersten Sieg
     'oonyudo': 'onyudo_kette', 'nurarihyon': 'nurarihyon_pfeife', 'kamaitachi_trio': 'kamaitachi_klingen',
     'akkorokamui': 'akkoro_tinte', 'enma': 'enma_spiegel', 'izanami': 'izanami_schleier', 'amaterasu': None, 'kagutsuchi': 'kagutsuchi_glut',
     'fujin': 'kaze_bukuro', 'orochi': 'yamata_zahn', 'shuten_doji': 'shuten_schale', 'tamamo': 'kyubi_juwel', 'mikaboshi': 'hoshi_splitter',
-    'sutoku': 'sutoku_sutra', 'masakado': None,   # Belohnung folgt mit der Kubizuka-Pforte
+    'sutoku': 'sutoku_sutra', 'masakado': None,   # Belohnung (Boss-Item) folgt in einer eigenen Runde
 }
 
 # =====================================================================  PRÜFUNGEN (Herausforderungen)
@@ -752,6 +752,7 @@ ACHIEVEMENTS = [
     ('yomi', 'Rückkehr aus Yomi', 'Besiege Izanami in ihrem Totenpalast', ('item', 'yomi_momo')),
     ('iwato', 'Die Sonne kehrt zurück', 'Besiege Amaterasu in Ama-no-Iwato', ('item', 'uzume_suzu')),
     ('sutoku', 'Der Fluch von Shiramine', 'Besiege Sutoku-in am Grab des verbannten Kaisers', ('item', 'sutoku_sutra')),
+    ('masakado', 'Das Haupt kehrt heim', 'Besiege Taira no Masakado am Kubizuka', None),
     ('all_bosses', 'Bezwinger der Nachtparade', 'Besiege alle 24 Bosse', None),
     ('teahouse', 'Teezeremonie', 'Trinke im Teehaus', None),
     ('slots', 'Glücksspieler', 'Spiele am Tanuki-Automaten', None),
@@ -823,6 +824,15 @@ BIOMES['shiramine'] = dict(name='Grab des verbannten Kaisers', jp='Shiramine', d
                            decor='leaves', boss='sutoku')
 DEPTH_BIOMES[8] = ['shiramine']
 BOSS_POOL[8] = ['sutoku']
+# Kapitel IX (geheim, nach einem Sieg über Sutoku-in): Kubizuka, der Grabhügel von Masakados Haupt.
+# Nur die Kubizuka-Pforte in Shiramine führt hierher – und nur, wenn Sutoku-in schon einmal fiel.
+BIOMES['kubizuka'] = dict(name='Grabhügel des Hauptes', jp='Kubizuka', depth=9, floor=(22, 30, 34), floor_pat='stone',
+                          wall=(28, 38, 42), wall_pat='stone', rock=(70, 86, 88), moss=True, ambient='fog',
+                          enemies=['onibi', 'hitodama', 'shinigami', 'kasha', 'katawaguruma', 'oni', 'karasu_tengu'],
+                          music=('iwato', 174, 92, 'mystic', 59), weather='rain_dark', dark=90, grade=(20, 60, 70), pit='void',
+                          decor='cracks', boss='masakado')
+DEPTH_BIOMES[9] = ['kubizuka']
+BOSS_POOL[9] = ['masakado']
 BOSS_POOL[6].remove('izanami')    # Izanami wartet jetzt in ihrem eigenen Reich
 BOSS_POOL[7] = ['izanami']
 
