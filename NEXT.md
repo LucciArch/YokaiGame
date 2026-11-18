@@ -325,12 +325,23 @@ für Talismane greifen (z. B. `bullet_tick`) – sollen sie auch für Strahl/Hie
 - Runde 143: `senbon_gari` (tausendstes_schwert + nanatsu_dogu, sig `senbon`): Waffe jeden 5. Wurf, Treffer mit `fl['senbon']`
   zählen über `sigs._jagd` für die Schwertjagd. ×0,99 im Bosstest (wächst über den Lauf, Bossmaß sieht das nicht).
 
-# Nächster Schritt: Belohnungs-Synergien Teil 5
-Warum: Noch einige Siegel-Items ohne Sagen-Partner; jede Synergie ist ein neuer Grund, eine Figur weiterzuspielen.
-Freie Paare (vorher `grep "items=\[" yokai/data.py` prüfen):
-- Hana: tamagushi + kotodama (Opferzweig + Norito)
-- Benkei: tachi_ojo + kanjincho (stehend sterben / Ataka-Wegliste)
-- Ponpoko: tanuki_bayashi + tanuki_tokkuri; Kuzunoha: hoshi_tama + kitsune_chochin
+# Erledigt (Runden 144–146): Synergien für Belohnungs-Items Teil 5
+- Runde 144: `tamagushi_hoten` (tamagushi + kotodama, sig `hoten`): Norito jeden 12. Wurf, bis zu 8 vergehende
+  Feindgeschosse → Sakaki-Blätter (60 %). ×1,37.
+- Runde 145: `ataka_no_seki` (tachi_ojo + kanjincho, sig `ataka`): Tachi-ōjō bei ≤1 Herz, 4 s, Yokai erstarren 2 s
+  (Bosse 0,5 s). ×1,21.
+- Runde 146: `shojoji_utage` (tanuki_bayashi + tanuki_tokkuri, sig `utage`): Trommelschläge zählen 2 für den Tokkuri
+  (Helfer `sigs._schluck`), im Sake-Rausch Trommel auch im Gehen, 200 %/70 px. ×1,02 – Bosstest-Bot steht nie still
+  und sammelt keine Münzen, misst die Synergie also nicht.
+- Testumgebung: `pip install pygame-ce numpy` (ohne numpy stürzen uiflow2/bot ab).
+
+# Nächster Schritt: Belohnungs-Synergien Teil 6
+Warum: Kotarō (4) und Akago (5) haben die meisten Siegel-Items ohne Sagen-Partner – genau die Figuren, bei denen
+neue Synergien am meisten Wiederspielwert bringen. Freie Items (Stand Runde 146, Skript: Siegel-Tabelle gegen SYNERGIES):
+- Kotarō: tengu_tsubute, kakuremino, sojobo_hane, hanadaka_men (z. B. sojobo_hane + hanadaka_men „Kurama-Lehre“,
+  kakuremino + tengu_tsubute „Unsichtbarer Steinwurf“)
+- Akago: ibaraki_arm, masakari, setsubun_mame, oni_tsuno, kodomo_kanabo (z. B. masakari + kodomo_kanabo „Kintarō“)
+- Kuzunoha: hoshi_tama + kitsune_chochin; Ponpoko: bunbuku_kessel + shigaraki_tanuki
 Je Synergie: `SYNERGIES`, `TEXT`, sig, sigtest-Fall, `synbalance shuten_doji 5 <id> --leben`; Aufschlag ≤ ~×1,5.
 
 # Danach
@@ -338,6 +349,7 @@ Je Synergie: `SYNERGIES`, `TEXT`, sig, sigtest-Fall, `synbalance shuten_doji 5 <
 - Hi-ōgi (×1,53) und Masakari (×1,35) beobachten – oberer Rand der Siegel-Items
 
 # Weitere Ideen
+- `synbalance`: Option für stillstehenden Bot (Trommel/Kakuremino-Synergien messbar machen)
 - `synbalance --raum`: Option, `on_room_enter` nach dem Spawnen der ersten Welle aufzurufen (für Nebel-/Eintritts-Synergien)
 - Wanddekos: zweite Variante pro Biom (Index 2), Werkzeug walldeco_hi.py steht
 - Mondhase ist im Raum recht klein – ggf. größer zeichnen (Canvas 64×60 → 80×72) und Wendezone anpassen
