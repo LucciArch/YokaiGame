@@ -461,15 +461,24 @@ Ohne Video-Werkzeug NICHT wieder selbst Szenen malen.
   Seed 166; validate prüft die Zuordnung.
 - Runde 178: Titelstimmung `sutoku` in `App.draw_night` (Blutmond, `BRANCH['sutoku']`, Krähenzug); uiflow2 zeichnet sie.
 
-# Nächster Schritt: Wanddeko Hi-Res für Shiramine + Synergie für die Blut-Sutra
-Warum: Shiramine nutzt als einziges neues Biom noch die einfache Wanddeko, und das neue Item hat keine Synergie.
-1. `walldeco_hi.py` (wie `iwato_hi`): z. B. zerrissene Sutren-Banner, Krähen-Ema, Grabtafeln; validate prüft Indexgleichheit.
-2. Synergie Blut-Sutra + Tengu-Item (z. B. `tengu_uchiwa`/`yatagarasu`): „König der Tengu“ – umkehrende Sutren
-   lassen beim Wenden drei Federn fächern. Danach `synbalance` grob prüfen (Blut-Sutra allein noch ungemessen).
+# Erledigt (Runden 179–180)
+- Runde 179: Wanddekos Shiramine – Low-Res-Zweig in `props.wall_decos`, Hi-Res `walldeco_hi.shiramine_hi` (Blut-Sutren mit
+  Krähen-Tengu / Gorintō mit Groll-Feuer), `WALL_LIGHT[('shiramine', 1)]`. Gebaut mit `build.py shiramine` (wall_deco.png
+  nach yokai/assets kopieren) + `hi.py`. Damit haben alle Biome eigene Hi-Res-Wanddekos.
+- Runde 180: Synergie `daitengu` (Blut-Sutra + Tengu-Maske, sig `daitengu`): beim Wenden in `bullet_tick` drei durchbohrende
+  Federn (je 60 % des gewendeten Schadens). sigtest prüft. **synbalance ungemessen**: `synbalance.py shuten_doji 5 …` läuft
+  bei allen Kämpfen in den 180-s-Deckel (auch Zufall) – andere Boss/Tiefe suchen, bei der die Baseline unter 180 s bleibt.
+
+# Nächster Schritt: Zweiter geheimer Boss – Taira no Masakado (Story Teil 3)
+Warum: Sutoku ist fertig (Boss, Biom, Musik, Item, Synergie, Titel, Deko); Masakado ist der nächste der „drei großen Onryō“
+und gibt Könnern ein neues Ziel. Auf mehrere Runden verteilen:
+1. `bosses.Masakado` (Sprite handgesetzt in `art_src/fable/bosses_3/`, wie Sutoku): das fliegende Haupt (Kubizuka-Sage) –
+   Phase 1 Reiterpfeile, Phase 2 der Kopf löst sich und fliegt, Phase 3 sieben Schattendoppelgänger (nur einer echt).
+2. Freischaltbedingung: z. B. Kapitel-I-Boss ohne Treffer besiegt → Kubizuka-Pforte; Erfolg + Boss-Item als Belohnung.
+3. Danach Bossmusik, Titelstimmung, Wanddeko wie bei Sutoku.
 
 # Danach (Story)
-- Zweiter geheimer Boss über eine besondere Bedingung (z. B. Kapitel-I-Boss ohne Treffer → Masakados Haupt erscheint) –
-  Masakado und Michizane sind die beiden anderen „großen Onryō“ neben Sutoku, das passt als Reihe.
+- Danach Sugawara no Michizane (Raijin-Onryō, Blitze, Pflaumenblüten) als dritter großer Onryō
 - Je Figur ein eigenes Story-Kapitel (`ENDINGS` in `epilogue.py` als Knoten im Baum, Bedingung `char_wins`)
 - Iwato erst nach Yomi öffnen (strengerer Pfad wie Isaac), oder Kapitel VII je nach gewähltem Weg
 
