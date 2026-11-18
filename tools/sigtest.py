@@ -483,5 +483,13 @@ sigs.st(p)['shinoda'] = False
 sigs.on_room_enter(run)
 if 'koishikuba' not in p.sgs or not getattr(e, 'sg_conf', 0) > 0 or not e.burn > 0:
     print('FEHLER Koishikuba', getattr(e, 'sg_conf', 0), e.burn); bad += 1
+# Yōtō Muramasa (Muramasa + Kesa-giri): im Blutdurst jeden 2. Wurf blutrote Diagonalschnitte
+g.start_run('kenji', 44); run = g.run; p = run.player
+for iid in ('muramasa', 'kesagiri'):
+    p.gain_item(iid, silent=True)
+sigs.st(p)['shots'] = 1; sigs.st(p)['bd_t'] = run.time + 2; run.pbullets = []
+sigs.on_fire(p, run, [])
+if 'yoto' not in p.sgs or sum(1 for b in run.pbullets if b.col == (200, 60, 70)) != 2:
+    print('FEHLER Yōtō Muramasa', [b.col for b in run.pbullets]); bad += 1
 print('Signaturen/Synergien geprüft:', len(items), 'Fehler:', bad)
 sys.exit(1 if bad else 0)

@@ -212,6 +212,7 @@ TEXT = {
     'juni_tori': 'Die zwölf Himmelsgeneräle kommen schon jeden 8. Wurf – als Papiervögel, die Feinde verfolgen',
     'yakumo': 'Jede Kamm-Stufe lässt die Gewitterwolke schneller blitzen (bis 1,8×); ab 4 Stufen springt der Blitz auf einen zweiten Feind',
     'koishikuba': 'Der Fuchsnebel liegt in jedem Raum, auch nach Treffern, und entzündet die Yokai mit Fuchsfeuer – so verfallen sie dem Fuchszauber',
+    'yoto': 'Im Blutdurst schneidet Kesa-giri schon jeden 2. Wurf, mit blutroten Klingen (150 %)',
     'henro': 'Jede neue Ebene faltet zwei Kraniche, jede 2. Ebene bringt ein Geisterherz',
     'sommerwind': 'Die Rolle wirft acht Federn, die weiter fliegen',
     'fest_der_laternen': 'Treffer entzünden doppelt so oft den Boden, die Flammen brennen länger',
@@ -700,10 +701,14 @@ def _siegel_fire(p, run, bullets, g, n, base, dmg, spd, life, size):
         b.r *= 1.3
         b.col = (220, 120, 60)
         b.fl = dict(b.fl, boomerang=1, pierce=1)
-    if 'kesagiri' in S and n % 4 == 0:                   # Diagonalschnitt
+    yoto = 'yoto' in S and run.time < g.get('bd_t', 0)  # Yōtō Muramasa: im Blutdurst schneidet die Klinge doppelt so oft
+    if 'kesagiri' in S and n % (2 if yoto else 4) == 0:  # Diagonalschnitt
+        if yoto:
+            _syn(run, 'yoto', p.x, p.y, (200, 60, 70))
         for da in (-0.6, 0.6):
-            nb = run.fire_player_bullet(p.x, p.y - 3, base + da, dmg * 1.2, spd * 1.1, 3, life, {'pierce': 1})
-            nb.col = (230, 230, 245)
+            nb = run.fire_player_bullet(p.x, p.y - 3, base + da, dmg * (1.5 if yoto else 1.2), spd * 1.1, 3, life,
+                                        {'pierce': 1})
+            nb.col = (200, 60, 70) if yoto else (230, 230, 245)
     tori = 'juni_tori' in S                              # Shikigami-Tsukai: die Generäle fliegen als Papiervögel
     if 'juni' in S and n % (8 if tori else 12) == 0:     # Jūni-Shinshō
         if tori:
