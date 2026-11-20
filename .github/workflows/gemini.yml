@@ -1,0 +1,99 @@
+name: Gemini-Aufgabe
+
+# Ein Issue oder Kommentar mit "@gemini" startet Gemini CLI.
+# Gemini arbeitet die Aufgabe ab; Änderungen landen als Pull Request, Antwort als Kommentar.
+on:
+  issues:
+    types: [opened]
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: gemini-${{ github.event.issue.number }}
+
+jobs:
+  gemini:
+    # Öffentliches Repo: nur der Besitzer darf Gemini (und damit den API-Key) benutzen.
+    if: >-
+      !github.event.issue.pull_request &&
+      (github.event.comment.author_association || github.event.issue.author_association) == 'OWNER' &&
+      contains(github.event.comment.body || format('{0} {1}', github.event.issue.title, github.event.issue.body), '@gemini')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Abhängigkeiten installieren
+        run: |
+          pip install -r requirements.txt pillow
+          npm install -g @google/gemini-cli
+
+      - name: Gemini arbeitet
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          # Text nur über env, nie direkt in run: einsetzen (Schutz vor Script-Injection)
+          TITLE: ${{ github.event.issue.title }}
+          TASK: ${{ github.event.issue.body }}
+          COMMENT: ${{ github.event.comment.body }}
+          SDL_VIDEODRIVER: dummy
+          SDL_AUDIODRIVER: dummy
+        run: |
+          PROMPT="Du arbeitest im Repo dieses Spiels. Lies zuerst CLAUDE.md und halte dich an die Regeln dort.
+          Aufgabe (Issue: $TITLE):
+          $TASK
+
+          Neuer Kommentar dazu (falls vorhanden, hat Vorrang):
+          $COMMENT
+
+          Ändere die nötigen Dateien direkt. Keine git-Befehle. Fasse am Ende auf Deutsch kurz zusammen, was du geändert hast."
+          gemini --yolo -p "$PROMPT" > gemini_antwort.md 2>&1 || echo "(Gemini-Fehler, siehe Log)" >> gemini_antwort.md
+
+      - name: Tests (wie im Windows-Build)
+        id: tests
+        continue-on-error: true
+        env:
+          SDL_VIDEODRIVER: dummy
+          SDL_AUDIODRIVER: dummy
+          PYTHONIOENCODING: utf-8
+        working-directory: tools
+        run: |
+          python validate.py
+          python uiflow2.py
+          python bot.py 1
+
+      - name: Pull Request und Antwort
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NR: ${{ github.event.issue.number }}
+          TESTS: ${{ steps.tests.outcome }}
+        run: |
+          # GitHub-Kommentare sind auf 65k Zeichen begrenzt
+          head -c 60000 gemini_antwort.md > /tmp/antwort.md && rm gemini_antwort.md
+          if [ -n "$(git status --porcelain)" ]; then
+            BRANCH="gemini/issue-$NR-${{ github.run_number }}"
+            git config user.name "gemini-bot"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git checkout -b "$BRANCH"
+            git add -A
+            git commit -m "Gemini: Issue #$NR"
+            git push origin "$BRANCH"
+            { echo "Aufgabe aus #$NR, erledigt von Gemini. Tests: **$TESTS**"; echo; cat /tmp/antwort.md; } > /tmp/pr.md
+            URL=$(gh pr create --head "$BRANCH" --title "Gemini: Issue #$NR" --body-file /tmp/pr.md)
+            { echo "Fertig, Tests: **$TESTS**. Pull Request: $URL"; echo; cat /tmp/antwort.md; } > /tmp/kommentar.md
+          else
+            { echo "Keine Dateien geändert. Antwort von Gemini:"; echo; cat /tmp/antwort.md; } > /tmp/kommentar.md
+          fi
+          gh issue comment "$NR" --body-file /tmp/kommentar.md
