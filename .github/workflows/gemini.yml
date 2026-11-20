@@ -46,13 +46,17 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           # Text nur über env, nie direkt in run: einsetzen (Schutz vor Script-Injection)
           TITLE: ${{ github.event.issue.title }}
-          TASK: ${{ github.event.comment.body || github.event.issue.body }}
+          TASK: ${{ github.event.issue.body }}
+          COMMENT: ${{ github.event.comment.body }}
           SDL_VIDEODRIVER: dummy
           SDL_AUDIODRIVER: dummy
         run: |
           PROMPT="Du arbeitest im Repo dieses Spiels. Lies zuerst CLAUDE.md und halte dich an die Regeln dort.
           Aufgabe (Issue: $TITLE):
           $TASK
+
+          Neuer Kommentar dazu (falls vorhanden, hat Vorrang):
+          $COMMENT
 
           Ändere die nötigen Dateien direkt. Keine git-Befehle. Fasse am Ende auf Deutsch kurz zusammen, was du geändert hast."
           gemini --yolo -p "$PROMPT" > gemini_antwort.md 2>&1 || echo "(Gemini-Fehler, siehe Log)" >> gemini_antwort.md
