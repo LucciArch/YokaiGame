@@ -469,11 +469,11 @@
  },
  "kappa": {
   "atk": 4,
-  "h": 62,
+  "h": 60,
   "hi": true,
   "kind": "strip",
   "n": 7,
-  "w": 68,
+  "w": 64,
   "walk": 4
  },
  "kappa_small": {
@@ -712,11 +712,11 @@
  },
  "oni": {
   "atk": 4,
-  "h": 106,
+  "h": 102,
   "hi": true,
   "kind": "strip",
   "n": 7,
-  "w": 152,
+  "w": 144,
   "walk": 4
  },
  "onibi": {
