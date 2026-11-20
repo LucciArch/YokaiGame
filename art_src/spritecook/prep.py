@@ -54,6 +54,34 @@ def build(name, im, fg, boxes, target_h, flip=True, colors=48):
     print(name, 'Zelle', (W, H), 'Maßstab', round(k, 3))
 
 
+def grid_boxes(fg, rows=2, cols=4):
+    """Bildgrenzen je Zeile an Spaltenlücken statt starrem Raster – Waffen und Effekte ragen oft über die Rastergrenze.
+    Fällt auf das starre Raster zurück, wenn die Lücken nicht genau cols Bilder ergeben."""
+    H, W = fg.shape
+    out = []
+    for r in range(rows):
+        y0, y1 = r * H // rows, (r + 1) * H // rows
+        occ = fg[y0:y1].sum(0) > 0
+        segs, s0 = [], None
+        for x, v in enumerate(occ):
+            if v and s0 is None:
+                s0 = x
+            if not v and s0 is not None:
+                segs.append([s0, x]); s0 = None
+        if s0 is not None:
+            segs.append([s0, W])
+        merged = []                                    # Splitter (Staub, Spitzen) zum Nachbarn mit kleinerem Abstand
+        for g in segs:
+            if merged and (g[1] - g[0] < W // 40 or g[0] - merged[-1][1] < 4):
+                merged[-1][1] = g[1]
+            else:
+                merged.append(g)
+        if len(merged) != cols:
+            merged = [[c * W // cols, (c + 1) * W // cols] for c in range(cols)]
+        out.append([(a, y0, b, y1) for a, b in merged])
+    return out
+
+
 def tidy(c):
     """Krümel weg (Teile unter 12 px), dann 1-px-Umriss wie bei den übrigen Spielfiguren."""
     a = np.array(c)
