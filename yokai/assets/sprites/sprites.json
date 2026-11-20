@@ -631,11 +631,11 @@
  },
  "mezu": {
   "atk": 4,
-  "h": 109,
+  "h": 104,
   "hi": true,
   "kind": "strip",
   "n": 7,
-  "w": 162,
+  "w": 142,
   "walk": 4
  },
  "mokumokuren": {
