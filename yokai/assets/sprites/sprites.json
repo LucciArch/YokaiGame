@@ -469,11 +469,11 @@
  },
  "kappa": {
   "atk": 4,
-  "h": 56,
+  "h": 62,
   "hi": true,
   "kind": "strip",
   "n": 7,
-  "w": 64,
+  "w": 68,
   "walk": 4
  },
  "kappa_small": {

@@ -21,7 +21,7 @@ Prototyp im Browser (`/prototype`, `engines/web`) werden nicht benutzt.
 
 ## Verbindliche Regeln
 
-- Alle Sprites und Klänge sind selbst erzeugt – keine heruntergeladenen Assets.
+- Sprites dürfen selbst gezeichnet (art_src/fable) oder mit SpriteCook erzeugt sein (art_src/spritecook: Bogen + Aufbereitungsskript, das Palette, Pixeldichte, Umriss und Zellen ans Spiel angleicht). Klänge sind selbst erzeugt – keine heruntergeladenen Assets.
 - Stil: 16-Bit, dunkle Mondnacht, „halb-ernst“; siehe `design/art/art-bible.md`.
 - Spieltexte auf Deutsch.
 - Vor jedem Commit: `tools/`-Tests (Bot-Läufe, Boss-Test, UI-Durchlauf, `validate.py`).
