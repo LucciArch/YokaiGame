@@ -44,6 +44,8 @@ jobs:
       - name: Gemini arbeitet
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          # Ohne das bricht Gemini CLI im Runner ab ("not running in a trusted directory")
+          GEMINI_CLI_TRUST_WORKSPACE: 'true'
           # Text nur über env, nie direkt in run: einsetzen (Schutz vor Script-Injection)
           TITLE: ${{ github.event.issue.title }}
           TASK: ${{ github.event.issue.body }}
