@@ -12,9 +12,9 @@ import numpy as np
 OUT = os.path.join(DIR, '..', '..', '..', 'yokai', 'assets', 'sprites')
 CW, CH, CX, CY, RB = 104, 88, 52, 44, 17
 
+# Figuren mit KI-Bogen (art_src/spritecook, z. B. Hana) bringen ihre Rolle selbst mit und fehlen hier.
 # Figur: Kopfraster/Legende im Modul, Rücken, Beine, Füße, Extra (Schweif, Flügel, Haar, Lätzchen)
 SPEC = {
-    'hana':     dict(head='LEG', back=WH, legs=RD, feet=WH, extra=('hair', HAIR)),
     'kenji':    dict(head='L_', back=BLU, legs=DARK, feet=WH, extra=('band', WH)),
     'kuzunoha': dict(head='L_', back=PUR, legs=WH, feet=WH, extra=('tail', ('t0', 't1', 't2'))),
     'ponpoko':  dict(head='T', back=('s1', 's2', 's3'), legs=('s0', 's1', 's2'), feet=('s0', 's1', 's2'),
