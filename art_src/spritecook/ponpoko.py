@@ -1,0 +1,11 @@
+"""Ponpoko aus dem KI-Bogen ponpoko_sheet.jpg (3×4-Raster: Laufen; Ruhe, Ausholen, Münzwurf, Nachschwung; Ducken, Ball, Ball, –)."""
+import numpy as np
+from PIL import Image
+from scipy import ndimage
+from prep import build, grid_boxes
+
+im = np.array(Image.open('ponpoko_sheet.jpg').convert('RGB')).astype(int)
+fg = ndimage.binary_fill_holes(ndimage.binary_opening(np.abs(im - im[5, 5]).sum(2) > 20, iterations=2))
+walk, atk, roll = grid_boxes(fg, rows=3)
+# letztes Rollbild des Bogens ist kein Ball (Rückenansicht) – Ball 2/3 entstehen durch Drehen
+build('ponpoko', im, fg, walk + atk[1:], target_h=0, k=1 / (5.36 * 1.25), roll=roll[:3])  # Raster ~5,36 px; der Bogen zeichnet ihn sehr groß, also 1,25 Kunstpixel je Pixel
