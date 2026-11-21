@@ -58,9 +58,11 @@ def grid_boxes(fg, rows=2, cols=4):
     """Bildgrenzen je Zeile an Spaltenlücken statt starrem Raster – Waffen und Effekte ragen oft über die Rastergrenze.
     Fällt auf das starre Raster zurück, wenn die Lücken nicht genau cols Bilder ergeben."""
     H, W = fg.shape
-    out = []
+    occ_y = fg.sum(1)
+    ys = [0] + [r * H // rows - H // 8 + int(np.argmin(occ_y[r * H // rows - H // 8: r * H // rows + H // 8])) for r in range(1, rows)] + [H]
+    out = []                                           # Zeilengrenze an der leersten Bildzeile nahe der Rastermitte (hochgerissene Waffen)
     for r in range(rows):
-        y0, y1 = r * H // rows, (r + 1) * H // rows
+        y0, y1 = ys[r], ys[r + 1]
         occ = fg[y0:y1].sum(0) > 0
         segs, s0 = [], None
         for x, v in enumerate(occ):
