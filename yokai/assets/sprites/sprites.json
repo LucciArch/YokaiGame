@@ -55,11 +55,11 @@
  },
  "benkei": {
   "atk": 4,
-  "h": 80,
+  "h": 82,
   "hi": true,
   "kind": "strip",
   "n": 7,
-  "w": 148,
+  "w": 136,
   "walk": 4
  },
  "boss_akkorokamui": {

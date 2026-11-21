@@ -10,7 +10,7 @@ SPRITES = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '
 
 def build(name, im, fg, boxes, target_h, flip=True, colors=48, k=None, roll=None):
     """im: RGB-Array des Bogens, fg: Vordergrundmaske, boxes: 7 Rechtecke (x0, y0, x1, y1), erst 4 Lauf-, dann 3 Angriffsbilder.
-    target_h: Höhe der Laufbilder in Hi-Res-Pixeln. roll: optional 3 Rechtecke (geduckt, Ball A, Ball B) einer Spielfigur."""
+    target_h: Höhe der Laufbilder in Hi-Res-Pixeln. roll: optional 2–3 Rechtecke (geduckt, Ball A[, Ball B]) einer Spielfigur."""
     walk_h = max(np.ptp(np.where(fg[y0:y1, x0:x1].any(1))[0]) + 1 for x0, y0, x1, y1 in boxes[:4])
     k = k or target_h / walk_h                        # k vorgeben, wenn der Bogen ein echtes Kunst-Pixelraster hat (k = 1/Rastergröße)
     cells = []
@@ -62,9 +62,12 @@ def build(name, im, fg, boxes, target_h, flip=True, colors=48, k=None, roll=None
 
 def save_roll(name, cells):
     """Ausweich-Rolle wie art_src/fable/heroes/roll.py: 5 Zellen [geduckt, Ball 0..3], Blick nach links, Ball-Mitte = Zellmitte.
-    Ball 2/3 sind Ball 0/1 um 180° gedreht (bei Pixelkunst verlustfrei). Unterkante des Balls 17 px unter der Mitte wie bisher."""
-    cr, a, b = cells
-    balls = [a, b, a.rotate(180), b.rotate(180)]
+    Ball 2/3 sind Ball 0/1 um 180° gedreht (bei nur einem Ballbild: vier Vierteldrehungen) (bei Pixelkunst verlustfrei). Unterkante des Balls 17 px unter der Mitte wie bisher."""
+    cr, *bl = cells
+    if len(bl) == 1:                                   # nur ein brauchbares Ballbild: Vierteldrehungen (gegen den Uhrzeiger = Rolle nach links)
+        balls = [bl[0].rotate(90 * i, expand=True) for i in range(4)]
+    else:
+        balls = [bl[0], bl[1], bl[0].rotate(180), bl[1].rotate(180)]
     D = max(max(c.size) for c in balls)
     CW = max(cr.width, D) + 2
     CH = max(88, 2 * (D - 17) + 2, 2 * cr.height)
