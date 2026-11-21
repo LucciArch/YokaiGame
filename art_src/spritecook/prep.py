@@ -5,11 +5,11 @@ from PIL import Image
 from scipy import ndimage
 
 
-def build(name, im, fg, boxes, target_h, flip=True, colors=48):
+def build(name, im, fg, boxes, target_h, flip=True, colors=48, k=None):
     """im: RGB-Array des Bogens, fg: Vordergrundmaske, boxes: 7 Rechtecke (x0, y0, x1, y1), erst 4 Lauf-, dann 3 Angriffsbilder.
     target_h: Höhe der Laufbilder in Hi-Res-Pixeln."""
     walk_h = max(np.ptp(np.where(fg[y0:y1, x0:x1].any(1))[0]) + 1 for x0, y0, x1, y1 in boxes[:4])
-    k = target_h / walk_h
+    k = k or target_h / walk_h                        # k vorgeben, wenn der Bogen ein echtes Kunst-Pixelraster hat (k = 1/Rastergröße)
     cells = []
     for x0, y0, x1, y1 in boxes:
         m = fg[y0:y1, x0:x1]

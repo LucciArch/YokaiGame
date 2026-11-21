@@ -496,11 +496,11 @@
  },
  "karasu_tengu": {
   "atk": 4,
-  "h": 85,
+  "h": 84,
   "hi": true,
   "kind": "strip",
   "n": 7,
-  "w": 114,
+  "w": 124,
   "walk": 4
  },
  "kasa_obake": {
