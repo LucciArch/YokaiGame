@@ -66,7 +66,7 @@ def anchors(spr):
 
 # Kopf-Oberkante und Kopfmitte (Hi-Res-Pixel) im ersten Laufbild jeder Figur, von Hand ausgemessen
 HEAD0 = {'hana': (56, 11), 'kenji': (72, 11), 'kuzunoha': (63, 12), 'ponpoko': (57, 11), 'benkei': (70, 10),
-         'okiku': (75, 12), 'kotaro': (90, 12), 'seimei': (90, 4), 'akago': (36, 9), 'susanoo': (57, 16)}
+         'okiku': (75, 12), 'kotaro': (90, 12), 'seimei': (90, 4), 'akago': (36, 9), 'susanoo': (78, 12)}
 
 
 def head_anchor(player, frame_idx):

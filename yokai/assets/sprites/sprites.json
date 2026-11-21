@@ -775,11 +775,11 @@
  },
  "susanoo": {
   "atk": 4,
-  "h": 83,
+  "h": 79,
   "hi": true,
   "kind": "strip",
   "n": 7,
-  "w": 130,
+  "w": 150,
   "walk": 4
  },
  "tennin": {
