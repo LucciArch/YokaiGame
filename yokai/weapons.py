@@ -288,7 +288,7 @@ def fire(p, d, wk):
                 if i == 0:
                     melee(run, x, y, a, reach, math.tau, dmg * 2.6, kind=wk, col=col if fl else (200, 170, 255), fl=fl, seen=seen)
             else:
-                melee(run, x + math.cos(a) * 4, y + math.sin(a) * 4, a, reach, math.radians(26), dmg * 2.0, knock=120, kind=wk, col=col if fl else (255, 230, 160), fl=fl, seen=seen)
+                melee(run, x + math.cos(a) * 4, y + math.sin(a) * 4, a, reach, math.radians(26), dmg * 2.0, knock=120, kind=wk, col=col if fl else (200, 228, 255), fl=fl, seen=seen)
         for a in angs[:n] if n > 1 else ():                 # Mehrfachwurf: jeder weitere Wurf wird zur Klingenwelle
             wave(a)
         audio.play('ehit' if wk == 'w_club' else 'slash', 1.0 if wk in ('w_club', 'w_scythe') else 0.7)
@@ -358,11 +358,13 @@ def _slash_img(kind, r, arc, frac, col):
         return im
     R = int(r * 2) + 6
     s = pygame.Surface((R * 2, R * 2), pygame.SRCALPHA)
-    if kind == 'w_spear':
-        ln = int(r * 2 * (0.6 + 0.4 * (1 - frac)))
-        pygame.draw.polygon(s, (20, 14, 20), [(R, R - 4), (R + ln, R), (R, R + 4)])
-        pygame.draw.polygon(s, col, [(R, R - 3), (R + ln - 2, R), (R, R + 3)])
-        pygame.draw.line(s, (255, 255, 255), (R + ln // 3, R), (R + ln - 6, R), 1)
+    if kind == 'w_spear':                                   # Stoßwind wie in Benkeis Bild: hellblaue Wischspuren vor der Klinge bis zur Reichweite
+        ln = int(r * 2 * (0.8 + 0.2 * (1 - frac)))
+        alpha = int(255 * (1 - frac * 0.85))
+        for dy, l0, l1 in ((-6, 0.50, 0.86), (-2, 0.40, 1.0), (2, 0.46, 0.94), (6, 0.56, 0.80)):
+            pygame.draw.line(s, (20, 14, 26, alpha // 2), (R + int(ln * l0), R + dy), (R + int(ln * l1), R + dy), 4)
+            pygame.draw.line(s, col + (alpha,), (R + int(ln * l0), R + dy), (R + int(ln * l1), R + dy), 2)
+            pygame.draw.line(s, (255, 255, 255, alpha), (R + int(ln * (l0 + l1) / 2), R + dy), (R + int(ln * l1), R + dy), 1)
     else:
         a0 = -arc / 2 if arc < math.tau else 0
         a1 = arc / 2 if arc < math.tau else math.tau
