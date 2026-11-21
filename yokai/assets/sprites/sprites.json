@@ -622,11 +622,11 @@
  },
  "kuzunoha": {
   "atk": 4,
-  "h": 67,
+  "h": 81,
   "hi": true,
   "kind": "strip",
   "n": 7,
-  "w": 98,
+  "w": 154,
   "walk": 4
  },
  "mezu": {
