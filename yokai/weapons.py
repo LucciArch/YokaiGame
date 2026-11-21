@@ -317,7 +317,7 @@ def fire(p, d, wk):
                                            p.s['shotspd'] * 1.1, p.s['size'] * 1.2, 0.42, wf)
                 b.wind = True
                 if not fl:
-                    b.col = (190, 240, 210)
+                    b.col = (205, 232, 255)            # hellblau wie der Windbogen in Kotarōs Bild
                 made.append(b)
         audio.play('gust', 0.5)
     side = bridge_of(p)

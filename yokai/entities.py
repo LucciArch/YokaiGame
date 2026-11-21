@@ -276,6 +276,10 @@ class Bullet:
                 img = props.arrow(ang) if getattr(self, 'arrow', False) else props.crescent(ang)
                 gfx.hi_blit(img, x, y + img.get_height() / 4)
                 return
+            if gfx.HI_MODE and self.delay <= 0 and getattr(self, 'wind', False):
+                img = props.gust(ang, tuple(col))
+                gfx.hi_blit(img, x, y + img.get_height() / 4)
+                return
             if gfx.HI_MODE and self.delay <= 0:
                 img = props.ofuda(tuple(col), r, ang)
                 if img is not None:

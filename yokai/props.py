@@ -779,6 +779,23 @@ def crescent(ang):
     return s
 
 
+def gust(ang, col):
+    """Windstoß aus Kotarōs Fächer (Hi-Res): kleine hellblaue Sichel mit zwei Wischspuren, wie der Bogen in seinem Bild."""
+    step = int(round(math.degrees(ang) / 10)) % 36
+    key = ('gust', step, col)
+    if key in _cache:
+        return _cache[key]
+    s = pygame.Surface((28, 22), pygame.SRCALPHA)
+    pygame.draw.arc(s, (14, 9, 16), (12, 1, 14, 20), -1.3, 1.3, 5)
+    pygame.draw.arc(s, col, (12, 1, 14, 20), -1.3, 1.3, 3)
+    pygame.draw.arc(s, (255, 255, 255), (13, 3, 12, 16), -1.0, 1.0, 1)
+    for y, x0 in ((7, 2), (14, 5)):
+        pygame.draw.line(s, col + (150,), (x0, y), (17, y), 2)
+    s = pygame.transform.rotate(s, -step * 10)
+    _cache[key] = s
+    return s
+
+
 # ---------------------------------------------------------------- Tessos Eisenzahn-Ratte und Gashadokuro-Knochensplitter (2x)
 _RAT = ("""
 .............kk.......
