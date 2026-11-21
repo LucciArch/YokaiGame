@@ -541,11 +541,11 @@
  },
  "kenji": {
   "atk": 4,
-  "h": 72,
+  "h": 80,
   "hi": true,
   "kind": "strip",
   "n": 7,
-  "w": 82,
+  "w": 152,
   "walk": 4
  },
  "kerakera_onna": {
