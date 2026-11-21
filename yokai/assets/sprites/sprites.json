@@ -856,11 +856,11 @@
  },
  "yamauba": {
   "atk": 4,
-  "h": 83,
+  "h": 91,
   "hi": true,
   "kind": "strip",
   "n": 7,
-  "w": 100,
+  "w": 144,
   "walk": 4
  },
  "yosuzume": {
