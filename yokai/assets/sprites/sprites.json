@@ -10,11 +10,11 @@
  },
  "akago": {
   "atk": 4,
-  "h": 60,
+  "h": 53,
   "hi": true,
   "kind": "strip",
   "n": 7,
-  "w": 96,
+  "w": 66,
   "walk": 4
  },
  "azukiarai": {

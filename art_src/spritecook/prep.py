@@ -8,7 +8,7 @@ from scipy import ndimage
 SPRITES = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'yokai', 'assets', 'sprites')
 
 
-def build(name, im, fg, boxes, target_h, flip=True, colors=48, k=None, roll=None):
+def build(name, im, fg, boxes, target_h, flip=True, colors=48, k=None, roll=None, resample=Image.BOX):
     """im: RGB-Array des Bogens, fg: Vordergrundmaske, boxes: 7 Rechtecke (x0, y0, x1, y1), erst 4 Lauf-, dann 3 Angriffsbilder.
     target_h: Höhe der Laufbilder in Hi-Res-Pixeln. roll: optional 2–3 Rechtecke (geduckt, Ball A[, Ball B]) einer Spielfigur."""
     walk_h = max(np.ptp(np.where(fg[y0:y1, x0:x1].any(1))[0]) + 1 for x0, y0, x1, y1 in boxes[:4])
@@ -25,7 +25,7 @@ def build(name, im, fg, boxes, target_h, flip=True, colors=48, k=None, roll=None
         rgb = im[y0 + top:y0 + bot, x0:x1]
         w, h = int(round((x1 - x0) * k)), int(round((bot - top) * k))
         # Farben nur aus dem Vordergrund mitteln (sonst färbt der Grund die Kanten ein), Deckung als Alpha
-        pre = Image.fromarray(np.dstack([rgb * m[..., None], m * 255]).astype(np.uint8)).resize((w, h), Image.BOX)
+        pre = Image.fromarray(np.dstack([rgb * m[..., None], m * 255]).astype(np.uint8)).resize((w, h), resample)  # NEAREST hält kleine Farbflecken
         p = np.array(pre).astype(float)
         al = p[..., 3:4] / 255
         col = np.where(al > 0, p[..., :3] / np.maximum(al, 1e-6), 0)

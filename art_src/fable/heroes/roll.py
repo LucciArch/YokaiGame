@@ -12,10 +12,9 @@ import numpy as np
 OUT = os.path.join(DIR, '..', '..', '..', 'yokai', 'assets', 'sprites')
 CW, CH, CX, CY, RB = 104, 88, 52, 44, 17
 
-# Figuren mit KI-Bogen (art_src/spritecook, z. B. Hana, Kenji, Kuzunoha, Ponpoko, Benkei, Okiku, Kotarō, Seimei) bringen ihre Rolle selbst mit und fehlen hier.
+# Figuren mit KI-Bogen (art_src/spritecook, z. B. Hana, Kenji, Kuzunoha, Ponpoko, Benkei, Okiku, Kotarō, Seimei, Akago) bringen ihre Rolle selbst mit und fehlen hier.
 # Figur: Kopfraster/Legende im Modul, Rücken, Beine, Füße, Extra (Schweif, Flügel, Haar, Lätzchen)
 SPEC = {
-    'akago':    dict(head='A_', back=('r1', 'r2', 'r3'), legs=('r0', 'r1', 'r2'), feet=('r1', 'r2', 'r3'), extra=('bib', WH)),
     'susanoo':  dict(head='L_', back=WH, legs=WH, feet=SKN, extra=('band', RD)),
 }
 ANG = (135, 225, 315, 45)          # Kopfrichtung je Bild (180 = links, 90 = oben); Rolle nach links = gegen den Uhrzeiger

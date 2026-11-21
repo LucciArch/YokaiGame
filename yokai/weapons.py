@@ -283,7 +283,7 @@ def fire(p, d, wk):
                 if p.f['sword_wave'] and i == 0:
                     wave(a, 0.9)
             elif wk == 'w_club':
-                melee(run, x + math.cos(a) * 5, y + math.sin(a) * 5, a, reach, math.radians(110), dmg * 2.8, knock=320, kind=wk, col=col if fl else (255, 200, 160), fl=fl, seen=seen)
+                melee(run, x + math.cos(a) * 5, y + math.sin(a) * 5, a, reach, math.radians(110), dmg * 2.8, knock=320, kind=wk, col=col if fl else (255, 120, 40), fl=fl, seen=seen)
             elif wk == 'w_scythe':
                 if i == 0:
                     melee(run, x, y, a, reach, math.tau, dmg * 2.6, kind=wk, col=col if fl else (200, 170, 255), fl=fl, seen=seen)
@@ -365,6 +365,21 @@ def _slash_img(kind, r, arc, frac, col):
             pygame.draw.line(s, (20, 14, 26, alpha // 2), (R + int(ln * l0), R + dy), (R + int(ln * l1), R + dy), 4)
             pygame.draw.line(s, col + (alpha,), (R + int(ln * l0), R + dy), (R + int(ln * l1), R + dy), 2)
             pygame.draw.line(s, (255, 255, 255, alpha), (R + int(ln * (l0 + l1) / 2), R + dy), (R + int(ln * l1), R + dy), 1)
+    elif kind == 'w_club':                                  # Keulenschlag wie in Akagos Bild: zackiger Feuer-Aufprall vor ihm am Boden
+        cx, cy = R + int(r * 1.3), R
+        alpha = int(255 * (1 - frac * 0.75))
+        sc = 0.7 + 0.5 * min(1, frac * 3)
+        for rad, c in ((17, (20, 14, 20)), (15, col), (9, (255, 230, 120)), (4, (255, 255, 230))):
+            pts = []
+            for i in range(14):
+                a = i * math.tau / 14
+                rr = rad * sc * (1.0 if i % 2 == 0 else 0.5)
+                pts.append((cx + math.cos(a) * rr, cy + math.sin(a) * rr * 0.8))
+            pygame.draw.polygon(s, c + (alpha,), pts)
+        for i in range(6):                                  # Funken fliegen nach außen
+            a = i * math.tau / 6 + 0.4
+            d = 18 + 14 * frac
+            pygame.draw.rect(s, (255, 200, 90, alpha), (cx + math.cos(a) * d * sc, cy + math.sin(a) * d * sc * 0.8, 2, 2))
     else:
         a0 = -arc / 2 if arc < math.tau else 0
         a1 = arc / 2 if arc < math.tau else math.tau
