@@ -352,7 +352,7 @@
  },
  "gaki": {
   "atk": 4,
-  "h": 59,
+  "h": 58,
   "hi": true,
   "kind": "strip",
   "n": 7,
@@ -361,7 +361,7 @@
  },
  "gaki_small": {
   "atk": 4,
-  "h": 45,
+  "h": 44,
   "hi": true,
   "kind": "strip",
   "n": 7,
@@ -469,7 +469,7 @@
  },
  "kappa": {
   "atk": 4,
-  "h": 55,
+  "h": 56,
   "hi": true,
   "kind": "strip",
   "n": 7,
@@ -496,7 +496,7 @@
  },
  "karasu_tengu": {
   "atk": 4,
-  "h": 84,
+  "h": 85,
   "hi": true,
   "kind": "strip",
   "n": 7,
@@ -514,11 +514,11 @@
  },
  "kasha": {
   "atk": 4,
-  "h": 72,
+  "h": 93,
   "hi": true,
   "kind": "strip",
   "n": 7,
-  "w": 114,
+  "w": 120,
   "walk": 4
  },
  "katawaguruma": {
