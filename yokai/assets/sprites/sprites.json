@@ -145,11 +145,11 @@
  },
  "boss_kappa_ou": {
   "atk": 4,
-  "h": 141,
+  "h": 111,
   "hi": true,
   "kind": "strip",
   "n": 7,
-  "w": 150,
+  "w": 180,
   "walk": 4
  },
  "boss_masakado": {
