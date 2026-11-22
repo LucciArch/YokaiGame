@@ -604,11 +604,11 @@
  },
  "kotaro": {
   "atk": 4,
-  "h": 80,
+  "h": 79,
   "hi": true,
   "kind": "strip",
   "n": 7,
-  "w": 158,
+  "w": 154,
   "walk": 4
  },
  "kumo": {

@@ -5,7 +5,8 @@ from scipy import ndimage
 from prep import build, grid_boxes
 
 im = np.array(Image.open('kotaro_sheet.jpg').convert('RGB')).astype(int)
-fg = ndimage.binary_fill_holes(ndimage.binary_opening(np.abs(im - im[5, 5]).sum(2) > 20, iterations=2))
+# schwarzes Gefieder liegt farblich dicht am Grund: niedrigere Schwelle als sonst (sonst Löcher im Kopf)
+fg = ndimage.binary_fill_holes(ndimage.binary_opening(np.abs(im - im[5, 5]).sum(2) > 11, iterations=2))
 walk, atk, roll = grid_boxes(fg, rows=3)
 # Windbogen und Staub ragen übers Raster: Angriffsbilder von Hand begrenzt. Letztes Rollbild ist kein Ball.
 y0, y1 = atk[0][1], atk[0][3]
