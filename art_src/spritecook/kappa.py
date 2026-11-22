@@ -9,3 +9,4 @@ from scipy import ndimage
 fg = ndimage.binary_fill_holes(ndimage.binary_opening(np.abs(im - im[5, 5]).sum(2) > 20, iterations=2))
 top, bottom = grid_boxes(fg)
 build('kappa', im, fg, top + bottom[1:], target_h=0, k=1 / (5.85 * 1.5))  # Kappa ist klein: 1,5 Kunstpixel je Spielpixel
+build('kappa_small', im, fg, top + bottom[1:], target_h=0, k=1 / (5.85 * 2))  # junger Kappa (Kappa-Ōs Gefolge): dieselbe Figur, genau halbes Raster

@@ -478,11 +478,11 @@
  },
  "kappa_small": {
   "atk": 4,
-  "h": 56,
+  "h": 42,
   "hi": true,
   "kind": "strip",
   "n": 7,
-  "w": 64,
+  "w": 70,
   "walk": 4
  },
  "karasu": {
