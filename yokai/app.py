@@ -547,7 +547,7 @@ class Game:
             if sel and ma:
                 self.brush_sel(('title', i), W // 2, y, 84, dt, ma)
             T.add(m, W // 2, y, 10, col, 'c', alpha=ma)
-        T.add('v' + VERSION + '   •   F11 / Alt+Enter Vollbild', W - 6, H - 12, 6, (140, 130, 150), 'r', alpha=ma)
+        T.add('v' + VERSION + (' Build ' + BUILD if BUILD else '') + '   •   F11 / Alt+Enter Vollbild', W - 6, H - 12, 6, (140, 130, 150), 'r', alpha=ma)
         if items and items[self.sel % len(items)] == 'Fortsetzen' and not show_news:
             info = getattr(self, '_cont_info', None)
             if info is None:

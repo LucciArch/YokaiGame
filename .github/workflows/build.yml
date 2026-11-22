@@ -45,6 +45,10 @@ jobs:
         shell: bash
         run: echo "v=$(python -c 'from yokai.settings import VERSION; print(VERSION)')" >> "$GITHUB_OUTPUT"
 
+      - name: Build-Nummer ins Spiel schreiben
+        shell: bash
+        run: echo "${{ github.run_number }}" > yokai/assets/build.txt
+
       - name: EXE bauen
         run: pyinstaller --noconfirm --onefile --windowed --name YokaiNoMichi --icon icon.png --collect-data pygame --add-data "yokai/assets;yokai/assets" main.py
 

@@ -26,6 +26,18 @@ T_FLOOR, T_ROCK, T_PIT, T_SPIKE, T_POT, T_LANTERN = 0, 1, 2, 3, 4, 5
 SOLID_TILES = (T_ROCK, T_POT, T_LANTERN)
 
 
+def _build():
+    """Build-Nummer, die der Windows-Build (GitHub Actions) in assets/build.txt schreibt – leer beim Start aus dem Quellcode."""
+    try:
+        with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets', 'build.txt'), encoding='utf-8') as fh:
+            return fh.read().strip()
+    except OSError:
+        return ''
+
+
+BUILD = _build()
+
+
 def save_dir():
     base = os.getenv('APPDATA') or os.path.join(os.path.expanduser('~'), '.local', 'share')
     d = os.path.join(base, 'YokaiNoMichi')
